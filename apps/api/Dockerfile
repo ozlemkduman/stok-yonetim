@@ -37,13 +37,20 @@ COPY apps/api/package.json ./apps/api/
 # Install production dependencies only
 RUN pnpm install --frozen-lockfile --prod
 
+# Install knex CLI and ts-node for migrations
+RUN pnpm add -w knex ts-node typescript
+
 # Copy built files
 COPY --from=builder /app/apps/api/dist ./apps/api/dist
 COPY --from=builder /app/apps/api/knexfile.ts ./apps/api/
 COPY --from=builder /app/apps/api/src/database ./apps/api/src/database
 
+# Copy startup script
+COPY apps/api/start.sh ./apps/api/start.sh
+RUN chmod +x ./apps/api/start.sh
+
 WORKDIR /app/apps/api
 
 EXPOSE 3000
 
-CMD ["node", "dist/main.js"]
+CMD ["./start.sh"]

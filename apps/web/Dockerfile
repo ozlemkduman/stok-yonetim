@@ -6,7 +6,7 @@ RUN corepack enable && corepack prepare pnpm@9.15.0 --activate
 WORKDIR /app
 
 # Copy workspace files
-COPY pnpm-lock.yaml pnpm-workspace.yaml package.json ./
+COPY pnpm-lock.yaml pnpm-workspace.yaml package.json tsconfig.base.json ./
 COPY packages/ui/package.json ./packages/ui/
 COPY apps/web/package.json ./apps/web/
 
@@ -17,9 +17,9 @@ RUN pnpm install --frozen-lockfile
 COPY packages/ui ./packages/ui
 COPY apps/web ./apps/web
 
-# Build UI first, then web
+# Build UI first, then web (production mode)
 RUN pnpm --filter @stok/ui build
-RUN pnpm --filter @stok/web build
+RUN cd apps/web && NODE_ENV=production pnpm build
 
 # Production stage - nginx
 FROM nginx:alpine AS production
