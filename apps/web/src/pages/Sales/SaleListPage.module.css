@@ -1,0 +1,112 @@
+/* Sale List Page */
+.page { display: flex; flex-direction: column; gap: var(--space-6); }
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+}
+
+.headerLeft { display: flex; flex-direction: column; gap: var(--space-1); }
+
+.title {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.titleIcon {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--color-success) 0%, var(--color-accent) 100%);
+  border-radius: var(--radius-lg);
+  color: white;
+}
+
+.titleIcon svg { width: 20px; height: 20px; }
+
+.subtitle {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+.statsRow {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-4);
+}
+
+@media (min-width: 768px) { .statsRow { grid-template-columns: repeat(4, 1fr); } }
+
+.statCard {
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.statIcon {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.statIcon svg { width: 20px; height: 20px; }
+.statIcon.primary { background: var(--color-primary-light); color: var(--color-primary); }
+.statIcon.success { background: var(--color-success-light); color: var(--color-success); }
+.statIcon.warning { background: var(--color-warning-light); color: var(--color-warning); }
+.statIcon.danger { background: var(--color-danger-light); color: var(--color-danger); }
+
+.statContent { display: flex; flex-direction: column; }
+.statValue { font-size: var(--font-size-xl); font-weight: var(--font-weight-bold); color: var(--color-text-primary); line-height: 1.2; }
+.statLabel { font-size: var(--font-size-xs); color: var(--color-text-muted); }
+
+.card {
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-4) var(--space-5);
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-bg);
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-4);
+  border-top: 1px solid var(--color-border);
+  background: var(--color-bg);
+}
+
+.invoiceNumber { font-weight: var(--font-weight-semibold); color: var(--color-primary); }
+.total { font-weight: var(--font-weight-bold); color: var(--color-text-primary); }
+
+@media (max-width: 767px) {
+  .header { flex-direction: column; align-items: stretch; }
+  .toolbar { flex-direction: column; align-items: stretch; }
+}

@@ -1,0 +1,25 @@
+{
+  "name": "stok-yonetim",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Stok Yonetim Sistemi - Monorepo",
+  "scripts": {
+    "dev": "pnpm -r --parallel dev",
+    "dev:api": "pnpm --filter @stok/api dev",
+    "dev:web": "pnpm --filter @stok/web dev",
+    "build": "pnpm --filter @stok/ui build && pnpm -r --parallel build",
+    "lint": "pnpm -r lint",
+    "typecheck": "pnpm -r typecheck",
+    "test": "pnpm -r test",
+    "db:migrate": "pnpm --filter @stok/api knex migrate:latest",
+    "db:rollback": "pnpm --filter @stok/api knex migrate:rollback",
+    "db:seed": "pnpm --filter @stok/api knex seed:run",
+    "docker:up": "docker compose up -d",
+    "docker:down": "docker compose down"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=9.0.0"
+  },
+  "packageManager": "pnpm@9.15.0"
+}

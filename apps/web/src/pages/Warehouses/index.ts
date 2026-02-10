@@ -1,0 +1,1 @@
+export { WarehouseListPage } from './WarehouseListPage';

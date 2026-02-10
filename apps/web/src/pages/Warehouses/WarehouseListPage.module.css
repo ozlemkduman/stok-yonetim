@@ -1,0 +1,109 @@
+/* Warehouse List Page */
+.page { display: flex; flex-direction: column; gap: var(--space-6); }
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+}
+
+.headerLeft { display: flex; flex-direction: column; gap: var(--space-1); }
+
+.title {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.titleIcon {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-info) 100%);
+  border-radius: var(--radius-lg);
+  color: white;
+}
+
+.titleIcon svg { width: 20px; height: 20px; }
+
+.subtitle {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+/* Card & Tabs */
+.card {
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.tabs {
+  display: flex;
+  gap: var(--space-1);
+  border-bottom: 1px solid var(--color-border);
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-bg);
+}
+
+.tab {
+  padding: var(--space-2) var(--space-4);
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+  border-radius: var(--radius-md);
+  transition: all var(--transition-fast);
+}
+
+.tab:hover { color: var(--color-text); background: var(--color-bg-elevated); }
+.tab.active { color: var(--color-primary); background: var(--color-primary-light); }
+
+.error {
+  padding: var(--space-4);
+  margin: var(--space-4);
+  background: var(--color-danger-light);
+  color: var(--color-danger);
+  border-radius: var(--radius-md);
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-4);
+  border-top: 1px solid var(--color-border);
+  background: var(--color-bg);
+}
+
+/* Table Cells */
+.warehouseInfo { display: flex; flex-direction: column; }
+.warehouseName { font-weight: var(--font-weight-semibold); color: var(--color-text-primary); }
+.warehouseCode { font-size: var(--font-size-xs); color: var(--color-text-muted); font-family: monospace; margin-top: 2px; }
+
+.movementQuantity { font-weight: var(--font-weight-semibold); }
+.movementQuantity.positive { color: var(--color-success); }
+.movementQuantity.negative { color: var(--color-danger); }
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  justify-content: flex-end;
+}
+
+@media (max-width: 767px) {
+  .header { flex-direction: column; align-items: stretch; }
+}

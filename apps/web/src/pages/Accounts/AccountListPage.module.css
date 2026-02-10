@@ -1,0 +1,157 @@
+/* Account List Page */
+.page { display: flex; flex-direction: column; gap: var(--space-6); }
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+}
+
+.headerLeft { display: flex; flex-direction: column; gap: var(--space-1); }
+
+.title {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.titleIcon {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--color-success) 0%, var(--color-primary) 100%);
+  border-radius: var(--radius-lg);
+  color: white;
+}
+
+.titleIcon svg { width: 20px; height: 20px; }
+
+.subtitle {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+.headerActions {
+  display: flex;
+  gap: var(--space-2);
+}
+
+/* Summary Cards */
+.summaryCards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-4);
+}
+
+@media (max-width: 767px) {
+  .summaryCards { grid-template-columns: 1fr; }
+}
+
+.summaryCard {
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.summaryIcon {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.summaryIcon svg { width: 24px; height: 24px; }
+.summaryIcon.kasa { background: var(--color-primary-light); color: var(--color-primary); }
+.summaryIcon.banka { background: var(--color-info-light); color: var(--color-info); }
+.summaryIcon.total { background: var(--color-success-light); color: var(--color-success); }
+
+.summaryContent { display: flex; flex-direction: column; }
+.summaryLabel { font-size: var(--font-size-sm); color: var(--color-text-secondary); margin: 0; }
+.summaryValue { font-size: var(--font-size-2xl); font-weight: var(--font-weight-bold); margin: 0; }
+.summaryValue.kasa { color: var(--color-primary); }
+.summaryValue.banka { color: var(--color-info); }
+.summaryValue.total { color: var(--color-success); }
+
+/* Card & Tabs */
+.card {
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.tabs {
+  display: flex;
+  gap: var(--space-1);
+  border-bottom: 1px solid var(--color-border);
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-bg);
+}
+
+.tab {
+  padding: var(--space-2) var(--space-4);
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+  border-radius: var(--radius-md);
+  transition: all var(--transition-fast);
+}
+
+.tab:hover { color: var(--color-text); background: var(--color-bg-elevated); }
+.tab.active { color: var(--color-primary); background: var(--color-primary-light); }
+
+.error {
+  padding: var(--space-4);
+  margin: var(--space-4);
+  background: var(--color-danger-light);
+  color: var(--color-danger);
+  border-radius: var(--radius-md);
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-4);
+  border-top: 1px solid var(--color-border);
+  background: var(--color-bg);
+}
+
+/* Table Cells */
+.accountInfo { display: flex; flex-direction: column; }
+.accountName { font-weight: var(--font-weight-semibold); color: var(--color-text-primary); }
+.accountDetails { font-size: var(--font-size-xs); color: var(--color-text-muted); margin-top: 2px; }
+
+.balance { font-weight: var(--font-weight-semibold); }
+.balance.positive { color: var(--color-success); }
+.balance.negative { color: var(--color-danger); }
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  justify-content: flex-end;
+}
+
+@media (max-width: 767px) {
+  .header { flex-direction: column; align-items: stretch; }
+  .headerActions { justify-content: flex-end; }
+}
