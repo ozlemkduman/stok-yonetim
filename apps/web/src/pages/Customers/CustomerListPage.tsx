@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Table, Button, Input, Badge, Pagination, type Column } from '@stok/ui';
 import { useCustomers } from '../../hooks/useCustomers';
 import { Customer, CreateCustomerData } from '../../api/customers.api';
@@ -19,6 +20,7 @@ const icons = {
 };
 
 export function CustomerListPage() {
+  const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingCustomer, setEditingCustomer] = useState<Customer | null>(null);
   const [searchInput, setSearchInput] = useState('');
@@ -51,6 +53,10 @@ export function CustomerListPage() {
   const handleEdit = (customer: Customer) => {
     setEditingCustomer(customer);
     setIsModalOpen(true);
+  };
+
+  const handleRowClick = (customer: Customer) => {
+    navigate(`/customers/${customer.id}`);
   };
 
   const handleDelete = async (customer: Customer) => {
@@ -122,16 +128,19 @@ export function CustomerListPage() {
     {
       key: 'actions',
       header: '',
-      width: '120px',
+      width: '180px',
       render: (customer) => (
         <div className={styles.actions}>
-          <Button size="sm" variant="ghost" onClick={() => handleEdit(customer)}>
+          <Button size="sm" variant="ghost" onClick={(e) => { e.stopPropagation(); handleRowClick(customer); }}>
+            Detay
+          </Button>
+          <Button size="sm" variant="ghost" onClick={(e) => { e.stopPropagation(); handleEdit(customer); }}>
             Duzenle
           </Button>
           <Button
             size="sm"
             variant="ghost"
-            onClick={() => handleDelete(customer)}
+            onClick={(e) => { e.stopPropagation(); handleDelete(customer); }}
           >
             Sil
           </Button>
@@ -175,7 +184,7 @@ export function CustomerListPage() {
           keyExtractor={(customer) => customer.id}
           loading={loading}
           emptyMessage="Musteri bulunamadi"
-          onRowClick={handleEdit}
+          onRowClick={handleRowClick}
         />
 
         {totalPages > 1 && (

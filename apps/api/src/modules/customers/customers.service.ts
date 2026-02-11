@@ -84,4 +84,42 @@ export class CustomersService {
     await this.findById(id); // Ensure customer exists
     await this.customersRepository.updateBalance(id, amount);
   }
+
+  async getCustomerSales(id: string) {
+    await this.findById(id);
+    return this.customersRepository.getCustomerSalesWithItems(id);
+  }
+
+  async getCustomerReturns(id: string) {
+    await this.findById(id);
+    return this.customersRepository.getCustomerReturns(id);
+  }
+
+  async getCustomerPayments(id: string) {
+    await this.findById(id);
+    return this.customersRepository.getCustomerPayments(id);
+  }
+
+  async getCustomerStats(id: string) {
+    await this.findById(id);
+    return this.customersRepository.getCustomerStats(id);
+  }
+
+  async getCustomerDetail(id: string) {
+    const customer = await this.findById(id);
+    const [sales, returns, payments, stats] = await Promise.all([
+      this.customersRepository.getCustomerSalesWithItems(id),
+      this.customersRepository.getCustomerReturns(id),
+      this.customersRepository.getCustomerPayments(id),
+      this.customersRepository.getCustomerStats(id),
+    ]);
+
+    return {
+      customer,
+      sales,
+      returns,
+      payments,
+      stats,
+    };
+  }
 }

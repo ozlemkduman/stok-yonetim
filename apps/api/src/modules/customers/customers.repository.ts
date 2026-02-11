@@ -153,4 +153,91 @@ export class CustomersRepository {
       .orderBy('balance', 'desc')
       .select('*');
   }
+
+  async getCustomerSales(customerId: string): Promise<any[]> {
+    return this.db.knex('sales')
+      .where('customer_id', customerId)
+      .orderBy('sale_date', 'desc')
+      .select('*');
+  }
+
+  async getCustomerSalesWithItems(customerId: string): Promise<any[]> {
+    const sales = await this.db.knex('sales')
+      .where('customer_id', customerId)
+      .orderBy('sale_date', 'desc')
+      .select('*');
+
+    for (const sale of sales) {
+      sale.items = await this.db.knex('sale_items')
+        .leftJoin('products', 'sale_items.product_id', 'products.id')
+        .where('sale_items.sale_id', sale.id)
+        .select('sale_items.*', 'products.name as product_name', 'products.barcode');
+    }
+
+    return sales;
+  }
+
+  async getCustomerReturns(customerId: string): Promise<any[]> {
+    const returns = await this.db.knex('returns')
+      .where('customer_id', customerId)
+      .orderBy('return_date', 'desc')
+      .select('*');
+
+    for (const ret of returns) {
+      ret.items = await this.db.knex('return_items')
+        .leftJoin('products', 'return_items.product_id', 'products.id')
+        .where('return_items.return_id', ret.id)
+        .select('return_items.*', 'products.name as product_name', 'products.barcode');
+    }
+
+    return returns;
+  }
+
+  async getCustomerPayments(customerId: string): Promise<any[]> {
+    return this.db.knex('payments')
+      .where('customer_id', customerId)
+      .orderBy('payment_date', 'desc')
+      .select('*');
+  }
+
+  async getCustomerStats(customerId: string): Promise<{
+    totalSales: number;
+    totalReturns: number;
+    totalPayments: number;
+    salesCount: number;
+    returnsCount: number;
+    paymentsCount: number;
+  }> {
+    const [salesStats] = await this.db.knex('sales')
+      .where('customer_id', customerId)
+      .where('status', 'completed')
+      .select(
+        this.db.knex.raw('COALESCE(SUM(grand_total), 0) as total'),
+        this.db.knex.raw('COUNT(*) as count')
+      ) as { total: string; count: string }[];
+
+    const [returnsStats] = await this.db.knex('returns')
+      .where('customer_id', customerId)
+      .where('status', 'completed')
+      .select(
+        this.db.knex.raw('COALESCE(SUM(total_amount), 0) as total'),
+        this.db.knex.raw('COUNT(*) as count')
+      ) as { total: string; count: string }[];
+
+    const [paymentsStats] = await this.db.knex('payments')
+      .where('customer_id', customerId)
+      .select(
+        this.db.knex.raw('COALESCE(SUM(amount), 0) as total'),
+        this.db.knex.raw('COUNT(*) as count')
+      ) as { total: string; count: string }[];
+
+    return {
+      totalSales: parseFloat(salesStats?.total || '0'),
+      totalReturns: parseFloat(returnsStats?.total || '0'),
+      totalPayments: parseFloat(paymentsStats?.total || '0'),
+      salesCount: parseInt(salesStats?.count || '0', 10),
+      returnsCount: parseInt(returnsStats?.count || '0', 10),
+      paymentsCount: parseInt(paymentsStats?.count || '0', 10),
+    };
+  }
 }

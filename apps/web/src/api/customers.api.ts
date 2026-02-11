@@ -38,6 +38,79 @@ export interface CustomerListParams {
   isActive?: boolean;
 }
 
+export interface SaleItem {
+  id: string;
+  product_id: string;
+  product_name: string;
+  barcode: string | null;
+  quantity: number;
+  unit_price: number;
+  discount_rate: number;
+  vat_rate: number;
+  vat_amount: number;
+  line_total: number;
+}
+
+export interface CustomerSale {
+  id: string;
+  invoice_number: string;
+  sale_date: string;
+  subtotal: number;
+  discount_amount: number;
+  vat_total: number;
+  grand_total: number;
+  payment_method: string;
+  status: string;
+  items: SaleItem[];
+}
+
+export interface ReturnItem {
+  id: string;
+  product_id: string;
+  product_name: string;
+  barcode: string | null;
+  quantity: number;
+  unit_price: number;
+  vat_amount: number;
+  line_total: number;
+}
+
+export interface CustomerReturn {
+  id: string;
+  return_number: string;
+  return_date: string;
+  total_amount: number;
+  vat_total: number;
+  reason: string | null;
+  status: string;
+  items: ReturnItem[];
+}
+
+export interface CustomerPayment {
+  id: string;
+  payment_date: string;
+  amount: number;
+  method: string;
+  notes: string | null;
+}
+
+export interface CustomerStats {
+  totalSales: number;
+  totalReturns: number;
+  totalPayments: number;
+  salesCount: number;
+  returnsCount: number;
+  paymentsCount: number;
+}
+
+export interface CustomerDetail {
+  customer: Customer;
+  sales: CustomerSale[];
+  returns: CustomerReturn[];
+  payments: CustomerPayment[];
+  stats: CustomerStats;
+}
+
 export const customersApi = {
   getAll: async (params: CustomerListParams = {}) => {
     const queryParams: Record<string, string | number> = {};
@@ -74,5 +147,25 @@ export const customersApi = {
 
   getWithCredit: async () => {
     return apiClient.get<Customer[]>('/customers/with-credit');
+  },
+
+  getDetail: async (id: string) => {
+    return apiClient.get<CustomerDetail>(`/customers/${id}/detail`);
+  },
+
+  getSales: async (id: string) => {
+    return apiClient.get<CustomerSale[]>(`/customers/${id}/sales`);
+  },
+
+  getReturns: async (id: string) => {
+    return apiClient.get<CustomerReturn[]>(`/customers/${id}/returns`);
+  },
+
+  getPayments: async (id: string) => {
+    return apiClient.get<CustomerPayment[]>(`/customers/${id}/payments`);
+  },
+
+  getStats: async (id: string) => {
+    return apiClient.get<CustomerStats>(`/customers/${id}/stats`);
   },
 };

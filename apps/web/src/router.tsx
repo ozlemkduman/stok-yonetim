@@ -1,7 +1,7 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { MainLayout } from './layouts/MainLayout';
 import { DashboardPage } from './pages/Dashboard';
-import { CustomerListPage } from './pages/Customers';
+import { CustomerListPage, CustomerDetailPage } from './pages/Customers';
 import { ProductListPage } from './pages/Products';
 import { SaleListPage } from './pages/Sales';
 import { ReturnListPage } from './pages/Returns';
@@ -23,6 +23,7 @@ export function AppRouter() {
         <Route index element={<Navigate to="/dashboard" replace />} />
         <Route path="dashboard" element={<DashboardPage />} />
         <Route path="customers" element={<CustomerListPage />} />
+        <Route path="customers/:id" element={<CustomerDetailPage />} />
         <Route path="products" element={<ProductListPage />} />
         <Route path="quotes" element={<QuoteListPage />} />
         <Route path="sales" element={<SaleListPage />} />

@@ -46,6 +46,31 @@ export class CustomersController {
     return this.customersService.findById(id);
   }
 
+  @Get(':id/detail')
+  async getCustomerDetail(@Param('id', ParseUUIDPipe) id: string) {
+    return this.customersService.getCustomerDetail(id);
+  }
+
+  @Get(':id/sales')
+  async getCustomerSales(@Param('id', ParseUUIDPipe) id: string) {
+    return this.customersService.getCustomerSales(id);
+  }
+
+  @Get(':id/returns')
+  async getCustomerReturns(@Param('id', ParseUUIDPipe) id: string) {
+    return this.customersService.getCustomerReturns(id);
+  }
+
+  @Get(':id/payments')
+  async getCustomerPayments(@Param('id', ParseUUIDPipe) id: string) {
+    return this.customersService.getCustomerPayments(id);
+  }
+
+  @Get(':id/stats')
+  async getCustomerStats(@Param('id', ParseUUIDPipe) id: string) {
+    return this.customersService.getCustomerStats(id);
+  }
+
   @Post()
   async create(@Body() dto: CreateCustomerDto) {
     return this.customersService.create(dto);
