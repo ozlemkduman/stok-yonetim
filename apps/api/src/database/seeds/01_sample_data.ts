@@ -66,9 +66,9 @@ export async function seed(knex: Knex): Promise<void> {
   // =====================
   const warehouses = await knex('warehouses')
     .insert([
-      { name: 'Ana Depo', code: 'AD001', address: 'Kadikoy, Istanbul', phone: '0216 123 4567', manager: 'Hasan Yilmaz', is_default: true, is_active: true },
-      { name: 'Sube Depo', code: 'SD001', address: 'Besiktas, Istanbul', phone: '0212 234 5678', manager: 'Ayse Kara', is_default: false, is_active: true },
-      { name: 'Yedek Depo', code: 'YD001', address: 'Umraniye, Istanbul', phone: '0216 345 6789', manager: 'Mehmet Oz', is_default: false, is_active: true },
+      { name: 'Ana Depo', code: 'AD001', address: 'Kadikoy, Istanbul', is_default: true, is_active: true },
+      { name: 'Sube Depo', code: 'SD001', address: 'Besiktas, Istanbul', is_default: false, is_active: true },
+      { name: 'Yedek Depo', code: 'YD001', address: 'Umraniye, Istanbul', is_default: false, is_active: true },
     ])
     .returning('*');
 
