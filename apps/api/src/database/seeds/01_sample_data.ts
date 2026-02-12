@@ -217,11 +217,11 @@ export async function seed(knex: Knex): Promise<void> {
   // =====================
   const eDocuments = await knex('e_documents')
     .insert([
-      { document_type: 'e-fatura', document_number: 'EF2024000001', sale_id: sales[0].id, customer_id: customers[0].id, issue_date: '2024-01-15', subtotal: 15000, vat_total: 3000, grand_total: 18000, status: 'sent', gib_uuid: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890', gib_response_code: '1000', gib_response_message: 'Basariyla gonderildi' },
-      { document_type: 'e-fatura', document_number: 'EF2024000002', sale_id: sales[1].id, customer_id: customers[1].id, issue_date: '2024-01-16', subtotal: 55000, vat_total: 10450, grand_total: 62700, status: 'sent', gib_uuid: 'b2c3d4e5-f6a7-8901-bcde-f23456789012' },
-      { document_type: 'e-arsiv', document_number: 'EA2024000001', sale_id: sales[2].id, customer_id: customers[2].id, issue_date: '2024-01-17', subtotal: 6500, vat_total: 1300, grand_total: 7800, status: 'created' },
-      { document_type: 'e-irsaliye', document_number: 'EI2024000001', customer_id: customers[3].id, issue_date: '2024-01-18', subtotal: 32000, vat_total: 6080, grand_total: 36480, status: 'pending' },
-      { document_type: 'e-smm', document_number: 'ES2024000001', customer_id: customers[4].id, issue_date: '2024-01-20', subtotal: 5000, vat_total: 1000, grand_total: 6000, status: 'sent', gib_uuid: 'c3d4e5f6-a7b8-9012-cdef-345678901234' },
+      { document_type: 'e_fatura', document_number: 'EF2024000001', reference_type: 'sale', reference_id: sales[0].id, customer_id: customers[0].id, issue_date: '2024-01-15', amount: 15000, vat_amount: 3000, total_amount: 18000, status: 'sent', gib_uuid: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890', gib_response_code: '1000', gib_response_message: 'Basariyla gonderildi' },
+      { document_type: 'e_fatura', document_number: 'EF2024000002', reference_type: 'sale', reference_id: sales[1].id, customer_id: customers[1].id, issue_date: '2024-01-16', amount: 55000, vat_amount: 10450, total_amount: 62700, status: 'sent', gib_uuid: 'b2c3d4e5-f6a7-8901-bcde-f23456789012' },
+      { document_type: 'e_arsiv', document_number: 'EA2024000001', reference_type: 'sale', reference_id: sales[2].id, customer_id: customers[2].id, issue_date: '2024-01-17', amount: 6500, vat_amount: 1300, total_amount: 7800, status: 'draft' },
+      { document_type: 'e_irsaliye', document_number: 'EI2024000001', reference_type: 'waybill', reference_id: sales[3].id, customer_id: customers[3].id, issue_date: '2024-01-18', amount: 32000, vat_amount: 6080, total_amount: 36480, status: 'pending' },
+      { document_type: 'e_smm', document_number: 'ES2024000001', reference_type: 'sale', reference_id: sales[4].id, customer_id: customers[4].id, issue_date: '2024-01-20', amount: 5000, vat_amount: 1000, total_amount: 6000, status: 'sent', gib_uuid: 'c3d4e5f6-a7b8-9012-cdef-345678901234' },
     ])
     .returning('*');
 
@@ -229,13 +229,13 @@ export async function seed(knex: Knex): Promise<void> {
   // 17. E-DOCUMENT LOGS
   // =====================
   await knex('e_document_logs').insert([
-    { e_document_id: eDocuments[0].id, action: 'create', status: 'created', message: 'Belge olusturuldu' },
-    { e_document_id: eDocuments[0].id, action: 'send', status: 'sent', message: 'GIB\'e gonderildi' },
-    { e_document_id: eDocuments[1].id, action: 'create', status: 'created', message: 'Belge olusturuldu' },
-    { e_document_id: eDocuments[1].id, action: 'send', status: 'sent', message: 'GIB\'e gonderildi' },
-    { e_document_id: eDocuments[2].id, action: 'create', status: 'created', message: 'Belge olusturuldu' },
-    { e_document_id: eDocuments[3].id, action: 'create', status: 'created', message: 'Belge olusturuldu' },
-    { e_document_id: eDocuments[3].id, action: 'send', status: 'pending', message: 'Gonderim bekleniyor' },
+    { document_id: eDocuments[0].id, action: 'created', status_after: 'draft', message: 'Belge olusturuldu' },
+    { document_id: eDocuments[0].id, action: 'sent', status_before: 'draft', status_after: 'sent', message: 'GIB\'e gonderildi' },
+    { document_id: eDocuments[1].id, action: 'created', status_after: 'draft', message: 'Belge olusturuldu' },
+    { document_id: eDocuments[1].id, action: 'sent', status_before: 'draft', status_after: 'sent', message: 'GIB\'e gonderildi' },
+    { document_id: eDocuments[2].id, action: 'created', status_after: 'draft', message: 'Belge olusturuldu' },
+    { document_id: eDocuments[3].id, action: 'created', status_after: 'draft', message: 'Belge olusturuldu' },
+    { document_id: eDocuments[3].id, action: 'sent', status_before: 'draft', status_after: 'pending', message: 'Gonderim bekleniyor' },
   ]);
 
   // =====================
