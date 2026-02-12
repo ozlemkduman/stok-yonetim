@@ -192,11 +192,11 @@ export async function seed(knex: Knex): Promise<void> {
   // =====================
   const quotes = await knex('quotes')
     .insert([
-      { quote_number: 'QT202401001', customer_id: customers[0].id, quote_date: '2024-01-10', validity_date: '2024-02-10', subtotal: 65000, discount_amount: 3250, discount_rate: 5, vat_total: 12350, grand_total: 74100, include_vat: true, status: 'sent', notes: 'Toplu alis teklifi' },
-      { quote_number: 'QT202401002', customer_id: customers[1].id, quote_date: '2024-01-12', validity_date: '2024-01-27', subtotal: 32000, discount_amount: 0, discount_rate: 0, vat_total: 6400, grand_total: 38400, include_vat: true, status: 'accepted' },
-      { quote_number: 'QT202401003', customer_id: customers[2].id, quote_date: '2024-01-14', validity_date: '2024-01-29', subtotal: 10500, discount_amount: 0, discount_rate: 0, vat_total: 2100, grand_total: 12600, include_vat: true, status: 'rejected', notes: 'Fiyat yuksek bulundu' },
-      { quote_number: 'QT202401004', customer_id: customers[3].id, quote_date: '2024-01-18', validity_date: '2024-02-18', subtotal: 21000, discount_amount: 1050, discount_rate: 5, vat_total: 3990, grand_total: 23940, include_vat: true, status: 'draft' },
-      { quote_number: 'QT202401005', customer_id: customers[4].id, quote_date: '2024-01-20', validity_date: '2024-02-20', subtotal: 55000, discount_amount: 0, discount_rate: 0, vat_total: 11000, grand_total: 66000, include_vat: true, status: 'converted', converted_sale_id: sales[1].id },
+      { quote_number: 'QT202401001', customer_id: customers[0].id, quote_date: '2024-01-10', valid_until: '2024-02-10', subtotal: 65000, discount_amount: 3250, discount_rate: 5, vat_total: 12350, grand_total: 74100, include_vat: true, status: 'sent', notes: 'Toplu alis teklifi' },
+      { quote_number: 'QT202401002', customer_id: customers[1].id, quote_date: '2024-01-12', valid_until: '2024-01-27', subtotal: 32000, discount_amount: 0, discount_rate: 0, vat_total: 6400, grand_total: 38400, include_vat: true, status: 'accepted' },
+      { quote_number: 'QT202401003', customer_id: customers[2].id, quote_date: '2024-01-14', valid_until: '2024-01-29', subtotal: 10500, discount_amount: 0, discount_rate: 0, vat_total: 2100, grand_total: 12600, include_vat: true, status: 'rejected', notes: 'Fiyat yuksek bulundu' },
+      { quote_number: 'QT202401004', customer_id: customers[3].id, quote_date: '2024-01-18', valid_until: '2024-02-18', subtotal: 21000, discount_amount: 1050, discount_rate: 5, vat_total: 3990, grand_total: 23940, include_vat: true, status: 'draft' },
+      { quote_number: 'QT202401005', customer_id: customers[4].id, quote_date: '2024-01-20', valid_until: '2024-02-20', subtotal: 55000, discount_amount: 0, discount_rate: 0, vat_total: 11000, grand_total: 66000, include_vat: true, status: 'converted', converted_sale_id: sales[1].id },
     ])
     .returning('*');
 
