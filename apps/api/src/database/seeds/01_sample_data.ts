@@ -204,12 +204,12 @@ export async function seed(knex: Knex): Promise<void> {
   // 15. QUOTE ITEMS
   // =====================
   await knex('quote_items').insert([
-    { quote_id: quotes[0].id, product_id: products[0].id, quantity: 2, unit_price: 15000, discount_rate: 5, vat_rate: 20, vat_amount: 5700, line_total: 34200 },
-    { quote_id: quotes[0].id, product_id: products[2].id, quantity: 5, unit_price: 6500, discount_rate: 5, vat_rate: 20, vat_amount: 6175, line_total: 37050 },
-    { quote_id: quotes[1].id, product_id: products[3].id, quantity: 1, unit_price: 32000, discount_rate: 0, vat_rate: 20, vat_amount: 6400, line_total: 38400 },
-    { quote_id: quotes[2].id, product_id: products[4].id, quantity: 1, unit_price: 10500, discount_rate: 0, vat_rate: 20, vat_amount: 2100, line_total: 12600 },
-    { quote_id: quotes[3].id, product_id: products[4].id, quantity: 2, unit_price: 10500, discount_rate: 5, vat_rate: 20, vat_amount: 3990, line_total: 23940 },
-    { quote_id: quotes[4].id, product_id: products[1].id, quantity: 1, unit_price: 55000, discount_rate: 0, vat_rate: 20, vat_amount: 11000, line_total: 66000 },
+    { quote_id: quotes[0].id, product_id: products[0].id, product_name: products[0].name, quantity: 2, unit_price: 15000, discount_rate: 5, vat_rate: 20, vat_amount: 5700, line_total: 34200 },
+    { quote_id: quotes[0].id, product_id: products[2].id, product_name: products[2].name, quantity: 5, unit_price: 6500, discount_rate: 5, vat_rate: 20, vat_amount: 6175, line_total: 37050 },
+    { quote_id: quotes[1].id, product_id: products[3].id, product_name: products[3].name, quantity: 1, unit_price: 32000, discount_rate: 0, vat_rate: 20, vat_amount: 6400, line_total: 38400 },
+    { quote_id: quotes[2].id, product_id: products[4].id, product_name: products[4].name, quantity: 1, unit_price: 10500, discount_rate: 0, vat_rate: 20, vat_amount: 2100, line_total: 12600 },
+    { quote_id: quotes[3].id, product_id: products[4].id, product_name: products[4].name, quantity: 2, unit_price: 10500, discount_rate: 5, vat_rate: 20, vat_amount: 3990, line_total: 23940 },
+    { quote_id: quotes[4].id, product_id: products[1].id, product_name: products[1].name, quantity: 1, unit_price: 55000, discount_rate: 0, vat_rate: 20, vat_amount: 11000, line_total: 66000 },
   ]);
 
   // =====================
