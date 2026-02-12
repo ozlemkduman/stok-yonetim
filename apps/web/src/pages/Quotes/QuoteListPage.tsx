@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Table, Button, Input, Select, Badge, Pagination, type Column } from '@stok/ui';
 import { Quote, quotesApi } from '../../api/quotes.api';
 import { useToast } from '../../context/ToastContext';
@@ -37,6 +38,7 @@ const STATUS_OPTIONS = [
 ];
 
 export function QuoteListPage() {
+  const navigate = useNavigate();
   const [quotes, setQuotes] = useState<Quote[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -152,7 +154,7 @@ export function QuoteListPage() {
       key: 'quote_number',
       header: 'Teklif',
       render: (q) => (
-        <div className={styles.quoteInfo}>
+        <div className={styles.quoteInfo} onClick={() => navigate(`/quotes/${q.id}`)} style={{ cursor: 'pointer' }}>
           <span className={styles.quoteNumber}>{q.quote_number}</span>
           {q.customer_name && <span className={styles.customerName}>{q.customer_name}</span>}
         </div>

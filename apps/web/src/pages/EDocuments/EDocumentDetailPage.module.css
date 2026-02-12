@@ -1,0 +1,210 @@
+/* EDocument Detail Page */
+.page { display: flex; flex-direction: column; gap: var(--space-6); }
+
+.loading, .error {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-8);
+  font-size: var(--font-size-lg);
+  color: var(--color-text-secondary);
+}
+
+.error { color: var(--color-danger); }
+
+/* Header */
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+}
+
+.headerLeft { display: flex; flex-direction: column; gap: var(--space-2); }
+
+.title {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.documentMeta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.documentType {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  padding: var(--space-1) var(--space-2);
+  background: var(--color-bg-elevated);
+  border-radius: var(--radius-sm);
+}
+
+.headerRight { display: flex; align-items: flex-start; }
+
+.totalCard {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  padding: var(--space-4) var(--space-5);
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  min-width: 180px;
+}
+
+.totalLabel {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.totalValue {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-primary);
+  margin-top: var(--space-1);
+}
+
+/* Actions Bar */
+.actionsBar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+}
+
+/* Info Grid */
+.infoGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--space-4);
+}
+
+.infoCard {
+  padding: var(--space-5);
+}
+
+.infoCard h3 {
+  margin: 0 0 var(--space-4);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+}
+
+.infoList { display: flex; flex-direction: column; gap: var(--space-3); }
+
+.infoItem { display: flex; flex-direction: column; gap: var(--space-1); }
+
+.infoLabel {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.infoValue {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-primary);
+}
+
+.grandTotal {
+  font-weight: var(--font-weight-bold);
+  font-size: var(--font-size-lg);
+  color: var(--color-primary);
+}
+
+/* GIB Card */
+.gibCard {
+  padding: var(--space-5);
+}
+
+.gibCard h3 {
+  margin: 0 0 var(--space-4);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+}
+
+.gibInfo {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--space-4);
+}
+
+/* Logs Card */
+.logsCard {
+  padding: var(--space-5);
+}
+
+.logsCard h3 {
+  margin: 0 0 var(--space-4);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+}
+
+.logsList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.logItem {
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.logHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.logAction {
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+}
+
+.logDate {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+
+.logStatus {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+}
+
+.logArrow {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+.logMessage {
+  margin: var(--space-2) 0 0;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+/* Responsive */
+@media (max-width: 767px) {
+  .header { flex-direction: column; }
+  .headerRight { width: 100%; }
+  .totalCard { width: 100%; align-items: center; }
+  .actionsBar { flex-wrap: wrap; }
+  .gibInfo { grid-template-columns: 1fr; }
+}

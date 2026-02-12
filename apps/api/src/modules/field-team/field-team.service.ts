@@ -171,4 +171,34 @@ export class FieldTeamService {
   async getTodayStats() {
     return this.repository.getTodayStats();
   }
+
+  // Route Detail
+  async getRouteDetail(id: string): Promise<{
+    route: FieldRoute;
+    visits: FieldVisit[];
+    stats: {
+      totalVisits: number;
+      completedVisits: number;
+      pendingVisits: number;
+      skippedVisits: number;
+      inProgressVisits: number;
+    };
+    assignedUser: { id: string; name: string } | null;
+  }> {
+    const route = await this.findRouteById(id);
+    const visits = await this.findVisitsByRouteId(id);
+    const assignedUser = route.assigned_to
+      ? await this.repository.getUserById(route.assigned_to)
+      : null;
+
+    const stats = {
+      totalVisits: visits.length,
+      completedVisits: visits.filter((v) => v.status === 'completed').length,
+      pendingVisits: visits.filter((v) => v.status === 'pending').length,
+      skippedVisits: visits.filter((v) => v.status === 'skipped').length,
+      inProgressVisits: visits.filter((v) => v.status === 'in_progress').length,
+    };
+
+    return { route, visits, stats, assignedUser };
+  }
 }

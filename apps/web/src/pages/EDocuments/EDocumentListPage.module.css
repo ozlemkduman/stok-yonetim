@@ -98,7 +98,14 @@
 
 /* Table Cells */
 .documentInfo { display: flex; flex-direction: column; }
-.documentNumber { font-weight: var(--font-weight-semibold); color: var(--color-info); font-family: monospace; }
+.documentNumber {
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-info);
+  font-family: monospace;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.documentNumber:hover { color: var(--color-primary); text-decoration: underline; }
 .documentType { font-size: var(--font-size-xs); color: var(--color-text-muted); margin-top: 2px; }
 
 .total { font-weight: var(--font-weight-bold); color: var(--color-text-primary); }

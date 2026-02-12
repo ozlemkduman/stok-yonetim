@@ -10,6 +10,15 @@ export interface SaleItem {
   vat_amount: number;
   line_total: number;
   product_name?: string;
+  barcode?: string;
+}
+
+export interface SalePayment {
+  id: string;
+  payment_date: string;
+  amount: number;
+  method: string;
+  notes: string | null;
 }
 
 export interface Sale {
@@ -31,6 +40,11 @@ export interface Sale {
   items?: SaleItem[];
 }
 
+export interface SaleDetail extends Sale {
+  items: SaleItem[];
+  payments: SalePayment[];
+}
+
 export interface CreateSaleData {
   customer_id?: string;
   items: { product_id: string; quantity: number; unit_price: number; discount_rate?: number }[];
@@ -45,6 +59,7 @@ export interface CreateSaleData {
 export const salesApi = {
   getAll: (params: Record<string, string | number> = {}) => apiClient.get<Sale[]>('/sales', params),
   getById: (id: string) => apiClient.get<Sale>(`/sales/${id}`),
+  getDetail: (id: string) => apiClient.get<SaleDetail>(`/sales/${id}/detail`),
   create: (data: CreateSaleData) => apiClient.post<Sale>('/sales', data),
   cancel: (id: string) => apiClient.patch<{ message: string }>(`/sales/${id}/cancel`, {}),
 };

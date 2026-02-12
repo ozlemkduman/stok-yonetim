@@ -73,6 +73,18 @@
   justify-content: flex-end;
 }
 
+.routeLink {
+  color: var(--color-primary);
+  cursor: pointer;
+  font-weight: var(--font-weight-medium);
+  transition: color 0.2s;
+}
+
+.routeLink:hover {
+  color: var(--color-primary-dark);
+  text-decoration: underline;
+}
+
 .badge {
   display: inline-flex;
   align-items: center;

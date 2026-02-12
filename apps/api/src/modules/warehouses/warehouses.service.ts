@@ -35,6 +35,37 @@ export class WarehousesService {
     return warehouse;
   }
 
+  async getDetail(id: string) {
+    const warehouse = await this.findById(id);
+
+    const [stocksResult, movementsResult, transfersResult] = await Promise.all([
+      this.repository.getStocks({ warehouseId: id, page: 1, limit: 100 }),
+      this.repository.findMovements({ warehouseId: id, page: 1, limit: 50 }),
+      this.repository.findTransfers({ warehouseId: id, page: 1, limit: 50 }),
+    ]);
+
+    // Calculate stats
+    const totalProducts = stocksResult.total;
+    const totalQuantity = stocksResult.items.reduce((sum, s) => sum + Number(s.quantity), 0);
+    const lowStockCount = stocksResult.items.filter(s => Number(s.quantity) <= Number(s.min_stock_level)).length;
+    const pendingTransfers = transfersResult.items.filter(t => t.status === 'pending').length;
+
+    return {
+      warehouse,
+      stocks: stocksResult.items,
+      movements: movementsResult.items,
+      transfers: transfersResult.items,
+      stats: {
+        totalProducts,
+        totalQuantity,
+        lowStockCount,
+        pendingTransfers,
+        movementsCount: movementsResult.total,
+        transfersCount: transfersResult.total,
+      },
+    };
+  }
+
   async create(dto: CreateWarehouseDto): Promise<Warehouse> {
     // Check code uniqueness
     const existing = await this.repository.findByCode(dto.code);

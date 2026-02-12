@@ -107,6 +107,22 @@ export interface AccountSummary {
   totalBalance: number;
 }
 
+export interface AccountStats {
+  movementsCount: number;
+  totalIncome: number;
+  totalExpense: number;
+  totalTransferIn: number;
+  totalTransferOut: number;
+  transfersCount: number;
+}
+
+export interface AccountDetail {
+  account: Account;
+  movements: AccountMovement[];
+  transfers: AccountTransfer[];
+  stats: AccountStats;
+}
+
 export const accountsApi = {
   getAll: async (params: AccountListParams = {}) => {
     const queryParams: Record<string, string | number> = {};
@@ -123,6 +139,10 @@ export const accountsApi = {
 
   getById: async (id: string) => {
     return apiClient.get<Account>(`/accounts/${id}`);
+  },
+
+  getDetail: async (id: string) => {
+    return apiClient.get<AccountDetail>(`/accounts/${id}/detail`);
   },
 
   getSummary: async () => {

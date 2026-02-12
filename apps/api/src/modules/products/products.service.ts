@@ -51,4 +51,42 @@ export class ProductsService {
   async getCategories(): Promise<string[]> {
     return this.productsRepository.getCategories();
   }
+
+  async getProductSales(id: string) {
+    await this.findById(id);
+    return this.productsRepository.getProductSalesWithItems(id);
+  }
+
+  async getProductReturns(id: string) {
+    await this.findById(id);
+    return this.productsRepository.getProductReturns(id);
+  }
+
+  async getProductStockMovements(id: string) {
+    await this.findById(id);
+    return this.productsRepository.getProductStockMovements(id);
+  }
+
+  async getProductStats(id: string) {
+    await this.findById(id);
+    return this.productsRepository.getProductStats(id);
+  }
+
+  async getProductDetail(id: string) {
+    const product = await this.findById(id);
+    const [sales, returns, movements, stats] = await Promise.all([
+      this.productsRepository.getProductSalesWithItems(id),
+      this.productsRepository.getProductReturns(id),
+      this.productsRepository.getProductStockMovements(id),
+      this.productsRepository.getProductStats(id),
+    ]);
+
+    return {
+      product,
+      sales,
+      returns,
+      movements,
+      stats,
+    };
+  }
 }

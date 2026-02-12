@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Table, Button, Card, type Column } from '@stok/ui';
 import { integrationsApi, Integration } from '../../api/integrations.api';
 import { IntegrationFormModal } from './IntegrationFormModal';
@@ -40,6 +41,7 @@ const providerLabels: Record<string, string> = {
 };
 
 export function IntegrationListPage() {
+  const navigate = useNavigate();
   const [integrations, setIntegrations] = useState<Integration[]>([]);
   const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
@@ -159,9 +161,12 @@ export function IntegrationListPage() {
     {
       key: 'actions',
       header: 'Islemler',
-      width: '28%',
+      width: '32%',
       render: (item) => (
         <div className={styles.actions}>
+          <Button size="sm" variant="secondary" onClick={() => navigate(`/integrations/${item.id}`)}>
+            Detay
+          </Button>
           <Button size="sm" variant="secondary" onClick={() => handleTestConnection(item.id)} disabled={testingId === item.id}>
             {testingId === item.id ? 'Test...' : 'Test'}
           </Button>

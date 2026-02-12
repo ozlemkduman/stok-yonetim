@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { Link } from 'react-router-dom';
 import { Table, Button, Select, Badge, Pagination, type Column } from '@stok/ui';
 import { EDocument, EDocumentSummary, eDocumentsApi } from '../../api/e-documents.api';
 import { useToast } from '../../context/ToastContext';
@@ -140,7 +141,7 @@ export function EDocumentListPage() {
       header: 'Belge',
       render: (d) => (
         <div className={styles.documentInfo}>
-          <span className={styles.documentNumber}>{d.document_number}</span>
+          <Link to={`/e-documents/${d.id}`} className={styles.documentNumber}>{d.document_number}</Link>
           <span className={styles.documentType}>{DOCUMENT_TYPE_LABELS[d.document_type] || d.document_type}</span>
         </div>
       ),

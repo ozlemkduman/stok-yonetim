@@ -47,10 +47,22 @@ export class CrmController {
     return { success: true, data: contact };
   }
 
+  @Get('contacts/:id/detail')
+  async getContactDetail(@Param('id') id: string) {
+    const detail = await this.service.getContactDetail(id);
+    return { success: true, data: detail };
+  }
+
   @Get('contacts/:id/activities')
   async findActivitiesByContactId(@Param('id') id: string) {
     const activities = await this.service.findActivitiesByContactId(id);
     return { success: true, data: activities };
+  }
+
+  @Post('contacts/:id/convert-to-customer')
+  async convertToCustomer(@Param('id') id: string) {
+    const result = await this.service.convertToCustomer(id);
+    return { success: true, data: result };
   }
 
   @Post('contacts')

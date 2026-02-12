@@ -26,6 +26,7 @@ export interface ReturnItem {
   vat_amount: number;
   line_total: number;
   product_name?: string;
+  barcode?: string | null;
 }
 
 @Injectable()
@@ -47,12 +48,29 @@ export class ReturnsRepository {
     return { items, total: parseInt(count as string, 10) };
   }
 
-  async findById(id: string): Promise<Return | null> {
-    return this.db.knex('returns').leftJoin('customers', 'returns.customer_id', 'customers.id').select('returns.*', 'customers.name as customer_name').where('returns.id', id).first() || null;
+  async findById(id: string): Promise<Return & { sale_invoice_number?: string; sale_date?: Date } | null> {
+    return this.db.knex('returns')
+      .leftJoin('customers', 'returns.customer_id', 'customers.id')
+      .leftJoin('sales', 'returns.sale_id', 'sales.id')
+      .select(
+        'returns.*',
+        'customers.name as customer_name',
+        'sales.invoice_number as sale_invoice_number',
+        'sales.sale_date as sale_date'
+      )
+      .where('returns.id', id)
+      .first() || null;
   }
 
   async findItemsByReturnId(returnId: string): Promise<ReturnItem[]> {
-    return this.db.knex('return_items').leftJoin('products', 'return_items.product_id', 'products.id').select('return_items.*', 'products.name as product_name').where('return_items.return_id', returnId);
+    return this.db.knex('return_items')
+      .leftJoin('products', 'return_items.product_id', 'products.id')
+      .select(
+        'return_items.*',
+        'products.name as product_name',
+        'products.barcode as barcode'
+      )
+      .where('return_items.return_id', returnId);
   }
 
   async generateReturnNumber(): Promise<string> {

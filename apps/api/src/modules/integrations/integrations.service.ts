@@ -191,6 +191,29 @@ export class IntegrationsService {
     return this.repository.findLogsByIntegrationId(id);
   }
 
+  async getDetail(id: string): Promise<{
+    integration: Integration;
+    logs: unknown[];
+    stats: {
+      totalSynced: number;
+      totalErrors: number;
+      lastSyncAt: Date | null;
+      syncedOrders: number;
+      pendingOrders: number;
+      errorOrders: number;
+    };
+  }> {
+    const integration = await this.findById(id);
+    const logs = await this.repository.findLogsByIntegrationId(id, 20);
+    const stats = await this.repository.getIntegrationStats(id);
+
+    return {
+      integration,
+      logs,
+      stats,
+    };
+  }
+
   // E-commerce orders
   async findECommerceOrders(params: {
     page?: number;

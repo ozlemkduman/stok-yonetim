@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Table, Button, Card, Input, Select, type Column } from '@stok/ui';
 import { crmApi, CrmContact } from '../../api/crm.api';
 import { ContactFormModal } from './ContactFormModal';
@@ -21,6 +22,7 @@ const sourceLabels: Record<string, string> = {
 };
 
 export function ContactListPage() {
+  const navigate = useNavigate();
   const [contacts, setContacts] = useState<CrmContact[]>([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
@@ -90,7 +92,19 @@ export function ContactListPage() {
   };
 
   const columns: Column<CrmContact>[] = [
-    { key: 'name', header: 'Ad Soyad', width: '20%' },
+    {
+      key: 'name',
+      header: 'Ad Soyad',
+      width: '20%',
+      render: (item) => (
+        <span
+          className={styles.nameLink}
+          onClick={() => navigate(`/crm/${item.id}`)}
+        >
+          {item.name}
+        </span>
+      ),
+    },
     {
       key: 'status',
       header: 'Durum',
@@ -124,6 +138,9 @@ export function ContactListPage() {
       width: '14%',
       render: (item) => (
         <div className={styles.actions}>
+          <Button size="sm" variant="ghost" onClick={() => navigate(`/crm/${item.id}`)}>
+            Detay
+          </Button>
           <Button size="sm" variant="secondary" onClick={() => handleEdit(item)}>
             Duzenle
           </Button>

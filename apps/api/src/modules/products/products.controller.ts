@@ -36,6 +36,31 @@ export class ProductsController {
     return this.productsService.findById(id);
   }
 
+  @Get(':id/detail')
+  async getProductDetail(@Param('id', ParseUUIDPipe) id: string) {
+    return this.productsService.getProductDetail(id);
+  }
+
+  @Get(':id/sales')
+  async getProductSales(@Param('id', ParseUUIDPipe) id: string) {
+    return this.productsService.getProductSales(id);
+  }
+
+  @Get(':id/returns')
+  async getProductReturns(@Param('id', ParseUUIDPipe) id: string) {
+    return this.productsService.getProductReturns(id);
+  }
+
+  @Get(':id/movements')
+  async getProductStockMovements(@Param('id', ParseUUIDPipe) id: string) {
+    return this.productsService.getProductStockMovements(id);
+  }
+
+  @Get(':id/stats')
+  async getProductStats(@Param('id', ParseUUIDPipe) id: string) {
+    return this.productsService.getProductStats(id);
+  }
+
   @Post()
   async create(@Body() dto: CreateProductDto) {
     return this.productsService.create(dto);

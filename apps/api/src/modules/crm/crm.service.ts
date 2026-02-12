@@ -108,4 +108,29 @@ export class CrmService {
   async getContactStats() {
     return this.repository.getContactStats();
   }
+
+  // Contact Detail (contact + activities + stats)
+  async getContactDetail(id: string) {
+    const contact = await this.findContactById(id);
+    const activities = await this.repository.findActivitiesByContactId(id);
+    const stats = await this.repository.getContactActivityStats(id);
+    return { contact, activities, stats };
+  }
+
+  // Convert contact to customer
+  async convertToCustomer(id: string): Promise<{ contact: CrmContact; customerId: string }> {
+    const contact = await this.findContactById(id);
+
+    if (contact.customer_id) {
+      throw new NotFoundException('Bu kisi zaten bir musteriye baglidir');
+    }
+
+    const customerId = await this.repository.convertToCustomer(id, contact);
+    const updatedContact = await this.repository.updateContact(id, {
+      customer_id: customerId,
+      status: 'customer',
+    });
+
+    return { contact: updatedContact, customerId };
+  }
 }

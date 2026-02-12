@@ -63,6 +63,26 @@ export interface TodayStats {
   completedVisits: number;
 }
 
+export interface RouteDetailStats {
+  totalVisits: number;
+  completedVisits: number;
+  pendingVisits: number;
+  skippedVisits: number;
+  inProgressVisits: number;
+}
+
+export interface AssignedUser {
+  id: string;
+  name: string;
+}
+
+export interface RouteDetail {
+  route: FieldRoute;
+  visits: FieldVisit[];
+  stats: RouteDetailStats;
+  assignedUser: AssignedUser | null;
+}
+
 const getRoutes = (params?: {
   page?: number;
   limit?: number;
@@ -80,6 +100,10 @@ const getRoute = (id: string): Promise<ApiResponse<FieldRoute>> => {
 
 const getRouteVisits = (routeId: string): Promise<ApiResponse<FieldVisit[]>> => {
   return apiClient.get<FieldVisit[]>(`/field-team/routes/${routeId}/visits`);
+};
+
+const getRouteDetail = (id: string): Promise<ApiResponse<RouteDetail>> => {
+  return apiClient.get<RouteDetail>(`/field-team/routes/${id}/detail`);
 };
 
 const getTodayStats = (): Promise<ApiResponse<TodayStats>> => {
@@ -147,6 +171,7 @@ export const fieldTeamApi = {
   getRoutes,
   getRoute,
   getRouteVisits,
+  getRouteDetail,
   getTodayStats,
   createRoute,
   updateRoute,

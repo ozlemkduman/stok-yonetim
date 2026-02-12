@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { Table, Button, Badge, Pagination, type Column } from '@stok/ui';
 import { apiClient } from '../../api/client';
 import { useToast } from '../../context/ToastContext';
@@ -51,7 +52,11 @@ export function ReturnListPage() {
     {
       key: 'return_number',
       header: 'Iade No',
-      render: (r) => <span className={styles.returnNumber}>{r.return_number}</span>
+      render: (r) => (
+        <Link to={`/returns/${r.id}`} className={styles.returnNumber}>
+          {r.return_number}
+        </Link>
+      )
     },
     { key: 'customer_name', header: 'Musteri', render: (r) => r.customer_name || '-' },
     { key: 'return_date', header: 'Tarih', render: (r) => formatDateTime(r.return_date) },

@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Table, Button, Badge, Pagination, type Column } from '@stok/ui';
 import { Warehouse, StockTransfer, StockMovement, CreateWarehouseData, warehousesApi } from '../../api/warehouses.api';
 import { WarehouseFormModal } from './WarehouseFormModal';
@@ -35,6 +36,7 @@ const MOVEMENT_TYPE_LABELS: Record<string, string> = {
 };
 
 export function WarehouseListPage() {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<TabType>('warehouses');
   const [warehouses, setWarehouses] = useState<Warehouse[]>([]);
   const [transfers, setTransfers] = useState<StockTransfer[]>([]);
@@ -115,12 +117,22 @@ export function WarehouseListPage() {
     setIsFormModalOpen(true);
   };
 
-  const handleEdit = (warehouse: Warehouse) => {
+  const handleView = (warehouse: Warehouse) => {
+    navigate(`/warehouses/${warehouse.id}`);
+  };
+
+  const handleEdit = (warehouse: Warehouse, e?: React.MouseEvent) => {
+    if (e) {
+      e.stopPropagation();
+    }
     setEditingWarehouse(warehouse);
     setIsFormModalOpen(true);
   };
 
-  const handleDelete = async (warehouse: Warehouse) => {
+  const handleDelete = async (warehouse: Warehouse, e?: React.MouseEvent) => {
+    if (e) {
+      e.stopPropagation();
+    }
     if (!confirm(`"${warehouse.name}" deposunu silmek istediginizden emin misiniz?`)) {
       return;
     }
@@ -197,11 +209,12 @@ export function WarehouseListPage() {
     {
       key: 'actions',
       header: '',
-      width: '120px',
+      width: '150px',
       render: (wh) => (
         <div className={styles.actions}>
-          <Button size="sm" variant="ghost" onClick={() => handleEdit(wh)}>Duzenle</Button>
-          <Button size="sm" variant="ghost" onClick={() => handleDelete(wh)}>Sil</Button>
+          <Button size="sm" variant="ghost" onClick={() => handleView(wh)}>Detay</Button>
+          <Button size="sm" variant="ghost" onClick={(e) => handleEdit(wh, e)}>Duzenle</Button>
+          <Button size="sm" variant="ghost" onClick={(e) => handleDelete(wh, e)}>Sil</Button>
         </div>
       ),
     },
@@ -347,7 +360,7 @@ export function WarehouseListPage() {
             keyExtractor={(wh) => wh.id}
             loading={loading}
             emptyMessage="Depo bulunamadi"
-            onRowClick={handleEdit}
+            onRowClick={handleView}
           />
         )}
 

@@ -205,4 +205,59 @@ export class CrmRepository {
 
     return { total: parseInt(total as string, 10), byStatus, bySource };
   }
+
+  // Get activity stats for a specific contact
+  async getContactActivityStats(contactId: string): Promise<{
+    totalActivities: number;
+    completedActivities: number;
+    plannedActivities: number;
+    byType: Record<string, number>;
+  }> {
+    const [{ count: total }] = await this.db.knex('crm_activities')
+      .where('contact_id', contactId)
+      .count('id as count');
+
+    const statusCounts = await this.db.knex('crm_activities')
+      .select('status')
+      .count('id as count')
+      .where('contact_id', contactId)
+      .groupBy('status');
+
+    const typeCounts = await this.db.knex('crm_activities')
+      .select('type')
+      .count('id as count')
+      .where('contact_id', contactId)
+      .groupBy('type');
+
+    const byStatus: Record<string, number> = {};
+    statusCounts.forEach((row: { status: string; count: string }) => {
+      byStatus[row.status] = parseInt(row.count, 10);
+    });
+
+    const byType: Record<string, number> = {};
+    typeCounts.forEach((row: { type: string; count: string }) => {
+      byType[row.type] = parseInt(row.count, 10);
+    });
+
+    return {
+      totalActivities: parseInt(total as string, 10),
+      completedActivities: byStatus['completed'] || 0,
+      plannedActivities: byStatus['planned'] || 0,
+      byType,
+    };
+  }
+
+  // Convert contact to customer
+  async convertToCustomer(contactId: string, contact: CrmContact): Promise<string> {
+    const [customer] = await this.db.knex('customers').insert({
+      name: contact.name,
+      phone: contact.phone || contact.mobile,
+      email: contact.email,
+      notes: contact.notes,
+      is_active: true,
+      balance: 0,
+    }).returning('id');
+
+    return customer.id;
+  }
 }

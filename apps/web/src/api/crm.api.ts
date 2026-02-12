@@ -68,6 +68,24 @@ export interface ContactStats {
   bySource: Record<string, number>;
 }
 
+export interface ContactActivityStats {
+  totalActivities: number;
+  completedActivities: number;
+  plannedActivities: number;
+  byType: Record<string, number>;
+}
+
+export interface ContactDetail {
+  contact: CrmContact;
+  activities: CrmActivity[];
+  stats: ContactActivityStats;
+}
+
+export interface ConvertToCustomerResult {
+  contact: CrmContact;
+  customerId: string;
+}
+
 const getContacts = (params?: {
   page?: number;
   limit?: number;
@@ -82,8 +100,16 @@ const getContact = (id: string): Promise<ApiResponse<CrmContact>> => {
   return apiClient.get<CrmContact>(`/crm/contacts/${id}`);
 };
 
+const getContactDetail = (id: string): Promise<ApiResponse<ContactDetail>> => {
+  return apiClient.get<ContactDetail>(`/crm/contacts/${id}/detail`);
+};
+
 const getContactStats = (): Promise<ApiResponse<ContactStats>> => {
   return apiClient.get<ContactStats>('/crm/contacts/stats');
+};
+
+const convertToCustomer = (id: string): Promise<ApiResponse<ConvertToCustomerResult>> => {
+  return apiClient.post<ConvertToCustomerResult>(`/crm/contacts/${id}/convert-to-customer`, {});
 };
 
 const getContactActivities = (contactId: string): Promise<ApiResponse<CrmActivity[]>> => {
@@ -131,11 +157,13 @@ const deleteActivity = (id: string): Promise<ApiResponse<void>> => {
 export const crmApi = {
   getContacts,
   getContact,
+  getContactDetail,
   getContactStats,
   getContactActivities,
   createContact,
   updateContact,
   deleteContact,
+  convertToCustomer,
   getActivities,
   createActivity,
   updateActivity,

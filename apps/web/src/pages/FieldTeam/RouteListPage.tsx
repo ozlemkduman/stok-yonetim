@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Table, Button, Card, Select, type Column } from '@stok/ui';
 import { fieldTeamApi, FieldRoute } from '../../api/field-team.api';
 import { RouteFormModal } from './RouteFormModal';
@@ -12,6 +13,7 @@ const statusLabels: Record<string, string> = {
 };
 
 export function RouteListPage() {
+  const navigate = useNavigate();
   const [routes, setRoutes] = useState<FieldRoute[]>([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
@@ -91,8 +93,24 @@ export function RouteListPage() {
     fetchRoutes();
   };
 
+  const handleViewDetail = (id: string) => {
+    navigate(`/field-team/${id}`);
+  };
+
   const columns: Column<FieldRoute>[] = [
-    { key: 'name', header: 'Rota Adi', width: '20%' },
+    {
+      key: 'name',
+      header: 'Rota Adi',
+      width: '20%',
+      render: (item) => (
+        <span
+          className={styles.routeLink}
+          onClick={() => handleViewDetail(item.id)}
+        >
+          {item.name}
+        </span>
+      ),
+    },
     {
       key: 'route_date',
       header: 'Tarih',
@@ -130,6 +148,9 @@ export function RouteListPage() {
       width: '34%',
       render: (item) => (
         <div className={styles.actions}>
+          <Button size="sm" variant="ghost" onClick={() => handleViewDetail(item.id)}>
+            Detay
+          </Button>
           {item.status === 'planned' && (
             <Button size="sm" variant="primary" onClick={() => handleStartRoute(item.id)}>
               Baslat

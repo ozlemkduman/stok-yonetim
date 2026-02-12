@@ -27,6 +27,16 @@ export class SalesService {
     return { ...sale, items };
   }
 
+  async findDetail(id: string): Promise<Sale & { items: SaleItem[]; payments: { id: string; payment_date: Date; amount: number; method: string; notes: string | null }[] }> {
+    const sale = await this.salesRepository.findById(id);
+    if (!sale) throw new NotFoundException(`Satis bulunamadi: ${id}`);
+    const [items, payments] = await Promise.all([
+      this.salesRepository.findItemsBySaleId(id),
+      this.salesRepository.findPaymentsBySaleId(id),
+    ]);
+    return { ...sale, items, payments };
+  }
+
   async create(dto: CreateSaleDto): Promise<Sale> {
     if (dto.customer_id) {
       const customer = await this.customersRepository.findById(dto.customer_id);

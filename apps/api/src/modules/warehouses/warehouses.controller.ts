@@ -69,6 +69,11 @@ export class WarehousesController {
     return this.service.findById(id);
   }
 
+  @Get(':id/detail')
+  async getDetail(@Param('id') id: string) {
+    return this.service.getDetail(id);
+  }
+
   @Get(':id/stocks')
   async getStocks(
     @Param('id') id: string,

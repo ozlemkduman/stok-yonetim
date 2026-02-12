@@ -48,6 +48,11 @@ export class AccountsController {
     return this.service.findById(id);
   }
 
+  @Get(':id/detail')
+  async getDetail(@Param('id') id: string) {
+    return this.service.getDetail(id);
+  }
+
   @Get(':id/movements')
   async getMovements(
     @Param('id') id: string,

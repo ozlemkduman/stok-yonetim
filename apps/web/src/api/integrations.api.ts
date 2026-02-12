@@ -90,6 +90,21 @@ export interface SyncResult {
   errors?: string[];
 }
 
+export interface IntegrationStats {
+  totalSynced: number;
+  totalErrors: number;
+  lastSyncAt: string | null;
+  syncedOrders: number;
+  pendingOrders: number;
+  errorOrders: number;
+}
+
+export interface IntegrationDetail {
+  integration: Integration;
+  logs: IntegrationLog[];
+  stats: IntegrationStats;
+}
+
 const getIntegrations = (type?: string, status?: string): Promise<ApiResponse<Integration[]>> => {
   const params: Record<string, string> = {};
   if (type) params.type = type;
@@ -103,6 +118,10 @@ const getIntegration = (id: string): Promise<ApiResponse<Integration>> => {
 
 const getIntegrationLogs = (id: string): Promise<ApiResponse<IntegrationLog[]>> => {
   return apiClient.get<IntegrationLog[]>(`/integrations/${id}/logs`);
+};
+
+const getIntegrationDetail = (id: string): Promise<ApiResponse<IntegrationDetail>> => {
+  return apiClient.get<IntegrationDetail>(`/integrations/${id}/detail`);
 };
 
 const createIntegration = (data: CreateIntegrationInput): Promise<ApiResponse<Integration>> => {
@@ -164,6 +183,7 @@ const ignoreBankStatement = (id: string): Promise<ApiResponse<void>> => {
 export const integrationsApi = {
   getIntegrations,
   getIntegration,
+  getIntegrationDetail,
   getIntegrationLogs,
   createIntegration,
   updateIntegration,

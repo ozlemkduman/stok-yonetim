@@ -261,4 +261,40 @@ export class IntegrationsRepository {
       .where('id', id)
       .update({ match_status: 'ignored', updated_at: this.db.knex.fn.now() });
   }
+
+  async getIntegrationStats(integrationId: string): Promise<{
+    totalSynced: number;
+    totalErrors: number;
+    lastSyncAt: Date | null;
+    syncedOrders: number;
+    pendingOrders: number;
+    errorOrders: number;
+  }> {
+    // Get log stats
+    const [logStats] = await this.db.knex('integration_logs')
+      .where('integration_id', integrationId)
+      .select(
+        this.db.knex.raw("COUNT(CASE WHEN status = 'success' THEN 1 END) as total_synced"),
+        this.db.knex.raw("COUNT(CASE WHEN status = 'failed' THEN 1 END) as total_errors"),
+        this.db.knex.raw("MAX(CASE WHEN status = 'success' THEN created_at END) as last_sync_at")
+      ) as unknown as { total_synced: string; total_errors: string; last_sync_at: Date | null }[];
+
+    // Get e-commerce order stats
+    const [orderStats] = await this.db.knex('e_commerce_orders')
+      .where('integration_id', integrationId)
+      .select(
+        this.db.knex.raw("COUNT(CASE WHEN sync_status = 'synced' THEN 1 END) as synced_orders"),
+        this.db.knex.raw("COUNT(CASE WHEN sync_status = 'pending' THEN 1 END) as pending_orders"),
+        this.db.knex.raw("COUNT(CASE WHEN sync_status = 'error' THEN 1 END) as error_orders")
+      ) as unknown as { synced_orders: string; pending_orders: string; error_orders: string }[];
+
+    return {
+      totalSynced: parseInt(logStats?.total_synced || '0', 10),
+      totalErrors: parseInt(logStats?.total_errors || '0', 10),
+      lastSyncAt: logStats?.last_sync_at || null,
+      syncedOrders: parseInt(orderStats?.synced_orders || '0', 10),
+      pendingOrders: parseInt(orderStats?.pending_orders || '0', 10),
+      errorOrders: parseInt(orderStats?.error_orders || '0', 10),
+    };
+  }
 }

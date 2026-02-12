@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Table, Button, Input, Badge, Pagination, Modal, type Column } from '@stok/ui';
 import { productsApi, Product, CreateProductData } from '../../api/products.api';
 import { useToast } from '../../context/ToastContext';
@@ -16,6 +17,7 @@ const icons = {
 };
 
 export function ProductListPage() {
+  const navigate = useNavigate();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
@@ -91,7 +93,7 @@ export function ProductListPage() {
       header: 'Urun Adi',
       render: (p) => (
         <div className={styles.productName}>
-          <span className={styles.name}>{p.name}</span>
+          <span className={styles.name} onClick={() => navigate(`/products/${p.id}`)} style={{ cursor: 'pointer' }}>{p.name}</span>
           {p.barcode && <span className={styles.barcode}>{p.barcode}</span>}
         </div>
       )
@@ -112,9 +114,10 @@ export function ProductListPage() {
     {
       key: 'actions',
       header: '',
-      width: '100px',
+      width: '150px',
       render: (p) => (
         <div className={styles.actions}>
+          <Button size="sm" variant="ghost" onClick={() => navigate(`/products/${p.id}`)}>Detay</Button>
           <Button size="sm" variant="ghost" onClick={() => openModal(p)}>Duzenle</Button>
           <Button size="sm" variant="ghost" onClick={() => handleDelete(p)}>Sil</Button>
         </div>

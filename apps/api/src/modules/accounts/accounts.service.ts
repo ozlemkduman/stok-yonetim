@@ -209,4 +209,50 @@ export class AccountsService {
   async getSummary() {
     return this.repository.getSummary();
   }
+
+  // Detail (account + movements + transfers)
+  async getDetail(id: string) {
+    const account = await this.findById(id);
+
+    const [movementsResult, transfersResult] = await Promise.all([
+      this.repository.findMovements({
+        accountId: id,
+        page: 1,
+        limit: 50,
+      }),
+      this.repository.findTransfers({
+        page: 1,
+        limit: 50,
+        accountId: id,
+      }),
+    ]);
+
+    // Calculate stats
+    const allMovements = await this.db.knex('account_movements')
+      .where('account_id', id)
+      .select(
+        this.db.knex.raw('COUNT(*) as total_count'),
+        this.db.knex.raw("SUM(CASE WHEN movement_type = 'gelir' OR movement_type = 'transfer_in' THEN amount ELSE 0 END) as total_income"),
+        this.db.knex.raw("SUM(CASE WHEN movement_type = 'gider' OR movement_type = 'transfer_out' THEN amount ELSE 0 END) as total_expense"),
+        this.db.knex.raw("SUM(CASE WHEN movement_type = 'transfer_in' THEN amount ELSE 0 END) as total_transfer_in"),
+        this.db.knex.raw("SUM(CASE WHEN movement_type = 'transfer_out' THEN amount ELSE 0 END) as total_transfer_out")
+      )
+      .first() as unknown as { total_count: string; total_income: string; total_expense: string; total_transfer_in: string; total_transfer_out: string } | undefined;
+
+    const stats = {
+      movementsCount: parseInt(allMovements?.total_count || '0', 10),
+      totalIncome: parseFloat(allMovements?.total_income || '0'),
+      totalExpense: parseFloat(allMovements?.total_expense || '0'),
+      totalTransferIn: parseFloat(allMovements?.total_transfer_in || '0'),
+      totalTransferOut: parseFloat(allMovements?.total_transfer_out || '0'),
+      transfersCount: transfersResult.total,
+    };
+
+    return {
+      account,
+      movements: movementsResult.items,
+      transfers: transfersResult.items,
+      stats,
+    };
+  }
 }

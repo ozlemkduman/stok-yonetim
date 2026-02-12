@@ -27,6 +27,11 @@ export class SalesController {
     return this.salesService.findById(id);
   }
 
+  @Get(':id/detail')
+  async findDetail(@Param('id', ParseUUIDPipe) id: string) {
+    return this.salesService.findDetail(id);
+  }
+
   @Post()
   async create(@Body() dto: CreateSaleDto) {
     return this.salesService.create(dto);

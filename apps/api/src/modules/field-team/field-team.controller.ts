@@ -55,6 +55,12 @@ export class FieldTeamController {
     return { success: true, data: visits };
   }
 
+  @Get('routes/:id/detail')
+  async getRouteDetail(@Param('id') id: string) {
+    const detail = await this.service.getRouteDetail(id);
+    return { success: true, data: detail };
+  }
+
   @Post('routes')
   async createRoute(@Body() dto: CreateRouteDto) {
     const route = await this.service.createRoute(dto);

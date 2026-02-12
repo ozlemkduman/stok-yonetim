@@ -109,4 +109,8 @@ export class SalesRepository {
     const r = result as any;
     return { count: parseInt(r?.count || '0', 10), total: parseFloat(r?.total || '0') };
   }
+
+  async findPaymentsBySaleId(saleId: string): Promise<{ id: string; payment_date: Date; amount: number; method: string; notes: string | null }[]> {
+    return this.db.knex('payments').where('sale_id', saleId).orderBy('payment_date', 'desc');
+  }
 }

@@ -56,7 +56,15 @@
   background: var(--color-bg);
 }
 
-.returnNumber { font-weight: var(--font-weight-semibold); color: var(--color-warning-dark); }
+.returnNumber {
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-warning-dark);
+  text-decoration: none;
+}
+
+.returnNumber:hover {
+  text-decoration: underline;
+}
 .total { font-weight: var(--font-weight-bold); color: var(--color-text-primary); }
 
 @media (max-width: 767px) {

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Table, Button, Badge, Pagination, type Column } from '@stok/ui';
 import { salesApi, Sale } from '../../api/sales.api';
 import { useToast } from '../../context/ToastContext';
@@ -45,6 +46,7 @@ const icons = {
 };
 
 export function SaleListPage() {
+  const navigate = useNavigate();
   const [sales, setSales] = useState<Sale[]>([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
@@ -90,7 +92,11 @@ export function SaleListPage() {
     {
       key: 'invoice_number',
       header: 'Fatura No',
-      render: (s) => <span className={styles.invoiceNumber}>{s.invoice_number}</span>
+      render: (s) => (
+        <button className={styles.invoiceLink} onClick={() => navigate(`/sales/${s.id}`)}>
+          {s.invoice_number}
+        </button>
+      )
     },
     { key: 'customer_name', header: 'Musteri', render: (s) => s.customer_name || 'Perakende' },
     { key: 'sale_date', header: 'Tarih', render: (s) => formatDateTime(s.sale_date) },

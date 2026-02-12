@@ -237,4 +237,12 @@ export class FieldTeamRepository {
   getKnex() {
     return this.db.knex;
   }
+
+  async getUserById(id: string): Promise<{ id: string; name: string } | null> {
+    const user = await this.db.knex('users')
+      .where('id', id)
+      .select('id', 'name')
+      .first();
+    return user || null;
+  }
 }

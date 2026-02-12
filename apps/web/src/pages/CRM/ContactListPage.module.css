@@ -74,6 +74,16 @@
   justify-content: flex-end;
 }
 
+.nameLink {
+  color: var(--color-primary);
+  cursor: pointer;
+  font-weight: var(--font-weight-medium);
+}
+
+.nameLink:hover {
+  text-decoration: underline;
+}
+
 .badge {
   display: inline-flex;
   align-items: center;

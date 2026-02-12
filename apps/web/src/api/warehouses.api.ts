@@ -59,6 +59,23 @@ export interface StockMovement {
   product_name?: string;
 }
 
+export interface WarehouseStats {
+  totalProducts: number;
+  totalQuantity: number;
+  lowStockCount: number;
+  pendingTransfers: number;
+  movementsCount: number;
+  transfersCount: number;
+}
+
+export interface WarehouseDetail {
+  warehouse: Warehouse;
+  stocks: WarehouseStock[];
+  movements: StockMovement[];
+  transfers: StockTransfer[];
+  stats: WarehouseStats;
+}
+
 export interface CreateWarehouseData {
   name: string;
   code: string;
@@ -109,6 +126,10 @@ export const warehousesApi = {
 
   getById: async (id: string) => {
     return apiClient.get<Warehouse>(`/warehouses/${id}`);
+  },
+
+  getDetail: async (id: string) => {
+    return apiClient.get<WarehouseDetail>(`/warehouses/${id}/detail`);
   },
 
   create: async (data: CreateWarehouseData) => {

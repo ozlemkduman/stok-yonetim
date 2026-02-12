@@ -106,6 +106,12 @@ export class IntegrationsController {
     return { success: true, data: integration };
   }
 
+  @Get(':id/detail')
+  async getDetail(@Param('id') id: string) {
+    const detail = await this.service.getDetail(id);
+    return { success: true, data: detail };
+  }
+
   @Get(':id/logs')
   async getLogs(@Param('id') id: string) {
     const logs = await this.service.getLogs(id);
