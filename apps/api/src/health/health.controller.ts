@@ -38,38 +38,42 @@ export class HealthController {
 
   @Post('reseed')
   async reseed() {
-    const knex = this.databaseService.knex;
+    try {
+      const knex = this.databaseService.knex;
 
-    // Clear all data first
-    await knex('field_team_visits').del().catch(() => {});
-    await knex('field_team_routes').del().catch(() => {});
-    await knex('crm_activities').del().catch(() => {});
-    await knex('crm_contacts').del().catch(() => {});
-    await knex('e_commerce_orders').del().catch(() => {});
-    await knex('integration_logs').del().catch(() => {});
-    await knex('integrations').del().catch(() => {});
-    await knex('e_document_logs').del().catch(() => {});
-    await knex('e_documents').del().catch(() => {});
-    await knex('quote_items').del().catch(() => {});
-    await knex('quotes').del().catch(() => {});
-    await knex('stock_transfer_items').del().catch(() => {});
-    await knex('stock_transfers').del().catch(() => {});
-    await knex('stock_movements').del().catch(() => {});
-    await knex('warehouse_stocks').del().catch(() => {});
-    await knex('account_transfers').del().catch(() => {});
-    await knex('account_movements').del().catch(() => {});
-    await knex('accounts').del().catch(() => {});
-    await knex('payments').del().catch(() => {});
-    await knex('return_items').del().catch(() => {});
-    await knex('returns').del().catch(() => {});
-    await knex('sale_items').del().catch(() => {});
-    await knex('sales').del().catch(() => {});
-    await knex('expenses').del().catch(() => {});
-    await knex('warehouses').del().catch(() => {});
-    await knex('products').del().catch(() => {});
-    await knex('customers').del().catch(() => {});
+      // Clear all data first
+      await knex('field_team_visits').del().catch(() => {});
+      await knex('field_team_routes').del().catch(() => {});
+      await knex('crm_activities').del().catch(() => {});
+      await knex('crm_contacts').del().catch(() => {});
+      await knex('e_commerce_orders').del().catch(() => {});
+      await knex('integration_logs').del().catch(() => {});
+      await knex('integrations').del().catch(() => {});
+      await knex('e_document_logs').del().catch(() => {});
+      await knex('e_documents').del().catch(() => {});
+      await knex('quote_items').del().catch(() => {});
+      await knex('quotes').del().catch(() => {});
+      await knex('stock_transfer_items').del().catch(() => {});
+      await knex('stock_transfers').del().catch(() => {});
+      await knex('stock_movements').del().catch(() => {});
+      await knex('warehouse_stocks').del().catch(() => {});
+      await knex('account_transfers').del().catch(() => {});
+      await knex('account_movements').del().catch(() => {});
+      await knex('accounts').del().catch(() => {});
+      await knex('payments').del().catch(() => {});
+      await knex('return_items').del().catch(() => {});
+      await knex('returns').del().catch(() => {});
+      await knex('sale_items').del().catch(() => {});
+      await knex('sales').del().catch(() => {});
+      await knex('expenses').del().catch(() => {});
+      await knex('warehouses').del().catch(() => {});
+      await knex('products').del().catch(() => {});
+      await knex('customers').del().catch(() => {});
 
-    return this.runFullSeed();
+      return this.runFullSeed();
+    } catch (error) {
+      return { success: false, error: error.message, stack: error.stack };
+    }
   }
 
   private async runFullSeed() {
