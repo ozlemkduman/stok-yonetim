@@ -77,6 +77,7 @@ export class HealthController {
   }
 
   private async runFullSeed() {
+    try {
     const knex = this.databaseService.knex;
 
     // 1. CUSTOMERS
@@ -286,5 +287,8 @@ export class HealthController {
         routes: routes.length,
       }
     };
+    } catch (error) {
+      return { success: false, error: error.message, step: 'runFullSeed' };
+    }
   }
 }
