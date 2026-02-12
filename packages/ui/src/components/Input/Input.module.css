@@ -98,3 +98,29 @@
   font-size: var(--font-size-xs);
   color: var(--color-text-muted);
 }
+
+/* Responsive */
+@media (max-width: 768px) {
+  .input {
+    height: 44px; /* Better touch target */
+    font-size: 16px; /* Prevents zoom on iOS */
+  }
+
+  .label {
+    font-size: var(--font-size-sm);
+  }
+}
+
+@media (max-width: 480px) {
+  .input {
+    padding: 0 var(--space-3);
+  }
+
+  .hasLeftIcon {
+    padding-left: var(--space-9);
+  }
+
+  .hasRightIcon {
+    padding-right: var(--space-9);
+  }
+}

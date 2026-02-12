@@ -486,31 +486,233 @@
   color: var(--color-danger);
 }
 
-/* ── Responsive ── */
+/* ══════════════════════════════════════════════════════════════════════════
+   RESPONSIVE DESIGN
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Tablet (max-width: 1024px) ── */
+@media (max-width: 1024px) {
+  .reportGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* ── Mobile Large (max-width: 767px) ── */
 @media (max-width: 767px) {
+  .page {
+    gap: var(--space-4);
+  }
+
   .header {
     flex-direction: column;
     align-items: stretch;
+    gap: var(--space-3);
+  }
+
+  .headerLeft {
+    gap: var(--space-1);
+  }
+
+  .title {
+    font-size: var(--font-size-xl);
+  }
+
+  .titleIcon {
+    width: 28px;
+    height: 28px;
+  }
+
+  .titleIcon svg {
+    width: 16px;
+    height: 16px;
   }
 
   .headerRight {
-    justify-content: flex-end;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    gap: var(--space-2);
   }
 
   .toolbar {
     flex-direction: column;
     align-items: stretch;
+    padding: var(--space-3);
+    gap: var(--space-3);
   }
 
   .searchForm {
     max-width: none;
+    width: 100%;
   }
 
   .searchWrapper {
     max-width: none;
+    width: 100%;
+  }
+
+  .toolbarFilters {
+    flex-wrap: wrap;
+    width: 100%;
+  }
+
+  .filterButton {
+    flex: 1;
+    min-width: 120px;
+    justify-content: center;
   }
 
   .dateFilters {
     flex-wrap: wrap;
+    width: 100%;
+  }
+
+  .dateInput {
+    flex: 1;
+    min-width: 140px;
+  }
+
+  .statsRow {
+    grid-template-columns: 1fr;
+    gap: var(--space-3);
+  }
+
+  .statCard {
+    padding: var(--space-3);
+  }
+
+  .statIcon {
+    width: 36px;
+    height: 36px;
+  }
+
+  .statIcon svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .statValue {
+    font-size: var(--font-size-lg);
+  }
+
+  .reportGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .pagination {
+    padding: var(--space-3);
+  }
+
+  .empty {
+    padding: var(--space-8);
+  }
+
+  .empty svg {
+    width: 40px;
+    height: 40px;
+  }
+
+  .emptyTitle {
+    font-size: var(--font-size-base);
+  }
+}
+
+/* ── Mobile Small (max-width: 480px) ── */
+@media (max-width: 480px) {
+  .page {
+    gap: var(--space-3);
+  }
+
+  .title {
+    font-size: var(--font-size-lg);
+    gap: var(--space-2);
+  }
+
+  .titleIcon {
+    width: 24px;
+    height: 24px;
+  }
+
+  .titleIcon svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  .subtitle {
+    font-size: var(--font-size-xs);
+  }
+
+  .headerRight button {
+    font-size: var(--font-size-xs);
+    padding: var(--space-2) var(--space-3);
+  }
+
+  .toolbar {
+    padding: var(--space-2);
+    gap: var(--space-2);
+  }
+
+  .searchInput {
+    height: 36px;
+    font-size: var(--font-size-xs);
+  }
+
+  .filterButton {
+    padding: var(--space-2);
+    font-size: var(--font-size-xs);
+  }
+
+  .statCard {
+    padding: var(--space-2);
+    gap: var(--space-2);
+  }
+
+  .statIcon {
+    width: 32px;
+    height: 32px;
+  }
+
+  .statValue {
+    font-size: var(--font-size-base);
+  }
+
+  .statLabel {
+    font-size: var(--font-size-2xs);
+  }
+
+  .actions {
+    flex-wrap: wrap;
+  }
+
+  .actionButton {
+    width: 28px;
+    height: 28px;
+  }
+
+  .actionButton svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  .reportCardHeader {
+    padding: var(--space-3);
+  }
+
+  .reportCardBody {
+    padding: var(--space-3);
+  }
+
+  .reportCardTitle {
+    font-size: var(--font-size-sm);
+  }
+
+  .reportItem {
+    padding: var(--space-2) 0;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-1);
+  }
+
+  .reportItemValue {
+    font-size: var(--font-size-sm);
   }
 }

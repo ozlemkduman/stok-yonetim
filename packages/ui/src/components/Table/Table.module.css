@@ -84,8 +84,19 @@
   font-size: var(--font-size-sm);
 }
 
+/* Responsive - Tablet */
+@media (max-width: 1024px) {
+  .th {
+    padding: var(--space-2) var(--space-3);
+  }
+
+  .td {
+    padding: var(--space-3);
+  }
+}
+
 /* Responsive - Card view on mobile */
-@media (max-width: 639px) {
+@media (max-width: 768px) {
   .responsive .thead {
     display: none;
   }
@@ -94,14 +105,22 @@
     display: flex;
     flex-direction: column;
     gap: var(--space-3);
+    padding: var(--space-3);
   }
 
   .responsive .tr {
     display: flex;
     flex-direction: column;
-    padding: var(--space-4);
+    padding: var(--space-3);
     border: 1px solid var(--color-border);
-    border-radius: var(--radius-md);
+    border-radius: var(--radius-lg);
+    background: var(--color-bg-elevated);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .responsive .tr:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-1px);
   }
 
   .responsive .tr:not(:last-child) {
@@ -111,18 +130,59 @@
   .responsive .td {
     display: flex;
     justify-content: space-between;
+    align-items: flex-start;
     padding: var(--space-2) 0;
-    border-bottom: 1px solid var(--color-border);
+    border-bottom: 1px solid var(--color-border-light);
+    gap: var(--space-2);
   }
 
   .responsive .td:last-child {
     border-bottom: none;
+    padding-bottom: 0;
+  }
+
+  .responsive .td:first-child {
+    padding-top: 0;
   }
 
   .responsive .td::before {
     content: attr(data-label);
-    font-weight: var(--font-weight-medium);
-    color: var(--color-text-secondary);
-    margin-right: var(--space-4);
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    flex-shrink: 0;
+    min-width: 100px;
+  }
+
+  .loading {
+    padding: var(--space-8);
+  }
+
+  .empty {
+    padding: var(--space-8);
+  }
+}
+
+/* Responsive - Small mobile */
+@media (max-width: 480px) {
+  .responsive .tbody {
+    padding: var(--space-2);
+    gap: var(--space-2);
+  }
+
+  .responsive .tr {
+    padding: var(--space-3);
+  }
+
+  .responsive .td {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-1);
+  }
+
+  .responsive .td::before {
+    min-width: auto;
   }
 }

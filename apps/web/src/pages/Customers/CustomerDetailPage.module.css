@@ -328,14 +328,203 @@
   color: var(--color-success);
 }
 
-/* Responsive */
+/* ══════════════════════════════════════════════════════════════════════════
+   RESPONSIVE DESIGN
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* Tablet */
+@media (max-width: 1024px) {
+  .infoGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Mobile Large */
 @media (max-width: 767px) {
-  .header { flex-direction: column; }
+  .page { gap: var(--space-4); }
+
+  .header {
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  .title {
+    font-size: var(--font-size-xl);
+  }
+
+  .customerMeta {
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+
   .headerRight { width: 100%; }
-  .balanceCard { width: 100%; align-items: center; }
-  .statsGrid { grid-template-columns: 1fr; }
-  .saleMeta { flex-wrap: wrap; }
-  .tabs { flex-direction: column; }
-  .tab { text-align: center; }
-  .tabActive::after { display: none; }
+
+  .balanceCard {
+    width: 100%;
+    align-items: center;
+    padding: var(--space-3) var(--space-4);
+    min-width: auto;
+  }
+
+  .balanceValue {
+    font-size: var(--font-size-xl);
+  }
+
+  .infoCard, .statsCard {
+    padding: var(--space-4);
+  }
+
+  .infoCard h3, .statsCard h3 {
+    font-size: var(--font-size-base);
+    margin-bottom: var(--space-3);
+  }
+
+  .statsGrid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-2);
+  }
+
+  .statItem {
+    padding: var(--space-2);
+  }
+
+  .statValue {
+    font-size: var(--font-size-lg);
+  }
+
+  .statLabel {
+    font-size: var(--font-size-2xs);
+  }
+
+  .tabs {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .tab {
+    padding: var(--space-3);
+    white-space: nowrap;
+    flex: none;
+    min-width: 100px;
+  }
+
+  .tabContent {
+    padding: var(--space-3);
+  }
+
+  .saleHeader {
+    padding: var(--space-3);
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+
+  .saleMeta {
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .saleItems {
+    padding: var(--space-2);
+  }
+
+  .itemsTable {
+    font-size: var(--font-size-xs);
+  }
+
+  .itemsTable th, .itemsTable td {
+    padding: var(--space-1) var(--space-2);
+  }
+
+  .paymentsTable {
+    font-size: var(--font-size-xs);
+  }
+
+  .paymentsTable th, .paymentsTable td {
+    padding: var(--space-2) var(--space-3);
+  }
+}
+
+/* Mobile Small */
+@media (max-width: 480px) {
+  .page { gap: var(--space-3); }
+
+  .title {
+    font-size: var(--font-size-lg);
+  }
+
+  .customerMeta {
+    font-size: var(--font-size-xs);
+  }
+
+  .balanceCard {
+    padding: var(--space-3);
+  }
+
+  .balanceValue {
+    font-size: var(--font-size-lg);
+  }
+
+  .infoCard, .statsCard {
+    padding: var(--space-3);
+  }
+
+  .statsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .statItem {
+    flex-direction: row;
+    justify-content: space-between;
+    text-align: left;
+    padding: var(--space-2) var(--space-3);
+  }
+
+  .statValue {
+    font-size: var(--font-size-base);
+    order: 1;
+  }
+
+  .statLabel {
+    margin-top: 0;
+    order: 0;
+  }
+
+  .statTotal {
+    margin-top: 0;
+    margin-left: var(--space-2);
+    order: 2;
+  }
+
+  .tab {
+    padding: var(--space-2) var(--space-3);
+    min-width: 80px;
+    font-size: var(--font-size-xs);
+  }
+
+  .tabContent {
+    padding: var(--space-2);
+  }
+
+  .saleCard {
+    border-radius: var(--radius-sm);
+  }
+
+  .saleHeader {
+    padding: var(--space-2);
+  }
+
+  .invoiceNumber {
+    font-size: var(--font-size-sm);
+  }
+
+  .saleTotal {
+    font-size: var(--font-size-sm);
+  }
+
+  .emptyState {
+    padding: var(--space-6);
+    font-size: var(--font-size-xs);
+  }
 }
