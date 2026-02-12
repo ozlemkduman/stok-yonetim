@@ -200,11 +200,73 @@
   color: var(--color-text-secondary);
 }
 
-/* Responsive */
+/* ══════════════════════════════════════════════════════════════════════════
+   RESPONSIVE DESIGN
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* Tablet */
+@media (max-width: 1024px) {
+  .infoGrid { grid-template-columns: 1fr; }
+}
+
+/* Mobile Large */
 @media (max-width: 767px) {
-  .header { flex-direction: column; }
+  .page { gap: var(--space-4); }
+
+  .header { flex-direction: column; gap: var(--space-3); }
   .headerRight { width: 100%; }
-  .totalCard { width: 100%; align-items: center; }
-  .actionsBar { flex-wrap: wrap; }
-  .gibInfo { grid-template-columns: 1fr; }
+
+  .title { font-size: var(--font-size-xl); }
+  .documentMeta { flex-wrap: wrap; gap: var(--space-2); }
+  .documentType { font-size: var(--font-size-xs); }
+
+  .totalCard { width: 100%; align-items: center; padding: var(--space-3) var(--space-4); min-width: auto; }
+  .totalValue { font-size: var(--font-size-xl); }
+
+  .actionsBar { flex-wrap: wrap; padding: var(--space-3); gap: var(--space-2); }
+  .actionsBar > * { flex: 1; min-width: 120px; }
+
+  .infoCard { padding: var(--space-4); }
+  .infoCard h3 { font-size: var(--font-size-base); margin-bottom: var(--space-3); }
+
+  .gibCard { padding: var(--space-4); }
+  .gibCard h3 { font-size: var(--font-size-base); margin-bottom: var(--space-3); }
+  .gibInfo { grid-template-columns: 1fr; gap: var(--space-3); }
+
+  .logsCard { padding: var(--space-4); }
+  .logsCard h3 { font-size: var(--font-size-base); margin-bottom: var(--space-3); }
+  .logItem { padding: var(--space-2) var(--space-3); }
+  .logHeader { flex-direction: column; align-items: flex-start; gap: var(--space-1); }
+
+  .grandTotal { font-size: var(--font-size-base); }
+}
+
+/* Mobile Small */
+@media (max-width: 480px) {
+  .page { gap: var(--space-3); }
+
+  .title { font-size: var(--font-size-lg); }
+  .documentMeta { gap: var(--space-1); }
+  .documentType { font-size: var(--font-size-2xs); padding: var(--space-1); }
+
+  .totalCard { padding: var(--space-3); }
+  .totalValue { font-size: var(--font-size-lg); }
+
+  .actionsBar { padding: var(--space-2); flex-direction: column; }
+  .actionsBar > * { width: 100%; min-width: auto; }
+
+  .infoCard { padding: var(--space-3); }
+  .infoCard h3 { font-size: var(--font-size-sm); }
+  .infoLabel { font-size: var(--font-size-2xs); }
+  .infoValue { font-size: var(--font-size-xs); }
+
+  .gibCard { padding: var(--space-3); }
+  .gibCard h3 { font-size: var(--font-size-sm); }
+
+  .logsCard { padding: var(--space-3); }
+  .logsCard h3 { font-size: var(--font-size-sm); }
+  .logItem { padding: var(--space-2); }
+  .logAction { font-size: var(--font-size-sm); }
+  .logDate { font-size: var(--font-size-2xs); }
+  .logMessage { font-size: var(--font-size-xs); }
 }

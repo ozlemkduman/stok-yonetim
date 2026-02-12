@@ -52,8 +52,16 @@
   gap: var(--space-4);
 }
 
+/* ══════════════════════════════════════════════════════════════════════════
+   RESPONSIVE DESIGN
+   ══════════════════════════════════════════════════════════════════════════ */
+
 @media (max-width: 767px) {
-  .summaryCards { grid-template-columns: 1fr; }
+  .summaryCards { grid-template-columns: 1fr; gap: var(--space-3); }
+  .summaryCard { padding: var(--space-4); gap: var(--space-3); }
+  .summaryIcon { width: 40px; height: 40px; }
+  .summaryIcon svg { width: 20px; height: 20px; }
+  .summaryValue { font-size: var(--font-size-xl); }
 }
 
 .summaryCard {
@@ -151,7 +159,44 @@
   justify-content: flex-end;
 }
 
+/* Mobile Large */
 @media (max-width: 767px) {
-  .header { flex-direction: column; align-items: stretch; }
+  .page { gap: var(--space-4); }
+
+  .header { flex-direction: column; align-items: stretch; gap: var(--space-3); }
   .headerActions { justify-content: flex-end; }
+
+  .title { font-size: var(--font-size-xl); }
+  .titleIcon { width: 28px; height: 28px; }
+  .titleIcon svg { width: 16px; height: 16px; }
+  .subtitle { font-size: var(--font-size-xs); }
+
+  .tabs { padding: var(--space-2) var(--space-3); overflow-x: auto; }
+  .tab { padding: var(--space-2) var(--space-3); white-space: nowrap; }
+
+  .pagination { padding: var(--space-3); }
+
+  .accountName { font-size: var(--font-size-sm); }
+  .accountDetails { font-size: var(--font-size-2xs); }
+}
+
+/* Mobile Small */
+@media (max-width: 480px) {
+  .page { gap: var(--space-3); }
+
+  .title { font-size: var(--font-size-lg); gap: var(--space-2); }
+  .titleIcon { width: 24px; height: 24px; }
+  .titleIcon svg { width: 14px; height: 14px; }
+
+  .summaryCards { gap: var(--space-2); }
+  .summaryCard { padding: var(--space-3); }
+  .summaryIcon { width: 36px; height: 36px; }
+  .summaryIcon svg { width: 18px; height: 18px; }
+  .summaryValue { font-size: var(--font-size-lg); }
+  .summaryLabel { font-size: var(--font-size-xs); }
+
+  .tabs { padding: var(--space-2); gap: 0; }
+  .tab { padding: var(--space-2); font-size: var(--font-size-xs); }
+
+  .pagination { padding: var(--space-2); }
 }

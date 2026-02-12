@@ -258,14 +258,82 @@
   word-break: break-all;
 }
 
-/* Responsive */
+/* ══════════════════════════════════════════════════════════════════════════
+   RESPONSIVE DESIGN
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* Tablet */
+@media (max-width: 1024px) {
+  .infoGrid { grid-template-columns: 1fr; }
+}
+
+/* Mobile Large */
 @media (max-width: 767px) {
-  .header { flex-direction: column; }
+  .page { gap: var(--space-4); }
+
+  .header { flex-direction: column; gap: var(--space-3); }
   .headerRight { width: 100%; }
-  .actions { width: 100%; justify-content: stretch; }
+
+  .title { font-size: var(--font-size-xl); }
+  .integrationMeta { flex-wrap: wrap; gap: var(--space-2); font-size: var(--font-size-xs); }
+
+  .actions { width: 100%; justify-content: stretch; gap: var(--space-2); }
   .actions > * { flex: 1; }
-  .statsGrid { grid-template-columns: repeat(2, 1fr); }
-  .tabs { flex-direction: column; }
-  .tab { text-align: center; }
-  .tabActive::after { display: none; }
+
+  .errorBanner { padding: var(--space-2) var(--space-3); font-size: var(--font-size-xs); }
+
+  .infoCard, .statsCard { padding: var(--space-4); }
+  .infoCard h3, .statsCard h3 { font-size: var(--font-size-base); margin-bottom: var(--space-3); }
+
+  .statsGrid { grid-template-columns: repeat(2, 1fr); gap: var(--space-2); }
+  .statItem { padding: var(--space-2); }
+  .statValue { font-size: var(--font-size-xl); }
+  .statLabel { font-size: var(--font-size-2xs); }
+
+  .tabs { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .tab { padding: var(--space-3); white-space: nowrap; flex: none; min-width: 100px; }
+  .tabContent { padding: var(--space-3); }
+
+  .logsTable { font-size: var(--font-size-xs); }
+  .logsTable th, .logsTable td { padding: var(--space-2) var(--space-3); }
+
+  .emptyState { padding: var(--space-6); }
+}
+
+/* Mobile Small */
+@media (max-width: 480px) {
+  .page { gap: var(--space-3); }
+
+  .title { font-size: var(--font-size-lg); }
+  .integrationMeta { font-size: var(--font-size-2xs); gap: var(--space-1); }
+  .metaItem { padding: 2px var(--space-1); font-size: var(--font-size-2xs); }
+
+  .actions { flex-direction: column; }
+  .actions > * { flex: none; width: 100%; }
+
+  .infoCard, .statsCard { padding: var(--space-3); }
+  .infoCard h3, .statsCard h3 { font-size: var(--font-size-sm); }
+  .infoLabel { font-size: var(--font-size-2xs); }
+  .infoValue { font-size: var(--font-size-xs); }
+
+  .statsGrid { grid-template-columns: 1fr; }
+  .statItem {
+    flex-direction: row;
+    justify-content: space-between;
+    text-align: left;
+    padding: var(--space-2) var(--space-3);
+  }
+  .statValue { font-size: var(--font-size-base); order: 1; }
+  .statLabel { margin-top: 0; order: 0; }
+
+  .tab { padding: var(--space-2) var(--space-3); min-width: 80px; font-size: var(--font-size-xs); }
+  .tabContent { padding: var(--space-2); }
+
+  .logsTable th, .logsTable td { padding: var(--space-1) var(--space-2); }
+
+  .configItem { padding: var(--space-2); }
+  .configKey { font-size: var(--font-size-2xs); }
+  .configValue { font-size: var(--font-size-xs); }
+
+  .emptyState { padding: var(--space-4); font-size: var(--font-size-xs); }
 }

@@ -68,3 +68,14 @@
 .textarea::placeholder {
   color: var(--color-text-muted);
 }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   RESPONSIVE DESIGN
+   ══════════════════════════════════════════════════════════════════════════ */
+
+@media (max-width: 639px) {
+  .grid { grid-template-columns: 1fr; }
+  .footer { flex-direction: column; gap: var(--space-2); }
+  .footer > * { width: 100%; }
+  .textarea { font-size: 16px; } /* Prevent iOS zoom */
+}

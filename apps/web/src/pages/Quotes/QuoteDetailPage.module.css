@@ -287,15 +287,67 @@
   gap: var(--space-3);
 }
 
-/* Responsive */
-@media (max-width: 767px) {
-  .header { flex-direction: column; }
-  .headerRight { width: 100%; }
-  .totalCard { width: 100%; align-items: center; }
+/* ══════════════════════════════════════════════════════════════════════════
+   RESPONSIVE DESIGN
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* Tablet */
+@media (max-width: 1024px) {
   .infoGrid { grid-template-columns: 1fr; }
+}
+
+/* Mobile Large */
+@media (max-width: 767px) {
+  .page { gap: var(--space-4); }
+
+  .header { flex-direction: column; gap: var(--space-3); }
+  .headerRight { width: 100%; }
+
+  .title { font-size: var(--font-size-xl); }
+  .quoteMeta { flex-wrap: wrap; gap: var(--space-2); font-size: var(--font-size-xs); }
+
+  .totalCard { width: 100%; align-items: center; padding: var(--space-3) var(--space-4); min-width: auto; }
+  .totalValue { font-size: var(--font-size-xl); }
+
+  .infoCard, .actionsCard, .itemsCard { padding: var(--space-4); }
+  .infoCard h3, .actionsCard h3, .itemsCard h3 { font-size: var(--font-size-base); margin-bottom: var(--space-3); }
+
   .actionButtons { flex-direction: column; }
   .actionButtons button { width: 100%; }
+
+  .itemsTable { font-size: var(--font-size-xs); }
+  .itemsTable th, .itemsTable td { padding: var(--space-2) var(--space-3); }
+
   .totalsSection { justify-content: stretch; }
   .totalsGrid { min-width: 100%; }
+  .grandTotalRow .totalRowValue { font-size: var(--font-size-base); }
+
   .modal { min-width: auto; width: 90%; padding: var(--space-4); }
+  .modalTitle { font-size: var(--font-size-lg); }
+  .modalActions { flex-direction: column; }
+  .modalActions button { width: 100%; }
+}
+
+/* Mobile Small */
+@media (max-width: 480px) {
+  .page { gap: var(--space-3); }
+
+  .title { font-size: var(--font-size-lg); }
+  .quoteMeta { font-size: var(--font-size-2xs); gap: var(--space-1); }
+
+  .totalCard { padding: var(--space-3); }
+  .totalValue { font-size: var(--font-size-lg); }
+
+  .infoCard, .actionsCard, .itemsCard { padding: var(--space-3); }
+  .infoCard h3, .actionsCard h3, .itemsCard h3 { font-size: var(--font-size-sm); }
+  .infoLabel { font-size: var(--font-size-2xs); }
+  .infoValue { font-size: var(--font-size-xs); }
+
+  .itemsTable th, .itemsTable td { padding: var(--space-1) var(--space-2); }
+  .emptyItems { padding: var(--space-4); font-size: var(--font-size-xs); }
+
+  .totalRowLabel, .totalRowValue { font-size: var(--font-size-xs); }
+
+  .modal { width: 95%; padding: var(--space-3); }
+  .modalTitle { font-size: var(--font-size-base); }
 }

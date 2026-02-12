@@ -109,7 +109,42 @@
   background: var(--color-bg);
 }
 
+/* ══════════════════════════════════════════════════════════════════════════
+   RESPONSIVE DESIGN
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* Mobile Large */
 @media (max-width: 767px) {
-  .header { flex-direction: column; align-items: stretch; }
-  .filterRow > * { max-width: none; }
+  .container { gap: var(--space-4); }
+
+  .header { flex-direction: column; align-items: stretch; gap: var(--space-3); }
+
+  .title { font-size: var(--font-size-xl); }
+  .titleIcon { width: 28px; height: 28px; }
+  .titleIcon svg { width: 16px; height: 16px; }
+  .subtitle { font-size: var(--font-size-xs); }
+
+  .filters { padding: var(--space-3); }
+  .filterRow { gap: var(--space-2); }
+  .filterRow > * { max-width: none; min-width: 120px; }
+
+  .pagination { padding: var(--space-3); }
+
+  .routeLink { font-size: var(--font-size-sm); }
+  .badge { font-size: var(--font-size-2xs); }
+}
+
+/* Mobile Small */
+@media (max-width: 480px) {
+  .container { gap: var(--space-3); }
+
+  .title { font-size: var(--font-size-lg); gap: var(--space-2); }
+  .titleIcon { width: 24px; height: 24px; }
+  .titleIcon svg { width: 14px; height: 14px; }
+
+  .filters { padding: var(--space-2); }
+  .filterRow { flex-direction: column; gap: var(--space-2); }
+  .filterRow > * { min-width: 100%; }
+
+  .pagination { padding: var(--space-2); gap: var(--space-2); }
 }

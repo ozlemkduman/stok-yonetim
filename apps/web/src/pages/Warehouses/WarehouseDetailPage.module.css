@@ -357,13 +357,85 @@
   white-space: nowrap;
 }
 
-/* Responsive */
+/* ══════════════════════════════════════════════════════════════════════════
+   RESPONSIVE DESIGN
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* Tablet */
+@media (max-width: 1024px) {
+  .infoGrid { grid-template-columns: 1fr; }
+}
+
+/* Mobile Large */
 @media (max-width: 767px) {
-  .header { flex-direction: column; }
+  .page { gap: var(--space-4); }
+
+  .header { flex-direction: column; gap: var(--space-3); }
   .headerRight { width: 100%; }
-  .statsCard { width: 100%; justify-content: center; }
+
+  .title { font-size: var(--font-size-xl); }
+  .warehouseMeta { flex-wrap: wrap; gap: var(--space-2); font-size: var(--font-size-xs); }
+
+  .statsCard { width: 100%; justify-content: center; padding: var(--space-3) var(--space-4); flex-wrap: wrap; }
+  .statItem { padding: 0 var(--space-2); }
+  .statValue { font-size: var(--font-size-xl); }
+  .statLabel { font-size: var(--font-size-2xs); }
+
+  .infoCard, .summaryCard { padding: var(--space-4); }
+  .infoCard h3, .summaryCard h3 { font-size: var(--font-size-base); margin-bottom: var(--space-3); }
+
+  .summaryGrid { grid-template-columns: repeat(3, 1fr); gap: var(--space-2); }
+  .summaryItem { padding: var(--space-2); }
+  .summaryValue { font-size: var(--font-size-lg); }
+  .summaryLabel { font-size: var(--font-size-2xs); }
+
+  .tabs { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .tab { padding: var(--space-3); white-space: nowrap; flex: none; min-width: 100px; }
+  .tabContent { padding: var(--space-3); }
+
+  .stocksTable, .movementsTable, .transfersTable { font-size: var(--font-size-xs); }
+  .stocksTable th, .stocksTable td,
+  .movementsTable th, .movementsTable td,
+  .transfersTable th, .transfersTable td { padding: var(--space-2) var(--space-3); }
+
+  .movementNotes, .transferNotes { max-width: 120px; }
+
+  .emptyState { padding: var(--space-6); }
+}
+
+/* Mobile Small */
+@media (max-width: 480px) {
+  .page { gap: var(--space-3); }
+
+  .title { font-size: var(--font-size-lg); }
+  .warehouseMeta { font-size: var(--font-size-2xs); gap: var(--space-1); }
+
+  .statsCard { padding: var(--space-3); gap: var(--space-2); }
+  .statItem { padding: 0 var(--space-1); }
+  .statItem:not(:last-child) { border-right: none; }
+  .statValue { font-size: var(--font-size-lg); }
+
+  .infoCard, .summaryCard { padding: var(--space-3); }
+  .infoCard h3, .summaryCard h3 { font-size: var(--font-size-sm); }
+  .infoLabel { font-size: var(--font-size-2xs); }
+  .infoValue { font-size: var(--font-size-xs); }
+
   .summaryGrid { grid-template-columns: 1fr; }
-  .tabs { flex-direction: column; }
-  .tab { text-align: center; }
-  .tabActive::after { display: none; }
+  .summaryItem {
+    flex-direction: row;
+    justify-content: space-between;
+    text-align: left;
+    padding: var(--space-2) var(--space-3);
+  }
+  .summaryValue { font-size: var(--font-size-base); order: 1; }
+  .summaryLabel { margin-top: 0; order: 0; }
+
+  .tab { padding: var(--space-2) var(--space-3); min-width: 80px; font-size: var(--font-size-xs); }
+  .tabContent { padding: var(--space-2); }
+
+  .stocksTable th, .stocksTable td,
+  .movementsTable th, .movementsTable td,
+  .transfersTable th, .transfersTable td { padding: var(--space-1) var(--space-2); }
+
+  .emptyState { padding: var(--space-4); font-size: var(--font-size-xs); }
 }

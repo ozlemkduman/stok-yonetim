@@ -233,11 +233,61 @@
   color: var(--color-warning-dark);
 }
 
-/* Responsive */
+/* ══════════════════════════════════════════════════════════════════════════
+   RESPONSIVE DESIGN
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* Mobile Large */
 @media (max-width: 767px) {
-  .header { flex-direction: column; }
+  .page { gap: var(--space-4); }
+
+  .header { flex-direction: column; gap: var(--space-3); }
   .headerRight { width: 100%; }
-  .totalCard { width: 100%; align-items: center; }
-  .infoGrid { grid-template-columns: 1fr; }
-  .totalsCard { max-width: none; margin-left: 0; }
+
+  .title { font-size: var(--font-size-xl); }
+  .returnMeta { flex-wrap: wrap; gap: var(--space-2); font-size: var(--font-size-xs); }
+
+  .totalCard { width: 100%; align-items: center; padding: var(--space-3) var(--space-4); min-width: auto; }
+  .totalValue { font-size: var(--font-size-xl); }
+
+  .infoGrid { grid-template-columns: 1fr; gap: var(--space-3); }
+  .infoCard { padding: var(--space-4); }
+  .infoCard h3 { font-size: var(--font-size-base); margin-bottom: var(--space-3); }
+
+  .itemsCard { padding: var(--space-3); }
+  .itemsCard h3 { font-size: var(--font-size-base); margin-bottom: var(--space-3); }
+  .itemsTable { font-size: var(--font-size-xs); }
+  .itemsTable th, .itemsTable td { padding: var(--space-2) var(--space-3); }
+
+  .totalsCard { max-width: none; margin-left: 0; padding: var(--space-4); }
+  .totalsCard h3 { font-size: var(--font-size-base); }
+  .grandTotalValue { font-size: var(--font-size-base); }
+
+  .emptyState { padding: var(--space-6); }
+}
+
+/* Mobile Small */
+@media (max-width: 480px) {
+  .page { gap: var(--space-3); }
+
+  .title { font-size: var(--font-size-lg); }
+  .returnMeta { font-size: var(--font-size-2xs); gap: var(--space-1); }
+
+  .totalCard { padding: var(--space-3); }
+  .totalValue { font-size: var(--font-size-lg); }
+
+  .infoCard { padding: var(--space-3); }
+  .infoCard h3 { font-size: var(--font-size-sm); }
+  .infoLabel { font-size: var(--font-size-2xs); }
+  .infoValue { font-size: var(--font-size-xs); }
+
+  .itemsCard { padding: var(--space-2); }
+  .itemsCard h3 { font-size: var(--font-size-sm); }
+  .itemsTable th, .itemsTable td { padding: var(--space-1) var(--space-2); }
+
+  .totalsCard { padding: var(--space-3); }
+  .totalsCard h3 { font-size: var(--font-size-sm); }
+  .totalRowLabel, .totalRowValue { font-size: var(--font-size-xs); }
+
+  .emptyState { padding: var(--space-4); font-size: var(--font-size-xs); }
 }

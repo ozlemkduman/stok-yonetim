@@ -117,7 +117,47 @@
 .success { color: var(--color-success); }
 .danger { color: var(--color-danger); }
 
+/* ══════════════════════════════════════════════════════════════════════════
+   RESPONSIVE DESIGN
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* Mobile Large */
 @media (max-width: 767px) {
-  .header { flex-direction: column; align-items: stretch; }
-  .filters { flex-wrap: wrap; }
+  .page { gap: var(--space-4); }
+
+  .header { flex-direction: column; align-items: stretch; gap: var(--space-3); }
+
+  .title { font-size: var(--font-size-xl); }
+  .titleIcon { width: 28px; height: 28px; }
+  .titleIcon svg { width: 16px; height: 16px; }
+  .subtitle { font-size: var(--font-size-xs); }
+
+  .filters { flex-wrap: wrap; gap: var(--space-2); }
+  .dateInput { height: 44px; width: 100%; }
+
+  .grid { gap: var(--space-4); }
+  .reportCardHeader { padding: var(--space-3) var(--space-4); }
+  .reportCardTitle { font-size: var(--font-size-sm); }
+  .reportCardBody { padding: var(--space-3) var(--space-4); }
+  .reportItem { padding: var(--space-2) 0; }
+  .reportItem span { font-size: var(--font-size-xs); }
+  .reportItem strong { font-size: var(--font-size-sm); }
+}
+
+/* Mobile Small */
+@media (max-width: 480px) {
+  .page { gap: var(--space-3); }
+
+  .title { font-size: var(--font-size-lg); gap: var(--space-2); }
+  .titleIcon { width: 24px; height: 24px; }
+  .titleIcon svg { width: 14px; height: 14px; }
+
+  .filters { flex-direction: column; width: 100%; }
+  .dateInput { font-size: 16px; } /* Prevent iOS zoom */
+
+  .grid { gap: var(--space-3); }
+  .reportCardHeader { padding: var(--space-2) var(--space-3); gap: var(--space-1); }
+  .reportCardHeader svg { width: 16px; height: 16px; }
+  .reportCardTitle { font-size: var(--font-size-xs); }
+  .reportCardBody { padding: var(--space-2) var(--space-3); }
 }
