@@ -212,31 +212,31 @@ export class HealthController {
 
     // 17. INTEGRATIONS
     const integrations = await knex('integrations').insert([
-      { name: 'Trendyol Magazasi', type: 'e-commerce', provider: 'trendyol', status: 'active', config: JSON.stringify({ apiKey: 'xxx', sellerId: '12345' }), last_sync_at: '2024-01-25 10:30:00' },
-      { name: 'Hepsiburada Magazasi', type: 'e-commerce', provider: 'hepsiburada', status: 'active', config: JSON.stringify({ apiKey: 'yyy' }), last_sync_at: '2024-01-24 15:45:00' },
+      { name: 'Trendyol Magazasi', type: 'e_commerce', provider: 'trendyol', status: 'active', config: JSON.stringify({ apiKey: 'xxx', sellerId: '12345' }), last_sync_at: '2024-01-25 10:30:00' },
+      { name: 'Hepsiburada Magazasi', type: 'e_commerce', provider: 'hepsiburada', status: 'active', config: JSON.stringify({ apiKey: 'yyy' }), last_sync_at: '2024-01-24 15:45:00' },
       { name: 'Garanti Banka', type: 'bank', provider: 'garanti', status: 'active', config: JSON.stringify({ merchantId: 'M123' }) },
     ]).returning('*');
 
     // 18. INTEGRATION LOGS
     await knex('integration_logs').insert([
-      { integration_id: integrations[0].id, action: 'sync_orders', status: 'success', message: '15 siparis senkronize edildi' },
-      { integration_id: integrations[0].id, action: 'sync_products', status: 'success', message: 'Urunler guncellendi' },
-      { integration_id: integrations[1].id, action: 'sync_orders', status: 'success', message: '8 siparis senkronize edildi' },
+      { integration_id: integrations[0].id, action: 'sync', status: 'success', message: '15 siparis senkronize edildi' },
+      { integration_id: integrations[0].id, action: 'pull', status: 'success', message: 'Urunler guncellendi' },
+      { integration_id: integrations[1].id, action: 'sync', status: 'success', message: '8 siparis senkronize edildi' },
     ]);
 
     // 19. E-COMMERCE ORDERS
     await knex('e_commerce_orders').insert([
-      { integration_id: integrations[0].id, platform_order_id: 'TY-2024-001', order_date: '2024-01-20', customer_name: 'Online Musteri 1', total_amount: 15000, status: 'delivered', sync_status: 'synced' },
-      { integration_id: integrations[0].id, platform_order_id: 'TY-2024-002', order_date: '2024-01-22', customer_name: 'Online Musteri 2', total_amount: 6500, status: 'shipped', sync_status: 'synced' },
-      { integration_id: integrations[1].id, platform_order_id: 'HB-2024-001', order_date: '2024-01-21', customer_name: 'HB Musteri 1', total_amount: 10500, status: 'delivered', sync_status: 'synced' },
+      { integration_id: integrations[0].id, external_order_id: 'TY-2024-001', order_date: '2024-01-20', customer_name: 'Online Musteri 1', subtotal: 15000, total: 15000, status: 'delivered', sync_status: 'synced' },
+      { integration_id: integrations[0].id, external_order_id: 'TY-2024-002', order_date: '2024-01-22', customer_name: 'Online Musteri 2', subtotal: 6500, total: 6500, status: 'shipped', sync_status: 'synced' },
+      { integration_id: integrations[1].id, external_order_id: 'HB-2024-001', order_date: '2024-01-21', customer_name: 'HB Musteri 1', subtotal: 10500, total: 10500, status: 'delivered', sync_status: 'synced' },
     ]);
 
     // 20. CRM CONTACTS
     const contacts = await knex('crm_contacts').insert([
-      { name: 'Burak Yildirim', email: 'burak@firma.com', phone: '0537 111 2233', company: 'ABC Teknoloji', title: 'Satin Alma Muduru', status: 'lead', source: 'website' },
-      { name: 'Selin Aksoy', email: 'selin@xyz.com', phone: '0538 222 3344', company: 'XYZ Holding', title: 'IT Direktoru', status: 'prospect', source: 'referral' },
-      { name: 'Emre Koc', email: 'emre@startup.io', phone: '0539 333 4455', company: 'Startup IO', title: 'CEO', status: 'customer', source: 'fair', customer_id: customers[4].id },
-      { name: 'Zeynep Demir', email: 'zeynep@bigcorp.com', phone: '0540 444 5566', company: 'Big Corp', title: 'Proje Yoneticisi', status: 'lead', source: 'linkedin' },
+      { name: 'Burak Yildirim', email: 'burak@firma.com', phone: '0537 111 2233', title: 'Satin Alma Muduru', status: 'lead', source: 'website' },
+      { name: 'Selin Aksoy', email: 'selin@xyz.com', phone: '0538 222 3344', title: 'IT Direktoru', status: 'prospect', source: 'referral' },
+      { name: 'Emre Koc', email: 'emre@startup.io', phone: '0539 333 4455', title: 'CEO', status: 'customer', source: 'event', customer_id: customers[4].id },
+      { name: 'Zeynep Demir', email: 'zeynep@bigcorp.com', phone: '0540 444 5566', title: 'Proje Yoneticisi', status: 'lead', source: 'social' },
     ]).returning('*');
 
     // 21. CRM ACTIVITIES
@@ -249,20 +249,20 @@ export class HealthController {
 
     // 22. FIELD TEAM ROUTES
     const routes = await knex('field_team_routes').insert([
-      { name: 'Kadikoy Rotasi', route_date: '2024-01-25', status: 'completed', notes: 'Kadikoy bolgesi', estimated_duration: 240, actual_duration: 255 },
-      { name: 'Besiktas Rotasi', route_date: '2024-01-26', status: 'completed', notes: 'Besiktas bolgesi', estimated_duration: 180, actual_duration: 195 },
-      { name: 'Sisli Rotasi', route_date: '2024-01-28', status: 'in_progress', notes: 'Sisli bolgesi', estimated_duration: 300 },
-      { name: 'Bakirkoy Rotasi', route_date: '2024-01-29', status: 'planned', notes: 'Bakirkoy bolgesi', estimated_duration: 210 },
+      { name: 'Kadikoy Rotasi', route_date: '2024-01-25', status: 'completed', notes: 'Kadikoy bolgesi', estimated_duration_minutes: 240, actual_duration_minutes: 255 },
+      { name: 'Besiktas Rotasi', route_date: '2024-01-26', status: 'completed', notes: 'Besiktas bolgesi', estimated_duration_minutes: 180, actual_duration_minutes: 195 },
+      { name: 'Sisli Rotasi', route_date: '2024-01-28', status: 'in_progress', notes: 'Sisli bolgesi', estimated_duration_minutes: 300 },
+      { name: 'Bakirkoy Rotasi', route_date: '2024-01-29', status: 'planned', notes: 'Bakirkoy bolgesi', estimated_duration_minutes: 210 },
     ]).returning('*');
 
     // 23. FIELD TEAM VISITS
     await knex('field_team_visits').insert([
-      { route_id: routes[0].id, customer_id: customers[0].id, visit_type: 'regular', scheduled_time: '09:00', check_in_time: '2024-01-25 09:05:00', check_out_time: '2024-01-25 09:45:00', status: 'completed', outcome: 'Siparis alindi' },
-      { route_id: routes[0].id, customer_id: customers[2].id, visit_type: 'collection', scheduled_time: '10:30', check_in_time: '2024-01-25 10:35:00', check_out_time: '2024-01-25 11:00:00', status: 'completed', outcome: 'Odeme alindi' },
-      { route_id: routes[1].id, customer_id: customers[1].id, visit_type: 'regular', scheduled_time: '14:00', check_in_time: '2024-01-26 14:10:00', check_out_time: '2024-01-26 14:50:00', status: 'completed' },
-      { route_id: routes[2].id, customer_id: customers[4].id, visit_type: 'regular', scheduled_time: '10:00', check_in_time: '2024-01-28 10:00:00', status: 'in_progress' },
-      { route_id: routes[2].id, customer_id: customers[3].id, visit_type: 'collection', scheduled_time: '11:30', status: 'pending' },
-      { route_id: routes[3].id, customer_id: customers[3].id, visit_type: 'regular', scheduled_time: '09:00', status: 'pending' },
+      { route_id: routes[0].id, customer_id: customers[0].id, visit_order: 1, visit_type: 'sales', scheduled_time: '2024-01-25 09:00:00', check_in_time: '2024-01-25 09:05:00', check_out_time: '2024-01-25 09:45:00', status: 'completed', outcome: 'Siparis alindi' },
+      { route_id: routes[0].id, customer_id: customers[2].id, visit_order: 2, visit_type: 'collection', scheduled_time: '2024-01-25 10:30:00', check_in_time: '2024-01-25 10:35:00', check_out_time: '2024-01-25 11:00:00', status: 'completed', outcome: 'Odeme alindi' },
+      { route_id: routes[1].id, customer_id: customers[1].id, visit_order: 1, visit_type: 'sales', scheduled_time: '2024-01-26 14:00:00', check_in_time: '2024-01-26 14:10:00', check_out_time: '2024-01-26 14:50:00', status: 'completed' },
+      { route_id: routes[2].id, customer_id: customers[4].id, visit_order: 1, visit_type: 'sales', scheduled_time: '2024-01-28 10:00:00', check_in_time: '2024-01-28 10:00:00', status: 'in_progress' },
+      { route_id: routes[2].id, customer_id: customers[3].id, visit_order: 2, visit_type: 'collection', scheduled_time: '2024-01-28 11:30:00', status: 'pending' },
+      { route_id: routes[3].id, customer_id: customers[3].id, visit_order: 1, visit_type: 'sales', scheduled_time: '2024-01-29 09:00:00', status: 'pending' },
     ]);
 
     // 24. STOCK MOVEMENTS
