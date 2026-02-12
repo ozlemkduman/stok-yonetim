@@ -121,10 +121,10 @@ export class HealthController {
 
     // 5. ACCOUNTS
     const accounts = await knex('accounts').insert([
-      { name: 'Ana Kasa', type: 'kasa', balance: 25000.0, opening_balance: 10000.0, is_default: true, is_active: true },
-      { name: 'Garanti Bankasi', type: 'banka', bank_name: 'Garanti BBVA', branch_name: 'Kadikoy Subesi', account_number: '1234567', iban: 'TR12 0006 2000 0001 2345 6789 01', balance: 150000.0, opening_balance: 100000.0, is_default: false, is_active: true },
-      { name: 'Is Bankasi', type: 'banka', bank_name: 'Turkiye Is Bankasi', branch_name: 'Besiktas Subesi', account_number: '7654321', iban: 'TR98 0006 4000 0017 6543 2100 01', balance: 75000.0, opening_balance: 50000.0, is_default: false, is_active: true },
-      { name: 'Pos Cihazi', type: 'kasa', balance: 5000.0, opening_balance: 0, is_default: false, is_active: true },
+      { name: 'Ana Kasa', account_type: 'kasa', current_balance: 25000.0, opening_balance: 10000.0, is_default: true, is_active: true },
+      { name: 'Garanti Bankasi', account_type: 'banka', bank_name: 'Garanti BBVA', branch_name: 'Kadikoy Subesi', account_number: '1234567', iban: 'TR12 0006 2000 0001 2345 6789 01', current_balance: 150000.0, opening_balance: 100000.0, is_default: false, is_active: true },
+      { name: 'Is Bankasi', account_type: 'banka', bank_name: 'Turkiye Is Bankasi', branch_name: 'Besiktas Subesi', account_number: '7654321', iban: 'TR98 0006 4000 0017 6543 2100 01', current_balance: 75000.0, opening_balance: 50000.0, is_default: false, is_active: true },
+      { name: 'Pos Cihazi', account_type: 'kasa', current_balance: 5000.0, opening_balance: 0, is_default: false, is_active: true },
     ]).returning('*');
 
     // 6. SALES
