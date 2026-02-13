@@ -1,0 +1,237 @@
+/* Invoice Print View - A4 Format */
+.invoice {
+  width: 210mm;
+  min-height: 297mm;
+  padding: 15mm;
+  margin: 0 auto;
+  background: white;
+  color: #000;
+  font-family: 'Arial', sans-serif;
+  font-size: 10pt;
+  line-height: 1.4;
+  box-sizing: border-box;
+}
+
+/* Header */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding-bottom: 10mm;
+  border-bottom: 2px solid #333;
+  margin-bottom: 8mm;
+}
+
+.companyInfo {
+  flex: 1;
+}
+
+.companyName {
+  font-size: 18pt;
+  font-weight: bold;
+  margin: 0 0 2mm 0;
+  color: #1a365d;
+}
+
+.companyInfo p {
+  margin: 1mm 0;
+  font-size: 9pt;
+  color: #444;
+}
+
+.invoiceInfo {
+  text-align: right;
+}
+
+.invoiceTitle {
+  font-size: 16pt;
+  font-weight: bold;
+  margin: 0 0 4mm 0;
+  color: #1a365d;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.invoiceMeta {
+  font-size: 9pt;
+  border-collapse: collapse;
+}
+
+.invoiceMeta td {
+  padding: 1mm 2mm;
+  text-align: right;
+}
+
+.invoiceMeta td:first-child {
+  color: #666;
+}
+
+/* Customer Section */
+.customerSection {
+  margin-bottom: 8mm;
+  padding: 4mm;
+  background: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 2mm;
+}
+
+.customerSection h3 {
+  margin: 0 0 2mm 0;
+  font-size: 10pt;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.customerInfo p {
+  margin: 1mm 0;
+}
+
+/* Items Table */
+.itemsTable {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 8mm;
+  font-size: 9pt;
+}
+
+.itemsTable th,
+.itemsTable td {
+  padding: 2.5mm 2mm;
+  border: 1px solid #dee2e6;
+}
+
+.itemsTable th {
+  background: #1a365d;
+  color: white;
+  font-weight: 600;
+  text-align: left;
+  font-size: 8pt;
+  text-transform: uppercase;
+}
+
+.itemsTable tbody tr:nth-child(even) {
+  background: #f8f9fa;
+}
+
+.itemsTable tbody td {
+  vertical-align: middle;
+}
+
+.right {
+  text-align: right !important;
+}
+
+/* Totals Section */
+.totalsSection {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 8mm;
+}
+
+.totalsTable {
+  width: 70mm;
+  border-collapse: collapse;
+  font-size: 10pt;
+}
+
+.totalsTable td {
+  padding: 2mm 3mm;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.totalsTable td:first-child {
+  color: #666;
+  text-align: right;
+  padding-right: 5mm;
+}
+
+.totalsTable td:last-child {
+  text-align: right;
+  font-weight: 500;
+}
+
+.grandTotal td {
+  border-top: 2px solid #1a365d;
+  border-bottom: 2px solid #1a365d;
+  font-weight: bold !important;
+  font-size: 12pt;
+  color: #1a365d !important;
+  padding: 3mm !important;
+}
+
+/* Payment Section */
+.paymentSection {
+  margin-bottom: 10mm;
+  padding: 4mm;
+  background: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 2mm;
+}
+
+.paymentSection p {
+  margin: 1mm 0;
+  font-size: 9pt;
+}
+
+/* Footer */
+.footer {
+  margin-top: auto;
+  padding-top: 10mm;
+}
+
+.signatures {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10mm;
+}
+
+.signature {
+  width: 60mm;
+  text-align: center;
+}
+
+.signatureLine {
+  height: 15mm;
+  border-bottom: 1px solid #333;
+  margin-bottom: 2mm;
+}
+
+.signature p {
+  margin: 0;
+  font-size: 9pt;
+  color: #666;
+}
+
+.footerNote {
+  text-align: center;
+  font-size: 8pt;
+  color: #999;
+  margin: 0;
+  padding-top: 5mm;
+  border-top: 1px dashed #ccc;
+}
+
+/* Print Styles */
+@media print {
+  .invoice {
+    width: 100%;
+    min-height: auto;
+    padding: 10mm;
+    margin: 0;
+    box-shadow: none;
+  }
+
+  @page {
+    size: A4;
+    margin: 10mm;
+  }
+}
+
+/* Screen Preview */
+@media screen {
+  .invoice {
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    margin: 20px auto;
+  }
+}

@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Table, Button, Select, Badge, Pagination, type Column } from '@stok/ui';
 import { EDocument, EDocumentSummary, eDocumentsApi } from '../../api/e-documents.api';
 import { useToast } from '../../context/ToastContext';
+import { CreateEDocumentModal } from './CreateEDocumentModal';
 import { formatCurrency, formatDate } from '../../utils/formatters';
 import styles from './EDocumentListPage.module.css';
 
@@ -61,6 +62,7 @@ export function EDocumentListPage() {
   const [total, setTotal] = useState(0);
   const [typeFilter, setTypeFilter] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
+  const [showCreateModal, setShowCreateModal] = useState(false);
 
   const { showToast } = useToast();
 
@@ -206,6 +208,9 @@ export function EDocumentListPage() {
           </h1>
           <p className={styles.subtitle}>Toplam {total} belge</p>
         </div>
+        <Button onClick={() => setShowCreateModal(true)}>
+          + Yeni e-Belge
+        </Button>
       </div>
 
       {summary && (
@@ -269,6 +274,17 @@ export function EDocumentListPage() {
           </div>
         )}
       </div>
+
+      {showCreateModal && (
+        <CreateEDocumentModal
+          onClose={() => setShowCreateModal(false)}
+          onSuccess={() => {
+            setShowCreateModal(false);
+            fetchDocuments();
+            fetchSummary();
+          }}
+        />
+      )}
     </div>
   );
 }

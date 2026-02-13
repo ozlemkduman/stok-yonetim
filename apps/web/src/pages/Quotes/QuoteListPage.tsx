@@ -231,7 +231,7 @@ export function QuoteListPage() {
           </h1>
           <p className={styles.subtitle}>Toplam {total} teklif</p>
         </div>
-        <Button onClick={() => alert('Teklif olusturma sayfasi yakin zamanda eklenecek')}>
+        <Button onClick={() => navigate('/quotes/new')}>
           + Yeni Teklif
         </Button>
       </div>

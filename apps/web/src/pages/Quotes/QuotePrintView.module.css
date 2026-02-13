@@ -1,0 +1,249 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.loading, .error {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-8);
+  font-size: var(--font-size-lg);
+  color: var(--color-text-secondary);
+}
+
+.error { color: var(--color-danger); }
+
+.toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-4);
+  background: var(--color-bg-elevated);
+  border-radius: var(--radius-lg);
+  margin-bottom: var(--space-4);
+}
+
+.printArea {
+  background: white;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+}
+
+.printContent {
+  padding: var(--space-8);
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.printHeader {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: var(--space-8);
+  padding-bottom: var(--space-4);
+  border-bottom: 2px solid var(--color-border);
+}
+
+.companyInfo {
+  flex: 1;
+}
+
+.companyName {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  margin: 0 0 var(--space-2);
+  color: var(--color-primary);
+}
+
+.companyInfo p {
+  margin: var(--space-1) 0;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+.documentInfo {
+  text-align: right;
+}
+
+.documentTitle {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  margin: 0 0 var(--space-3);
+  color: var(--color-text-primary);
+}
+
+.infoTable {
+  font-size: var(--font-size-sm);
+}
+
+.infoTable td {
+  padding: var(--space-1) var(--space-2);
+}
+
+.infoTable td:first-child {
+  color: var(--color-text-secondary);
+  text-align: right;
+}
+
+.customerSection {
+  margin-bottom: var(--space-6);
+  padding: var(--space-4);
+  background: var(--color-bg);
+  border-radius: var(--radius-md);
+}
+
+.customerSection h3 {
+  margin: 0 0 var(--space-2);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+}
+
+.customerSection p {
+  margin: 0;
+}
+
+.itemsTable {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: var(--space-6);
+  font-size: var(--font-size-sm);
+}
+
+.itemsTable th,
+.itemsTable td {
+  padding: var(--space-3);
+  border: 1px solid var(--color-border);
+}
+
+.itemsTable th {
+  background: var(--color-bg);
+  font-weight: var(--font-weight-semibold);
+  text-align: left;
+}
+
+.alignRight {
+  text-align: right;
+}
+
+.totalsSection {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: var(--space-6);
+}
+
+.totalsTable {
+  min-width: 300px;
+  font-size: var(--font-size-sm);
+}
+
+.totalsTable td {
+  padding: var(--space-2) var(--space-4);
+}
+
+.totalsTable td:first-child {
+  text-align: right;
+  color: var(--color-text-secondary);
+}
+
+.totalsTable td:last-child {
+  text-align: right;
+}
+
+.grandTotalRow {
+  border-top: 2px solid var(--color-border);
+  font-size: var(--font-size-lg);
+}
+
+.grandTotalRow td {
+  padding-top: var(--space-3);
+  color: var(--color-primary);
+}
+
+.notesSection {
+  margin-bottom: var(--space-6);
+  padding: var(--space-4);
+  background: var(--color-bg);
+  border-radius: var(--radius-md);
+}
+
+.notesSection h4 {
+  margin: 0 0 var(--space-2);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+.notesSection p {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  white-space: pre-wrap;
+}
+
+.printFooter {
+  margin-top: var(--space-8);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--color-border);
+}
+
+.printFooter > p {
+  text-align: center;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  margin-bottom: var(--space-6);
+}
+
+.signatureArea {
+  display: flex;
+  justify-content: space-around;
+  margin-top: var(--space-8);
+}
+
+.signatureBox {
+  text-align: center;
+  width: 200px;
+}
+
+.signatureBox p {
+  margin: 0 0 var(--space-12);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+.signatureLine {
+  border-top: 1px solid var(--color-text-secondary);
+}
+
+/* Print styles */
+@media print {
+  .toolbar {
+    display: none;
+  }
+
+  .page {
+    padding: 0;
+    background: white;
+  }
+
+  .printArea {
+    box-shadow: none;
+    border-radius: 0;
+  }
+
+  .printContent {
+    padding: 20mm;
+    max-width: none;
+  }
+}
+
+/* Responsive */
+@media (max-width: 767px) {
+  .printContent { padding: var(--space-4); }
+  .printHeader { flex-direction: column; gap: var(--space-4); }
+  .documentInfo { text-align: left; }
+  .itemsTable { font-size: var(--font-size-xs); }
+  .itemsTable th, .itemsTable td { padding: var(--space-2); }
+  .totalsTable { min-width: 100%; }
+  .signatureArea { flex-direction: column; gap: var(--space-6); align-items: center; }
+}

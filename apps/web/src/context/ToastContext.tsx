@@ -40,28 +40,32 @@ export function ToastProvider({ children }: { children: ReactNode }) {
       {toasts.length > 0 && (
         <div style={{
           position: 'fixed',
-          bottom: 'var(--space-4)',
-          right: 'var(--space-4)',
+          bottom: '24px',
+          right: '24px',
           display: 'flex',
           flexDirection: 'column',
-          gap: 'var(--space-2)',
-          zIndex: 'var(--z-toast)',
+          gap: '8px',
+          zIndex: 9999,
         }}>
           {toasts.map((toast) => (
             <div
               key={toast.id}
               onClick={() => removeToast(toast.id)}
               style={{
-                padding: 'var(--space-4)',
-                borderRadius: 'var(--radius-md)',
-                backgroundColor: toast.type === 'success' ? 'var(--color-success)' :
-                                toast.type === 'error' ? 'var(--color-danger)' :
-                                toast.type === 'warning' ? 'var(--color-warning)' :
-                                'var(--color-info)',
+                padding: '16px 20px',
+                borderRadius: '8px',
+                backgroundColor: toast.type === 'success' ? '#10b981' :
+                                toast.type === 'error' ? '#ef4444' :
+                                toast.type === 'warning' ? '#f59e0b' :
+                                '#3b82f6',
                 color: 'white',
                 cursor: 'pointer',
-                boxShadow: 'var(--shadow-lg)',
-                minWidth: '250px',
+                boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+                minWidth: '280px',
+                maxWidth: '400px',
+                fontSize: '14px',
+                fontWeight: 500,
+                animation: 'slideIn 0.3s ease-out',
               }}
             >
               {toast.message}
@@ -69,6 +73,18 @@ export function ToastProvider({ children }: { children: ReactNode }) {
           ))}
         </div>
       )}
+      <style>{`
+        @keyframes slideIn {
+          from {
+            transform: translateX(100%);
+            opacity: 0;
+          }
+          to {
+            transform: translateX(0);
+            opacity: 1;
+          }
+        }
+      `}</style>
     </ToastContext.Provider>
   );
 }

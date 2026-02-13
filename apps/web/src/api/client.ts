@@ -17,6 +17,10 @@ interface ApiError {
   errors?: string[];
 }
 
+// Token storage keys
+const ACCESS_TOKEN_KEY = 'access_token';
+const REFRESH_TOKEN_KEY = 'refresh_token';
+
 class ApiClient {
   private baseUrl: string;
 
@@ -24,21 +28,86 @@ class ApiClient {
     this.baseUrl = baseUrl;
   }
 
+  getAccessToken(): string | null {
+    return localStorage.getItem(ACCESS_TOKEN_KEY);
+  }
+
+  setAccessToken(token: string): void {
+    localStorage.setItem(ACCESS_TOKEN_KEY, token);
+  }
+
+  getRefreshToken(): string | null {
+    return localStorage.getItem(REFRESH_TOKEN_KEY);
+  }
+
+  setRefreshToken(token: string): void {
+    localStorage.setItem(REFRESH_TOKEN_KEY, token);
+  }
+
+  clearTokens(): void {
+    localStorage.removeItem(ACCESS_TOKEN_KEY);
+    localStorage.removeItem(REFRESH_TOKEN_KEY);
+  }
+
+  setTokens(accessToken: string, refreshToken: string): void {
+    this.setAccessToken(accessToken);
+    this.setRefreshToken(refreshToken);
+  }
+
+  isAuthenticated(): boolean {
+    return !!this.getAccessToken();
+  }
+
   private async request<T>(
     endpoint: string,
-    options: RequestInit = {}
+    options: RequestInit = {},
+    skipAuth = false
   ): Promise<ApiResponse<T>> {
     const url = `${this.baseUrl}${endpoint}`;
 
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+      ...(options.headers as Record<string, string>),
+    };
+
+    // Add auth header if token exists and not skipping auth
+    if (!skipAuth) {
+      const token = this.getAccessToken();
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+    }
+
     const config: RequestInit = {
       ...options,
-      headers: {
-        'Content-Type': 'application/json',
-        ...options.headers,
-      },
+      headers,
     };
 
     const response = await fetch(url, config);
+
+    // Handle 401 Unauthorized - try to refresh token
+    if (response.status === 401 && !skipAuth) {
+      const refreshed = await this.tryRefreshToken();
+      if (refreshed) {
+        // Retry the request with new token
+        headers['Authorization'] = `Bearer ${this.getAccessToken()}`;
+        const retryResponse = await fetch(url, { ...config, headers });
+        const retryData = await retryResponse.json();
+
+        if (!retryResponse.ok) {
+          const error = retryData as ApiError;
+          throw new Error(error.message || 'API error');
+        }
+
+        return retryData as ApiResponse<T>;
+      } else {
+        // Refresh failed, clear tokens and throw
+        this.clearTokens();
+        window.dispatchEvent(new CustomEvent('auth:logout'));
+        throw new Error('Oturum süresi doldu');
+      }
+    }
+
     const data = await response.json();
 
     if (!response.ok) {
@@ -49,23 +118,56 @@ class ApiClient {
     return data as ApiResponse<T>;
   }
 
-  async get<T>(endpoint: string, params?: Record<string, string | number>): Promise<ApiResponse<T>> {
+  private async tryRefreshToken(): Promise<boolean> {
+    const refreshToken = this.getRefreshToken();
+    if (!refreshToken) return false;
+
+    try {
+      const response = await fetch(`${this.baseUrl}/auth/refresh`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ refreshToken }),
+      });
+
+      if (!response.ok) return false;
+
+      const data = await response.json();
+      if (data.data?.accessToken) {
+        this.setAccessToken(data.data.accessToken);
+        if (data.data.refreshToken) {
+          this.setRefreshToken(data.data.refreshToken);
+        }
+        return true;
+      }
+
+      return false;
+    } catch {
+      return false;
+    }
+  }
+
+  async get<T>(endpoint: string, params?: Record<string, string | number | boolean | undefined>): Promise<ApiResponse<T>> {
     let url = endpoint;
     if (params) {
       const searchParams = new URLSearchParams();
       Object.entries(params).forEach(([key, value]) => {
-        searchParams.append(key, String(value));
+        if (value !== undefined) {
+          searchParams.append(key, String(value));
+        }
       });
-      url = `${endpoint}?${searchParams.toString()}`;
+      const queryString = searchParams.toString();
+      if (queryString) {
+        url = `${endpoint}?${queryString}`;
+      }
     }
     return this.request<T>(url, { method: 'GET' });
   }
 
-  async post<T>(endpoint: string, body: unknown): Promise<ApiResponse<T>> {
+  async post<T>(endpoint: string, body: unknown, skipAuth = false): Promise<ApiResponse<T>> {
     return this.request<T>(endpoint, {
       method: 'POST',
       body: JSON.stringify(body),
-    });
+    }, skipAuth);
   }
 
   async patch<T>(endpoint: string, body: unknown): Promise<ApiResponse<T>> {

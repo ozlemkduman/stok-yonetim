@@ -125,4 +125,197 @@ export class ReportsService {
       .orderBy('total_quantity', 'desc')
       .limit(limit);
   }
+
+  async getTopCustomers(startDate: string, endDate: string, limit: number = 10) {
+    return this.db.knex('sales')
+      .join('customers', 'sales.customer_id', 'customers.id')
+      .where('sales.status', 'completed')
+      .whereBetween('sales.sale_date', [startDate, endDate])
+      .select('customers.id', 'customers.name', 'customers.phone')
+      .sum('sales.grand_total as total_amount')
+      .count('sales.id as sale_count')
+      .groupBy('customers.id', 'customers.name', 'customers.phone')
+      .orderBy('total_amount', 'desc')
+      .limit(limit);
+  }
+
+  async getUpcomingPayments(days: number = 30) {
+    const today = new Date().toISOString().split('T')[0];
+    const futureDate = new Date(Date.now() + days * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+
+    return this.db.knex('sales')
+      .leftJoin('customers', 'sales.customer_id', 'customers.id')
+      .where('sales.status', 'completed')
+      .where('sales.payment_method', 'veresiye')
+      .whereNotNull('sales.due_date')
+      .whereBetween('sales.due_date', [today, futureDate])
+      .select(
+        'sales.id',
+        'sales.invoice_number',
+        'sales.grand_total',
+        'sales.due_date',
+        'sales.sale_date',
+        'customers.name as customer_name',
+        'customers.phone as customer_phone'
+      )
+      .orderBy('sales.due_date', 'asc');
+  }
+
+  async getOverduePayments() {
+    const today = new Date().toISOString().split('T')[0];
+
+    const overdueList = await this.db.knex('sales')
+      .leftJoin('customers', 'sales.customer_id', 'customers.id')
+      .where('sales.status', 'completed')
+      .where('sales.payment_method', 'veresiye')
+      .whereNotNull('sales.due_date')
+      .where('sales.due_date', '<', today)
+      .select(
+        'sales.id',
+        'sales.invoice_number',
+        'sales.grand_total',
+        'sales.due_date',
+        'sales.sale_date',
+        'customers.id as customer_id',
+        'customers.name as customer_name',
+        'customers.phone as customer_phone',
+        this.db.knex.raw(`(CURRENT_DATE - DATE(sales.due_date)) as days_overdue`)
+      )
+      .orderBy('sales.due_date', 'asc');
+
+    const [totals] = await this.db.knex('sales')
+      .where('status', 'completed')
+      .where('payment_method', 'veresiye')
+      .whereNotNull('due_date')
+      .where('due_date', '<', today)
+      .select(
+        this.db.knex.raw('COUNT(*) as count'),
+        this.db.knex.raw('COALESCE(SUM(grand_total), 0) as total')
+      );
+
+    return {
+      overdueList,
+      totalCount: parseInt((totals as any)?.count || '0'),
+      totalAmount: parseFloat((totals as any)?.total || '0'),
+    };
+  }
+
+  async getStockReport() {
+    const products = await this.db.knex('products')
+      .where('is_active', true)
+      .select(
+        'id',
+        'name',
+        'barcode',
+        'stock_quantity',
+        'min_stock_level',
+        'purchase_price',
+        'sale_price'
+      )
+      .orderBy('stock_quantity', 'asc');
+
+    const lowStock = products.filter(p => p.stock_quantity <= p.min_stock_level);
+    const outOfStock = products.filter(p => p.stock_quantity === 0);
+    const totalStockValue = products.reduce((sum, p) => sum + (p.stock_quantity * p.purchase_price), 0);
+    const totalSaleValue = products.reduce((sum, p) => sum + (p.stock_quantity * p.sale_price), 0);
+
+    return {
+      products,
+      summary: {
+        totalProducts: products.length,
+        lowStockCount: lowStock.length,
+        outOfStockCount: outOfStock.length,
+        totalStockValue,
+        totalSaleValue,
+        potentialProfit: totalSaleValue - totalStockValue,
+      },
+    };
+  }
+
+  async getReturnsReport(startDate: string, endDate: string) {
+    const returns = await this.db.knex('returns')
+      .leftJoin('customers', 'returns.customer_id', 'customers.id')
+      .where('returns.status', 'completed')
+      .whereBetween('returns.return_date', [startDate, endDate])
+      .select(
+        'returns.id',
+        'returns.return_number',
+        'returns.return_date',
+        'returns.total_amount',
+        'returns.reason',
+        'customers.name as customer_name'
+      )
+      .orderBy('returns.return_date', 'desc');
+
+    const [summary] = await this.db.knex('returns')
+      .where('status', 'completed')
+      .whereBetween('return_date', [startDate, endDate])
+      .select(
+        this.db.knex.raw('COUNT(*) as count'),
+        this.db.knex.raw('COALESCE(SUM(total_amount), 0) as total')
+      );
+
+    const byReason = await this.db.knex('returns')
+      .where('status', 'completed')
+      .whereBetween('return_date', [startDate, endDate])
+      .select('reason')
+      .count('id as count')
+      .sum('total_amount as total')
+      .groupBy('reason');
+
+    const topReturnedProducts = await this.db.knex('return_items')
+      .join('returns', 'return_items.return_id', 'returns.id')
+      .join('products', 'return_items.product_id', 'products.id')
+      .where('returns.status', 'completed')
+      .whereBetween('returns.return_date', [startDate, endDate])
+      .select('products.id', 'products.name')
+      .sum('return_items.quantity as total_quantity')
+      .sum('return_items.line_total as total_amount')
+      .groupBy('products.id', 'products.name')
+      .orderBy('total_quantity', 'desc')
+      .limit(10);
+
+    return {
+      returns,
+      summary: {
+        count: parseInt((summary as any)?.count || '0'),
+        total: parseFloat((summary as any)?.total || '0'),
+      },
+      byReason,
+      topReturnedProducts,
+    };
+  }
+
+  async getExpensesByCategory(startDate: string, endDate: string) {
+    const byCategory = await this.db.knex('expenses')
+      .whereBetween('expense_date', [startDate, endDate])
+      .select('category')
+      .sum('amount as total')
+      .count('id as count')
+      .groupBy('category')
+      .orderBy('total', 'desc');
+
+    const [totals] = await this.db.knex('expenses')
+      .whereBetween('expense_date', [startDate, endDate])
+      .select(
+        this.db.knex.raw('COUNT(*) as count'),
+        this.db.knex.raw('COALESCE(SUM(amount), 0) as total')
+      );
+
+    const monthlyTrend = await this.db.knex('expenses')
+      .whereBetween('expense_date', [startDate, endDate])
+      .select(this.db.knex.raw("TO_CHAR(expense_date, 'YYYY-MM') as month"))
+      .sum('amount as total')
+      .groupBy(this.db.knex.raw("TO_CHAR(expense_date, 'YYYY-MM')"))
+      .orderBy('month');
+
+    return {
+      byCategory,
+      summary: {
+        count: parseInt((totals as any)?.count || '0'),
+        total: parseFloat((totals as any)?.total || '0'),
+      },
+      monthlyTrend,
+    };
+  }
 }

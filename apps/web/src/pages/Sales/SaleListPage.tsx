@@ -45,29 +45,37 @@ const icons = {
   ),
 };
 
+type VatFilter = 'all' | 'with_vat' | 'without_vat';
+
 export function SaleListPage() {
   const navigate = useNavigate();
   const [sales, setSales] = useState<Sale[]>([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [stats, setStats] = useState({ total: 0, count: 0, completed: 0, cancelled: 0 });
+  const [stats, setStats] = useState({ total: 0, count: 0, completed: 0, cancelled: 0, noVatCount: 0 });
+  const [vatFilter, setVatFilter] = useState<VatFilter>('all');
   const { showToast } = useToast();
 
   const fetchSales = async () => {
     setLoading(true);
     try {
-      const response = await salesApi.getAll({ page, limit: 20 });
+      const params: Record<string, string | number> = { page, limit: 20 };
+      if (vatFilter === 'with_vat') params.includeVat = 'true';
+      if (vatFilter === 'without_vat') params.includeVat = 'false';
+
+      const response = await salesApi.getAll(params);
       setSales(response.data);
       setTotalPages(response.meta?.totalPages || 1);
 
       // Calculate stats
       const allSales = response.data;
       setStats({
-        total: allSales.reduce((sum, s) => sum + s.grand_total, 0),
+        total: allSales.reduce((sum, s) => sum + parseFloat(String(s.grand_total) || '0'), 0),
         count: response.meta?.total || allSales.length,
         completed: allSales.filter(s => s.status === 'completed').length,
         cancelled: allSales.filter(s => s.status === 'cancelled').length,
+        noVatCount: allSales.filter(s => !s.include_vat).length,
       });
     } catch (err) {
       showToast('error', 'Satislar yuklenemedi');
@@ -75,7 +83,12 @@ export function SaleListPage() {
     setLoading(false);
   };
 
-  useEffect(() => { fetchSales(); }, [page]);
+  useEffect(() => { fetchSales(); }, [page, vatFilter]);
+
+  const handleVatFilterChange = (filter: VatFilter) => {
+    setVatFilter(filter);
+    setPage(1);
+  };
 
   const handleCancel = async (sale: Sale) => {
     if (!confirm(`${sale.invoice_number} numarali satisi iptal etmek istediginizden emin misiniz?`)) return;
@@ -112,6 +125,11 @@ export function SaleListPage() {
       render: (s) => PAYMENT_METHODS[s.payment_method as keyof typeof PAYMENT_METHODS] || s.payment_method
     },
     {
+      key: 'include_vat',
+      header: 'KDV',
+      render: (s) => s.include_vat ? 'Dahil' : <span className={styles.noVatBadge}>KDV'siz</span>
+    },
+    {
       key: 'status',
       header: 'Durum',
       render: (s) => (
@@ -140,7 +158,7 @@ export function SaleListPage() {
           </h1>
           <p className={styles.subtitle}>Satis islemleri ve fatura yonetimi</p>
         </div>
-        <Button onClick={() => showToast('info', 'Yeni satis sayfasi yakin zamanda eklenecek')}>
+        <Button onClick={() => navigate('/sales/new')}>
           + Yeni Satis
         </Button>
       </div>
@@ -174,6 +192,28 @@ export function SaleListPage() {
             <span className={styles.statLabel}>Iptal Edilen</span>
           </div>
         </div>
+      </div>
+
+      <div className={styles.tabs}>
+        <button
+          className={`${styles.tab} ${vatFilter === 'all' ? styles.tabActive : ''}`}
+          onClick={() => handleVatFilterChange('all')}
+        >
+          Tum Satislar
+        </button>
+        <button
+          className={`${styles.tab} ${vatFilter === 'with_vat' ? styles.tabActive : ''}`}
+          onClick={() => handleVatFilterChange('with_vat')}
+        >
+          KDV Dahil
+        </button>
+        <button
+          className={`${styles.tab} ${vatFilter === 'without_vat' ? styles.tabActive : ''}`}
+          onClick={() => handleVatFilterChange('without_vat')}
+        >
+          KDV'siz Satislar
+          {stats.noVatCount > 0 && <span className={styles.tabBadge}>{stats.noVatCount}</span>}
+        </button>
       </div>
 
       <div className={styles.card}>

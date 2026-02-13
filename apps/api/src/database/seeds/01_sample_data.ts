@@ -96,17 +96,30 @@ export async function seed(knex: Knex): Promise<void> {
     .returning('*');
 
   // =====================
-  // 6. SALES
+  // 6. SALES (KDV'li ve KDV'siz, veresiye ve pesin)
   // =====================
   const sales = await knex('sales')
     .insert([
+      // KDV'li satislar
       { invoice_number: 'INV202401001', customer_id: customers[0].id, warehouse_id: warehouses[0].id, sale_date: '2024-01-15', subtotal: 15000, discount_amount: 0, discount_rate: 0, vat_total: 3000, grand_total: 18000, include_vat: true, payment_method: 'cash', status: 'completed' },
       { invoice_number: 'INV202401002', customer_id: customers[1].id, warehouse_id: warehouses[0].id, sale_date: '2024-01-16', subtotal: 55000, discount_amount: 2750, discount_rate: 5, vat_total: 10450, grand_total: 62700, include_vat: true, payment_method: 'credit_card', status: 'completed' },
       { invoice_number: 'INV202401003', customer_id: customers[2].id, warehouse_id: warehouses[1].id, sale_date: '2024-01-17', subtotal: 6500, discount_amount: 0, discount_rate: 0, vat_total: 1300, grand_total: 7800, include_vat: true, payment_method: 'bank_transfer', status: 'completed' },
-      { invoice_number: 'INV202401004', customer_id: customers[3].id, warehouse_id: warehouses[0].id, sale_date: '2024-01-18', subtotal: 32000, discount_amount: 1600, discount_rate: 5, vat_total: 6080, grand_total: 36480, include_vat: true, payment_method: 'credit', due_date: '2024-02-18', status: 'completed' },
+      { invoice_number: 'INV202401004', customer_id: customers[3].id, warehouse_id: warehouses[0].id, sale_date: '2024-01-18', subtotal: 32000, discount_amount: 1600, discount_rate: 5, vat_total: 6080, grand_total: 36480, include_vat: true, payment_method: 'veresiye', due_date: '2024-02-18', status: 'completed' },
       { invoice_number: 'INV202401005', customer_id: customers[4].id, warehouse_id: warehouses[0].id, sale_date: '2024-01-20', subtotal: 21000, discount_amount: 0, discount_rate: 0, vat_total: 4200, grand_total: 25200, include_vat: true, payment_method: 'cash', status: 'completed' },
       { invoice_number: 'INV202401006', customer_id: customers[0].id, warehouse_id: warehouses[0].id, sale_date: '2024-01-22', subtotal: 3200, discount_amount: 0, discount_rate: 0, vat_total: 640, grand_total: 3840, include_vat: true, payment_method: 'credit_card', status: 'completed' },
       { invoice_number: 'INV202401007', customer_id: customers[1].id, warehouse_id: warehouses[1].id, sale_date: '2024-01-25', subtotal: 10500, discount_amount: 525, discount_rate: 5, vat_total: 1995, grand_total: 11970, include_vat: true, payment_method: 'cash', status: 'cancelled' },
+      // KDV'siz satislar (faturasiz)
+      { invoice_number: 'INV202401008', customer_id: null, warehouse_id: warehouses[0].id, sale_date: '2024-01-23', subtotal: 1200, discount_amount: 0, discount_rate: 0, vat_total: 0, grand_total: 1200, include_vat: false, payment_method: 'cash', status: 'completed', notes: 'Perakende - faturasiz' },
+      { invoice_number: 'INV202401009', customer_id: null, warehouse_id: warehouses[0].id, sale_date: '2024-01-24', subtotal: 3200, discount_amount: 0, discount_rate: 0, vat_total: 0, grand_total: 3200, include_vat: false, payment_method: 'cash', status: 'completed', notes: 'Perakende - faturasiz' },
+      { invoice_number: 'INV202401010', customer_id: null, warehouse_id: warehouses[1].id, sale_date: '2024-01-26', subtotal: 750, discount_amount: 0, discount_rate: 0, vat_total: 0, grand_total: 750, include_vat: false, payment_method: 'cash', status: 'completed', notes: 'Perakende - faturasiz' },
+      { invoice_number: 'INV202401011', customer_id: null, warehouse_id: warehouses[0].id, sale_date: '2024-01-27', subtotal: 2100, discount_amount: 0, discount_rate: 0, vat_total: 0, grand_total: 2100, include_vat: false, payment_method: 'cash', status: 'completed', notes: 'Perakende - faturasiz' },
+      // Veresiye satislar - geciken odemeler icin
+      { invoice_number: 'INV202401012', customer_id: customers[1].id, warehouse_id: warehouses[0].id, sale_date: '2024-01-05', subtotal: 10500, discount_amount: 0, discount_rate: 0, vat_total: 2100, grand_total: 12600, include_vat: true, payment_method: 'veresiye', due_date: '2024-01-20', status: 'completed', notes: 'Vade gecmis' },
+      { invoice_number: 'INV202401013', customer_id: customers[3].id, warehouse_id: warehouses[0].id, sale_date: '2024-01-10', subtotal: 6500, discount_amount: 0, discount_rate: 0, vat_total: 1300, grand_total: 7800, include_vat: true, payment_method: 'veresiye', due_date: '2024-01-25', status: 'completed', notes: 'Vade gecmis' },
+      { invoice_number: 'INV202401014', customer_id: customers[0].id, warehouse_id: warehouses[0].id, sale_date: '2024-01-15', subtotal: 15000, discount_amount: 750, discount_rate: 5, vat_total: 2850, grand_total: 17100, include_vat: true, payment_method: 'veresiye', due_date: '2024-02-01', status: 'completed', notes: 'Vade gecmis' },
+      // Yaklasan vadeli satislar
+      { invoice_number: 'INV202402001', customer_id: customers[2].id, warehouse_id: warehouses[0].id, sale_date: '2024-02-01', subtotal: 21000, discount_amount: 0, discount_rate: 0, vat_total: 4200, grand_total: 25200, include_vat: true, payment_method: 'veresiye', due_date: '2024-03-01', status: 'completed' },
+      { invoice_number: 'INV202402002', customer_id: customers[4].id, warehouse_id: warehouses[0].id, sale_date: '2024-02-05', subtotal: 32000, discount_amount: 0, discount_rate: 0, vat_total: 6400, grand_total: 38400, include_vat: true, payment_method: 'veresiye', due_date: '2024-03-05', status: 'completed' },
     ])
     .returning('*');
 
@@ -114,6 +127,7 @@ export async function seed(knex: Knex): Promise<void> {
   // 7. SALE ITEMS
   // =====================
   await knex('sale_items').insert([
+    // KDV'li satislar
     { sale_id: sales[0].id, product_id: products[0].id, quantity: 1, unit_price: 15000, discount_rate: 0, vat_rate: 20, vat_amount: 3000, line_total: 18000 },
     { sale_id: sales[1].id, product_id: products[1].id, quantity: 1, unit_price: 55000, discount_rate: 5, vat_rate: 20, vat_amount: 10450, line_total: 62700 },
     { sale_id: sales[2].id, product_id: products[2].id, quantity: 1, unit_price: 6500, discount_rate: 0, vat_rate: 20, vat_amount: 1300, line_total: 7800 },
@@ -121,6 +135,17 @@ export async function seed(knex: Knex): Promise<void> {
     { sale_id: sales[4].id, product_id: products[4].id, quantity: 2, unit_price: 10500, discount_rate: 0, vat_rate: 20, vat_amount: 4200, line_total: 25200 },
     { sale_id: sales[5].id, product_id: products[5].id, quantity: 1, unit_price: 3200, discount_rate: 0, vat_rate: 20, vat_amount: 640, line_total: 3840 },
     { sale_id: sales[6].id, product_id: products[4].id, quantity: 1, unit_price: 10500, discount_rate: 5, vat_rate: 20, vat_amount: 1995, line_total: 11970 },
+    // KDV'siz satislar
+    { sale_id: sales[7].id, product_id: products[6].id, quantity: 1, unit_price: 1200, discount_rate: 0, vat_rate: 0, vat_amount: 0, line_total: 1200 },
+    { sale_id: sales[8].id, product_id: products[5].id, quantity: 1, unit_price: 3200, discount_rate: 0, vat_rate: 0, vat_amount: 0, line_total: 3200 },
+    { sale_id: sales[9].id, product_id: products[8].id, quantity: 10, unit_price: 75, discount_rate: 0, vat_rate: 0, vat_amount: 0, line_total: 750 },
+    { sale_id: sales[10].id, product_id: products[7].id, quantity: 21, unit_price: 100, discount_rate: 0, vat_rate: 0, vat_amount: 0, line_total: 2100 },
+    // Veresiye satislar
+    { sale_id: sales[11].id, product_id: products[4].id, quantity: 1, unit_price: 10500, discount_rate: 0, vat_rate: 20, vat_amount: 2100, line_total: 12600 },
+    { sale_id: sales[12].id, product_id: products[2].id, quantity: 1, unit_price: 6500, discount_rate: 0, vat_rate: 20, vat_amount: 1300, line_total: 7800 },
+    { sale_id: sales[13].id, product_id: products[0].id, quantity: 1, unit_price: 15000, discount_rate: 5, vat_rate: 20, vat_amount: 2850, line_total: 17100 },
+    { sale_id: sales[14].id, product_id: products[4].id, quantity: 2, unit_price: 10500, discount_rate: 0, vat_rate: 20, vat_amount: 4200, line_total: 25200 },
+    { sale_id: sales[15].id, product_id: products[3].id, quantity: 1, unit_price: 32000, discount_rate: 0, vat_rate: 20, vat_amount: 6400, line_total: 38400 },
   ]);
 
   // =====================

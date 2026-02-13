@@ -47,3 +47,15 @@ export function createPaginatedResult<T>(
     totalPages: Math.ceil(total / limit),
   };
 }
+
+// Alias for backwards compatibility
+export type PaginationParams = {
+  page?: number;
+  limit?: number;
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
+  search?: string;
+};
+
+// Alias function
+export const createPaginatedResponse = createPaginatedResult;

@@ -8,7 +8,7 @@ export class SalesController {
   constructor(private readonly salesService: SalesService) {}
 
   @Get()
-  async findAll(@Query() query: PaginationDto & { customerId?: string; status?: string; startDate?: string; endDate?: string }) {
+  async findAll(@Query() query: PaginationDto & { customerId?: string; status?: string; startDate?: string; endDate?: string; includeVat?: string }) {
     return this.salesService.findAll({
       page: query.page || 1,
       limit: query.limit || 20,
@@ -17,6 +17,7 @@ export class SalesController {
       status: query.status,
       startDate: query.startDate,
       endDate: query.endDate,
+      includeVat: query.includeVat,
       sortBy: query.sortBy || 'sale_date',
       sortOrder: query.sortOrder || 'desc',
     });

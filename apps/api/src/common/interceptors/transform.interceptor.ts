@@ -33,8 +33,8 @@ export class TransformInterceptor<T>
           return data;
         }
 
-        // If data has pagination info
-        if (data && typeof data === 'object' && 'items' in data) {
+        // If data has pagination info (check for page/total to distinguish from regular objects with items)
+        if (data && typeof data === 'object' && 'items' in data && 'total' in data && 'page' in data) {
           return {
             success: true,
             data: data.items,

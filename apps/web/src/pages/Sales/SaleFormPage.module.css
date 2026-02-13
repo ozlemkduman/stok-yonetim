@@ -1,0 +1,223 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-8);
+  font-size: var(--font-size-lg);
+  color: var(--color-text-secondary);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.title {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.formGrid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: var(--space-4);
+}
+
+.formCard {
+  padding: var(--space-5);
+}
+
+.formCard h3 {
+  margin: 0 0 var(--space-4);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+}
+
+.formRow {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-4);
+  margin-bottom: var(--space-4);
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.label {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
+}
+
+.checkboxLabel {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+}
+
+.checkboxLabel input {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+}
+
+.textarea {
+  width: 100%;
+  padding: var(--space-3);
+  font-family: var(--font-family);
+  font-size: var(--font-size-sm);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  resize: vertical;
+}
+
+.textarea:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-light);
+}
+
+.itemsCard {
+  padding: var(--space-5);
+}
+
+.itemsHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-4);
+}
+
+.itemsHeader h3 {
+  margin: 0;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+}
+
+.emptyItems {
+  text-align: center;
+  padding: var(--space-8);
+  color: var(--color-text-muted);
+}
+
+.itemsTableContainer {
+  overflow-x: auto;
+}
+
+.itemsTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--font-size-sm);
+}
+
+.itemsTable th,
+.itemsTable td {
+  padding: var(--space-3) var(--space-2);
+  text-align: left;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.itemsTable th {
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  text-transform: uppercase;
+  background: var(--color-bg);
+}
+
+.alignRight {
+  text-align: right;
+}
+
+.numberInput {
+  width: 80px;
+}
+
+.lowStock {
+  color: var(--color-danger);
+  font-weight: var(--font-weight-medium);
+}
+
+.deleteButton {
+  color: var(--color-danger);
+}
+
+.totalsSection {
+  margin-top: var(--space-4);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--color-border);
+  display: flex;
+  justify-content: flex-end;
+}
+
+.totalsGrid {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-width: 280px;
+}
+
+.totalRow {
+  display: flex;
+  justify-content: space-between;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+.grandTotal {
+  padding-top: var(--space-2);
+  margin-top: var(--space-2);
+  border-top: 2px solid var(--color-border);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-primary);
+}
+
+.formActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-3);
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .formGrid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 767px) {
+  .page { gap: var(--space-4); }
+  .header { flex-direction: column; align-items: flex-start; gap: var(--space-2); }
+  .title { font-size: var(--font-size-xl); }
+  .formRow { grid-template-columns: 1fr; gap: var(--space-3); }
+  .formCard { padding: var(--space-4); }
+  .formCard h3 { font-size: var(--font-size-base); }
+  .itemsCard { padding: var(--space-4); }
+  .itemsTable { font-size: var(--font-size-xs); }
+  .itemsTable th, .itemsTable td { padding: var(--space-2) var(--space-1); }
+  .numberInput { width: 60px; }
+  .totalsGrid { min-width: 100%; }
+  .formActions { flex-direction: column; }
+  .formActions button { width: 100%; }
+}
+
+@media (max-width: 480px) {
+  .page { gap: var(--space-3); }
+  .formCard, .itemsCard { padding: var(--space-3); }
+  .totalRow { font-size: var(--font-size-xs); }
+  .grandTotal { font-size: var(--font-size-base); }
+}

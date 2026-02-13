@@ -1,0 +1,103 @@
+/* Print Modal */
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+/* Type Selector */
+.typeSelector {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-3);
+}
+
+.typeButton {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  background: var(--color-bg);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.typeButton:hover {
+  border-color: var(--color-primary-light);
+  background: var(--color-bg-elevated);
+}
+
+.typeButton.active {
+  border-color: var(--color-primary);
+  background: var(--color-primary-light);
+}
+
+.typeButton svg {
+  width: 32px;
+  height: 32px;
+  color: var(--color-text-secondary);
+}
+
+.typeButton.active svg {
+  color: var(--color-primary);
+}
+
+.typeButton span {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+}
+
+.typeButton small {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+
+/* Preview */
+.preview {
+  background: #f0f0f0;
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  max-height: 60vh;
+  overflow: hidden;
+}
+
+.previewScroll {
+  max-height: calc(60vh - var(--space-8));
+  overflow-y: auto;
+  transform: scale(0.6);
+  transform-origin: top center;
+}
+
+/* Actions */
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-3);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--color-border);
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .typeSelector {
+    grid-template-columns: 1fr;
+  }
+
+  .typeButton {
+    flex-direction: row;
+    padding: var(--space-3);
+  }
+
+  .typeButton svg {
+    width: 24px;
+    height: 24px;
+  }
+
+  .previewScroll {
+    transform: scale(0.4);
+  }
+}

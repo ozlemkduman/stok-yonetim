@@ -116,6 +116,114 @@
 
 .success { color: var(--color-success); }
 .danger { color: var(--color-danger); }
+.warning { color: var(--color-warning); }
+
+/* Tabs */
+.tabs {
+  display: flex;
+  gap: var(--space-1);
+  background: var(--color-bg);
+  padding: var(--space-1);
+  border-radius: var(--radius-lg);
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.tab {
+  padding: var(--space-2) var(--space-4);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+}
+
+.tab:hover { color: var(--color-text-primary); background: var(--color-bg-elevated); }
+.tabActive { color: var(--color-primary); background: var(--color-bg-elevated); box-shadow: var(--shadow-sm); }
+
+/* Full width card */
+.fullWidthCard { grid-column: 1 / -1; }
+
+/* Table in card */
+.reportTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--font-size-sm);
+}
+
+.reportTable th,
+.reportTable td {
+  padding: var(--space-2) var(--space-3);
+  text-align: left;
+  border-bottom: 1px solid var(--color-border-light);
+}
+
+.reportTable th {
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  text-transform: uppercase;
+}
+
+.reportTable tbody tr:hover { background: var(--color-bg); }
+.reportTable .alignRight { text-align: right; }
+
+/* Summary Cards */
+.summaryGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+
+.summaryCard {
+  padding: var(--space-3);
+  background: var(--color-bg);
+  border-radius: var(--radius-md);
+  text-align: center;
+}
+
+.summaryValue {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+}
+
+.summaryLabel {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  margin-top: var(--space-1);
+}
+
+/* Badge */
+.badge {
+  display: inline-block;
+  padding: var(--space-1) var(--space-2);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  border-radius: var(--radius-full);
+  background: var(--color-bg);
+}
+
+.badgeDanger { background: var(--color-danger-light); color: var(--color-danger); }
+.badgeWarning { background: var(--color-warning-light); color: var(--color-warning); }
+.badgeSuccess { background: var(--color-success-light); color: var(--color-success); }
+
+/* Empty state */
+.emptyState {
+  text-align: center;
+  padding: var(--space-6);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+/* Two column grid */
+.twoColGrid { grid-template-columns: repeat(2, 1fr); }
+@media (max-width: 1024px) { .twoColGrid { grid-template-columns: 1fr; } }
 
 /* ══════════════════════════════════════════════════════════════════════════
    RESPONSIVE DESIGN

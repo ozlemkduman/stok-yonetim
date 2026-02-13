@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Table, Button, Badge, Pagination, type Column } from '@stok/ui';
 import { apiClient } from '../../api/client';
 import { useToast } from '../../context/ToastContext';
@@ -26,6 +26,7 @@ interface Return {
 }
 
 export function ReturnListPage() {
+  const navigate = useNavigate();
   const [returns, setReturns] = useState<Return[]>([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
@@ -84,7 +85,7 @@ export function ReturnListPage() {
           </h1>
           <p className={styles.subtitle}>Toplam {total} iade kaydi</p>
         </div>
-        <Button onClick={() => showToast('info', 'Yeni iade sayfasi yakin zamanda eklenecek')}>
+        <Button onClick={() => navigate('/returns/new')}>
           + Yeni Iade
         </Button>
       </div>

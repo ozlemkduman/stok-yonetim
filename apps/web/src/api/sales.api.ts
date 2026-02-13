@@ -26,6 +26,10 @@ export interface Sale {
   invoice_number: string;
   customer_id: string | null;
   customer_name?: string;
+  customer_phone?: string;
+  customer_address?: string;
+  customer_tax_number?: string;
+  customer_tax_office?: string;
   sale_date: string;
   subtotal: number;
   discount_amount: number;

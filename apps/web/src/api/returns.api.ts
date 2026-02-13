@@ -41,6 +41,21 @@ export interface ReturnListParams {
   sortOrder?: 'asc' | 'desc';
 }
 
+export interface CreateReturnItem {
+  product_id: string;
+  quantity: number;
+  unit_price: number;
+  sale_item_id?: string;
+}
+
+export interface CreateReturnData {
+  sale_id?: string;
+  customer_id?: string;
+  items: CreateReturnItem[];
+  reason?: string;
+  warehouse_id?: string;
+}
+
 export const returnsApi = {
   getAll: (params: ReturnListParams = {}) => {
     const queryParams: Record<string, string | number> = {};
@@ -53,4 +68,6 @@ export const returnsApi = {
   },
 
   getById: (id: string) => apiClient.get<ReturnDetail>(`/returns/${id}`),
+
+  create: (data: CreateReturnData) => apiClient.post<Return>('/returns', data),
 };

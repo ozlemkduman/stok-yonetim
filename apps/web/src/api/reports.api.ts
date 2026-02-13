@@ -1,5 +1,60 @@
 import { apiClient } from './client';
 
+export interface TopProduct {
+  id: string;
+  name: string;
+  total_quantity: number;
+  total_revenue: number;
+}
+
+export interface TopCustomer {
+  id: string;
+  name: string;
+  phone: string | null;
+  total_amount: number;
+  sale_count: number;
+}
+
+export interface UpcomingPayment {
+  id: string;
+  invoice_number: string;
+  grand_total: number;
+  due_date: string;
+  sale_date: string;
+  customer_name: string | null;
+  customer_phone: string | null;
+}
+
+export interface OverduePayment extends UpcomingPayment {
+  customer_id: string;
+  days_overdue: number;
+}
+
+export interface StockReportProduct {
+  id: string;
+  name: string;
+  barcode: string | null;
+  stock_quantity: number;
+  min_stock_level: number;
+  purchase_price: number;
+  sale_price: number;
+}
+
+export interface ReturnReport {
+  id: string;
+  return_number: string;
+  return_date: string;
+  total_amount: number;
+  reason: string | null;
+  customer_name: string | null;
+}
+
+export interface ExpenseByCategory {
+  category: string;
+  total: number;
+  count: number;
+}
+
 export const reportsApi = {
   getSalesSummary: (startDate: string, endDate: string) =>
     apiClient.get<any>('/reports/sales-summary', { startDate, endDate }),
@@ -9,5 +64,17 @@ export const reportsApi = {
   getProfitLoss: (startDate: string, endDate: string) =>
     apiClient.get<any>('/reports/profit-loss', { startDate, endDate }),
   getTopProducts: (startDate: string, endDate: string, limit?: number) =>
-    apiClient.get<any[]>('/reports/top-products', { startDate, endDate, limit: limit || 10 }),
+    apiClient.get<TopProduct[]>('/reports/top-products', { startDate, endDate, limit: limit || 10 }),
+  getTopCustomers: (startDate: string, endDate: string, limit?: number) =>
+    apiClient.get<TopCustomer[]>('/reports/top-customers', { startDate, endDate, limit: limit || 10 }),
+  getUpcomingPayments: (days?: number) =>
+    apiClient.get<UpcomingPayment[]>('/reports/upcoming-payments', { days: days || 30 }),
+  getOverduePayments: () =>
+    apiClient.get<{ overdueList: OverduePayment[]; totalCount: number; totalAmount: number }>('/reports/overdue-payments'),
+  getStockReport: () =>
+    apiClient.get<{ products: StockReportProduct[]; summary: any }>('/reports/stock-report'),
+  getReturnsReport: (startDate: string, endDate: string) =>
+    apiClient.get<{ returns: ReturnReport[]; summary: any; byReason: any[]; topReturnedProducts: any[] }>('/reports/returns-report', { startDate, endDate }),
+  getExpensesByCategory: (startDate: string, endDate: string) =>
+    apiClient.get<{ byCategory: ExpenseByCategory[]; summary: any; monthlyTrend: any[] }>('/reports/expenses-by-category', { startDate, endDate }),
 };

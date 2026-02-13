@@ -1,0 +1,144 @@
+/* Receipt Print View - Thermal Printer Format (80mm) */
+.receipt {
+  width: 80mm;
+  padding: 3mm;
+  margin: 0 auto;
+  background: white;
+  color: #000;
+  font-family: 'Courier New', monospace;
+  font-size: 10pt;
+  line-height: 1.3;
+  box-sizing: border-box;
+}
+
+/* Header */
+.header {
+  text-align: center;
+  margin-bottom: 2mm;
+}
+
+.companyName {
+  font-size: 14pt;
+  font-weight: bold;
+  margin: 0 0 1mm 0;
+  text-transform: uppercase;
+}
+
+.header p {
+  margin: 0.5mm 0;
+  font-size: 9pt;
+}
+
+/* Divider */
+.divider {
+  text-align: center;
+  font-size: 9pt;
+  margin: 2mm 0;
+  color: #333;
+  letter-spacing: -1px;
+}
+
+/* Section */
+.section {
+  margin: 2mm 0;
+}
+
+.section p {
+  margin: 0.5mm 0;
+  font-size: 9pt;
+}
+
+/* Items */
+.items {
+  margin: 2mm 0;
+}
+
+.item {
+  margin-bottom: 2mm;
+  padding-bottom: 1mm;
+  border-bottom: 1px dotted #ccc;
+}
+
+.item:last-child {
+  border-bottom: none;
+}
+
+.itemName {
+  font-size: 9pt;
+  font-weight: bold;
+  word-wrap: break-word;
+}
+
+.itemDetails {
+  display: flex;
+  justify-content: space-between;
+  font-size: 9pt;
+  margin-top: 0.5mm;
+}
+
+.itemDiscount {
+  font-size: 8pt;
+  color: #666;
+  font-style: italic;
+}
+
+/* Totals */
+.totals {
+  margin: 2mm 0;
+}
+
+.totalRow {
+  display: flex;
+  justify-content: space-between;
+  font-size: 9pt;
+  margin: 0.5mm 0;
+}
+
+/* Grand Total */
+.grandTotal {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12pt;
+  font-weight: bold;
+  padding: 2mm 0;
+}
+
+/* Footer */
+.footer {
+  text-align: center;
+  margin-top: 3mm;
+}
+
+.footer p {
+  margin: 1mm 0;
+  font-size: 9pt;
+}
+
+.noVatNote {
+  font-size: 8pt;
+  color: #666;
+  margin-top: 2mm !important;
+}
+
+/* Print Styles */
+@media print {
+  .receipt {
+    width: 100%;
+    padding: 0;
+    margin: 0;
+  }
+
+  @page {
+    size: 80mm auto;
+    margin: 2mm;
+  }
+}
+
+/* Screen Preview */
+@media screen {
+  .receipt {
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
+    margin: 20px auto;
+    border: 1px solid #ddd;
+  }
+}
