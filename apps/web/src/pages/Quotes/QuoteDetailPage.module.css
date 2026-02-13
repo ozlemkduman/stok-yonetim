@@ -122,7 +122,7 @@
 }
 
 .deleteButton:hover {
-  background: var(--color-danger-bg);
+  background: var(--color-danger-light);
 }
 
 .convertedInfo {
