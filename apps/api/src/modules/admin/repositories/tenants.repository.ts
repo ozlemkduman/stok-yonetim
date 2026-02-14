@@ -34,20 +34,15 @@ export class TenantsRepository {
     const { page = 1, limit = 20, sortBy = 'created_at', sortOrder = 'desc', status, search } = params;
     const offset = (page - 1) * limit;
 
-    let query = this.db.knex<TenantWithPlan>('tenants')
-      .select(
-        'tenants.*',
-        'plans.name as plan_name',
-        'plans.code as plan_code',
-      )
-      .leftJoin('plans', 'tenants.plan_id', 'plans.id');
+    // Build base query for filtering
+    let baseQuery = this.db.knex('tenants');
 
     if (status) {
-      query = query.where('tenants.status', status);
+      baseQuery = baseQuery.where('tenants.status', status);
     }
 
     if (search) {
-      query = query.where((builder) => {
+      baseQuery = baseQuery.where((builder) => {
         builder
           .whereILike('tenants.name', `%${search}%`)
           .orWhereILike('tenants.slug', `%${search}%`)
@@ -55,9 +50,18 @@ export class TenantsRepository {
       });
     }
 
-    const countQuery = query.clone().count('* as count').first();
-    const dataQuery = query
+    // Count query - separate from select to avoid grouping issues
+    const countQuery = baseQuery.clone().count('* as count').first();
+
+    // Data query with joins
+    const dataQuery = baseQuery
       .clone()
+      .select(
+        'tenants.*',
+        'plans.name as plan_name',
+        'plans.code as plan_code',
+      )
+      .leftJoin('plans', 'tenants.plan_id', 'plans.id')
       .orderBy(`tenants.${sortBy}`, sortOrder)
       .limit(limit)
       .offset(offset);
@@ -108,10 +112,20 @@ export class TenantsRepository {
   }
 
   async create(data: Partial<Tenant>): Promise<Tenant> {
-    const insertData = {
-      ...data,
+    const insertData: Record<string, any> = {
+      name: data.name,
+      slug: data.slug,
+      status: data.status || 'active',
       settings: JSON.stringify(data.settings || {}),
     };
+
+    // Only add optional fields if they have values
+    if (data.domain) insertData.domain = data.domain;
+    if (data.plan_id) insertData.plan_id = data.plan_id;
+    if (data.billing_email) insertData.billing_email = data.billing_email;
+    if (data.owner_id) insertData.owner_id = data.owner_id;
+    if (data.trial_ends_at) insertData.trial_ends_at = data.trial_ends_at;
+
     const [tenant] = await this.db.knex('tenants')
       .insert(insertData)
       .returning('*');

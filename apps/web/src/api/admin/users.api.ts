@@ -35,6 +35,25 @@ export interface RoleCount {
   count: number;
 }
 
+export interface CreateUserData {
+  email: string;
+  password: string;
+  name: string;
+  phone?: string;
+  role: string;
+  tenantId?: string;
+  permissions?: string[];
+}
+
+export interface UpdateUserData {
+  name?: string;
+  phone?: string;
+  role?: string;
+  tenantId?: string;
+  permissions?: string[];
+  status?: string;
+}
+
 export const adminUsersApi = {
   async getAll(params?: UserListParams): Promise<ApiResponse<AdminUser[]>> {
     return apiClient.get<AdminUser[]>('/admin/users', params);
@@ -42,6 +61,14 @@ export const adminUsersApi = {
 
   async getById(id: string): Promise<ApiResponse<AdminUser>> {
     return apiClient.get<AdminUser>(`/admin/users/${id}`);
+  },
+
+  async create(data: CreateUserData): Promise<ApiResponse<AdminUser>> {
+    return apiClient.post<AdminUser>('/admin/users', data);
+  },
+
+  async update(id: string, data: UpdateUserData): Promise<ApiResponse<AdminUser>> {
+    return apiClient.patch<AdminUser>(`/admin/users/${id}`, data);
   },
 
   async countByRole(): Promise<ApiResponse<RoleCount[]>> {

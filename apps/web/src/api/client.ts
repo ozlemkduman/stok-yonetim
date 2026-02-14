@@ -20,6 +20,7 @@ interface ApiError {
 // Token storage keys
 const ACCESS_TOKEN_KEY = 'access_token';
 const REFRESH_TOKEN_KEY = 'refresh_token';
+const IMPERSONATION_KEY = 'impersonated_tenant';
 
 class ApiClient {
   private baseUrl: string;
@@ -76,6 +77,13 @@ class ApiClient {
       if (token) {
         headers['Authorization'] = `Bearer ${token}`;
       }
+    }
+
+    // Add impersonation header if impersonating a tenant
+    const impersonatedTenant = localStorage.getItem(IMPERSONATION_KEY);
+    if (impersonatedTenant) {
+      const tenant = JSON.parse(impersonatedTenant);
+      headers['X-Impersonate-Tenant'] = tenant.id;
     }
 
     const config: RequestInit = {

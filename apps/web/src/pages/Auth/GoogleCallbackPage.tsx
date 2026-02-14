@@ -10,17 +10,26 @@ export function GoogleCallbackPage() {
   const { setTokens } = useAuth();
 
   useEffect(() => {
-    const accessToken = searchParams.get('accessToken');
-    const refreshToken = searchParams.get('refreshToken');
+    const handleCallback = async () => {
+      const accessToken = searchParams.get('accessToken');
+      const refreshToken = searchParams.get('refreshToken');
 
-    if (accessToken && refreshToken) {
-      // Store tokens and redirect to dashboard
-      setTokens(accessToken, refreshToken);
-      navigate('/', { replace: true });
-    } else {
-      // Error - redirect to login
-      navigate('/login', { replace: true });
-    }
+      if (accessToken && refreshToken) {
+        // Store tokens and get user
+        const user = await setTokens(accessToken, refreshToken);
+        // Super admin goes to admin panel, others go to dashboard
+        if (user?.role === 'super_admin') {
+          navigate('/admin', { replace: true });
+        } else {
+          navigate('/', { replace: true });
+        }
+      } else {
+        // Error - redirect to login
+        navigate('/login', { replace: true });
+      }
+    };
+
+    handleCallback();
   }, [searchParams, navigate, setTokens]);
 
   return (

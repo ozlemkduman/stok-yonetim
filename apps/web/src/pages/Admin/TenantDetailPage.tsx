@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Card, Button, Badge, Spinner } from '@stok/ui';
 import { adminTenantsApi, Tenant, TenantStats } from '../../api/admin/tenants.api';
+import { useTenant } from '../../context/TenantContext';
 import styles from './AdminPages.module.css';
 
 const statusColors: Record<string, 'success' | 'warning' | 'danger' | 'default'> = {
@@ -21,9 +22,20 @@ const statusLabels: Record<string, string> = {
 export function TenantDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { impersonate } = useTenant();
   const [tenant, setTenant] = useState<Tenant | null>(null);
   const [stats, setStats] = useState<TenantStats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+
+  const handleViewPanel = () => {
+    if (!tenant) return;
+    impersonate({
+      id: tenant.id,
+      name: tenant.name,
+      slug: tenant.slug,
+    });
+    navigate('/dashboard');
+  };
 
   useEffect(() => {
     if (id) {
@@ -51,7 +63,7 @@ export function TenantDetailPage() {
   };
 
   const handleSuspend = async () => {
-    if (!id || !confirm('Bu kiraciyi askiya almak istediginize emin misiniz?')) return;
+    if (!id || !confirm('Bu organizasyonu askiya almak istediginize emin misiniz?')) return;
 
     try {
       await adminTenantsApi.suspend(id);
@@ -73,7 +85,7 @@ export function TenantDetailPage() {
   };
 
   const handleDelete = async () => {
-    if (!id || !confirm('Bu kiraciyi silmek istediginize emin misiniz? Bu islem geri alinamaz!')) return;
+    if (!id || !confirm('Bu organizasyonu silmek istediginize emin misiniz? Bu islem geri alinamaz!')) return;
 
     try {
       await adminTenantsApi.delete(id);
@@ -95,7 +107,7 @@ export function TenantDetailPage() {
     return (
       <div className={styles.page}>
         <Card>
-          <p>Kiraci bulunamadi.</p>
+          <p>Organizasyon bulunamadi.</p>
           <Button onClick={() => navigate('/admin/tenants')}>Geri Don</Button>
         </Card>
       </div>
@@ -112,12 +124,18 @@ export function TenantDetailPage() {
           <h1 className={styles.pageTitle}>{tenant.name}</h1>
         </div>
         <div className={styles.actions}>
+          <Button variant="primary" onClick={handleViewPanel}>
+            Paneli Gor
+          </Button>
+          <Button variant="secondary" onClick={() => navigate(`/admin/tenants/${id}/edit`)}>
+            Duzenle
+          </Button>
           {tenant.status === 'active' || tenant.status === 'trial' ? (
-            <Button variant="secondary" onClick={handleSuspend}>
+            <Button variant="ghost" onClick={handleSuspend}>
               Askiya Al
             </Button>
           ) : (
-            <Button variant="secondary" onClick={handleActivate}>
+            <Button variant="ghost" onClick={handleActivate}>
               Aktif Et
             </Button>
           )}

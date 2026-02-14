@@ -40,7 +40,7 @@ export class AdminTenantsService {
   async findById(id: string): Promise<TenantWithPlan> {
     const tenant = await this.tenantsRepository.findById(id);
     if (!tenant) {
-      throw new NotFoundException('Kiracı bulunamadı');
+      throw new NotFoundException('Organizasyon bulunamadi');
     }
     return tenant;
   }
@@ -79,7 +79,7 @@ export class AdminTenantsService {
   async update(id: string, dto: UpdateTenantDto) {
     const tenant = await this.tenantsRepository.findById(id);
     if (!tenant) {
-      throw new NotFoundException('Kiracı bulunamadı');
+      throw new NotFoundException('Organizasyon bulunamadi');
     }
 
     // Validate plan if changing
@@ -105,23 +105,23 @@ export class AdminTenantsService {
   async delete(id: string): Promise<void> {
     const tenant = await this.tenantsRepository.findById(id);
     if (!tenant) {
-      throw new NotFoundException('Kiracı bulunamadı');
+      throw new NotFoundException('Organizasyon bulunamadi');
     }
 
     const deleted = await this.tenantsRepository.delete(id);
     if (!deleted) {
-      throw new BadRequestException('Kiracı silinemedi');
+      throw new BadRequestException('Organizasyon silinemedi');
     }
   }
 
   async suspend(id: string): Promise<TenantWithPlan> {
     const tenant = await this.tenantsRepository.findById(id);
     if (!tenant) {
-      throw new NotFoundException('Kiracı bulunamadı');
+      throw new NotFoundException('Organizasyon bulunamadi');
     }
 
     if (tenant.status === 'suspended') {
-      throw new BadRequestException('Kiracı zaten askıya alınmış');
+      throw new BadRequestException('Organizasyon zaten askiya alinmis');
     }
 
     await this.tenantsRepository.updateStatus(id, 'suspended');
@@ -131,11 +131,11 @@ export class AdminTenantsService {
   async activate(id: string): Promise<TenantWithPlan> {
     const tenant = await this.tenantsRepository.findById(id);
     if (!tenant) {
-      throw new NotFoundException('Kiracı bulunamadı');
+      throw new NotFoundException('Organizasyon bulunamadi');
     }
 
     if (tenant.status === 'active') {
-      throw new BadRequestException('Kiracı zaten aktif');
+      throw new BadRequestException('Organizasyon zaten aktif');
     }
 
     await this.tenantsRepository.updateStatus(id, 'active');
@@ -145,7 +145,7 @@ export class AdminTenantsService {
   async getStats(id: string) {
     const tenant = await this.tenantsRepository.findById(id);
     if (!tenant) {
-      throw new NotFoundException('Kiracı bulunamadı');
+      throw new NotFoundException('Organizasyon bulunamadi');
     }
 
     return this.tenantsRepository.getTenantStats(id);

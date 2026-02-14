@@ -2,14 +2,16 @@ import {
   Controller,
   Get,
   Post,
+  Patch,
   Delete,
+  Body,
   Param,
   Query,
   UseGuards,
   HttpCode,
   HttpStatus,
 } from '@nestjs/common';
-import { AdminUsersService } from '../services/admin-users.service';
+import { AdminUsersService, CreateUserDto, UpdateUserDto } from '../services/admin-users.service';
 import { Roles, UserRole } from '../../../common/decorators/roles.decorator';
 import { RolesGuard } from '../../../common/guards/roles.guard';
 import { PaginationParams } from '../../../common/dto/pagination.dto';
@@ -32,9 +34,19 @@ export class AdminUsersController {
     return this.usersService.countByRole();
   }
 
+  @Post()
+  async create(@Body() dto: CreateUserDto) {
+    return this.usersService.create(dto);
+  }
+
   @Get(':id')
   async findById(@Param('id') id: string) {
     return this.usersService.findById(id);
+  }
+
+  @Patch(':id')
+  async update(@Param('id') id: string, @Body() dto: UpdateUserDto) {
+    return this.usersService.update(id, dto);
   }
 
   @Post(':id/suspend')

@@ -16,8 +16,16 @@ export interface RequestWithUser extends Request {
 export class TenantMiddleware implements NestMiddleware {
   use(req: RequestWithUser, res: Response, next: NextFunction) {
     if (req.user) {
+      let tenantId = req.user.tenantId;
+
+      // Allow super_admin to impersonate a tenant
+      const impersonateTenantId = req.headers['x-impersonate-tenant'] as string;
+      if (impersonateTenantId && req.user.role === 'super_admin') {
+        tenantId = impersonateTenantId;
+      }
+
       const context: TenantContext = {
-        tenantId: req.user.tenantId,
+        tenantId,
         userId: req.user.sub,
         role: req.user.role,
         permissions: req.user.permissions || [],

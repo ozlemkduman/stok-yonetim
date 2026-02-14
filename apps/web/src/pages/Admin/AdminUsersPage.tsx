@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Card, Table, Button, Input, Badge, Pagination, type Column } from '@stok/ui';
 import { adminUsersApi, AdminUser } from '../../api/admin/users.api';
 import styles from './AdminPages.module.css';
@@ -24,6 +24,7 @@ const statusLabels: Record<string, string> = {
 };
 
 export function AdminUsersPage() {
+  const navigate = useNavigate();
   const [users, setUsers] = useState<AdminUser[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -89,7 +90,7 @@ export function AdminUsersPage() {
     },
     {
       key: 'tenant',
-      header: 'Sirket',
+      header: 'Organizasyon',
       render: (user) =>
         user.tenant_name ? (
           <Link to={`/admin/tenants/${user.tenant_id}`} className={styles.link}>
@@ -124,35 +125,48 @@ export function AdminUsersPage() {
     {
       key: 'actions',
       header: '',
-      render: (user) =>
-        user.role !== 'super_admin' && (
-          <div className={styles.actions}>
-            {user.status === 'active' ? (
+      render: (user) => (
+        <div className={styles.actions}>
+          {user.role !== 'super_admin' && (
+            <>
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => handleSuspend(user.id)}
+                onClick={() => navigate(`/admin/users/${user.id}/edit`)}
               >
-                Askiya Al
+                Duzenle
               </Button>
-            ) : (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => handleActivate(user.id)}
-              >
-                Aktif Et
-              </Button>
-            )}
-          </div>
-        ),
+              {user.status === 'active' ? (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => handleSuspend(user.id)}
+                >
+                  Askiya Al
+                </Button>
+              ) : (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => handleActivate(user.id)}
+                >
+                  Aktif Et
+                </Button>
+              )}
+            </>
+          )}
+        </div>
+      ),
     },
   ];
 
   return (
     <div className={styles.page}>
       <div className={styles.pageHeader}>
-        <h1 className={styles.pageTitle}>Kullanıcılar</h1>
+        <h1 className={styles.pageTitle}>Kullanicilar</h1>
+        <Button variant="primary" onClick={() => navigate('/admin/users/new')}>
+          Yeni Kullanici
+        </Button>
       </div>
 
       <Card className={styles.filters}>

@@ -29,6 +29,12 @@ interface TenantUsage {
   integrations: { current: number; limit: number };
 }
 
+interface ImpersonatedTenant {
+  id: string;
+  name: string;
+  slug: string;
+}
+
 interface TenantContextType {
   settings: TenantSettings | null;
   usage: TenantUsage | null;
@@ -37,15 +43,38 @@ interface TenantContextType {
   refreshUsage: () => Promise<void>;
   hasFeature: (feature: string) => boolean;
   isWithinLimit: (resource: string) => boolean;
+  // Impersonation for super_admin
+  impersonatedTenant: ImpersonatedTenant | null;
+  impersonate: (tenant: ImpersonatedTenant) => void;
+  stopImpersonating: () => void;
+  isImpersonating: boolean;
 }
 
 const TenantContext = createContext<TenantContextType | undefined>(undefined);
+
+const IMPERSONATION_KEY = 'impersonated_tenant';
 
 export function TenantProvider({ children }: { children: React.ReactNode }) {
   const { user, isAuthenticated } = useAuth();
   const [settings, setSettings] = useState<TenantSettings | null>(null);
   const [usage, setUsage] = useState<TenantUsage | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [impersonatedTenant, setImpersonatedTenant] = useState<ImpersonatedTenant | null>(() => {
+    const stored = localStorage.getItem(IMPERSONATION_KEY);
+    return stored ? JSON.parse(stored) : null;
+  });
+
+  const impersonate = useCallback((tenant: ImpersonatedTenant) => {
+    localStorage.setItem(IMPERSONATION_KEY, JSON.stringify(tenant));
+    setImpersonatedTenant(tenant);
+  }, []);
+
+  const stopImpersonating = useCallback(() => {
+    localStorage.removeItem(IMPERSONATION_KEY);
+    setImpersonatedTenant(null);
+  }, []);
+
+  const isImpersonating = impersonatedTenant !== null;
 
   const refreshSettings = useCallback(async () => {
     if (!isAuthenticated || !user?.tenantId) {
@@ -118,6 +147,10 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
         refreshUsage,
         hasFeature,
         isWithinLimit,
+        impersonatedTenant,
+        impersonate,
+        stopImpersonating,
+        isImpersonating,
       }}
     >
       {children}

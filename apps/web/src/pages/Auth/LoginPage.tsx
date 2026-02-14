@@ -24,8 +24,13 @@ export function LoginPage() {
     setIsLoading(true);
 
     try {
-      await login(formData);
-      navigate(from, { replace: true });
+      const user = await login(formData);
+      // Super admin goes to admin panel, others go to dashboard
+      if (user.role === 'super_admin') {
+        navigate('/admin', { replace: true });
+      } else {
+        navigate(from, { replace: true });
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Giris basarisiz');
     } finally {

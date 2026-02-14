@@ -51,7 +51,7 @@ export function TenantsListPage() {
   };
 
   const handleSuspend = async (id: string) => {
-    if (!confirm('Bu kiraciyi askiya almak istediginize emin misiniz?')) return;
+    if (!confirm('Bu organizasyonu askiya almak istediginize emin misiniz?')) return;
 
     try {
       await adminTenantsApi.suspend(id);
@@ -73,7 +73,7 @@ export function TenantsListPage() {
   const columns: Column<Tenant>[] = [
     {
       key: 'name',
-      header: 'Sirket',
+      header: 'Organizasyon',
       render: (tenant) => (
         <div>
           <Link to={`/admin/tenants/${tenant.id}`} className={styles.link}>
@@ -144,9 +144,9 @@ export function TenantsListPage() {
   return (
     <div className={styles.page}>
       <div className={styles.pageHeader}>
-        <h1 className={styles.pageTitle}>Kiracılar</h1>
+        <h1 className={styles.pageTitle}>Organizasyonlar</h1>
         <Button variant="primary" onClick={() => navigate('/admin/tenants/new')}>
-          Yeni Kiraci
+          Yeni Organizasyon
         </Button>
       </div>
 
@@ -177,7 +177,7 @@ export function TenantsListPage() {
           data={tenants}
           keyExtractor={(tenant) => tenant.id}
           loading={isLoading}
-          emptyMessage="Kiraci bulunamadi"
+          emptyMessage="Organizasyon bulunamadi"
         />
 
         {totalPages > 1 && (

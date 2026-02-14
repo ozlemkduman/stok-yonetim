@@ -47,11 +47,11 @@ export function AdminDashboardPage() {
       <div className={styles.statsGrid}>
         <Card className={styles.statCard}>
           <div className={styles.statValue}>{stats?.totalTenants || 0}</div>
-          <div className={styles.statLabel}>Toplam Kiraci</div>
+          <div className={styles.statLabel}>Toplam Organizasyon</div>
         </Card>
         <Card className={styles.statCard}>
           <div className={styles.statValue}>{stats?.activeTenants || 0}</div>
-          <div className={styles.statLabel}>Aktif Kiraci</div>
+          <div className={styles.statLabel}>Aktif Organizasyon</div>
         </Card>
         <Card className={styles.statCard}>
           <div className={styles.statValue}>{stats?.trialTenants || 0}</div>
@@ -94,7 +94,7 @@ export function AdminDashboardPage() {
               <div key={plan.planName} className={styles.planItem}>
                 <div className={styles.planInfo}>
                   <span className={styles.planName}>{plan.planName}</span>
-                  <span className={styles.planCount}>{plan.count} kiraci</span>
+                  <span className={styles.planCount}>{plan.count} organizasyon</span>
                 </div>
                 <div className={styles.progressBar}>
                   <div

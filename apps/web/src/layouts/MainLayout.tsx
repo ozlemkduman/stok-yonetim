@@ -3,6 +3,7 @@ import { Outlet, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { useIsMobile } from '@stok/ui';
 import { reportsApi } from '../api/reports.api';
 import { useAuth } from '../context/AuthContext';
+import { useTenant } from '../context/TenantContext';
 import { usePermissions } from '../hooks/usePermissions';
 import styles from './MainLayout.module.css';
 
@@ -94,6 +95,7 @@ export function MainLayout() {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
   const { isSuperAdmin } = usePermissions();
+  const { impersonatedTenant, isImpersonating, stopImpersonating } = useTenant();
   const [sidebarOpen, setSidebarOpen] = useState(!isMobile);
   const [expandedGroups, setExpandedGroups] = useState<string[]>([]);
   const [notifications, setNotifications] = useState<Notification[]>([]);
@@ -288,17 +290,32 @@ export function MainLayout() {
                 <span className={styles.userName}>{user?.name || 'Kullanici'}</span>
                 <span className={styles.userRole}>{user?.tenant?.name || user?.role}</span>
               </div>
+              <svg
+                className={`${styles.chevronIcon} ${showUserMenu ? styles.chevronOpen : ''}`}
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+              >
+                <path d="M7 10l5 5 5-5z"/>
+              </svg>
             </button>
             {showUserMenu && (
               <div className={styles.userMenu}>
+                <div className={styles.userMenuHeader}>
+                  <span className={styles.userMenuName}>{user?.name}</span>
+                  <span className={styles.userMenuEmail}>{user?.email}</span>
+                </div>
+                <div className={styles.userMenuDivider} />
                 <NavLink to="/profile" className={styles.userMenuItem} onClick={() => setShowUserMenu(false)}>
-                  Profil
+                  <span>👤</span> Profil
                 </NavLink>
                 <NavLink to="/settings" className={styles.userMenuItem} onClick={() => setShowUserMenu(false)}>
-                  Ayarlar
+                  <span>⚙️</span> Ayarlar
                 </NavLink>
-                <button className={styles.userMenuItem} onClick={handleLogout}>
-                  Cikis Yap
+                <div className={styles.userMenuDivider} />
+                <button className={`${styles.userMenuItem} ${styles.userMenuItemDanger}`} onClick={handleLogout}>
+                  <span>🚪</span> Cikis Yap
                 </button>
               </div>
             )}
@@ -384,6 +401,24 @@ export function MainLayout() {
             </div>
           </div>
         </header>
+
+        {/* Impersonation Banner */}
+        {isImpersonating && impersonatedTenant && (
+          <div className={styles.impersonationBanner}>
+            <span>
+              <strong>{impersonatedTenant.name}</strong> olarak goruntuluyorsunuz
+            </span>
+            <button
+              onClick={() => {
+                stopImpersonating();
+                navigate('/admin');
+              }}
+              className={styles.impersonationButton}
+            >
+              Admin Paneline Don
+            </button>
+          </div>
+        )}
 
         {/* Page content */}
         <main className={styles.content}>

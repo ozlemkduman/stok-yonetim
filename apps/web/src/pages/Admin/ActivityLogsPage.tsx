@@ -81,7 +81,7 @@ export function ActivityLogsPage() {
     },
     {
       key: 'tenant',
-      header: 'Sirket',
+      header: 'Organizasyon',
       render: (log) => log.tenant_name || '-',
     },
     {

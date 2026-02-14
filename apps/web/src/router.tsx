@@ -14,8 +14,10 @@ import {
   AdminDashboardPage,
   TenantsListPage,
   TenantDetailPage,
+  TenantFormPage,
   PlansListPage,
   AdminUsersPage,
+  UserFormPage,
   ActivityLogsPage,
 } from './pages/Admin';
 
@@ -64,9 +66,13 @@ export function AppRouter() {
       >
         <Route index element={<AdminDashboardPage />} />
         <Route path="tenants" element={<TenantsListPage />} />
+        <Route path="tenants/new" element={<TenantFormPage />} />
         <Route path="tenants/:id" element={<TenantDetailPage />} />
+        <Route path="tenants/:id/edit" element={<TenantFormPage />} />
         <Route path="plans" element={<PlansListPage />} />
         <Route path="users" element={<AdminUsersPage />} />
+        <Route path="users/new" element={<UserFormPage />} />
+        <Route path="users/:id/edit" element={<UserFormPage />} />
         <Route path="logs" element={<ActivityLogsPage />} />
       </Route>
 

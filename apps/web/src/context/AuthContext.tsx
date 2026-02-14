@@ -6,11 +6,11 @@ interface AuthContextType {
   user: (User & { tenant?: Tenant }) | null;
   isLoading: boolean;
   isAuthenticated: boolean;
-  login: (data: LoginData) => Promise<void>;
-  register: (data: RegisterData) => Promise<void>;
+  login: (data: LoginData) => Promise<User & { tenant?: Tenant }>;
+  register: (data: RegisterData) => Promise<User & { tenant?: Tenant }>;
   logout: () => Promise<void>;
   refreshUser: () => Promise<void>;
-  setTokens: (accessToken: string, refreshToken: string) => Promise<void>;
+  setTokens: (accessToken: string, refreshToken: string) => Promise<User | null>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -49,14 +49,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return () => window.removeEventListener('auth:logout', handleLogout);
   }, [refreshUser]);
 
-  const login = async (data: LoginData) => {
+  const login = async (data: LoginData): Promise<User & { tenant?: Tenant }> => {
     const response = await authApi.login(data);
     setUser(response.data.user);
+    return response.data.user;
   };
 
-  const register = async (data: RegisterData) => {
+  const register = async (data: RegisterData): Promise<User & { tenant?: Tenant }> => {
     const response = await authApi.register(data);
     setUser(response.data.user);
+    return response.data.user;
   };
 
   const logout = async () => {
@@ -64,9 +66,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setUser(null);
   };
 
-  const setTokens = async (accessToken: string, refreshToken: string) => {
+  const setTokens = async (accessToken: string, refreshToken: string): Promise<User | null> => {
     apiClient.setTokens(accessToken, refreshToken);
-    await refreshUser();
+    if (!apiClient.isAuthenticated()) {
+      return null;
+    }
+    try {
+      const response = await authApi.getProfile();
+      setUser(response.data);
+      return response.data;
+    } catch {
+      apiClient.clearTokens();
+      setUser(null);
+      return null;
+    }
   };
 
   return (
