@@ -9,9 +9,11 @@ export class SalesController {
 
   @Get()
   async findAll(@Query() query: PaginationDto & { customerId?: string; status?: string; startDate?: string; endDate?: string; includeVat?: string }) {
-    return this.salesService.findAll({
-      page: query.page || 1,
-      limit: query.limit || 20,
+    const page = query.page || 1;
+    const limit = query.limit || 20;
+    const result = await this.salesService.findAll({
+      page,
+      limit,
       search: query.search,
       customerId: query.customerId,
       status: query.status,
@@ -21,26 +23,39 @@ export class SalesController {
       sortBy: query.sortBy || 'sale_date',
       sortOrder: query.sortOrder || 'desc',
     });
+    return {
+      success: true,
+      data: result.items,
+      meta: {
+        page,
+        limit,
+        total: result.total,
+        totalPages: Math.ceil(result.total / limit),
+      },
+    };
   }
 
   @Get(':id')
   async findById(@Param('id', ParseUUIDPipe) id: string) {
-    return this.salesService.findById(id);
+    const data = await this.salesService.findById(id);
+    return { success: true, data };
   }
 
   @Get(':id/detail')
   async findDetail(@Param('id', ParseUUIDPipe) id: string) {
-    return this.salesService.findDetail(id);
+    const data = await this.salesService.findDetail(id);
+    return { success: true, data };
   }
 
   @Post()
   async create(@Body() dto: CreateSaleDto) {
-    return this.salesService.create(dto);
+    const data = await this.salesService.create(dto);
+    return { success: true, data };
   }
 
   @Patch(':id/cancel')
   async cancel(@Param('id', ParseUUIDPipe) id: string) {
     await this.salesService.cancel(id);
-    return { message: 'Satis iptal edildi' };
+    return { success: true, message: 'Satis iptal edildi' };
   }
 }

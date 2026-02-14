@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Card, Button, Badge, Spinner } from '@stok/ui';
+import { Card, Button, Badge, Spinner, Input } from '@stok/ui';
 import { adminTenantsApi, Tenant, TenantStats } from '../../api/admin/tenants.api';
+import { adminInvitationsApi } from '../../api/admin/invitations.api';
 import { useTenant } from '../../context/TenantContext';
 import styles from './AdminPages.module.css';
 
@@ -26,6 +27,15 @@ export function TenantDetailPage() {
   const [tenant, setTenant] = useState<Tenant | null>(null);
   const [stats, setStats] = useState<TenantStats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+
+  // Davet modal state
+  const [showInviteModal, setShowInviteModal] = useState(false);
+  const [inviteEmail, setInviteEmail] = useState('');
+  const [inviteRole, setInviteRole] = useState('user');
+  const [inviteError, setInviteError] = useState('');
+  const [isInviting, setIsInviting] = useState(false);
+  const [createdInviteLink, setCreatedInviteLink] = useState<string | null>(null);
+  const [linkCopied, setLinkCopied] = useState(false);
 
   const handleViewPanel = () => {
     if (!tenant) return;
@@ -95,6 +105,63 @@ export function TenantDetailPage() {
     }
   };
 
+  const handleInviteUser = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setInviteError('');
+
+    const emailTrimmed = inviteEmail.trim();
+    if (!emailTrimmed) {
+      setInviteError('E-posta adresi gerekli');
+      return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(emailTrimmed)) {
+      setInviteError('Gecerli bir e-posta adresi girin');
+      return;
+    }
+
+    setIsInviting(true);
+
+    try {
+      const response = await adminInvitationsApi.create({
+        email: emailTrimmed,
+        role: inviteRole,
+        tenantId: id,
+      });
+
+      const link = response.data?.invitationLink;
+      if (link) {
+        setCreatedInviteLink(link);
+        setInviteEmail('');
+        setInviteRole('user');
+      } else {
+        setInviteError('Davet olusturuldu ancak link alinamadi');
+      }
+    } catch (error) {
+      setInviteError(error instanceof Error ? error.message : 'Davet gonderilemedi');
+    } finally {
+      setIsInviting(false);
+    }
+  };
+
+  const copyInviteLink = () => {
+    if (createdInviteLink) {
+      navigator.clipboard.writeText(createdInviteLink);
+      setLinkCopied(true);
+      setTimeout(() => setLinkCopied(false), 2000);
+    }
+  };
+
+  const closeInviteModal = () => {
+    setShowInviteModal(false);
+    setCreatedInviteLink(null);
+    setInviteEmail('');
+    setInviteRole('user');
+    setInviteError('');
+    setLinkCopied(false);
+  };
+
   if (isLoading) {
     return (
       <div className={styles.loading}>
@@ -124,10 +191,13 @@ export function TenantDetailPage() {
           <h1 className={styles.pageTitle}>{tenant.name}</h1>
         </div>
         <div className={styles.actions}>
-          <Button variant="primary" onClick={handleViewPanel}>
+          <Button variant="primary" onClick={() => setShowInviteModal(true)}>
+            Kullanici Davet Et
+          </Button>
+          <Button variant="secondary" onClick={handleViewPanel}>
             Paneli Gor
           </Button>
-          <Button variant="secondary" onClick={() => navigate(`/admin/tenants/${id}/edit`)}>
+          <Button variant="ghost" onClick={() => navigate(`/admin/tenants/${id}/edit`)}>
             Duzenle
           </Button>
           {tenant.status === 'active' || tenant.status === 'trial' ? (
@@ -218,6 +288,85 @@ export function TenantDetailPage() {
           </dl>
         </Card>
       </div>
+
+      {/* Davet Modal */}
+      {showInviteModal && (
+        <div className={styles.modalOverlay} onClick={closeInviteModal}>
+          <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
+            {createdInviteLink ? (
+              <>
+                <h2>Davet Olusturuldu</h2>
+                <p style={{ marginBottom: '1rem', color: '#059669' }}>
+                  Davet basariyla olusturuldu. Asagidaki linki kopyalayip kullaniciya gonderin.
+                </p>
+                <div className={styles.formField}>
+                  <label>Davet Linki</label>
+                  <div style={{ display: 'flex', gap: '0.5rem' }}>
+                    <input
+                      type="text"
+                      value={createdInviteLink}
+                      readOnly
+                      style={{ flex: 1 }}
+                    />
+                    <Button variant="primary" onClick={copyInviteLink}>
+                      {linkCopied ? 'Kopyalandi!' : 'Kopyala'}
+                    </Button>
+                  </div>
+                </div>
+                <div className={styles.modalActions}>
+                  <Button variant="secondary" onClick={closeInviteModal}>
+                    Kapat
+                  </Button>
+                </div>
+              </>
+            ) : (
+              <>
+                <h2>Kullanici Davet Et</h2>
+                <p style={{ marginBottom: '1rem', color: '#6b7280' }}>
+                  {tenant?.name} organizasyonuna kullanici davet edin.
+                </p>
+
+                {inviteError && <div className={styles.error}>{inviteError}</div>}
+
+                <form onSubmit={handleInviteUser}>
+                  <div className={styles.formField}>
+                    <label>E-posta *</label>
+                    <Input
+                      type="email"
+                      value={inviteEmail}
+                      onChange={(e) => setInviteEmail(e.target.value)}
+                      placeholder="kullanici@sirket.com"
+                      required
+                    />
+                  </div>
+
+                  <div className={styles.formField}>
+                    <label>Rol *</label>
+                    <select
+                      value={inviteRole}
+                      onChange={(e) => setInviteRole(e.target.value)}
+                      className={styles.select}
+                    >
+                      <option value="tenant_admin">Organizasyon Yoneticisi</option>
+                      <option value="manager">Yonetici</option>
+                      <option value="user">Kullanici</option>
+                    </select>
+                  </div>
+
+                  <div className={styles.modalActions}>
+                    <Button type="button" variant="secondary" onClick={closeInviteModal}>
+                      Iptal
+                    </Button>
+                    <Button type="submit" variant="primary" disabled={isInviting}>
+                      {isInviting ? 'Gonderiliyor...' : 'Davet Gonder'}
+                    </Button>
+                  </div>
+                </form>
+              </>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

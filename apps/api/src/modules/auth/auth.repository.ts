@@ -247,4 +247,27 @@ export class AuthRepository {
   generateToken(): string {
     return crypto.randomBytes(32).toString('hex');
   }
+
+  // Invitation methods
+  async findInvitationByToken(token: string): Promise<{
+    id: string;
+    email: string;
+    token: string;
+    role: string;
+    tenant_id: string | null;
+    tenant_name: string | null;
+    expires_at: Date;
+    accepted_at: Date | null;
+  } | null> {
+    const invitation = await this.db.knex('invitations')
+      .where('token', token)
+      .first();
+    return invitation || null;
+  }
+
+  async markInvitationAccepted(id: string): Promise<void> {
+    await this.db.knex('invitations')
+      .where('id', id)
+      .update({ accepted_at: this.db.knex.fn.now() });
+  }
 }

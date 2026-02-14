@@ -7,21 +7,25 @@ export class DashboardController {
 
   @Get('summary')
   async getSummary() {
-    return this.dashboardService.getSummary();
+    const data = await this.dashboardService.getSummary();
+    return { success: true, data };
   }
 
   @Get('recent-sales')
   async getRecentSales() {
-    return this.dashboardService.getRecentSales();
+    const data = await this.dashboardService.getRecentSales();
+    return { success: true, data };
   }
 
   @Get('low-stock')
   async getLowStockProducts() {
-    return this.dashboardService.getLowStockProducts();
+    const data = await this.dashboardService.getLowStockProducts();
+    return { success: true, data };
   }
 
   @Get('top-debtors')
   async getTopDebtors() {
-    return this.dashboardService.getTopCustomersWithDebt();
+    const data = await this.dashboardService.getTopCustomersWithDebt();
+    return { success: true, data };
   }
 }

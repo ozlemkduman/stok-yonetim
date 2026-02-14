@@ -1,23 +1,64 @@
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { Button, Input } from '@stok/ui';
-import { useAuth } from '../../context/AuthContext';
+import { authApi, InvitationInfo } from '../../api/auth.api';
 import styles from './AuthPages.module.css';
 
 export function RegisterPage() {
   const navigate = useNavigate();
-  const { register } = useAuth();
+  const [searchParams] = useSearchParams();
+  const token = searchParams.get('token');
+
+  const [invitation, setInvitation] = useState<InvitationInfo | null>(null);
+  const [isValidating, setIsValidating] = useState(true);
+  const [validationError, setValidationError] = useState('');
 
   const [formData, setFormData] = useState({
-    companyName: '',
     name: '',
-    email: '',
     password: '',
     confirmPassword: '',
     phone: '',
   });
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    if (!token) {
+      setValidationError('Gecersiz davet linki');
+      setIsValidating(false);
+      return;
+    }
+
+    validateInvitation();
+  }, [token]);
+
+  const validateInvitation = async () => {
+    try {
+      setIsValidating(true);
+      const response = await authApi.validateInvitation(token!);
+      setInvitation(response.data);
+    } catch (err) {
+      setValidationError(err instanceof Error ? err.message : 'Gecersiz davet linki');
+    } finally {
+      setIsValidating(false);
+    }
+  };
+
+  const validatePassword = (password: string): string | null => {
+    if (password.length < 8) {
+      return 'Sifre en az 8 karakter olmalidir';
+    }
+    if (!/[a-z]/.test(password)) {
+      return 'Sifre en az bir kucuk harf icermelidir';
+    }
+    if (!/[A-Z]/.test(password)) {
+      return 'Sifre en az bir buyuk harf icermelidir';
+    }
+    if (!/\d/.test(password)) {
+      return 'Sifre en az bir rakam icermelidir';
+    }
+    return null;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -28,18 +69,18 @@ export function RegisterPage() {
       return;
     }
 
-    if (formData.password.length < 8) {
-      setError('Sifre en az 8 karakter olmalidir');
+    const passwordError = validatePassword(formData.password);
+    if (passwordError) {
+      setError(passwordError);
       return;
     }
 
     setIsLoading(true);
 
     try {
-      await register({
-        companyName: formData.companyName,
+      await authApi.registerWithInvitation({
+        token: token!,
         name: formData.name,
-        email: formData.email,
         password: formData.password,
         phone: formData.phone || undefined,
       });
@@ -51,24 +92,80 @@ export function RegisterPage() {
     }
   };
 
+  if (isValidating) {
+    return (
+      <div className={styles.page}>
+        <div className={styles.loading}>
+          <p>Davet dogrulaniyor...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!token) {
+    return (
+      <div className={styles.page}>
+        <h2 className={styles.title}>Davet Gerekli</h2>
+        <p className={styles.subtitle}>
+          Kayit olmak icin bir davet linkiniz olmasi gerekiyor.
+        </p>
+        <div className={styles.infoBox}>
+          <p>Bu platform sadece davetli kullanicilar icindir.</p>
+          <p>Kayit olmak icin sistem yoneticinizden davet linki talep edin.</p>
+        </div>
+        <div className={styles.footer}>
+          <p>
+            Zaten hesabiniz var mi?{' '}
+            <Link to="/login">Giris yapin</Link>
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  if (validationError) {
+    return (
+      <div className={styles.page}>
+        <h2 className={styles.title}>Gecersiz Davet</h2>
+        <div className={styles.error}>{validationError}</div>
+        <p className={styles.subtitle}>
+          Davet linkinin suresi dolmus veya daha once kullanilmis olabilir.
+        </p>
+        <div className={styles.footer}>
+          <p>
+            Zaten hesabiniz var mi?{' '}
+            <Link to="/login">Giris yapin</Link>
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className={styles.page}>
       <h2 className={styles.title}>Kayit Ol</h2>
-      <p className={styles.subtitle}>14 gun ucretsiz deneyin</p>
+      {invitation?.isNewTenant ? (
+        <p className={styles.subtitle}>
+          {invitation.tenantName} organizasyonunu olusturmak icin kayit olun
+        </p>
+      ) : (
+        <p className={styles.subtitle}>
+          {invitation?.tenantName} organizasyonuna katilmak icin kayit olun
+        </p>
+      )}
 
       {error && <div className={styles.error}>{error}</div>}
 
       <form onSubmit={handleSubmit} className={styles.form}>
         <div className={styles.field}>
-          <label htmlFor="companyName">Sirket Adi</label>
+          <label htmlFor="email">E-posta</label>
           <Input
-            id="companyName"
-            type="text"
-            value={formData.companyName}
-            onChange={(e) => setFormData({ ...formData, companyName: e.target.value })}
-            placeholder="Sirket Ltd. Sti."
-            required
+            id="email"
+            type="email"
+            value={invitation?.email || ''}
+            disabled
           />
+          <span className={styles.hint}>E-posta adresi degistirilemez</span>
         </div>
 
         <div className={styles.field}>
@@ -79,18 +176,6 @@ export function RegisterPage() {
             value={formData.name}
             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
             placeholder="Ahmet Yilmaz"
-            required
-          />
-        </div>
-
-        <div className={styles.field}>
-          <label htmlFor="email">E-posta</label>
-          <Input
-            id="email"
-            type="email"
-            value={formData.email}
-            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-            placeholder="ornek@sirket.com"
             required
           />
         </div>
@@ -113,9 +198,12 @@ export function RegisterPage() {
             type="password"
             value={formData.password}
             onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-            placeholder="En az 8 karakter"
+            placeholder="********"
             required
           />
+          <span className={styles.hint}>
+            En az 8 karakter, 1 buyuk harf, 1 kucuk harf ve 1 rakam
+          </span>
         </div>
 
         <div className={styles.field}>

@@ -18,9 +18,12 @@ export class QuotesController {
     @Query('sortBy') sortBy?: string,
     @Query('sortOrder') sortOrder?: 'asc' | 'desc',
   ) {
-    return this.service.findAll({
-      page: page ? parseInt(page, 10) : undefined,
-      limit: limit ? parseInt(limit, 10) : undefined,
+    const pageNum = page ? parseInt(page, 10) : 1;
+    const limitNum = limit ? parseInt(limit, 10) : 20;
+
+    const result = await this.service.findAll({
+      page: pageNum,
+      limit: limitNum,
       search,
       customerId,
       status,
@@ -29,46 +32,64 @@ export class QuotesController {
       sortBy,
       sortOrder,
     });
+
+    return {
+      success: true,
+      data: result.items,
+      meta: {
+        page: pageNum,
+        limit: limitNum,
+        total: result.total,
+        totalPages: Math.ceil(result.total / limitNum),
+      },
+    };
   }
 
   @Get(':id')
   async findById(@Param('id') id: string) {
-    return this.service.findById(id);
+    const quote = await this.service.findById(id);
+    return { success: true, data: quote };
   }
 
   @Post()
   async create(@Body() dto: CreateQuoteDto) {
-    return this.service.create(dto);
+    const quote = await this.service.create(dto);
+    return { success: true, data: quote };
   }
 
   @Patch(':id')
   async update(@Param('id') id: string, @Body() dto: UpdateQuoteDto) {
-    return this.service.update(id, dto);
+    const quote = await this.service.update(id, dto);
+    return { success: true, data: quote };
   }
 
   @Post(':id/send')
   async send(@Param('id') id: string) {
-    return this.service.send(id);
+    const quote = await this.service.send(id);
+    return { success: true, data: quote };
   }
 
   @Post(':id/accept')
   async accept(@Param('id') id: string) {
-    return this.service.accept(id);
+    const quote = await this.service.accept(id);
+    return { success: true, data: quote };
   }
 
   @Post(':id/reject')
   async reject(@Param('id') id: string) {
-    return this.service.reject(id);
+    const quote = await this.service.reject(id);
+    return { success: true, data: quote };
   }
 
   @Post(':id/convert')
   async convertToSale(@Param('id') id: string, @Body() dto: ConvertToSaleDto) {
-    return this.service.convertToSale(id, dto);
+    const sale = await this.service.convertToSale(id, dto);
+    return { success: true, data: sale };
   }
 
   @Delete(':id')
   async delete(@Param('id') id: string) {
     await this.service.delete(id);
-    return { message: 'Teklif silindi' };
+    return { success: true, message: 'Teklif silindi' };
   }
 }

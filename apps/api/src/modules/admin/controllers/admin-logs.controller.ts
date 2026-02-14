@@ -22,20 +22,34 @@ export class AdminLogsController {
       endDate?: string;
     },
   ) {
-    return this.logsService.findAll({
+    const page = params.page || 1;
+    const limit = params.limit || 20;
+    const result = await this.logsService.findAll({
       ...params,
       startDate: params.startDate ? new Date(params.startDate) : undefined,
       endDate: params.endDate ? new Date(params.endDate) : undefined,
     });
+    return {
+      success: true,
+      data: result.items,
+      meta: {
+        page,
+        limit,
+        total: result.total,
+        totalPages: Math.ceil(result.total / limit),
+      },
+    };
   }
 
   @Get('action-types')
   async getActionTypes() {
-    return this.logsService.getActionTypes();
+    const data = await this.logsService.getActionTypes();
+    return { success: true, data };
   }
 
   @Get('entity-types')
   async getEntityTypes() {
-    return this.logsService.getEntityTypes();
+    const data = await this.logsService.getEntityTypes();
+    return { success: true, data };
   }
 }

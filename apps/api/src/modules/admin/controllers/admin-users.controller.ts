@@ -26,39 +26,57 @@ export class AdminUsersController {
   async findAll(
     @Query() params: PaginationParams & { role?: string; status?: string; tenantId?: string; search?: string },
   ) {
-    return this.usersService.findAll(params);
+    const page = params.page || 1;
+    const limit = params.limit || 20;
+    const result = await this.usersService.findAll(params);
+    return {
+      success: true,
+      data: result.items,
+      meta: {
+        page,
+        limit,
+        total: result.total,
+        totalPages: Math.ceil(result.total / limit),
+      },
+    };
   }
 
   @Get('stats/by-role')
   async countByRole() {
-    return this.usersService.countByRole();
+    const data = await this.usersService.countByRole();
+    return { success: true, data };
   }
 
   @Post()
   async create(@Body() dto: CreateUserDto) {
-    return this.usersService.create(dto);
+    const data = await this.usersService.create(dto);
+    return { success: true, data };
   }
 
   @Get(':id')
   async findById(@Param('id') id: string) {
-    return this.usersService.findById(id);
+    const data = await this.usersService.findById(id);
+    return { success: true, data };
   }
 
   @Patch(':id')
   async update(@Param('id') id: string, @Body() dto: UpdateUserDto) {
-    return this.usersService.update(id, dto);
+    const data = await this.usersService.update(id, dto);
+    return { success: true, data };
   }
 
   @Post(':id/suspend')
   @HttpCode(HttpStatus.OK)
   async suspend(@Param('id') id: string) {
-    return this.usersService.suspend(id);
+    const data = await this.usersService.suspend(id);
+    return { success: true, data };
   }
 
   @Post(':id/activate')
   @HttpCode(HttpStatus.OK)
   async activate(@Param('id') id: string) {
-    return this.usersService.activate(id);
+    const data = await this.usersService.activate(id);
+    return { success: true, data };
   }
 
   @Delete(':id')

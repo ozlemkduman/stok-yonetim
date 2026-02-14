@@ -19,61 +19,82 @@ export class CustomersController {
 
   @Get()
   async findAll(@Query() query: PaginationDto & { isActive?: string }) {
+    const page = query.page || 1;
+    const limit = query.limit || 20;
     const params = {
-      page: query.page || 1,
-      limit: query.limit || 20,
+      page,
+      limit,
       search: query.search,
       sortBy: query.sortBy || 'created_at',
       sortOrder: query.sortOrder || 'desc',
       isActive: query.isActive === 'true' ? true : query.isActive === 'false' ? false : undefined,
     };
 
-    return this.customersService.findAll(params);
+    const result = await this.customersService.findAll(params);
+    return {
+      success: true,
+      data: result.items,
+      meta: {
+        page,
+        limit,
+        total: result.total,
+        totalPages: Math.ceil(result.total / limit),
+      },
+    };
   }
 
   @Get('with-debt')
   async getCustomersWithDebt() {
-    return this.customersService.getCustomersWithDebt();
+    const data = await this.customersService.getCustomersWithDebt();
+    return { success: true, data };
   }
 
   @Get('with-credit')
   async getCustomersWithCredit() {
-    return this.customersService.getCustomersWithCredit();
+    const data = await this.customersService.getCustomersWithCredit();
+    return { success: true, data };
   }
 
   @Get(':id')
   async findById(@Param('id', ParseUUIDPipe) id: string) {
-    return this.customersService.findById(id);
+    const data = await this.customersService.findById(id);
+    return { success: true, data };
   }
 
   @Get(':id/detail')
   async getCustomerDetail(@Param('id', ParseUUIDPipe) id: string) {
-    return this.customersService.getCustomerDetail(id);
+    const data = await this.customersService.getCustomerDetail(id);
+    return { success: true, data };
   }
 
   @Get(':id/sales')
   async getCustomerSales(@Param('id', ParseUUIDPipe) id: string) {
-    return this.customersService.getCustomerSales(id);
+    const data = await this.customersService.getCustomerSales(id);
+    return { success: true, data };
   }
 
   @Get(':id/returns')
   async getCustomerReturns(@Param('id', ParseUUIDPipe) id: string) {
-    return this.customersService.getCustomerReturns(id);
+    const data = await this.customersService.getCustomerReturns(id);
+    return { success: true, data };
   }
 
   @Get(':id/payments')
   async getCustomerPayments(@Param('id', ParseUUIDPipe) id: string) {
-    return this.customersService.getCustomerPayments(id);
+    const data = await this.customersService.getCustomerPayments(id);
+    return { success: true, data };
   }
 
   @Get(':id/stats')
   async getCustomerStats(@Param('id', ParseUUIDPipe) id: string) {
-    return this.customersService.getCustomerStats(id);
+    const data = await this.customersService.getCustomerStats(id);
+    return { success: true, data };
   }
 
   @Post()
   async create(@Body() dto: CreateCustomerDto) {
-    return this.customersService.create(dto);
+    const data = await this.customersService.create(dto);
+    return { success: true, data };
   }
 
   @Patch(':id')
@@ -81,12 +102,13 @@ export class CustomersController {
     @Param('id', ParseUUIDPipe) id: string,
     @Body() dto: UpdateCustomerDto,
   ) {
-    return this.customersService.update(id, dto);
+    const data = await this.customersService.update(id, dto);
+    return { success: true, data };
   }
 
   @Delete(':id')
   async delete(@Param('id', ParseUUIDPipe) id: string) {
     await this.customersService.delete(id);
-    return { message: 'Musteri basariyla silindi' };
+    return { success: true, message: 'Musteri basariyla silindi' };
   }
 }

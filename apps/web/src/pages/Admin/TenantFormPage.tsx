@@ -91,7 +91,7 @@ export function TenantFormPage() {
       navigate('/admin/tenants');
     } catch (err: any) {
       console.error('Failed to save tenant:', err);
-      setError(err.response?.data?.message || 'Organizasyon kaydedilemedi');
+      setError(err instanceof Error ? err.message : 'Organizasyon kaydedilemedi');
     } finally {
       setIsSaving(false);
     }

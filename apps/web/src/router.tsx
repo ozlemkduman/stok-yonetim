@@ -19,6 +19,7 @@ import {
   AdminUsersPage,
   UserFormPage,
   ActivityLogsPage,
+  InvitationsPage,
 } from './pages/Admin';
 
 // Settings Pages
@@ -73,6 +74,7 @@ export function AppRouter() {
         <Route path="users" element={<AdminUsersPage />} />
         <Route path="users/new" element={<UserFormPage />} />
         <Route path="users/:id/edit" element={<UserFormPage />} />
+        <Route path="invitations" element={<InvitationsPage />} />
         <Route path="logs" element={<ActivityLogsPage />} />
       </Route>
 

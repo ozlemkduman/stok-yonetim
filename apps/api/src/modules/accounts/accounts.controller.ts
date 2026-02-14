@@ -15,19 +15,32 @@ export class AccountsController {
     @Query('sortBy') sortBy?: string,
     @Query('sortOrder') sortOrder?: 'asc' | 'desc',
   ) {
-    return this.service.findAll({
-      page: page ? parseInt(page, 10) : undefined,
-      limit: limit ? parseInt(limit, 10) : undefined,
+    const pageNum = page ? parseInt(page, 10) : 1;
+    const limitNum = limit ? parseInt(limit, 10) : 20;
+    const result = await this.service.findAll({
+      page: pageNum,
+      limit: limitNum,
       accountType,
       isActive,
       sortBy,
       sortOrder,
     });
+    return {
+      success: true,
+      data: result.items,
+      meta: {
+        page: pageNum,
+        limit: limitNum,
+        total: result.total,
+        totalPages: Math.ceil(result.total / limitNum),
+      },
+    };
   }
 
   @Get('summary')
   async getSummary() {
-    return this.service.getSummary();
+    const data = await this.service.getSummary();
+    return { success: true, data };
   }
 
   @Get('transfers')
@@ -36,21 +49,35 @@ export class AccountsController {
     @Query('limit') limit?: string,
     @Query('accountId') accountId?: string,
   ) {
-    return this.service.getTransfers({
-      page: page ? parseInt(page, 10) : undefined,
-      limit: limit ? parseInt(limit, 10) : undefined,
+    const pageNum = page ? parseInt(page, 10) : 1;
+    const limitNum = limit ? parseInt(limit, 10) : 20;
+    const result = await this.service.getTransfers({
+      page: pageNum,
+      limit: limitNum,
       accountId,
     });
+    return {
+      success: true,
+      data: result.items,
+      meta: {
+        page: pageNum,
+        limit: limitNum,
+        total: result.total,
+        totalPages: Math.ceil(result.total / limitNum),
+      },
+    };
   }
 
   @Get(':id')
   async findById(@Param('id') id: string) {
-    return this.service.findById(id);
+    const data = await this.service.findById(id);
+    return { success: true, data };
   }
 
   @Get(':id/detail')
   async getDetail(@Param('id') id: string) {
-    return this.service.getDetail(id);
+    const data = await this.service.getDetail(id);
+    return { success: true, data };
   }
 
   @Get(':id/movements')
@@ -62,38 +89,54 @@ export class AccountsController {
     @Query('endDate') endDate?: string,
     @Query('movementType') movementType?: string,
   ) {
-    return this.service.getMovements(id, {
-      page: page ? parseInt(page, 10) : undefined,
-      limit: limit ? parseInt(limit, 10) : undefined,
+    const pageNum = page ? parseInt(page, 10) : 1;
+    const limitNum = limit ? parseInt(limit, 10) : 20;
+    const result = await this.service.getMovements(id, {
+      page: pageNum,
+      limit: limitNum,
       startDate,
       endDate,
       movementType,
     });
+    return {
+      success: true,
+      data: result.items,
+      meta: {
+        page: pageNum,
+        limit: limitNum,
+        total: result.total,
+        totalPages: Math.ceil(result.total / limitNum),
+      },
+    };
   }
 
   @Post()
   async create(@Body() dto: CreateAccountDto) {
-    return this.service.create(dto);
+    const data = await this.service.create(dto);
+    return { success: true, data };
   }
 
   @Post('transfers')
   async createTransfer(@Body() dto: CreateTransferDto) {
-    return this.service.createTransfer(dto);
+    const data = await this.service.createTransfer(dto);
+    return { success: true, data };
   }
 
   @Post(':id/movements')
   async addMovement(@Param('id') id: string, @Body() dto: CreateMovementDto) {
-    return this.service.addMovement(id, dto);
+    const data = await this.service.addMovement(id, dto);
+    return { success: true, data };
   }
 
   @Patch(':id')
   async update(@Param('id') id: string, @Body() dto: UpdateAccountDto) {
-    return this.service.update(id, dto);
+    const data = await this.service.update(id, dto);
+    return { success: true, data };
   }
 
   @Delete(':id')
   async delete(@Param('id') id: string) {
     await this.service.delete(id);
-    return { message: 'Hesap silindi' };
+    return { success: true, message: 'Hesap silindi' };
   }
 }

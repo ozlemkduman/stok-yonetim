@@ -26,27 +26,53 @@ export class AdminTenantsController {
   async findAll(
     @Query() params: PaginationParams & { status?: string; search?: string },
   ) {
-    return this.tenantsService.findAll(params);
+    const result = await this.tenantsService.findAll(params);
+    return {
+      success: true,
+      data: result.items,
+      meta: {
+        page: result.page,
+        limit: result.limit,
+        total: result.total,
+        totalPages: result.totalPages,
+      },
+    };
   }
 
   @Get(':id')
   async findById(@Param('id') id: string) {
-    return this.tenantsService.findById(id);
+    const tenant = await this.tenantsService.findById(id);
+    return {
+      success: true,
+      data: tenant,
+    };
   }
 
   @Get(':id/stats')
   async getStats(@Param('id') id: string) {
-    return this.tenantsService.getStats(id);
+    const stats = await this.tenantsService.getStats(id);
+    return {
+      success: true,
+      data: stats,
+    };
   }
 
   @Post()
   async create(@Body() dto: CreateTenantDto) {
-    return this.tenantsService.create(dto);
+    const tenant = await this.tenantsService.create(dto);
+    return {
+      success: true,
+      data: tenant,
+    };
   }
 
   @Patch(':id')
   async update(@Param('id') id: string, @Body() dto: UpdateTenantDto) {
-    return this.tenantsService.update(id, dto);
+    const tenant = await this.tenantsService.update(id, dto);
+    return {
+      success: true,
+      data: tenant,
+    };
   }
 
   @Delete(':id')
@@ -58,12 +84,20 @@ export class AdminTenantsController {
   @Post(':id/suspend')
   @HttpCode(HttpStatus.OK)
   async suspend(@Param('id') id: string) {
-    return this.tenantsService.suspend(id);
+    const tenant = await this.tenantsService.suspend(id);
+    return {
+      success: true,
+      data: tenant,
+    };
   }
 
   @Post(':id/activate')
   @HttpCode(HttpStatus.OK)
   async activate(@Param('id') id: string) {
-    return this.tenantsService.activate(id);
+    const tenant = await this.tenantsService.activate(id);
+    return {
+      success: true,
+      data: tenant,
+    };
   }
 }

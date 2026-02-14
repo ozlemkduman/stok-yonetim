@@ -8,10 +8,10 @@ import {
   HttpCode,
   HttpStatus,
   Headers,
-  Res,
+  Param,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { Request, Response } from 'express';
+import { Request } from 'express';
 import { ConfigService } from '@nestjs/config';
 import { AuthService, LoginResponse, AuthTokens } from './auth.service';
 import { LoginDto, RegisterDto, RefreshTokenDto, ForgotPasswordDto, ResetPasswordDto } from './dto';
@@ -51,8 +51,31 @@ export class AuthController {
 
   @Public()
   @Post('register')
-  async register(@Body() dto: RegisterDto): Promise<LoginResponse> {
-    return this.authService.register(dto);
+  async register(@Body() _dto: RegisterDto): Promise<LoginResponse> {
+    // Public registration is disabled
+    return this.authService.register(_dto);
+  }
+
+  @Public()
+  @Get('invitation/:token')
+  async validateInvitation(@Param('token') token: string) {
+    const invitation = await this.authService.validateInvitation(token);
+    return {
+      success: true,
+      data: invitation,
+    };
+  }
+
+  @Public()
+  @Post('register-with-invitation')
+  async registerWithInvitation(
+    @Body() dto: { token: string; name: string; password: string; phone?: string },
+  ): Promise<{ success: boolean; data: LoginResponse }> {
+    const result = await this.authService.registerWithInvitation(dto);
+    return {
+      success: true,
+      data: result,
+    };
   }
 
   @Public()
@@ -115,36 +138,37 @@ export class AuthController {
     };
   }
 
-  @Public()
-  @Get('google')
-  @UseGuards(AuthGuard('google'))
-  async googleAuth() {
-    // Guard redirects to Google
-  }
+  // Google login is disabled - only invitation-based registration is allowed
+  // @Public()
+  // @Get('google')
+  // @UseGuards(AuthGuard('google'))
+  // async googleAuth() {
+  //   // Guard redirects to Google
+  // }
 
-  @Public()
-  @Get('google/callback')
-  @UseGuards(AuthGuard('google'))
-  async googleAuthCallback(
-    @Req() req: Request & { user: GoogleUser },
-    @Res() res: Response,
-  ) {
-    const ipAddress = req.ip || req.socket.remoteAddress;
-    const userAgent = req.headers['user-agent'];
+  // @Public()
+  // @Get('google/callback')
+  // @UseGuards(AuthGuard('google'))
+  // async googleAuthCallback(
+  //   @Req() req: Request & { user: GoogleUser },
+  //   @Res() res: Response,
+  // ) {
+  //   const ipAddress = req.ip || req.socket.remoteAddress;
+  //   const userAgent = req.headers['user-agent'];
 
-    const result = await this.authService.googleLogin(
-      req.user,
-      ipAddress,
-      userAgent,
-    );
+  //   const result = await this.authService.googleLogin(
+  //     req.user,
+  //     ipAddress,
+  //     userAgent,
+  //   );
 
-    // Redirect to frontend with tokens
-    const frontendUrl = this.configService.get<string>('FRONTEND_URL') || 'http://localhost:5175';
-    const params = new URLSearchParams({
-      accessToken: result.tokens.accessToken,
-      refreshToken: result.tokens.refreshToken,
-    });
+  //   // Redirect to frontend with tokens
+  //   const frontendUrl = this.configService.get<string>('FRONTEND_URL') || 'http://localhost:5175';
+  //   const params = new URLSearchParams({
+  //     accessToken: result.tokens.accessToken,
+  //     refreshToken: result.tokens.refreshToken,
+  //   });
 
-    res.redirect(`${frontendUrl}/auth/google/callback?${params.toString()}`);
-  }
+  //   res.redirect(`${frontendUrl}/auth/google/callback?${params.toString()}`);
+  // }
 }

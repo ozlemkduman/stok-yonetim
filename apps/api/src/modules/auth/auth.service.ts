@@ -109,57 +109,105 @@ export class AuthService {
     };
   }
 
-  async register(dto: RegisterDto): Promise<LoginResponse> {
+  async register(_dto: RegisterDto): Promise<LoginResponse> {
+    // Public registration is disabled - use invitation-based registration
+    throw new BadRequestException('Kayit sadece davet ile yapilabilir');
+  }
+
+  async registerWithInvitation(dto: {
+    token: string;
+    name: string;
+    password: string;
+    phone?: string;
+  }): Promise<LoginResponse> {
+    // Find and validate invitation
+    const invitation = await this.authRepository.findInvitationByToken(dto.token);
+
+    if (!invitation) {
+      throw new BadRequestException('Gecersiz davet linki');
+    }
+
+    if (invitation.accepted_at) {
+      throw new BadRequestException('Bu davet zaten kullanilmis');
+    }
+
+    if (new Date(invitation.expires_at) < new Date()) {
+      throw new BadRequestException('Bu davetin suresi dolmus');
+    }
+
     // Check if email already exists
-    const existingUser = await this.authRepository.findUserByEmail(dto.email);
+    const existingUser = await this.authRepository.findUserByEmail(invitation.email);
     if (existingUser) {
       throw new ConflictException('Bu e-posta adresi zaten kullanımda');
     }
 
-    // Generate slug from company name
-    const slug = this.generateSlug(dto.companyName);
+    let tenant: Tenant;
 
-    // Check if slug already exists
-    const existingTenant = await this.authRepository.findTenantBySlug(slug);
-    if (existingTenant) {
-      throw new ConflictException('Bu şirket adı zaten kullanımda');
+    // If tenant_id exists, use existing tenant
+    if (invitation.tenant_id) {
+      const existingTenant = await this.authRepository.findTenantById(invitation.tenant_id);
+      if (!existingTenant) {
+        throw new BadRequestException('Organizasyon bulunamadi');
+      }
+      tenant = existingTenant;
+    } else {
+      // Create new tenant for tenant_admin invitations
+      if (!invitation.tenant_name) {
+        throw new BadRequestException('Organizasyon adi gerekli');
+      }
+
+      const slug = this.generateSlug(invitation.tenant_name);
+
+      // Check if slug already exists
+      const existingTenantBySlug = await this.authRepository.findTenantBySlug(slug);
+      if (existingTenantBySlug) {
+        throw new ConflictException('Bu organizasyon adı zaten kullanımda');
+      }
+
+      // Get default plan
+      const defaultPlan = await this.authRepository.getDefaultPlan();
+
+      // Create tenant with trial period
+      const trialEndDate = new Date();
+      trialEndDate.setDate(trialEndDate.getDate() + 14); // 14 days trial
+
+      tenant = await this.authRepository.createTenant({
+        name: invitation.tenant_name,
+        slug,
+        plan_id: defaultPlan?.id || null,
+        status: 'trial',
+        trial_ends_at: trialEndDate,
+        billing_email: invitation.email,
+        settings: {},
+      });
     }
-
-    // Get default plan
-    const defaultPlan = await this.authRepository.getDefaultPlan();
-
-    // Create tenant with trial period
-    const trialEndDate = new Date();
-    trialEndDate.setDate(trialEndDate.getDate() + 14); // 14 days trial
-
-    const tenant = await this.authRepository.createTenant({
-      name: dto.companyName,
-      slug,
-      plan_id: defaultPlan?.id || null,
-      status: 'trial',
-      trial_ends_at: trialEndDate,
-      billing_email: dto.email,
-      settings: {},
-    });
 
     // Hash password
     const passwordHash = await bcrypt.hash(dto.password, 12);
 
-    // Create user as tenant admin
+    // Determine permissions based on role
+    const permissions = invitation.role === 'tenant_admin' ? ['*'] : [];
+
+    // Create user
     const user = await this.authRepository.createUser({
       tenant_id: tenant.id,
-      email: dto.email,
+      email: invitation.email,
       password_hash: passwordHash,
       name: dto.name,
       phone: dto.phone || null,
-      role: 'tenant_admin',
-      permissions: ['*'],
+      role: invitation.role,
+      permissions,
       status: 'active',
-      email_verified_at: null,
+      email_verified_at: new Date(), // Invitation means email is verified
     });
 
-    // Update tenant owner
-    await this.authRepository.updateTenantOwner(tenant.id, user.id);
+    // Update tenant owner if this is a new tenant
+    if (!invitation.tenant_id && invitation.role === 'tenant_admin') {
+      await this.authRepository.updateTenantOwner(tenant.id, user.id);
+    }
+
+    // Mark invitation as accepted
+    await this.authRepository.markInvitationAccepted(invitation.id);
 
     // Generate tokens
     const tokens = await this.generateTokens(user);
@@ -187,6 +235,42 @@ export class AuthService {
         },
       },
       tokens,
+    };
+  }
+
+  async validateInvitation(token: string): Promise<{
+    email: string;
+    role: string;
+    tenantName: string | null;
+    isNewTenant: boolean;
+  }> {
+    const invitation = await this.authRepository.findInvitationByToken(token);
+
+    if (!invitation) {
+      throw new BadRequestException('Gecersiz davet linki');
+    }
+
+    if (invitation.accepted_at) {
+      throw new BadRequestException('Bu davet zaten kullanilmis');
+    }
+
+    if (new Date(invitation.expires_at) < new Date()) {
+      throw new BadRequestException('Bu davetin suresi dolmus');
+    }
+
+    let tenantName: string | null = null;
+    if (invitation.tenant_id) {
+      const tenant = await this.authRepository.findTenantById(invitation.tenant_id);
+      tenantName = tenant?.name || null;
+    } else {
+      tenantName = invitation.tenant_name;
+    }
+
+    return {
+      email: invitation.email,
+      role: invitation.role,
+      tenantName,
+      isNewTenant: !invitation.tenant_id,
     };
   }
 

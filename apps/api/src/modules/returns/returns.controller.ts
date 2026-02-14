@@ -9,22 +9,36 @@ export class ReturnsController {
 
   @Get()
   async findAll(@Query() query: PaginationDto & { customerId?: string }) {
-    return this.returnsService.findAll({
-      page: query.page || 1,
-      limit: query.limit || 20,
+    const page = query.page || 1;
+    const limit = query.limit || 20;
+    const result = await this.returnsService.findAll({
+      page,
+      limit,
       customerId: query.customerId,
       sortBy: query.sortBy || 'return_date',
       sortOrder: query.sortOrder || 'desc',
     });
+    return {
+      success: true,
+      data: result.items,
+      meta: {
+        page,
+        limit,
+        total: result.total,
+        totalPages: Math.ceil(result.total / limit),
+      },
+    };
   }
 
   @Get(':id')
   async findById(@Param('id', ParseUUIDPipe) id: string) {
-    return this.returnsService.findById(id);
+    const data = await this.returnsService.findById(id);
+    return { success: true, data };
   }
 
   @Post()
   async create(@Body() dto: CreateReturnDto) {
-    return this.returnsService.create(dto);
+    const data = await this.returnsService.create(dto);
+    return { success: true, data };
   }
 }

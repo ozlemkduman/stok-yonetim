@@ -23,22 +23,26 @@ export class AdminPlansController {
 
   @Get()
   async findAll(@Query('includeInactive') includeInactive?: boolean) {
-    return this.plansService.findAll(includeInactive);
+    const data = await this.plansService.findAll(includeInactive);
+    return { success: true, data };
   }
 
   @Get(':id')
   async findById(@Param('id') id: string) {
-    return this.plansService.findById(id);
+    const data = await this.plansService.findById(id);
+    return { success: true, data };
   }
 
   @Post()
   async create(@Body() dto: CreatePlanDto) {
-    return this.plansService.create(dto);
+    const data = await this.plansService.create(dto);
+    return { success: true, data };
   }
 
   @Patch(':id')
   async update(@Param('id') id: string, @Body() dto: UpdatePlanDto) {
-    return this.plansService.update(id, dto);
+    const data = await this.plansService.update(id, dto);
+    return { success: true, data };
   }
 
   @Delete(':id')

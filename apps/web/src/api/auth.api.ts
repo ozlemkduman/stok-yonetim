@@ -44,6 +44,20 @@ export interface RegisterData {
   phone?: string;
 }
 
+export interface RegisterWithInvitationData {
+  token: string;
+  name: string;
+  password: string;
+  phone?: string;
+}
+
+export interface InvitationInfo {
+  email: string;
+  role: string;
+  tenantName: string | null;
+  isNewTenant: boolean;
+}
+
 export const authApi = {
   async login(data: LoginData): Promise<ApiResponse<LoginResponse>> {
     const response = await apiClient.post<LoginResponse>('/auth/login', data, true);
@@ -55,6 +69,18 @@ export const authApi = {
 
   async register(data: RegisterData): Promise<ApiResponse<LoginResponse>> {
     const response = await apiClient.post<LoginResponse>('/auth/register', data, true);
+    if (response.data?.tokens) {
+      apiClient.setTokens(response.data.tokens.accessToken, response.data.tokens.refreshToken);
+    }
+    return response;
+  },
+
+  async validateInvitation(token: string): Promise<ApiResponse<InvitationInfo>> {
+    return apiClient.get<InvitationInfo>(`/auth/invitation/${token}`);
+  },
+
+  async registerWithInvitation(data: RegisterWithInvitationData): Promise<ApiResponse<LoginResponse>> {
+    const response = await apiClient.post<LoginResponse>('/auth/register-with-invitation', data, true);
     if (response.data?.tokens) {
       apiClient.setTokens(response.data.tokens.accessToken, response.data.tokens.refreshToken);
     }

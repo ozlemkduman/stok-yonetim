@@ -120,7 +120,7 @@ export function UserFormPage() {
       navigate('/admin/users');
     } catch (err: any) {
       console.error('Failed to save user:', err);
-      setError(err.response?.data?.message || 'Kullanici kaydedilemedi');
+      setError(err instanceof Error ? err.message : 'Kullanici kaydedilemedi');
     } finally {
       setIsSaving(false);
     }

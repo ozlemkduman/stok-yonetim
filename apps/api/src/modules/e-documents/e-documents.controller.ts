@@ -19,9 +19,11 @@ export class EDocumentsController {
     @Query('sortBy') sortBy?: string,
     @Query('sortOrder') sortOrder?: 'asc' | 'desc',
   ) {
-    return this.service.findAll({
-      page: page ? parseInt(page, 10) : undefined,
-      limit: limit ? parseInt(limit, 10) : undefined,
+    const pageNum = page ? parseInt(page, 10) : 1;
+    const limitNum = limit ? parseInt(limit, 10) : 20;
+    const result = await this.service.findAll({
+      page: pageNum,
+      limit: limitNum,
       documentType,
       status,
       referenceType,
@@ -31,35 +33,51 @@ export class EDocumentsController {
       sortBy,
       sortOrder,
     });
+    return {
+      success: true,
+      data: result.items,
+      meta: {
+        page: pageNum,
+        limit: limitNum,
+        total: result.total,
+        totalPages: Math.ceil(result.total / limitNum),
+      },
+    };
   }
 
   @Get('summary')
   async getSummary() {
-    return this.service.getSummary();
+    const data = await this.service.getSummary();
+    return { success: true, data };
   }
 
   @Get(':id')
   async findById(@Param('id') id: string) {
-    return this.service.findById(id);
+    const data = await this.service.findById(id);
+    return { success: true, data };
   }
 
   @Post()
   async create(@Body() dto: CreateEDocumentDto) {
-    return this.service.create(dto);
+    const data = await this.service.create(dto);
+    return { success: true, data };
   }
 
   @Post(':id/send')
   async send(@Param('id') id: string) {
-    return this.service.send(id);
+    const data = await this.service.send(id);
+    return { success: true, data };
   }
 
   @Post(':id/check-status')
   async checkStatus(@Param('id') id: string) {
-    return this.service.checkStatus(id);
+    const data = await this.service.checkStatus(id);
+    return { success: true, data };
   }
 
   @Post(':id/cancel')
   async cancel(@Param('id') id: string) {
-    return this.service.cancel(id);
+    const data = await this.service.cancel(id);
+    return { success: true, data };
   }
 }

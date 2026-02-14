@@ -29,33 +29,49 @@ export class UsersController {
   async findAll(
     @Query() params: PaginationParams & { role?: string; status?: string; search?: string },
   ) {
-    return this.usersService.findAll(params);
+    const page = params.page || 1;
+    const limit = params.limit || 20;
+    const result = await this.usersService.findAll(params);
+    return {
+      success: true,
+      data: result.items,
+      meta: {
+        page,
+        limit,
+        total: result.total,
+        totalPages: Math.ceil(result.total / limit),
+      },
+    };
   }
 
   @Get('stats/by-role')
   @RequirePermissions(PERMISSIONS.USERS_VIEW)
   async countByRole() {
-    return this.usersService.countByRole();
+    const data = await this.usersService.countByRole();
+    return { success: true, data };
   }
 
   @Get(':id')
   @RequirePermissions(PERMISSIONS.USERS_VIEW)
   async findById(@Param('id') id: string) {
-    return this.usersService.findById(id);
+    const data = await this.usersService.findById(id);
+    return { success: true, data };
   }
 
   @Post()
   @Roles(UserRole.TENANT_ADMIN, UserRole.SUPER_ADMIN)
   @RequirePermissions(PERMISSIONS.USERS_MANAGE)
   async create(@Body() dto: CreateUserDto) {
-    return this.usersService.create(dto);
+    const data = await this.usersService.create(dto);
+    return { success: true, data };
   }
 
   @Patch(':id')
   @Roles(UserRole.TENANT_ADMIN, UserRole.SUPER_ADMIN)
   @RequirePermissions(PERMISSIONS.USERS_MANAGE)
   async update(@Param('id') id: string, @Body() dto: UpdateUserDto) {
-    return this.usersService.update(id, dto);
+    const data = await this.usersService.update(id, dto);
+    return { success: true, data };
   }
 
   @Delete(':id')
@@ -73,6 +89,6 @@ export class UsersController {
     @Body() body: { currentPassword: string; newPassword: string },
   ) {
     await this.usersService.changePassword(user.sub, body.currentPassword, body.newPassword);
-    return { message: 'Şifre başarıyla değiştirildi' };
+    return { success: true, message: 'Şifre başarıyla değiştirildi' };
   }
 }

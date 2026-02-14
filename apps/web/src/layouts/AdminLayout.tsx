@@ -7,8 +7,9 @@ const menuItems = [
   { path: '/admin', label: 'Dashboard', icon: '📊' },
   { path: '/admin/tenants', label: 'Organizasyonlar', icon: '🏢' },
   { path: '/admin/plans', label: 'Planlar', icon: '📋' },
-  { path: '/admin/users', label: 'Kullanıcılar', icon: '👥' },
-  { path: '/admin/logs', label: 'Aktivite Kayıtları', icon: '📜' },
+  { path: '/admin/users', label: 'Kullanicilar', icon: '👥' },
+  { path: '/admin/invitations', label: 'Davetler', icon: '✉️' },
+  { path: '/admin/logs', label: 'Aktivite Kayitlari', icon: '📜' },
 ];
 
 export function AdminLayout() {

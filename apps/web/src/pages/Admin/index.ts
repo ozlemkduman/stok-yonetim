@@ -5,4 +5,5 @@ export { TenantFormPage } from './TenantFormPage';
 export { PlansListPage } from './PlansListPage';
 export { AdminUsersPage } from './AdminUsersPage';
 export { UserFormPage } from './UserFormPage';
+export { InvitationsPage } from './InvitationsPage';
 export { ActivityLogsPage } from './ActivityLogsPage';
