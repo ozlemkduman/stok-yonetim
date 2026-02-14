@@ -15,6 +15,7 @@ export interface User {
   status: string;
   email_verified_at: Date | null;
   last_login_at: Date | null;
+  google_id: string | null;
   created_at: Date;
   updated_at: Date;
 }

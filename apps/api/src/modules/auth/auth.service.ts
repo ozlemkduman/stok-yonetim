@@ -290,6 +290,71 @@ export class AuthService {
     return this.authRepository.findUserById(userId);
   }
 
+  async googleLogin(
+    googleUser: {
+      googleId: string;
+      email: string;
+      name: string;
+      avatarUrl: string | null;
+    },
+    ipAddress?: string,
+    userAgent?: string,
+  ): Promise<LoginResponse> {
+    // Check if user exists with this email
+    let user = await this.authRepository.findUserByEmail(googleUser.email);
+
+    if (user) {
+      // User exists, update google_id if not set
+      if (!user.google_id) {
+        await this.authRepository.updateUser(user.id, {
+          google_id: googleUser.googleId,
+          avatar_url: googleUser.avatarUrl,
+        } as any);
+      }
+    } else {
+      // New user - create tenant and user
+      const slug = this.generateSlug(googleUser.name + '-company');
+
+      // Get default plan
+      const defaultPlan = await this.authRepository.getDefaultPlan();
+
+      // Create tenant with trial period
+      const trialEndDate = new Date();
+      trialEndDate.setDate(trialEndDate.getDate() + 14);
+
+      const tenant = await this.authRepository.createTenant({
+        name: `${googleUser.name} Sirket`,
+        slug,
+        plan_id: defaultPlan?.id || null,
+        status: 'trial',
+        trial_ends_at: trialEndDate,
+        billing_email: googleUser.email,
+        settings: {},
+      });
+
+      // Create user as tenant admin (no password for Google users)
+      user = await this.authRepository.createUser({
+        tenant_id: tenant.id,
+        email: googleUser.email,
+        password_hash: '', // No password for Google login
+        name: googleUser.name,
+        phone: null,
+        role: 'tenant_admin',
+        permissions: ['*'],
+        status: 'active',
+        email_verified_at: new Date(), // Google emails are verified
+        google_id: googleUser.googleId,
+        avatar_url: googleUser.avatarUrl,
+      });
+
+      // Update tenant owner
+      await this.authRepository.updateTenantOwner(tenant.id, user.id);
+    }
+
+    // Login the user
+    return this.login(user, ipAddress, userAgent);
+  }
+
   private async generateTokens(user: User): Promise<AuthTokens> {
     const payload = {
       sub: user.id,

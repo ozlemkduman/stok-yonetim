@@ -8,9 +8,11 @@ import {
   HttpCode,
   HttpStatus,
   Headers,
+  Res,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { Request } from 'express';
+import { Request, Response } from 'express';
+import { ConfigService } from '@nestjs/config';
 import { AuthService, LoginResponse, AuthTokens } from './auth.service';
 import { LoginDto, RegisterDto, RefreshTokenDto, ForgotPasswordDto, ResetPasswordDto } from './dto';
 import { Public, CurrentUser, CurrentUserData } from '../../common';
@@ -20,9 +22,19 @@ interface RequestWithUser extends Request {
   user: User;
 }
 
+interface GoogleUser {
+  googleId: string;
+  email: string;
+  name: string;
+  avatarUrl: string | null;
+}
+
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly configService: ConfigService,
+  ) {}
 
   @Public()
   @UseGuards(AuthGuard('local'))
@@ -101,5 +113,38 @@ export class AuthController {
       emailVerifiedAt: profile.email_verified_at,
       lastLoginAt: profile.last_login_at,
     };
+  }
+
+  @Public()
+  @Get('google')
+  @UseGuards(AuthGuard('google'))
+  async googleAuth() {
+    // Guard redirects to Google
+  }
+
+  @Public()
+  @Get('google/callback')
+  @UseGuards(AuthGuard('google'))
+  async googleAuthCallback(
+    @Req() req: Request & { user: GoogleUser },
+    @Res() res: Response,
+  ) {
+    const ipAddress = req.ip || req.socket.remoteAddress;
+    const userAgent = req.headers['user-agent'];
+
+    const result = await this.authService.googleLogin(
+      req.user,
+      ipAddress,
+      userAgent,
+    );
+
+    // Redirect to frontend with tokens
+    const frontendUrl = this.configService.get<string>('FRONTEND_URL') || 'http://localhost:5175';
+    const params = new URLSearchParams({
+      accessToken: result.tokens.accessToken,
+      refreshToken: result.tokens.refreshToken,
+    });
+
+    res.redirect(`${frontendUrl}/auth/google/callback?${params.toString()}`);
   }
 }

@@ -10,6 +10,7 @@ interface AuthContextType {
   register: (data: RegisterData) => Promise<void>;
   logout: () => Promise<void>;
   refreshUser: () => Promise<void>;
+  setTokens: (accessToken: string, refreshToken: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -63,6 +64,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setUser(null);
   };
 
+  const setTokens = async (accessToken: string, refreshToken: string) => {
+    apiClient.setTokens(accessToken, refreshToken);
+    await refreshUser();
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -73,6 +79,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         register,
         logout,
         refreshUser,
+        setTokens,
       }}
     >
       {children}

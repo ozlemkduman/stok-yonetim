@@ -7,7 +7,7 @@ import { RoleGate } from './components/RoleGate';
 import { USER_ROLES } from './hooks/usePermissions';
 
 // Auth Pages
-import { LoginPage, RegisterPage, ForgotPasswordPage, ResetPasswordPage } from './pages/Auth';
+import { LoginPage, RegisterPage, ForgotPasswordPage, ResetPasswordPage, GoogleCallbackPage } from './pages/Auth';
 
 // Admin Pages
 import {
@@ -48,6 +48,7 @@ export function AppRouter() {
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         <Route path="/reset-password" element={<ResetPasswordPage />} />
+        <Route path="/auth/google/callback" element={<GoogleCallbackPage />} />
       </Route>
 
       {/* Admin Routes - Super Admin Only */}
