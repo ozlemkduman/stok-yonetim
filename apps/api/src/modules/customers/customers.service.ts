@@ -33,7 +33,7 @@ export class CustomersService {
       }
     }
 
-    return this.customersRepository.create(dto);
+    return this.customersRepository.createCustomer(dto);
   }
 
   async update(id: string, dto: UpdateCustomerDto): Promise<Customer> {
@@ -48,7 +48,7 @@ export class CustomersService {
       }
     }
 
-    const updated = await this.customersRepository.update(id, dto);
+    const updated = await this.customersRepository.updateCustomer(id, dto);
     if (!updated) {
       throw new NotFoundException(`Musteri bulunamadi: ${id}`);
     }
@@ -66,7 +66,7 @@ export class CustomersService {
       );
     }
 
-    const deleted = await this.customersRepository.delete(id);
+    const deleted = await this.customersRepository.deleteCustomer(id);
     if (!deleted) {
       throw new NotFoundException(`Musteri bulunamadi: ${id}`);
     }

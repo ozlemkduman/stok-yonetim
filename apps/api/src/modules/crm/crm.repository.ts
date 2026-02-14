@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { DatabaseService } from '../../database/database.service';
+import { BaseTenantRepository } from '../../common/repositories/base.repository';
 
 export interface CrmContact {
   id: string;
@@ -39,8 +40,12 @@ export interface CrmActivity {
 }
 
 @Injectable()
-export class CrmRepository {
-  constructor(private readonly db: DatabaseService) {}
+export class CrmRepository extends BaseTenantRepository<CrmContact> {
+  protected tableName = 'crm_contacts';
+
+  constructor(db: DatabaseService) {
+    super(db);
+  }
 
   // Contacts
   async findAllContacts(params: {
@@ -53,10 +58,10 @@ export class CrmRepository {
     const { page, limit, search, status, source } = params;
     const offset = (page - 1) * limit;
 
-    let query = this.db.knex('crm_contacts')
+    let query = this.query.clone()
       .leftJoin('customers', 'crm_contacts.customer_id', 'customers.id')
       .select('crm_contacts.*', 'customers.name as customer_name');
-    let countQuery = this.db.knex('crm_contacts');
+    let countQuery = this.query.clone();
 
     if (status) {
       query = query.where('crm_contacts.status', status);
@@ -87,35 +92,38 @@ export class CrmRepository {
   }
 
   async findContactById(id: string): Promise<CrmContact | null> {
-    return this.db.knex('crm_contacts')
+    return this.query.clone()
       .leftJoin('customers', 'crm_contacts.customer_id', 'customers.id')
       .select('crm_contacts.*', 'customers.name as customer_name')
       .where('crm_contacts.id', id)
       .first() || null;
   }
 
-  async createContact(data: Partial<CrmContact>): Promise<CrmContact> {
-    const [contact] = await this.db.knex('crm_contacts').insert(data).returning('*');
+  async createCrmContact(data: Partial<CrmContact>): Promise<CrmContact> {
+    const insertData = this.getInsertData(data);
+    const [contact] = await this.knex(this.tableName).insert(insertData).returning('*');
     return contact;
   }
 
-  async updateContact(id: string, data: Partial<CrmContact>): Promise<CrmContact> {
-    const [contact] = await this.db.knex('crm_contacts')
-      .where('id', id)
-      .update({ ...data, updated_at: this.db.knex.fn.now() })
+  async updateCrmContact(id: string, data: Partial<CrmContact>): Promise<CrmContact> {
+    const [contact] = await this.query
+      .where(`${this.tableName}.id`, id)
+      .update({ ...data, updated_at: this.knex.fn.now() })
       .returning('*');
     return contact;
   }
 
-  async deleteContact(id: string): Promise<void> {
-    await this.db.knex('crm_contacts').where('id', id).delete();
+  async deleteCrmContact(id: string): Promise<void> {
+    await this.query.where(`${this.tableName}.id`, id).delete();
   }
 
   // Activities
   async findActivitiesByContactId(contactId: string): Promise<CrmActivity[]> {
-    return this.db.knex('crm_activities')
+    const query = this.knex('crm_activities')
       .where('contact_id', contactId)
       .orderBy('created_at', 'desc');
+
+    return this.applyTenantFilter(query, 'crm_activities');
   }
 
   async findAllActivities(params: {
@@ -128,10 +136,14 @@ export class CrmRepository {
     const { page, limit, contactId, type, status } = params;
     const offset = (page - 1) * limit;
 
-    let query = this.db.knex('crm_activities')
+    let query = this.knex('crm_activities')
       .leftJoin('crm_contacts', 'crm_activities.contact_id', 'crm_contacts.id')
       .select('crm_activities.*', 'crm_contacts.name as contact_name');
-    let countQuery = this.db.knex('crm_activities');
+
+    query = this.applyTenantFilter(query, 'crm_activities');
+
+    let countQuery = this.knex('crm_activities');
+    countQuery = this.applyTenantFilter(countQuery, 'crm_activities');
 
     if (contactId) {
       query = query.where('crm_activities.contact_id', contactId);
@@ -153,27 +165,29 @@ export class CrmRepository {
     return { items, total: parseInt(count as string, 10) };
   }
 
-  async createActivity(data: Partial<CrmActivity>): Promise<CrmActivity> {
-    const [activity] = await this.db.knex('crm_activities').insert(data).returning('*');
+  async createCrmActivity(data: Partial<CrmActivity>): Promise<CrmActivity> {
+    const insertData = this.getInsertData(data as any);
+    const [activity] = await this.knex('crm_activities').insert(insertData).returning('*');
     // Update contact's last_contact_date
     if (data.contact_id) {
-      await this.db.knex('crm_contacts')
-        .where('id', data.contact_id)
-        .update({ last_contact_date: this.db.knex.fn.now(), updated_at: this.db.knex.fn.now() });
+      await this.query
+        .where(`${this.tableName}.id`, data.contact_id)
+        .update({ last_contact_date: this.knex.fn.now(), updated_at: this.knex.fn.now() });
     }
     return activity;
   }
 
-  async updateActivity(id: string, data: Partial<CrmActivity>): Promise<CrmActivity> {
-    const [activity] = await this.db.knex('crm_activities')
-      .where('id', id)
-      .update({ ...data, updated_at: this.db.knex.fn.now() })
+  async updateCrmActivity(id: string, data: Partial<CrmActivity>): Promise<CrmActivity> {
+    const query = this.knex('crm_activities').where('id', id);
+    const [activity] = await this.applyTenantFilter(query, 'crm_activities')
+      .update({ ...data, updated_at: this.knex.fn.now() })
       .returning('*');
     return activity;
   }
 
-  async deleteActivity(id: string): Promise<void> {
-    await this.db.knex('crm_activities').where('id', id).delete();
+  async deleteCrmActivity(id: string): Promise<void> {
+    const query = this.knex('crm_activities').where('id', id);
+    await this.applyTenantFilter(query, 'crm_activities').delete();
   }
 
   // Dashboard stats
@@ -182,12 +196,12 @@ export class CrmRepository {
     byStatus: Record<string, number>;
     bySource: Record<string, number>;
   }> {
-    const [{ count: total }] = await this.db.knex('crm_contacts').count('id as count');
-    const statusCounts = await this.db.knex('crm_contacts')
+    const [{ count: total }] = await this.query.clone().count('id as count');
+    const statusCounts = await this.query.clone()
       .select('status')
       .count('id as count')
       .groupBy('status');
-    const sourceCounts = await this.db.knex('crm_contacts')
+    const sourceCounts = await this.query.clone()
       .select('source')
       .count('id as count')
       .whereNotNull('source')
@@ -213,20 +227,23 @@ export class CrmRepository {
     plannedActivities: number;
     byType: Record<string, number>;
   }> {
-    const [{ count: total }] = await this.db.knex('crm_activities')
-      .where('contact_id', contactId)
-      .count('id as count');
+    const baseQuery = this.knex('crm_activities').where('contact_id', contactId);
+    const [{ count: total }] = await this.applyTenantFilter(baseQuery.clone(), 'crm_activities').count('id as count');
 
-    const statusCounts = await this.db.knex('crm_activities')
+    const statusCounts = await this.applyTenantFilter(
+      this.knex('crm_activities').where('contact_id', contactId),
+      'crm_activities'
+    )
       .select('status')
       .count('id as count')
-      .where('contact_id', contactId)
       .groupBy('status');
 
-    const typeCounts = await this.db.knex('crm_activities')
+    const typeCounts = await this.applyTenantFilter(
+      this.knex('crm_activities').where('contact_id', contactId),
+      'crm_activities'
+    )
       .select('type')
       .count('id as count')
-      .where('contact_id', contactId)
       .groupBy('type');
 
     const byStatus: Record<string, number> = {};
@@ -249,14 +266,15 @@ export class CrmRepository {
 
   // Convert contact to customer
   async convertToCustomer(contactId: string, contact: CrmContact): Promise<string> {
-    const [customer] = await this.db.knex('customers').insert({
+    const insertData = this.getInsertData({
       name: contact.name,
       phone: contact.phone || contact.mobile,
       email: contact.email,
       notes: contact.notes,
       is_active: true,
       balance: 0,
-    }).returning('id');
+    } as any);
+    const [customer] = await this.knex('customers').insert(insertData).returning('id');
 
     return customer.id;
   }

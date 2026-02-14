@@ -23,7 +23,7 @@ export class PaymentsService {
     if (!customer) throw new NotFoundException('Musteri bulunamadi');
 
     return this.db.transaction(async (trx) => {
-      const payment = await this.paymentsRepository.create({
+      const payment = await this.paymentsRepository.createPayment({
         customer_id: dto.customer_id,
         sale_id: dto.sale_id || null,
         payment_date: dto.payment_date ? new Date(dto.payment_date) : new Date(),

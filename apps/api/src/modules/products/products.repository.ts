@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { DatabaseService } from '../../database/database.service';
+import { BaseTenantRepository } from '../../common/repositories/base.repository';
 import { CreateProductDto, UpdateProductDto } from './dto';
 import { Knex } from 'knex';
 
@@ -31,17 +32,19 @@ export interface ProductListParams {
 }
 
 @Injectable()
-export class ProductsRepository {
-  private readonly tableName = 'products';
+export class ProductsRepository extends BaseTenantRepository<Product> {
+  protected tableName = 'products';
 
-  constructor(private readonly db: DatabaseService) {}
+  constructor(db: DatabaseService) {
+    super(db);
+  }
 
   async findAll(params: ProductListParams): Promise<{ items: Product[]; total: number }> {
     const { page, limit, search, category, sortBy, sortOrder, isActive, lowStock } = params;
     const offset = (page - 1) * limit;
 
-    let query = this.db.knex(this.tableName);
-    let countQuery = this.db.knex(this.tableName);
+    let query = this.query.clone();
+    let countQuery = this.query.clone();
 
     if (isActive !== undefined) {
       query = query.where('is_active', isActive);
@@ -82,44 +85,42 @@ export class ProductsRepository {
     return { items, total: parseInt(count as string, 10) };
   }
 
-  async findById(id: string): Promise<Product | null> {
-    return this.db.knex(this.tableName).where('id', id).first() || null;
-  }
-
   async findByBarcode(barcode: string): Promise<Product | null> {
-    return this.db.knex(this.tableName).where('barcode', barcode).first() || null;
+    return this.query.where('barcode', barcode).first() || null;
   }
 
-  async create(data: CreateProductDto): Promise<Product> {
-    const [product] = await this.db.knex(this.tableName).insert(data).returning('*');
+  async createProduct(data: CreateProductDto): Promise<Product> {
+    const insertData = this.getInsertData(data);
+    const [product] = await this.knex(this.tableName).insert(insertData).returning('*');
     return product;
   }
 
-  async update(id: string, data: UpdateProductDto): Promise<Product | null> {
-    const [product] = await this.db.knex(this.tableName)
-      .where('id', id)
-      .update({ ...data, updated_at: this.db.knex.fn.now() })
+  async updateProduct(id: string, data: UpdateProductDto): Promise<Product | null> {
+    const [product] = await this.query
+      .where(`${this.tableName}.id`, id)
+      .update({ ...data, updated_at: this.knex.fn.now() })
       .returning('*');
     return product || null;
   }
 
   async updateStock(id: string, quantity: number, trx?: Knex.Transaction): Promise<void> {
-    const query = trx ? trx(this.tableName) : this.db.knex(this.tableName);
+    const baseQuery = trx ? trx(this.tableName) : this.knex(this.tableName);
+    const query = this.applyTenantFilter(baseQuery);
     await query.where('id', id).update({
-      stock_quantity: this.db.knex.raw('stock_quantity + ?', [quantity]),
-      updated_at: this.db.knex.fn.now(),
+      stock_quantity: this.knex.raw('stock_quantity + ?', [quantity]),
+      updated_at: this.knex.fn.now(),
     });
   }
 
-  async delete(id: string): Promise<boolean> {
-    const result = await this.db.knex(this.tableName)
-      .where('id', id)
-      .update({ is_active: false, updated_at: this.db.knex.fn.now() });
+  async deleteProduct(id: string): Promise<boolean> {
+    const result = await this.query
+      .where(`${this.tableName}.id`, id)
+      .update({ is_active: false, updated_at: this.knex.fn.now() });
     return result > 0;
   }
 
   async getLowStockProducts(): Promise<Product[]> {
-    return this.db.knex(this.tableName)
+    return this.query
       .whereRaw('stock_quantity <= min_stock_level')
       .where('is_active', true)
       .orderBy('stock_quantity', 'asc')
@@ -127,7 +128,7 @@ export class ProductsRepository {
   }
 
   async getCategories(): Promise<string[]> {
-    const results = await this.db.knex(this.tableName)
+    const results = await this.query
       .distinct('category')
       .whereNotNull('category')
       .orderBy('category');
@@ -135,7 +136,7 @@ export class ProductsRepository {
   }
 
   async getProductSalesWithItems(productId: string): Promise<any[]> {
-    const saleItems = await this.db.knex('sale_items')
+    const baseQuery = this.knex('sale_items')
       .join('sales', 'sale_items.sale_id', 'sales.id')
       .leftJoin('customers', 'sales.customer_id', 'customers.id')
       .where('sale_items.product_id', productId)
@@ -157,11 +158,11 @@ export class ProductsRepository {
         'customers.name as customer_name'
       );
 
-    return saleItems;
+    return this.applyTenantFilter(baseQuery, 'sales');
   }
 
   async getProductReturns(productId: string): Promise<any[]> {
-    const returnItems = await this.db.knex('return_items')
+    const baseQuery = this.knex('return_items')
       .join('returns', 'return_items.return_id', 'returns.id')
       .leftJoin('customers', 'returns.customer_id', 'customers.id')
       .where('return_items.product_id', productId)
@@ -181,11 +182,11 @@ export class ProductsRepository {
         'customers.name as customer_name'
       );
 
-    return returnItems;
+    return this.applyTenantFilter(baseQuery, 'returns');
   }
 
   async getProductStockMovements(productId: string): Promise<any[]> {
-    return this.db.knex('stock_movements')
+    const baseQuery = this.knex('stock_movements')
       .leftJoin('warehouses', 'stock_movements.warehouse_id', 'warehouses.id')
       .where('stock_movements.product_id', productId)
       .orderBy('stock_movements.movement_date', 'desc')
@@ -193,6 +194,8 @@ export class ProductsRepository {
         'stock_movements.*',
         'warehouses.name as warehouse_name'
       );
+
+    return this.applyTenantFilter(baseQuery, 'stock_movements');
   }
 
   async getProductStats(productId: string): Promise<{
@@ -202,24 +205,28 @@ export class ProductsRepository {
     salesCount: number;
     returnsCount: number;
   }> {
-    const [salesStats] = await this.db.knex('sale_items')
+    const salesBaseQuery = this.knex('sale_items')
       .join('sales', 'sale_items.sale_id', 'sales.id')
       .where('sale_items.product_id', productId)
       .where('sales.status', 'completed')
       .select(
-        this.db.knex.raw('COALESCE(SUM(sale_items.quantity), 0) as total_quantity'),
-        this.db.knex.raw('COALESCE(SUM(sale_items.line_total), 0) as total_revenue'),
-        this.db.knex.raw('COUNT(DISTINCT sale_items.sale_id) as sales_count')
-      ) as { total_quantity: string; total_revenue: string; sales_count: string }[];
+        this.knex.raw('COALESCE(SUM(sale_items.quantity), 0) as total_quantity'),
+        this.knex.raw('COALESCE(SUM(sale_items.line_total), 0) as total_revenue'),
+        this.knex.raw('COUNT(DISTINCT sale_items.sale_id) as sales_count')
+      );
 
-    const [returnsStats] = await this.db.knex('return_items')
+    const [salesStats] = await this.applyTenantFilter(salesBaseQuery, 'sales') as { total_quantity: string; total_revenue: string; sales_count: string }[];
+
+    const returnsBaseQuery = this.knex('return_items')
       .join('returns', 'return_items.return_id', 'returns.id')
       .where('return_items.product_id', productId)
       .where('returns.status', 'completed')
       .select(
-        this.db.knex.raw('COALESCE(SUM(return_items.quantity), 0) as total_quantity'),
-        this.db.knex.raw('COUNT(DISTINCT return_items.return_id) as returns_count')
-      ) as { total_quantity: string; returns_count: string }[];
+        this.knex.raw('COALESCE(SUM(return_items.quantity), 0) as total_quantity'),
+        this.knex.raw('COUNT(DISTINCT return_items.return_id) as returns_count')
+      );
+
+    const [returnsStats] = await this.applyTenantFilter(returnsBaseQuery, 'returns') as { total_quantity: string; returns_count: string }[];
 
     return {
       totalSold: parseInt(salesStats?.total_quantity || '0', 10),

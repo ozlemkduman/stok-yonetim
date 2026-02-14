@@ -1,9 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { DatabaseService } from '../../database/database.service';
+import { BaseTenantRepository } from '../../common/repositories/base.repository';
 import { CreateCustomerDto, UpdateCustomerDto } from './dto';
 
 export interface Customer {
   id: string;
+  tenant_id?: string;
   name: string;
   phone: string | null;
   email: string | null;
@@ -27,17 +29,19 @@ export interface CustomerListParams {
 }
 
 @Injectable()
-export class CustomersRepository {
-  private readonly tableName = 'customers';
+export class CustomersRepository extends BaseTenantRepository<Customer> {
+  protected tableName = 'customers';
 
-  constructor(private readonly db: DatabaseService) {}
+  constructor(db: DatabaseService) {
+    super(db);
+  }
 
   async findAll(params: CustomerListParams): Promise<{ items: Customer[]; total: number }> {
     const { page, limit, search, sortBy, sortOrder, isActive } = params;
     const offset = (page - 1) * limit;
 
-    let query = this.db.knex(this.tableName);
-    let countQuery = this.db.knex(this.tableName);
+    let query = this.query;
+    let countQuery = this.query.clone();
 
     // Filter by active status
     if (isActive !== undefined) {
@@ -77,40 +81,33 @@ export class CustomersRepository {
     };
   }
 
-  async findById(id: string): Promise<Customer | null> {
-    const customer = await this.db.knex(this.tableName)
-      .where('id', id)
-      .first();
-
-    return customer || null;
-  }
-
   async findByEmail(email: string): Promise<Customer | null> {
-    const customer = await this.db.knex(this.tableName)
+    const customer = await this.query
       .where('email', email)
       .first();
 
     return customer || null;
   }
 
-  async create(data: CreateCustomerDto): Promise<Customer> {
-    const [customer] = await this.db.knex(this.tableName)
-      .insert({
-        ...data,
-        balance: 0,
-        is_active: true,
-      })
+  async createCustomer(data: CreateCustomerDto): Promise<Customer> {
+    const insertData = this.getInsertData({
+      ...data,
+      balance: 0,
+      is_active: true,
+    });
+    const [customer] = await this.knex(this.tableName)
+      .insert(insertData)
       .returning('*');
 
     return customer;
   }
 
-  async update(id: string, data: UpdateCustomerDto): Promise<Customer | null> {
-    const [customer] = await this.db.knex(this.tableName)
+  async updateCustomer(id: string, data: UpdateCustomerDto): Promise<Customer | null> {
+    const [customer] = await this.query
       .where('id', id)
       .update({
         ...data,
-        updated_at: this.db.knex.fn.now(),
+        updated_at: this.knex.fn.now(),
       })
       .returning('*');
 
@@ -118,28 +115,28 @@ export class CustomersRepository {
   }
 
   async updateBalance(id: string, amount: number): Promise<void> {
-    await this.db.knex(this.tableName)
+    await this.query
       .where('id', id)
       .update({
-        balance: this.db.knex.raw('balance + ?', [amount]),
-        updated_at: this.db.knex.fn.now(),
+        balance: this.knex.raw('balance + ?', [amount]),
+        updated_at: this.knex.fn.now(),
       });
   }
 
-  async delete(id: string): Promise<boolean> {
+  async deleteCustomer(id: string): Promise<boolean> {
     // Soft delete - set is_active to false
-    const result = await this.db.knex(this.tableName)
+    const result = await this.query
       .where('id', id)
       .update({
         is_active: false,
-        updated_at: this.db.knex.fn.now(),
+        updated_at: this.knex.fn.now(),
       });
 
     return result > 0;
   }
 
   async getCustomersWithDebt(): Promise<Customer[]> {
-    return this.db.knex(this.tableName)
+    return this.query
       .where('balance', '<', 0)
       .where('is_active', true)
       .orderBy('balance', 'asc')
@@ -147,7 +144,7 @@ export class CustomersRepository {
   }
 
   async getCustomersWithCredit(): Promise<Customer[]> {
-    return this.db.knex(this.tableName)
+    return this.query
       .where('balance', '>', 0)
       .where('is_active', true)
       .orderBy('balance', 'desc')
@@ -155,20 +152,20 @@ export class CustomersRepository {
   }
 
   async getCustomerSales(customerId: string): Promise<any[]> {
-    return this.db.knex('sales')
+    return this.applyTenantFilter(this.knex('sales'), 'sales')
       .where('customer_id', customerId)
       .orderBy('sale_date', 'desc')
       .select('*');
   }
 
   async getCustomerSalesWithItems(customerId: string): Promise<any[]> {
-    const sales = await this.db.knex('sales')
+    const sales = await this.applyTenantFilter(this.knex('sales'), 'sales')
       .where('customer_id', customerId)
       .orderBy('sale_date', 'desc')
       .select('*');
 
     for (const sale of sales) {
-      sale.items = await this.db.knex('sale_items')
+      sale.items = await this.knex('sale_items')
         .leftJoin('products', 'sale_items.product_id', 'products.id')
         .where('sale_items.sale_id', sale.id)
         .select('sale_items.*', 'products.name as product_name', 'products.barcode');
@@ -178,13 +175,13 @@ export class CustomersRepository {
   }
 
   async getCustomerReturns(customerId: string): Promise<any[]> {
-    const returns = await this.db.knex('returns')
+    const returns = await this.applyTenantFilter(this.knex('returns'), 'returns')
       .where('customer_id', customerId)
       .orderBy('return_date', 'desc')
       .select('*');
 
     for (const ret of returns) {
-      ret.items = await this.db.knex('return_items')
+      ret.items = await this.knex('return_items')
         .leftJoin('products', 'return_items.product_id', 'products.id')
         .where('return_items.return_id', ret.id)
         .select('return_items.*', 'products.name as product_name', 'products.barcode');
@@ -194,7 +191,7 @@ export class CustomersRepository {
   }
 
   async getCustomerPayments(customerId: string): Promise<any[]> {
-    return this.db.knex('payments')
+    return this.applyTenantFilter(this.knex('payments'), 'payments')
       .where('customer_id', customerId)
       .orderBy('payment_date', 'desc')
       .select('*');
@@ -208,27 +205,27 @@ export class CustomersRepository {
     returnsCount: number;
     paymentsCount: number;
   }> {
-    const [salesStats] = await this.db.knex('sales')
+    const [salesStats] = await this.applyTenantFilter(this.knex('sales'), 'sales')
       .where('customer_id', customerId)
       .where('status', 'completed')
       .select(
-        this.db.knex.raw('COALESCE(SUM(grand_total), 0) as total'),
-        this.db.knex.raw('COUNT(*) as count')
+        this.knex.raw('COALESCE(SUM(grand_total), 0) as total'),
+        this.knex.raw('COUNT(*) as count')
       ) as { total: string; count: string }[];
 
-    const [returnsStats] = await this.db.knex('returns')
+    const [returnsStats] = await this.applyTenantFilter(this.knex('returns'), 'returns')
       .where('customer_id', customerId)
       .where('status', 'completed')
       .select(
-        this.db.knex.raw('COALESCE(SUM(total_amount), 0) as total'),
-        this.db.knex.raw('COUNT(*) as count')
+        this.knex.raw('COALESCE(SUM(total_amount), 0) as total'),
+        this.knex.raw('COUNT(*) as count')
       ) as { total: string; count: string }[];
 
-    const [paymentsStats] = await this.db.knex('payments')
+    const [paymentsStats] = await this.applyTenantFilter(this.knex('payments'), 'payments')
       .where('customer_id', customerId)
       .select(
-        this.db.knex.raw('COALESCE(SUM(amount), 0) as total'),
-        this.db.knex.raw('COUNT(*) as count')
+        this.knex.raw('COALESCE(SUM(amount), 0) as total'),
+        this.knex.raw('COUNT(*) as count')
       ) as { total: string; count: string }[];
 
     return {

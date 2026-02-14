@@ -93,7 +93,7 @@ export class EDocumentsService {
         vatAmount: referenceData.vat_total,
       });
 
-      const document = await this.repository.create({
+      const document = await this.repository.createDocument({
         document_type: dto.document_type,
         document_number: documentNumber,
         reference_type: dto.reference_type,
@@ -141,7 +141,7 @@ export class EDocumentsService {
         sent_at: result.success ? new Date() : null,
       };
 
-      const updated = await this.repository.update(id, updateData, trx);
+      const updated = await this.repository.updateDocument(id, updateData, trx);
 
       await this.repository.createLog({
         document_id: id,
@@ -179,7 +179,7 @@ export class EDocumentsService {
         approved_at: result.status === 'approved' ? new Date() : null,
       };
 
-      const updated = await this.repository.update(id, updateData, trx);
+      const updated = await this.repository.updateDocument(id, updateData, trx);
 
       await this.repository.createLog({
         document_id: id,
@@ -204,7 +204,7 @@ export class EDocumentsService {
     }
 
     return this.db.transaction(async (trx) => {
-      const updated = await this.repository.update(id, { status: 'cancelled' }, trx);
+      const updated = await this.repository.updateDocument(id, { status: 'cancelled' }, trx);
 
       await this.repository.createLog({
         document_id: id,

@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { DatabaseService } from '../../database/database.service';
+import { BaseTenantRepository } from '../../common/repositories/base.repository';
 import { Knex } from 'knex';
 
 export interface Warehouse {
@@ -68,8 +69,12 @@ export interface StockMovement {
 }
 
 @Injectable()
-export class WarehousesRepository {
-  constructor(private readonly db: DatabaseService) {}
+export class WarehousesRepository extends BaseTenantRepository<Warehouse> {
+  protected tableName = 'warehouses';
+
+  constructor(db: DatabaseService) {
+    super(db);
+  }
 
   // Warehouses
   async findAll(params: {
@@ -82,8 +87,8 @@ export class WarehousesRepository {
     const { page, limit, isActive, sortBy, sortOrder } = params;
     const offset = (page - 1) * limit;
 
-    let query = this.db.knex('warehouses').select('*');
-    let countQuery = this.db.knex('warehouses');
+    let query = this.query.clone().select('*');
+    let countQuery = this.query.clone();
 
     if (isActive !== undefined) {
       query = query.where('is_active', isActive);
@@ -98,41 +103,38 @@ export class WarehousesRepository {
     return { items, total: parseInt(count as string, 10) };
   }
 
-  async findById(id: string): Promise<Warehouse | null> {
-    return this.db.knex('warehouses').where('id', id).first() || null;
-  }
-
   async findByCode(code: string): Promise<Warehouse | null> {
-    return this.db.knex('warehouses').where('code', code).first() || null;
+    return this.query.where('code', code).first() || null;
   }
 
   async findDefault(): Promise<Warehouse | null> {
-    return this.db.knex('warehouses').where('is_default', true).where('is_active', true).first() || null;
+    return this.query.where('is_default', true).where('is_active', true).first() || null;
   }
 
-  async create(data: Partial<Warehouse>, trx?: Knex.Transaction): Promise<Warehouse> {
-    const query = trx ? trx('warehouses') : this.db.knex('warehouses');
-    const [warehouse] = await query.insert(data).returning('*');
+  async createWarehouse(data: Partial<Warehouse>, trx?: Knex.Transaction): Promise<Warehouse> {
+    const insertData = this.getInsertData(data);
+    const query = trx ? trx('warehouses') : this.knex('warehouses');
+    const [warehouse] = await query.insert(insertData).returning('*');
     return warehouse;
   }
 
-  async update(id: string, data: Partial<Warehouse>): Promise<Warehouse> {
-    const [warehouse] = await this.db.knex('warehouses')
-      .where('id', id)
-      .update({ ...data, updated_at: this.db.knex.fn.now() })
+  async updateWarehouse(id: string, data: Partial<Warehouse>): Promise<Warehouse> {
+    const [warehouse] = await this.query
+      .where(`${this.tableName}.id`, id)
+      .update({ ...data, updated_at: this.knex.fn.now() })
       .returning('*');
     return warehouse;
   }
 
   async setDefault(id: string): Promise<void> {
     await this.db.knex.transaction(async (trx) => {
-      await trx('warehouses').update({ is_default: false });
-      await trx('warehouses').where('id', id).update({ is_default: true, updated_at: trx.fn.now() });
+      await this.applyTenantFilter(trx('warehouses')).update({ is_default: false });
+      await this.applyTenantFilter(trx('warehouses')).where('id', id).update({ is_default: true, updated_at: trx.fn.now() });
     });
   }
 
-  async delete(id: string): Promise<void> {
-    await this.db.knex('warehouses').where('id', id).update({ is_active: false, updated_at: this.db.knex.fn.now() });
+  async deleteWarehouse(id: string): Promise<void> {
+    await this.query.where(`${this.tableName}.id`, id).update({ is_active: false, updated_at: this.knex.fn.now() });
   }
 
   // Warehouse Stocks
@@ -146,12 +148,15 @@ export class WarehousesRepository {
     const { warehouseId, page, limit, search, lowStock } = params;
     const offset = (page - 1) * limit;
 
-    let query = this.db.knex('warehouse_stocks')
+    let query = this.knex('warehouse_stocks')
       .leftJoin('products', 'warehouse_stocks.product_id', 'products.id')
       .select('warehouse_stocks.*', 'products.name as product_name', 'products.barcode as product_barcode')
       .where('warehouse_stocks.warehouse_id', warehouseId);
 
-    let countQuery = this.db.knex('warehouse_stocks').where('warehouse_id', warehouseId);
+    query = this.applyTenantFilter(query, 'products');
+
+    let countQuery = this.knex('warehouse_stocks').where('warehouse_id', warehouseId);
+    countQuery = this.applyTenantFilter(countQuery, 'warehouse_stocks');
 
     if (search) {
       query = query.where((b) => b.whereILike('products.name', `%${search}%`).orWhereILike('products.barcode', `%${search}%`));
@@ -171,47 +176,51 @@ export class WarehousesRepository {
   }
 
   async getStockByProduct(warehouseId: string, productId: string): Promise<WarehouseStock | null> {
-    return this.db.knex('warehouse_stocks')
+    const query = this.knex('warehouse_stocks')
       .where('warehouse_id', warehouseId)
-      .where('product_id', productId)
-      .first() || null;
+      .where('product_id', productId);
+    return this.applyTenantFilter(query, 'warehouse_stocks').first() || null;
   }
 
   async updateStock(warehouseId: string, productId: string, quantity: number, trx?: Knex.Transaction): Promise<void> {
-    const query = trx ? trx('warehouse_stocks') : this.db.knex('warehouse_stocks');
+    const baseQuery = trx ? trx('warehouse_stocks') : this.knex('warehouse_stocks');
+    const query = this.applyTenantFilter(baseQuery.clone(), 'warehouse_stocks');
 
-    const existing = await query.clone()
+    const existing = await query
       .where('warehouse_id', warehouseId)
       .where('product_id', productId)
       .first();
 
     if (existing) {
-      await query
+      await this.applyTenantFilter(baseQuery.clone(), 'warehouse_stocks')
         .where('warehouse_id', warehouseId)
         .where('product_id', productId)
-        .update({ quantity, updated_at: this.db.knex.fn.now() });
+        .update({ quantity, updated_at: this.knex.fn.now() });
     } else {
-      await query.insert({ warehouse_id: warehouseId, product_id: productId, quantity });
+      const insertData = this.getInsertData({ warehouse_id: warehouseId, product_id: productId, quantity } as any);
+      await baseQuery.insert(insertData);
     }
   }
 
   async incrementStock(warehouseId: string, productId: string, amount: number, trx?: Knex.Transaction): Promise<number> {
-    const query = trx ? trx('warehouse_stocks') : this.db.knex('warehouse_stocks');
+    const baseQuery = trx ? trx('warehouse_stocks') : this.knex('warehouse_stocks');
+    const query = this.applyTenantFilter(baseQuery.clone(), 'warehouse_stocks');
 
-    const existing = await query.clone()
+    const existing = await query
       .where('warehouse_id', warehouseId)
       .where('product_id', productId)
       .first();
 
     if (existing) {
       const newQty = Number(existing.quantity) + amount;
-      await query
+      await this.applyTenantFilter(baseQuery.clone(), 'warehouse_stocks')
         .where('warehouse_id', warehouseId)
         .where('product_id', productId)
-        .update({ quantity: newQty, updated_at: this.db.knex.fn.now() });
+        .update({ quantity: newQty, updated_at: this.knex.fn.now() });
       return newQty;
     } else {
-      await query.insert({ warehouse_id: warehouseId, product_id: productId, quantity: amount > 0 ? amount : 0 });
+      const insertData = this.getInsertData({ warehouse_id: warehouseId, product_id: productId, quantity: amount > 0 ? amount : 0 } as any);
+      await baseQuery.insert(insertData);
       return amount > 0 ? amount : 0;
     }
   }
@@ -226,12 +235,15 @@ export class WarehousesRepository {
     const { page, limit, warehouseId, status } = params;
     const offset = (page - 1) * limit;
 
-    let query = this.db.knex('stock_transfers')
+    let query = this.knex('stock_transfers')
       .leftJoin('warehouses as from_wh', 'stock_transfers.from_warehouse_id', 'from_wh.id')
       .leftJoin('warehouses as to_wh', 'stock_transfers.to_warehouse_id', 'to_wh.id')
       .select('stock_transfers.*', 'from_wh.name as from_warehouse_name', 'to_wh.name as to_warehouse_name');
 
-    let countQuery = this.db.knex('stock_transfers');
+    query = this.applyTenantFilter(query, 'stock_transfers');
+
+    let countQuery = this.knex('stock_transfers');
+    countQuery = this.applyTenantFilter(countQuery, 'stock_transfers');
 
     if (warehouseId) {
       query = query.where((b) => b.where('from_warehouse_id', warehouseId).orWhere('to_warehouse_id', warehouseId));
@@ -252,31 +264,36 @@ export class WarehousesRepository {
   }
 
   async findTransferById(id: string): Promise<StockTransfer | null> {
-    return this.db.knex('stock_transfers')
+    const query = this.knex('stock_transfers')
       .leftJoin('warehouses as from_wh', 'stock_transfers.from_warehouse_id', 'from_wh.id')
       .leftJoin('warehouses as to_wh', 'stock_transfers.to_warehouse_id', 'to_wh.id')
       .select('stock_transfers.*', 'from_wh.name as from_warehouse_name', 'to_wh.name as to_warehouse_name')
-      .where('stock_transfers.id', id)
-      .first() || null;
+      .where('stock_transfers.id', id);
+
+    return this.applyTenantFilter(query, 'stock_transfers').first() || null;
   }
 
   async findTransferItems(transferId: string): Promise<StockTransferItem[]> {
-    return this.db.knex('stock_transfer_items')
+    const query = this.knex('stock_transfer_items')
       .leftJoin('products', 'stock_transfer_items.product_id', 'products.id')
       .select('stock_transfer_items.*', 'products.name as product_name')
       .where('stock_transfer_items.transfer_id', transferId);
+
+    return this.applyTenantFilter(query, 'products');
   }
 
   async generateTransferNumber(): Promise<string> {
     const today = new Date();
     const prefix = `TRN${today.getFullYear()}${String(today.getMonth() + 1).padStart(2, '0')}`;
-    const [result] = await this.db.knex('stock_transfers').whereILike('transfer_number', `${prefix}%`).count('id as count');
+    const query = this.knex('stock_transfers').whereILike('transfer_number', `${prefix}%`);
+    const [result] = await this.applyTenantFilter(query, 'stock_transfers').count('id as count');
     const count = parseInt(result.count as string, 10) + 1;
     return `${prefix}${String(count).padStart(4, '0')}`;
   }
 
   async createTransfer(data: Partial<StockTransfer>, items: { product_id: string; quantity: number }[], trx: Knex.Transaction): Promise<StockTransfer> {
-    const [transfer] = await trx('stock_transfers').insert(data).returning('*');
+    const insertData = this.getInsertData(data);
+    const [transfer] = await trx('stock_transfers').insert(insertData).returning('*');
 
     if (items.length > 0) {
       await trx('stock_transfer_items').insert(
@@ -288,8 +305,8 @@ export class WarehousesRepository {
   }
 
   async updateTransferStatus(id: string, status: string, trx?: Knex.Transaction): Promise<void> {
-    const query = trx ? trx('stock_transfers') : this.db.knex('stock_transfers');
-    await query.where('id', id).update({ status, updated_at: this.db.knex.fn.now() });
+    const baseQuery = trx ? trx('stock_transfers') : this.knex('stock_transfers');
+    await this.applyTenantFilter(baseQuery, 'stock_transfers').where('id', id).update({ status, updated_at: this.knex.fn.now() });
   }
 
   // Stock Movements
@@ -305,12 +322,15 @@ export class WarehousesRepository {
     const { page, limit, warehouseId, productId, movementType, startDate, endDate } = params;
     const offset = (page - 1) * limit;
 
-    let query = this.db.knex('stock_movements')
+    let query = this.knex('stock_movements')
       .leftJoin('warehouses', 'stock_movements.warehouse_id', 'warehouses.id')
       .leftJoin('products', 'stock_movements.product_id', 'products.id')
       .select('stock_movements.*', 'warehouses.name as warehouse_name', 'products.name as product_name');
 
-    let countQuery = this.db.knex('stock_movements');
+    query = this.applyTenantFilter(query, 'stock_movements');
+
+    let countQuery = this.knex('stock_movements');
+    countQuery = this.applyTenantFilter(countQuery, 'stock_movements');
 
     if (warehouseId) {
       query = query.where('stock_movements.warehouse_id', warehouseId);
@@ -346,8 +366,9 @@ export class WarehousesRepository {
   }
 
   async createMovement(data: Partial<StockMovement>, trx?: Knex.Transaction): Promise<StockMovement> {
-    const query = trx ? trx('stock_movements') : this.db.knex('stock_movements');
-    const [movement] = await query.insert(data).returning('*');
+    const insertData = this.getInsertData(data);
+    const query = trx ? trx('stock_movements') : this.knex('stock_movements');
+    const [movement] = await query.insert(insertData).returning('*');
     return movement;
   }
 }

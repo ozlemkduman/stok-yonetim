@@ -19,7 +19,7 @@ export class ReturnsService {
   }
 
   async findById(id: string): Promise<Return & { items: ReturnItem[] }> {
-    const ret = await this.returnsRepository.findById(id);
+    const ret = await this.returnsRepository.findReturnById(id);
     if (!ret) throw new NotFoundException(`Iade bulunamadi: ${id}`);
     const items = await this.returnsRepository.findItemsByReturnId(id);
     return { ...ret, items };
@@ -53,7 +53,7 @@ export class ReturnsService {
         });
       }
 
-      const ret = await this.returnsRepository.create({
+      const ret = await this.returnsRepository.createReturn({
         return_number: returnNumber,
         sale_id: dto.sale_id || null,
         customer_id: dto.customer_id || null,

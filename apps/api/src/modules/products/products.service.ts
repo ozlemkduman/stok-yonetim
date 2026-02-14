@@ -23,7 +23,7 @@ export class ProductsService {
       const existing = await this.productsRepository.findByBarcode(dto.barcode);
       if (existing) throw new ConflictException('Bu barkod zaten kullaniliyor');
     }
-    return this.productsRepository.create(dto);
+    return this.productsRepository.createProduct(dto);
   }
 
   async update(id: string, dto: UpdateProductDto): Promise<Product> {
@@ -34,14 +34,14 @@ export class ProductsService {
         throw new ConflictException('Bu barkod zaten kullaniliyor');
       }
     }
-    const updated = await this.productsRepository.update(id, dto);
+    const updated = await this.productsRepository.updateProduct(id, dto);
     if (!updated) throw new NotFoundException(`Urun bulunamadi: ${id}`);
     return updated;
   }
 
   async delete(id: string): Promise<void> {
     await this.findById(id);
-    await this.productsRepository.delete(id);
+    await this.productsRepository.deleteProduct(id);
   }
 
   async getLowStockProducts(): Promise<Product[]> {

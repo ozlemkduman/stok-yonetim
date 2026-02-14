@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { DatabaseService } from '../../database/database.service';
+import { BaseTenantRepository } from '../../common/repositories/base.repository';
 import { Knex } from 'knex';
 
 export interface Return {
@@ -30,17 +31,26 @@ export interface ReturnItem {
 }
 
 @Injectable()
-export class ReturnsRepository {
-  constructor(private readonly db: DatabaseService) {}
+export class ReturnsRepository extends BaseTenantRepository<Return> {
+  protected tableName = 'returns';
+
+  constructor(db: DatabaseService) {
+    super(db);
+  }
 
   async findAll(params: { page: number; limit: number; customerId?: string; sortBy: string; sortOrder: 'asc' | 'desc' }): Promise<{ items: Return[]; total: number }> {
     const { page, limit, customerId, sortBy, sortOrder } = params;
-    let query = this.db.knex('returns').leftJoin('customers', 'returns.customer_id', 'customers.id').select('returns.*', 'customers.name as customer_name');
-    let countQuery = this.db.knex('returns');
+
+    let query = this.query.clone()
+      .leftJoin('customers', 'returns.customer_id', 'customers.id')
+      .select('returns.*', 'customers.name as customer_name');
+    let countQuery = this.query.clone();
+
     if (customerId) {
       query = query.where('returns.customer_id', customerId);
       countQuery = countQuery.where('customer_id', customerId);
     }
+
     const [items, [{ count }]] = await Promise.all([
       query.orderBy(`returns.${sortBy}`, sortOrder).limit(limit).offset((page - 1) * limit),
       countQuery.count('id as count'),
@@ -48,8 +58,8 @@ export class ReturnsRepository {
     return { items, total: parseInt(count as string, 10) };
   }
 
-  async findById(id: string): Promise<Return & { sale_invoice_number?: string; sale_date?: Date } | null> {
-    return this.db.knex('returns')
+  async findReturnById(id: string): Promise<Return & { sale_invoice_number?: string; sale_date?: Date } | null> {
+    return this.query.clone()
       .leftJoin('customers', 'returns.customer_id', 'customers.id')
       .leftJoin('sales', 'returns.sale_id', 'sales.id')
       .select(
@@ -63,7 +73,7 @@ export class ReturnsRepository {
   }
 
   async findItemsByReturnId(returnId: string): Promise<ReturnItem[]> {
-    return this.db.knex('return_items')
+    const query = this.knex('return_items')
       .leftJoin('products', 'return_items.product_id', 'products.id')
       .select(
         'return_items.*',
@@ -71,19 +81,23 @@ export class ReturnsRepository {
         'products.barcode as barcode'
       )
       .where('return_items.return_id', returnId);
+
+    return this.applyTenantFilter(query, 'products');
   }
 
   async generateReturnNumber(): Promise<string> {
     const today = new Date();
     const prefix = `RET${today.getFullYear()}${String(today.getMonth() + 1).padStart(2, '0')}`;
-    const [result] = await this.db.knex('returns').whereILike('return_number', `${prefix}%`).count('id as count');
+    const [result] = await this.query.whereILike('return_number', `${prefix}%`).count('id as count');
     return `${prefix}${String(parseInt(result.count as string, 10) + 1).padStart(4, '0')}`;
   }
 
-  async create(data: Partial<Return>, items: Partial<ReturnItem>[], trx: Knex.Transaction): Promise<Return> {
-    const [ret] = await trx('returns').insert(data).returning('*');
+  async createReturn(data: Partial<Return>, items: Partial<ReturnItem>[], trx: Knex.Transaction): Promise<Return> {
+    const insertData = this.getInsertData(data);
+    const [ret] = await trx('returns').insert(insertData).returning('*');
     if (items.length > 0) {
-      await trx('return_items').insert(items.map((item) => ({ ...item, return_id: ret.id })));
+      const itemsData = items.map((item) => this.getInsertData({ ...item, return_id: ret.id } as any));
+      await trx('return_items').insert(itemsData);
     }
     return ret;
   }

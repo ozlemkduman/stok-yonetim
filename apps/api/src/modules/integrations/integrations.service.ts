@@ -22,7 +22,7 @@ export class IntegrationsService {
   }
 
   async create(dto: CreateIntegrationDto): Promise<Integration> {
-    return this.repository.create({
+    return this.repository.createIntegration({
       name: dto.name,
       type: dto.type,
       provider: dto.provider,
@@ -34,12 +34,12 @@ export class IntegrationsService {
 
   async update(id: string, dto: UpdateIntegrationDto): Promise<Integration> {
     await this.findById(id);
-    return this.repository.update(id, dto);
+    return this.repository.updateIntegration(id, dto);
   }
 
   async delete(id: string): Promise<void> {
     await this.findById(id);
-    await this.repository.delete(id);
+    await this.repository.deleteIntegration(id);
   }
 
   async testConnection(id: string): Promise<{ success: boolean; message: string }> {
@@ -68,9 +68,9 @@ export class IntegrationsService {
       });
 
       if (success) {
-        await this.repository.update(id, { status: 'active', last_error: null });
+        await this.repository.updateIntegration(id, { status: 'active', last_error: null });
       } else {
-        await this.repository.update(id, { status: 'error', last_error: 'Baglanti testi basarisiz' });
+        await this.repository.updateIntegration(id, { status: 'error', last_error: 'Baglanti testi basarisiz' });
       }
 
       return {
@@ -85,7 +85,7 @@ export class IntegrationsService {
         status: 'failed',
         message: errorMessage,
       });
-      await this.repository.update(id, { status: 'error', last_error: errorMessage });
+      await this.repository.updateIntegration(id, { status: 'error', last_error: errorMessage });
       return { success: false, message: errorMessage };
     }
   }
@@ -150,7 +150,7 @@ export class IntegrationsService {
         }
       }
 
-      await this.repository.update(id, { last_sync_at: new Date() as unknown as Date, last_error: null });
+      await this.repository.updateIntegration(id, { last_sync_at: new Date() as unknown as Date, last_error: null });
       await this.repository.createLog({
         integration_id: id,
         action: 'sync',
@@ -168,7 +168,7 @@ export class IntegrationsService {
       };
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Bilinmeyen hata';
-      await this.repository.update(id, { last_error: errorMessage });
+      await this.repository.updateIntegration(id, { last_error: errorMessage });
       await this.repository.createLog({
         integration_id: id,
         action: 'error',

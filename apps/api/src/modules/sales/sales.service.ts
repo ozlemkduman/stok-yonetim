@@ -85,7 +85,7 @@ export class SalesService {
       const discountAmount = dto.discount_amount || (subtotal * (dto.discount_rate || 0) / 100);
       const grandTotal = subtotal - discountAmount + vatTotal;
 
-      const sale = await this.salesRepository.create({
+      const sale = await this.salesRepository.createSale({
         invoice_number: invoiceNumber,
         customer_id: dto.customer_id || null,
         sale_date: dto.sale_date ? new Date(dto.sale_date) : new Date(),

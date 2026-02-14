@@ -74,10 +74,10 @@ export class WarehousesService {
     }
 
     if (dto.is_default) {
-      await this.db.knex('warehouses').update({ is_default: false });
+      await this.repository.setDefault('');
     }
 
-    return this.repository.create({
+    return this.repository.createWarehouse({
       name: dto.name,
       code: dto.code.toUpperCase(),
       address: dto.address,
@@ -94,7 +94,7 @@ export class WarehousesService {
       await this.repository.setDefault(id);
     }
 
-    return this.repository.update(id, dto);
+    return this.repository.updateWarehouse(id, dto);
   }
 
   async delete(id: string): Promise<void> {
@@ -104,7 +104,7 @@ export class WarehousesService {
       throw new BadRequestException('Varsayilan depo silinemez');
     }
 
-    await this.repository.delete(id);
+    await this.repository.deleteWarehouse(id);
   }
 
   // Stocks

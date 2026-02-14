@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { DatabaseService } from '../../database/database.service';
+import { BaseTenantRepository } from '../../common/repositories/base.repository';
 import { Knex } from 'knex';
 
 export interface Account {
@@ -47,8 +48,12 @@ export interface AccountTransfer {
 }
 
 @Injectable()
-export class AccountsRepository {
-  constructor(private readonly db: DatabaseService) {}
+export class AccountsRepository extends BaseTenantRepository<Account> {
+  protected tableName = 'accounts';
+
+  constructor(db: DatabaseService) {
+    super(db);
+  }
 
   async findAll(params: {
     page: number;
@@ -61,8 +66,8 @@ export class AccountsRepository {
     const { page, limit, accountType, isActive, sortBy, sortOrder } = params;
     const offset = (page - 1) * limit;
 
-    let query = this.db.knex('accounts').select('*');
-    let countQuery = this.db.knex('accounts');
+    let query = this.query.clone().select('*');
+    let countQuery = this.query.clone();
 
     if (accountType) {
       query = query.where('account_type', accountType);
@@ -82,51 +87,48 @@ export class AccountsRepository {
     return { items, total: parseInt(count as string, 10) };
   }
 
-  async findById(id: string): Promise<Account | null> {
-    return this.db.knex('accounts').where('id', id).first() || null;
-  }
-
   async findDefault(accountType?: string): Promise<Account | null> {
-    let query = this.db.knex('accounts').where('is_default', true).where('is_active', true);
+    let query = this.query.where('is_default', true).where('is_active', true);
     if (accountType) {
       query = query.where('account_type', accountType);
     }
     return query.first() || null;
   }
 
-  async create(data: Partial<Account>, trx?: Knex.Transaction): Promise<Account> {
-    const query = trx ? trx('accounts') : this.db.knex('accounts');
-    const [account] = await query.insert({
+  async createAccount(data: Partial<Account>, trx?: Knex.Transaction): Promise<Account> {
+    const insertData = this.getInsertData({
       ...data,
       current_balance: data.opening_balance || 0,
-    }).returning('*');
+    });
+    const query = trx ? trx('accounts') : this.knex('accounts');
+    const [account] = await query.insert(insertData).returning('*');
     return account;
   }
 
-  async update(id: string, data: Partial<Account>): Promise<Account> {
-    const [account] = await this.db.knex('accounts')
-      .where('id', id)
-      .update({ ...data, updated_at: this.db.knex.fn.now() })
+  async updateAccount(id: string, data: Partial<Account>): Promise<Account> {
+    const [account] = await this.query
+      .where(`${this.tableName}.id`, id)
+      .update({ ...data, updated_at: this.knex.fn.now() })
       .returning('*');
     return account;
   }
 
   async updateBalance(id: string, amount: number, trx?: Knex.Transaction): Promise<void> {
-    const query = trx ? trx('accounts') : this.db.knex('accounts');
-    await query.where('id', id).increment('current_balance', amount).update({ updated_at: this.db.knex.fn.now() });
+    const baseQuery = trx ? trx('accounts') : this.knex('accounts');
+    await this.applyTenantFilter(baseQuery).where('id', id).increment('current_balance', amount).update({ updated_at: this.knex.fn.now() });
   }
 
   async setDefault(id: string, accountType: string): Promise<void> {
     await this.db.knex.transaction(async (trx) => {
       // Remove default from all accounts of same type
-      await trx('accounts').where('account_type', accountType).update({ is_default: false });
+      await this.applyTenantFilter(trx('accounts')).where('account_type', accountType).update({ is_default: false });
       // Set new default
-      await trx('accounts').where('id', id).update({ is_default: true, updated_at: trx.fn.now() });
+      await this.applyTenantFilter(trx('accounts')).where('id', id).update({ is_default: true, updated_at: trx.fn.now() });
     });
   }
 
-  async delete(id: string): Promise<void> {
-    await this.db.knex('accounts').where('id', id).update({ is_active: false, updated_at: this.db.knex.fn.now() });
+  async deleteAccount(id: string): Promise<void> {
+    await this.query.where(`${this.tableName}.id`, id).update({ is_active: false, updated_at: this.knex.fn.now() });
   }
 
   // Movements
@@ -141,8 +143,11 @@ export class AccountsRepository {
     const { accountId, page, limit, startDate, endDate, movementType } = params;
     const offset = (page - 1) * limit;
 
-    let query = this.db.knex('account_movements').where('account_id', accountId);
-    let countQuery = this.db.knex('account_movements').where('account_id', accountId);
+    let query = this.knex('account_movements').where('account_id', accountId);
+    query = this.applyTenantFilter(query, 'account_movements');
+
+    let countQuery = this.knex('account_movements').where('account_id', accountId);
+    countQuery = this.applyTenantFilter(countQuery, 'account_movements');
 
     if (startDate) {
       query = query.where('movement_date', '>=', startDate);
@@ -166,8 +171,9 @@ export class AccountsRepository {
   }
 
   async createMovement(data: Partial<AccountMovement>, trx?: Knex.Transaction): Promise<AccountMovement> {
-    const query = trx ? trx('account_movements') : this.db.knex('account_movements');
-    const [movement] = await query.insert(data).returning('*');
+    const insertData = this.getInsertData(data);
+    const query = trx ? trx('account_movements') : this.knex('account_movements');
+    const [movement] = await query.insert(insertData).returning('*');
     return movement;
   }
 
@@ -180,7 +186,7 @@ export class AccountsRepository {
     const { page, limit, accountId } = params;
     const offset = (page - 1) * limit;
 
-    let query = this.db.knex('account_transfers')
+    let query = this.knex('account_transfers')
       .leftJoin('accounts as from_acc', 'account_transfers.from_account_id', 'from_acc.id')
       .leftJoin('accounts as to_acc', 'account_transfers.to_account_id', 'to_acc.id')
       .select(
@@ -188,7 +194,11 @@ export class AccountsRepository {
         'from_acc.name as from_account_name',
         'to_acc.name as to_account_name'
       );
-    let countQuery = this.db.knex('account_transfers');
+
+    query = this.applyTenantFilter(query, 'account_transfers');
+
+    let countQuery = this.knex('account_transfers');
+    countQuery = this.applyTenantFilter(countQuery, 'account_transfers');
 
     if (accountId) {
       query = query.where((b) => b.where('from_account_id', accountId).orWhere('to_account_id', accountId));
@@ -204,22 +214,26 @@ export class AccountsRepository {
   }
 
   async createTransfer(data: Partial<AccountTransfer>, trx?: Knex.Transaction): Promise<AccountTransfer> {
-    const query = trx ? trx('account_transfers') : this.db.knex('account_transfers');
-    const [transfer] = await query.insert(data).returning('*');
+    const insertData = this.getInsertData(data);
+    const query = trx ? trx('account_transfers') : this.knex('account_transfers');
+    const [transfer] = await query.insert(insertData).returning('*');
     return transfer;
   }
 
   // Summary
   async getSummary(): Promise<{ totalKasa: number; totalBanka: number; totalBalance: number }> {
-    const [kasaResult] = await this.db.knex('accounts')
+    const kasaQuery = this.query.clone()
       .where('account_type', 'kasa')
       .where('is_active', true)
       .sum('current_balance as total');
 
-    const [bankaResult] = await this.db.knex('accounts')
+    const bankaQuery = this.query.clone()
       .where('account_type', 'banka')
       .where('is_active', true)
       .sum('current_balance as total');
+
+    const [kasaResult] = await kasaQuery;
+    const [bankaResult] = await bankaQuery;
 
     const totalKasa = parseFloat((kasaResult as any)?.total || '0');
     const totalBanka = parseFloat((bankaResult as any)?.total || '0');

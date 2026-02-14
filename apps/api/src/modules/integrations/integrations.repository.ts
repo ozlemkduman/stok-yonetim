@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { DatabaseService } from '../../database/database.service';
+import { BaseTenantRepository } from '../../common/repositories/base.repository';
 
 export interface Integration {
   id: string;
@@ -73,11 +74,15 @@ export interface BankStatement {
 }
 
 @Injectable()
-export class IntegrationsRepository {
-  constructor(private readonly db: DatabaseService) {}
+export class IntegrationsRepository extends BaseTenantRepository<Integration> {
+  protected tableName = 'integrations';
+
+  constructor(db: DatabaseService) {
+    super(db);
+  }
 
   async findAll(params: { type?: string; status?: string }): Promise<Integration[]> {
-    let query = this.db.knex('integrations').select('*');
+    let query = this.query.clone().select('*');
     if (params.type) {
       query = query.where('type', params.type);
     }
@@ -87,37 +92,37 @@ export class IntegrationsRepository {
     return query.orderBy('name', 'asc');
   }
 
-  async findById(id: string): Promise<Integration | null> {
-    return this.db.knex('integrations').where('id', id).first() || null;
-  }
-
-  async create(data: Partial<Integration>): Promise<Integration> {
-    const [integration] = await this.db.knex('integrations').insert(data).returning('*');
+  async createIntegration(data: Partial<Integration>): Promise<Integration> {
+    const insertData = this.getInsertData(data);
+    const [integration] = await this.knex(this.tableName).insert(insertData).returning('*');
     return integration;
   }
 
-  async update(id: string, data: Partial<Integration>): Promise<Integration> {
-    const [integration] = await this.db.knex('integrations')
-      .where('id', id)
-      .update({ ...data, updated_at: this.db.knex.fn.now() })
+  async updateIntegration(id: string, data: Partial<Integration>): Promise<Integration> {
+    const [integration] = await this.query
+      .where(`${this.tableName}.id`, id)
+      .update({ ...data, updated_at: this.knex.fn.now() })
       .returning('*');
     return integration;
   }
 
-  async delete(id: string): Promise<void> {
-    await this.db.knex('integrations').where('id', id).delete();
+  async deleteIntegration(id: string): Promise<void> {
+    await this.query.where(`${this.tableName}.id`, id).delete();
   }
 
   async createLog(data: Partial<IntegrationLog>): Promise<IntegrationLog> {
-    const [log] = await this.db.knex('integration_logs').insert(data).returning('*');
+    const insertData = this.getInsertData(data as any);
+    const [log] = await this.knex('integration_logs').insert(insertData).returning('*');
     return log;
   }
 
   async findLogsByIntegrationId(integrationId: string, limit = 50): Promise<IntegrationLog[]> {
-    return this.db.knex('integration_logs')
+    const query = this.knex('integration_logs')
       .where('integration_id', integrationId)
       .orderBy('created_at', 'desc')
       .limit(limit);
+
+    return this.applyTenantFilter(query, 'integration_logs');
   }
 
   // E-commerce orders
@@ -133,10 +138,14 @@ export class IntegrationsRepository {
     const { page, limit, integrationId, status, syncStatus, startDate, endDate } = params;
     const offset = (page - 1) * limit;
 
-    let query = this.db.knex('e_commerce_orders')
+    let query = this.knex('e_commerce_orders')
       .leftJoin('integrations', 'e_commerce_orders.integration_id', 'integrations.id')
       .select('e_commerce_orders.*', 'integrations.name as integration_name');
-    let countQuery = this.db.knex('e_commerce_orders');
+
+    query = this.applyTenantFilter(query, 'e_commerce_orders');
+
+    let countQuery = this.knex('e_commerce_orders');
+    countQuery = this.applyTenantFilter(countQuery, 'e_commerce_orders');
 
     if (integrationId) {
       query = query.where('e_commerce_orders.integration_id', integrationId);
@@ -167,35 +176,39 @@ export class IntegrationsRepository {
   }
 
   async findECommerceOrderById(id: string): Promise<ECommerceOrder | null> {
-    return this.db.knex('e_commerce_orders')
+    const query = this.knex('e_commerce_orders')
       .leftJoin('integrations', 'e_commerce_orders.integration_id', 'integrations.id')
       .select('e_commerce_orders.*', 'integrations.name as integration_name')
-      .where('e_commerce_orders.id', id)
-      .first() || null;
+      .where('e_commerce_orders.id', id);
+
+    return this.applyTenantFilter(query, 'e_commerce_orders').first() || null;
   }
 
   async upsertECommerceOrder(data: Partial<ECommerceOrder>): Promise<ECommerceOrder> {
-    const existing = await this.db.knex('e_commerce_orders')
+    const existingQuery = this.knex('e_commerce_orders')
       .where('integration_id', data.integration_id)
-      .where('external_order_id', data.external_order_id)
-      .first();
+      .where('external_order_id', data.external_order_id);
+
+    const existing = await this.applyTenantFilter(existingQuery, 'e_commerce_orders').first();
 
     if (existing) {
-      const [order] = await this.db.knex('e_commerce_orders')
-        .where('id', existing.id)
-        .update({ ...data, updated_at: this.db.knex.fn.now() })
+      const updateQuery = this.knex('e_commerce_orders')
+        .where('id', existing.id);
+      const [order] = await this.applyTenantFilter(updateQuery, 'e_commerce_orders')
+        .update({ ...data, updated_at: this.knex.fn.now() })
         .returning('*');
       return order;
     } else {
-      const [order] = await this.db.knex('e_commerce_orders').insert(data).returning('*');
+      const insertData = this.getInsertData(data as any);
+      const [order] = await this.knex('e_commerce_orders').insert(insertData).returning('*');
       return order;
     }
   }
 
   async updateECommerceOrderSaleId(id: string, saleId: string): Promise<void> {
-    await this.db.knex('e_commerce_orders')
-      .where('id', id)
-      .update({ sale_id: saleId, sync_status: 'synced', updated_at: this.db.knex.fn.now() });
+    const query = this.knex('e_commerce_orders').where('id', id);
+    await this.applyTenantFilter(query, 'e_commerce_orders')
+      .update({ sale_id: saleId, sync_status: 'synced', updated_at: this.knex.fn.now() });
   }
 
   // Bank statements
@@ -211,11 +224,15 @@ export class IntegrationsRepository {
     const { page, limit, integrationId, accountId, matchStatus, startDate, endDate } = params;
     const offset = (page - 1) * limit;
 
-    let query = this.db.knex('bank_statements')
+    let query = this.knex('bank_statements')
       .leftJoin('integrations', 'bank_statements.integration_id', 'integrations.id')
       .leftJoin('accounts', 'bank_statements.account_id', 'accounts.id')
       .select('bank_statements.*', 'integrations.name as integration_name', 'accounts.name as account_name');
-    let countQuery = this.db.knex('bank_statements');
+
+    query = this.applyTenantFilter(query, 'bank_statements');
+
+    let countQuery = this.knex('bank_statements');
+    countQuery = this.applyTenantFilter(countQuery, 'bank_statements');
 
     if (integrationId) {
       query = query.where('bank_statements.integration_id', integrationId);
@@ -246,20 +263,21 @@ export class IntegrationsRepository {
   }
 
   async createBankStatement(data: Partial<BankStatement>): Promise<BankStatement> {
-    const [statement] = await this.db.knex('bank_statements').insert(data).returning('*');
+    const insertData = this.getInsertData(data as any);
+    const [statement] = await this.knex('bank_statements').insert(insertData).returning('*');
     return statement;
   }
 
   async matchBankStatement(id: string, movementId: string): Promise<void> {
-    await this.db.knex('bank_statements')
-      .where('id', id)
-      .update({ matched_movement_id: movementId, match_status: 'matched', updated_at: this.db.knex.fn.now() });
+    const query = this.knex('bank_statements').where('id', id);
+    await this.applyTenantFilter(query, 'bank_statements')
+      .update({ matched_movement_id: movementId, match_status: 'matched', updated_at: this.knex.fn.now() });
   }
 
   async ignoreBankStatement(id: string): Promise<void> {
-    await this.db.knex('bank_statements')
-      .where('id', id)
-      .update({ match_status: 'ignored', updated_at: this.db.knex.fn.now() });
+    const query = this.knex('bank_statements').where('id', id);
+    await this.applyTenantFilter(query, 'bank_statements')
+      .update({ match_status: 'ignored', updated_at: this.knex.fn.now() });
   }
 
   async getIntegrationStats(integrationId: string): Promise<{
@@ -271,22 +289,26 @@ export class IntegrationsRepository {
     errorOrders: number;
   }> {
     // Get log stats
-    const [logStats] = await this.db.knex('integration_logs')
+    const logQuery = this.knex('integration_logs')
       .where('integration_id', integrationId)
       .select(
-        this.db.knex.raw("COUNT(CASE WHEN status = 'success' THEN 1 END) as total_synced"),
-        this.db.knex.raw("COUNT(CASE WHEN status = 'failed' THEN 1 END) as total_errors"),
-        this.db.knex.raw("MAX(CASE WHEN status = 'success' THEN created_at END) as last_sync_at")
-      ) as unknown as { total_synced: string; total_errors: string; last_sync_at: Date | null }[];
+        this.knex.raw("COUNT(CASE WHEN status = 'success' THEN 1 END) as total_synced"),
+        this.knex.raw("COUNT(CASE WHEN status = 'failed' THEN 1 END) as total_errors"),
+        this.knex.raw("MAX(CASE WHEN status = 'success' THEN created_at END) as last_sync_at")
+      );
+
+    const [logStats] = await this.applyTenantFilter(logQuery, 'integration_logs') as unknown as { total_synced: string; total_errors: string; last_sync_at: Date | null }[];
 
     // Get e-commerce order stats
-    const [orderStats] = await this.db.knex('e_commerce_orders')
+    const orderQuery = this.knex('e_commerce_orders')
       .where('integration_id', integrationId)
       .select(
-        this.db.knex.raw("COUNT(CASE WHEN sync_status = 'synced' THEN 1 END) as synced_orders"),
-        this.db.knex.raw("COUNT(CASE WHEN sync_status = 'pending' THEN 1 END) as pending_orders"),
-        this.db.knex.raw("COUNT(CASE WHEN sync_status = 'error' THEN 1 END) as error_orders")
-      ) as unknown as { synced_orders: string; pending_orders: string; error_orders: string }[];
+        this.knex.raw("COUNT(CASE WHEN sync_status = 'synced' THEN 1 END) as synced_orders"),
+        this.knex.raw("COUNT(CASE WHEN sync_status = 'pending' THEN 1 END) as pending_orders"),
+        this.knex.raw("COUNT(CASE WHEN sync_status = 'error' THEN 1 END) as error_orders")
+      );
+
+    const [orderStats] = await this.applyTenantFilter(orderQuery, 'e_commerce_orders') as unknown as { synced_orders: string; pending_orders: string; error_orders: string }[];
 
     return {
       totalSynced: parseInt(logStats?.total_synced || '0', 10),

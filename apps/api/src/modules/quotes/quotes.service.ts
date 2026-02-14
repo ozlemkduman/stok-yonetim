@@ -79,7 +79,7 @@ export class QuotesService {
     const orderDiscount = dto.discount_amount || (subtotal * (dto.discount_rate || 0) / 100);
     const grandTotal = dto.include_vat ? subtotal - orderDiscount + vatTotal : subtotal - orderDiscount;
 
-    return this.repository.create({
+    return this.repository.createQuote({
       quote_number: quoteNumber,
       customer_id: dto.customer_id || null,
       quote_date: new Date(),
@@ -161,7 +161,7 @@ export class QuotesService {
         await this.repository.insertItems(itemsData, trx);
       }
 
-      return this.repository.update(id, updateData, trx);
+      return this.repository.updateQuote(id, updateData, trx);
     });
   }
 
@@ -223,7 +223,7 @@ export class QuotesService {
       const invoiceNumber = await this.salesRepository.generateInvoiceNumber();
 
       // Create sale
-      const sale = await this.salesRepository.create({
+      const sale = await this.salesRepository.createSale({
         invoice_number: invoiceNumber,
         customer_id: quote.customer_id,
         sale_date: new Date(),
@@ -265,7 +265,7 @@ export class QuotesService {
       throw new BadRequestException('Satisa donusturulmus teklif silinemez');
     }
 
-    await this.repository.delete(id);
+    await this.repository.deleteQuote(id);
   }
 
   async markExpiredQuotes(): Promise<number> {

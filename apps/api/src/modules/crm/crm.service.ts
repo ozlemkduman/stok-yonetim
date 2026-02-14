@@ -37,7 +37,7 @@ export class CrmService {
       ...dto,
       next_follow_up: dto.next_follow_up ? new Date(dto.next_follow_up) : undefined,
     };
-    return this.repository.createContact(data);
+    return this.repository.createCrmContact(data);
   }
 
   async updateContact(id: string, dto: Partial<CreateContactDto>): Promise<CrmContact> {
@@ -46,12 +46,12 @@ export class CrmService {
       ...dto,
       next_follow_up: dto.next_follow_up ? new Date(dto.next_follow_up) : undefined,
     };
-    return this.repository.updateContact(id, data);
+    return this.repository.updateCrmContact(id, data);
   }
 
   async deleteContact(id: string): Promise<void> {
     await this.findContactById(id);
-    await this.repository.deleteContact(id);
+    await this.repository.deleteCrmContact(id);
   }
 
   // Activities
@@ -82,7 +82,7 @@ export class CrmService {
       ...dto,
       scheduled_at: dto.scheduled_at ? new Date(dto.scheduled_at) : undefined,
     };
-    return this.repository.createActivity(data);
+    return this.repository.createCrmActivity(data);
   }
 
   async updateActivity(id: string, dto: Partial<CreateActivityDto>): Promise<CrmActivity> {
@@ -90,18 +90,18 @@ export class CrmService {
       ...dto,
       scheduled_at: dto.scheduled_at ? new Date(dto.scheduled_at) : undefined,
     };
-    return this.repository.updateActivity(id, data);
+    return this.repository.updateCrmActivity(id, data);
   }
 
   async completeActivity(id: string): Promise<CrmActivity> {
-    return this.repository.updateActivity(id, {
+    return this.repository.updateCrmActivity(id, {
       status: 'completed',
       completed_at: new Date(),
     });
   }
 
   async deleteActivity(id: string): Promise<void> {
-    await this.repository.deleteActivity(id);
+    await this.repository.deleteCrmActivity(id);
   }
 
   // Stats
@@ -126,7 +126,7 @@ export class CrmService {
     }
 
     const customerId = await this.repository.convertToCustomer(id, contact);
-    const updatedContact = await this.repository.updateContact(id, {
+    const updatedContact = await this.repository.updateCrmContact(id, {
       customer_id: customerId,
       status: 'customer',
     });

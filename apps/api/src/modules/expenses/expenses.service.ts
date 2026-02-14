@@ -19,19 +19,19 @@ export class ExpensesService {
   }
 
   async create(dto: CreateExpenseDto): Promise<Expense> {
-    return this.expensesRepository.create(dto);
+    return this.expensesRepository.createExpense(dto);
   }
 
   async update(id: string, dto: UpdateExpenseDto): Promise<Expense> {
     await this.findById(id);
-    const updated = await this.expensesRepository.update(id, dto);
+    const updated = await this.expensesRepository.updateExpense(id, dto);
     if (!updated) throw new NotFoundException(`Gider bulunamadi: ${id}`);
     return updated;
   }
 
   async delete(id: string): Promise<void> {
     await this.findById(id);
-    await this.expensesRepository.delete(id);
+    await this.expensesRepository.deleteExpense(id);
   }
 
   async getTotalByCategory(startDate?: string, endDate?: string) {

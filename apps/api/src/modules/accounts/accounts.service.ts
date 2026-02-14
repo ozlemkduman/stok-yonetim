@@ -45,12 +45,10 @@ export class AccountsService {
   async create(dto: CreateAccountDto): Promise<Account> {
     // If this is set as default, handle it
     if (dto.is_default) {
-      await this.db.knex('accounts')
-        .where('account_type', dto.account_type)
-        .update({ is_default: false });
+      await this.repository.setDefault('', dto.account_type);
     }
 
-    return this.repository.create({
+    return this.repository.createAccount({
       name: dto.name,
       account_type: dto.account_type,
       bank_name: dto.bank_name,
@@ -70,12 +68,12 @@ export class AccountsService {
       await this.repository.setDefault(id, account.account_type);
     }
 
-    return this.repository.update(id, dto);
+    return this.repository.updateAccount(id, dto);
   }
 
   async delete(id: string): Promise<void> {
     await this.findById(id);
-    await this.repository.delete(id);
+    await this.repository.deleteAccount(id);
   }
 
   // Movements

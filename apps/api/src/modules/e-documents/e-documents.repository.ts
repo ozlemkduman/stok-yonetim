@@ -1,9 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { DatabaseService } from '../../database/database.service';
+import { BaseTenantRepository } from '../../common/repositories/base.repository';
 import { Knex } from 'knex';
 
 export interface EDocument {
   id: string;
+  tenant_id?: string;
   document_type: string;
   document_number: string;
   gib_uuid: string | null;
@@ -38,8 +40,12 @@ export interface EDocumentLog {
 }
 
 @Injectable()
-export class EDocumentsRepository {
-  constructor(private readonly db: DatabaseService) {}
+export class EDocumentsRepository extends BaseTenantRepository<EDocument> {
+  protected tableName = 'e_documents';
+
+  constructor(db: DatabaseService) {
+    super(db);
+  }
 
   async findAll(params: {
     page: number;
@@ -56,10 +62,10 @@ export class EDocumentsRepository {
     const { page, limit, documentType, status, referenceType, customerId, startDate, endDate, sortBy, sortOrder } = params;
     const offset = (page - 1) * limit;
 
-    let query = this.db.knex('e_documents')
+    let query = this.query
       .leftJoin('customers', 'e_documents.customer_id', 'customers.id')
       .select('e_documents.*', 'customers.name as customer_name');
-    let countQuery = this.db.knex('e_documents');
+    let countQuery = this.query.clone();
 
     if (documentType) {
       query = query.where('e_documents.document_type', documentType);
@@ -100,7 +106,7 @@ export class EDocumentsRepository {
   }
 
   async findById(id: string): Promise<EDocument | null> {
-    return this.db.knex('e_documents')
+    return this.query
       .leftJoin('customers', 'e_documents.customer_id', 'customers.id')
       .select('e_documents.*', 'customers.name as customer_name')
       .where('e_documents.id', id)
@@ -108,7 +114,7 @@ export class EDocumentsRepository {
   }
 
   async findByReference(referenceType: string, referenceId: string): Promise<EDocument[]> {
-    return this.db.knex('e_documents')
+    return this.query
       .where('reference_type', referenceType)
       .where('reference_id', referenceId)
       .orderBy('created_at', 'desc');
@@ -126,7 +132,7 @@ export class EDocumentsRepository {
     const today = new Date();
     const dateStr = `${today.getFullYear()}${String(today.getMonth() + 1).padStart(2, '0')}`;
 
-    const [result] = await this.db.knex('e_documents')
+    const [result] = await this.query
       .where('document_type', documentType)
       .whereILike('document_number', `${prefix}${dateStr}%`)
       .count('id as count');
@@ -135,29 +141,30 @@ export class EDocumentsRepository {
     return `${prefix}${dateStr}${String(count).padStart(6, '0')}`;
   }
 
-  async create(data: Partial<EDocument>, trx?: Knex.Transaction): Promise<EDocument> {
-    const query = trx ? trx('e_documents') : this.db.knex('e_documents');
-    const [document] = await query.insert(data).returning('*');
+  async createDocument(data: Partial<EDocument>, trx?: Knex.Transaction): Promise<EDocument> {
+    const insertData = this.getInsertData(data);
+    const query = trx ? trx('e_documents') : this.knex('e_documents');
+    const [document] = await query.insert(insertData).returning('*');
     return document;
   }
 
-  async update(id: string, data: Partial<EDocument>, trx?: Knex.Transaction): Promise<EDocument> {
-    const query = trx ? trx('e_documents') : this.db.knex('e_documents');
-    const [document] = await query
+  async updateDocument(id: string, data: Partial<EDocument>, trx?: Knex.Transaction): Promise<EDocument> {
+    const query = trx ? trx('e_documents') : this.knex('e_documents');
+    const [document] = await this.applyTenantFilter(query)
       .where('id', id)
-      .update({ ...data, updated_at: this.db.knex.fn.now() })
+      .update({ ...data, updated_at: this.knex.fn.now() })
       .returning('*');
     return document;
   }
 
   async createLog(data: Partial<EDocumentLog>, trx?: Knex.Transaction): Promise<EDocumentLog> {
-    const query = trx ? trx('e_document_logs') : this.db.knex('e_document_logs');
+    const query = trx ? trx('e_document_logs') : this.knex('e_document_logs');
     const [log] = await query.insert(data).returning('*');
     return log;
   }
 
   async getLogs(documentId: string): Promise<EDocumentLog[]> {
-    return this.db.knex('e_document_logs')
+    return this.knex('e_document_logs')
       .where('document_id', documentId)
       .orderBy('created_at', 'desc');
   }
@@ -167,15 +174,15 @@ export class EDocumentsRepository {
     byType: Record<string, number>;
     byStatus: Record<string, number>;
   }> {
-    const [totalResult] = await this.db.knex('e_documents').count('id as count');
+    const [totalResult] = await this.query.count('id as count');
     const total = parseInt(totalResult.count as string, 10);
 
-    const byTypeResults = await this.db.knex('e_documents')
+    const byTypeResults = await this.query.clone()
       .select('document_type')
       .count('id as count')
       .groupBy('document_type');
 
-    const byStatusResults = await this.db.knex('e_documents')
+    const byStatusResults = await this.query.clone()
       .select('status')
       .count('id as count')
       .groupBy('status');
