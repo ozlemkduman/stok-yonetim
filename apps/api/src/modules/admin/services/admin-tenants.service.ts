@@ -108,6 +108,11 @@ export class AdminTenantsService {
       throw new NotFoundException('Organizasyon bulunamadi');
     }
 
+    // Clear owner_id first to avoid circular dependency
+    if (tenant.owner_id) {
+      await this.tenantsRepository.update(id, { owner_id: null } as any);
+    }
+
     const deleted = await this.tenantsRepository.delete(id);
     if (!deleted) {
       throw new BadRequestException('Organizasyon silinemedi');

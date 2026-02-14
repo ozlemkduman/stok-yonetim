@@ -100,6 +100,12 @@ class ApiClient {
         // Retry the request with new token
         headers['Authorization'] = `Bearer ${this.getAccessToken()}`;
         const retryResponse = await fetch(url, { ...config, headers });
+
+        // Handle 204 No Content
+        if (retryResponse.status === 204) {
+          return { success: true, data: null as T };
+        }
+
         const retryData = await retryResponse.json();
 
         if (!retryResponse.ok) {
@@ -114,6 +120,11 @@ class ApiClient {
         window.dispatchEvent(new CustomEvent('auth:logout'));
         throw new Error('Oturum süresi doldu');
       }
+    }
+
+    // Handle 204 No Content (e.g., successful DELETE)
+    if (response.status === 204) {
+      return { success: true, data: null as T };
     }
 
     const data = await response.json();

@@ -102,6 +102,7 @@ export function TenantDetailPage() {
       navigate('/admin/tenants');
     } catch (error) {
       console.error('Failed to delete tenant:', error);
+      alert('Organizasyon silinemedi: ' + (error instanceof Error ? error.message : 'Bilinmeyen hata'));
     }
   };
 
