@@ -65,6 +65,18 @@ export class ReportsController {
     return { success: true, data };
   }
 
+  @Get('customer-sales')
+  async getCustomerSales(@Query('startDate') startDate: string, @Query('endDate') endDate: string) {
+    const data = await this.reportsService.getCustomerSales(startDate, endDate);
+    return { success: true, data };
+  }
+
+  @Get('customer-product-purchases')
+  async getCustomerProductPurchases(@Query('startDate') startDate: string, @Query('endDate') endDate: string) {
+    const data = await this.reportsService.getCustomerProductPurchases(startDate, endDate);
+    return { success: true, data };
+  }
+
   @Get('expenses-by-category')
   async getExpensesByCategory(@Query('startDate') startDate: string, @Query('endDate') endDate: string) {
     const data = await this.reportsService.getExpensesByCategory(startDate, endDate);

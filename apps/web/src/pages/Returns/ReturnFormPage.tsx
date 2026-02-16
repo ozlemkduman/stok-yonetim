@@ -182,6 +182,7 @@ export function ReturnFormPage() {
           product_id: item.product_id,
           quantity: item.quantity,
           unit_price: item.unit_price,
+          vat_rate: item.vat_rate,
           sale_item_id: item.sale_item_id,
         })),
         reason: `${reason}${notes ? ': ' + notes : ''}`,

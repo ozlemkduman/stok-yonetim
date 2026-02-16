@@ -320,6 +320,81 @@ export class ReportsService {
     };
   }
 
+  async getCustomerSales(startDate: string, endDate: string) {
+    const tenantId = getCurrentTenantId();
+
+    let query = this.db.knex('sales')
+      .join('customers', 'sales.customer_id', 'customers.id')
+      .where('sales.status', 'completed')
+      .whereBetween('sales.sale_date', [startDate, endDate]);
+    if (tenantId) query = query.where('sales.tenant_id', tenantId);
+
+    const sales = await query
+      .select(
+        'sales.id',
+        'sales.invoice_number',
+        'sales.sale_date',
+        'sales.grand_total',
+        'sales.payment_method',
+        'customers.id as customer_id',
+        'customers.name as customer_name',
+        'customers.phone as customer_phone',
+      )
+      .orderBy('customers.name', 'asc')
+      .orderBy('sales.sale_date', 'desc');
+
+    // Her satis icin urun detaylarini getir
+    const saleIds = sales.map((s: any) => s.id);
+    let items: any[] = [];
+    if (saleIds.length > 0) {
+      let itemsQuery = this.db.knex('sale_items')
+        .join('products', 'sale_items.product_id', 'products.id')
+        .whereIn('sale_items.sale_id', saleIds);
+
+      items = await itemsQuery
+        .select(
+          'sale_items.sale_id',
+          'products.name as product_name',
+          'sale_items.quantity',
+          'sale_items.unit_price',
+          'sale_items.line_total',
+        );
+    }
+
+    // Satislara urun detaylarini ekle
+    const salesWithItems = sales.map((sale: any) => ({
+      ...sale,
+      items: items.filter((item: any) => item.sale_id === sale.id),
+    }));
+
+    return salesWithItems;
+  }
+
+  async getCustomerProductPurchases(startDate: string, endDate: string) {
+    const tenantId = getCurrentTenantId();
+
+    let query = this.db.knex('sale_items')
+      .join('sales', 'sale_items.sale_id', 'sales.id')
+      .join('products', 'sale_items.product_id', 'products.id')
+      .join('customers', 'sales.customer_id', 'customers.id')
+      .where('sales.status', 'completed')
+      .whereBetween('sales.sale_date', [startDate, endDate]);
+    if (tenantId) query = query.where('sales.tenant_id', tenantId);
+
+    return query
+      .select(
+        'customers.id as customer_id',
+        'customers.name as customer_name',
+        'products.id as product_id',
+        'products.name as product_name',
+      )
+      .sum('sale_items.quantity as total_quantity')
+      .sum('sale_items.line_total as total_amount')
+      .groupBy('customers.id', 'customers.name', 'products.id', 'products.name')
+      .orderBy('customers.name', 'asc')
+      .orderByRaw('SUM(sale_items.quantity) DESC');
+  }
+
   async getExpensesByCategory(startDate: string, endDate: string) {
     const byCategory = await this.tenantQuery('expenses')
       .whereBetween('expense_date', [startDate, endDate])

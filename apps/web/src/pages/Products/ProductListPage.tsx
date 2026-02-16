@@ -25,6 +25,8 @@ export function ProductListPage() {
   const [totalPages, setTotalPages] = useState(1);
   const [total, setTotal] = useState(0);
   const [search, setSearch] = useState('');
+  const [sortBy, setSortBy] = useState('total_sold');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [formData, setFormData] = useState<CreateProductData>({ name: '', purchase_price: 0, sale_price: 0 });
@@ -34,7 +36,7 @@ export function ProductListPage() {
   const fetchProducts = async () => {
     setLoading(true);
     try {
-      const response = await productsApi.getAll({ page, limit: 20, search });
+      const response = await productsApi.getAll({ page, limit: 20, search, sortBy, sortOrder });
       setProducts(response.data);
       setTotalPages(response.meta?.totalPages || 1);
       setTotal(response.meta?.total || 0);
@@ -44,7 +46,7 @@ export function ProductListPage() {
     setLoading(false);
   };
 
-  useEffect(() => { fetchProducts(); }, [page, search]);
+  useEffect(() => { fetchProducts(); }, [page, search, sortBy, sortOrder]);
 
   const handleSubmit = async () => {
     try {
@@ -103,6 +105,14 @@ export function ProductListPage() {
     },
     { key: 'category', header: 'Kategori', render: (p) => p.category || '-' },
     {
+      key: 'total_sold',
+      header: 'Satilan',
+      align: 'right',
+      render: (p) => (
+        <strong>{p.total_sold ?? '-'}</strong>
+      )
+    },
+    {
       key: 'stock_quantity',
       header: 'Stok',
       align: 'right',
@@ -149,6 +159,28 @@ export function ProductListPage() {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
+          </div>
+          <div className={styles.sortWrapper}>
+            <select
+              className={styles.sortSelect}
+              value={`${sortBy}_${sortOrder}`}
+              onChange={(e) => {
+                const [field, order] = e.target.value.split('_');
+                setSortBy(field);
+                setSortOrder(order as 'asc' | 'desc');
+                setPage(1);
+              }}
+            >
+              <option value="total_sold_desc">En Cok Satan</option>
+              <option value="total_sold_asc">En Az Satan</option>
+              <option value="name_asc">Ada Gore (A-Z)</option>
+              <option value="name_desc">Ada Gore (Z-A)</option>
+              <option value="stock_quantity_asc">Stok (Az-Cok)</option>
+              <option value="stock_quantity_desc">Stok (Cok-Az)</option>
+              <option value="sale_price_desc">Fiyat (Yuksek-Dusuk)</option>
+              <option value="sale_price_asc">Fiyat (Dusuk-Yuksek)</option>
+              <option value="created_at_desc">En Yeni</option>
+            </select>
           </div>
         </div>
 

@@ -4,7 +4,7 @@ import { CreateProductDto, UpdateProductDto } from './dto';
 import { PaginationDto } from '../../common/dto/pagination.dto';
 import { validateSortColumn } from '../../common/utils/validate-sort';
 
-const ALLOWED_SORT_COLUMNS = ['name', 'stock_quantity', 'sale_price', 'purchase_price', 'category', 'barcode', 'created_at'];
+const ALLOWED_SORT_COLUMNS = ['name', 'stock_quantity', 'sale_price', 'purchase_price', 'category', 'barcode', 'created_at', 'total_sold'];
 
 @Controller('products')
 export class ProductsController {

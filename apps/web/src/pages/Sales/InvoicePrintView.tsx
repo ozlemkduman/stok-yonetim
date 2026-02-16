@@ -123,6 +123,18 @@ export const InvoicePrintView = forwardRef<HTMLDivElement, InvoicePrintViewProps
               </tr>
             ))}
           </tbody>
+          <tfoot>
+            <tr className={styles.totalRow}>
+              <td colSpan={3} className={styles.right}><strong>Toplam Adet:</strong></td>
+              <td className={styles.right}>
+                <strong>{data.items.reduce((sum, item) => sum + item.quantity, 0)}</strong>
+              </td>
+              <td></td>
+              {data.items.some(i => i.discount_rate > 0) && <td></td>}
+              {data.include_vat && <><td></td><td></td></>}
+              <td></td>
+            </tr>
+          </tfoot>
         </table>
 
         {/* Totals */}

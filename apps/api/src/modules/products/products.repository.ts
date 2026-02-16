@@ -39,7 +39,7 @@ export class ProductsRepository extends BaseTenantRepository<Product> {
     super(db);
   }
 
-  async findAll(params: ProductListParams): Promise<{ items: Product[]; total: number }> {
+  async findAll(params: ProductListParams): Promise<{ items: (Product & { total_sold?: number })[]; total: number }> {
     const { page, limit, search, category, sortBy, sortOrder, isActive, lowStock } = params;
     const offset = (page - 1) * limit;
 
@@ -47,39 +47,49 @@ export class ProductsRepository extends BaseTenantRepository<Product> {
     let countQuery = this.query.clone();
 
     if (isActive !== undefined) {
-      query = query.where('is_active', isActive);
-      countQuery = countQuery.where('is_active', isActive);
+      query = query.where(`${this.tableName}.is_active`, isActive);
+      countQuery = countQuery.where(`${this.tableName}.is_active`, isActive);
     }
 
     if (category) {
-      query = query.where('category', category);
-      countQuery = countQuery.where('category', category);
+      query = query.where(`${this.tableName}.category`, category);
+      countQuery = countQuery.where(`${this.tableName}.category`, category);
     }
 
     if (lowStock) {
-      query = query.whereRaw('stock_quantity <= min_stock_level');
-      countQuery = countQuery.whereRaw('stock_quantity <= min_stock_level');
+      query = query.whereRaw(`${this.tableName}.stock_quantity <= ${this.tableName}.min_stock_level`);
+      countQuery = countQuery.whereRaw(`${this.tableName}.stock_quantity <= ${this.tableName}.min_stock_level`);
     }
 
     if (search) {
       const searchTerm = `%${search}%`;
-      query = query.where((builder) => {
+      const searchFilter = (builder: any) => {
         builder
-          .whereILike('name', searchTerm)
-          .orWhereILike('barcode', searchTerm)
-          .orWhereILike('category', searchTerm);
-      });
-      countQuery = countQuery.where((builder) => {
-        builder
-          .whereILike('name', searchTerm)
-          .orWhereILike('barcode', searchTerm)
-          .orWhereILike('category', searchTerm);
-      });
+          .whereILike(`${this.tableName}.name`, searchTerm)
+          .orWhereILike(`${this.tableName}.barcode`, searchTerm)
+          .orWhereILike(`${this.tableName}.category`, searchTerm);
+      };
+      query = query.where(searchFilter);
+      countQuery = countQuery.where(searchFilter);
+    }
+
+    // Satis adedine gore siralama
+    if (sortBy === 'total_sold') {
+      query = query
+        .leftJoin(
+          this.knex.raw(
+            `(SELECT product_id, COALESCE(SUM(si.quantity), 0) as total_sold FROM sale_items si JOIN sales s ON si.sale_id = s.id WHERE s.status = 'completed' GROUP BY si.product_id) as sold_agg ON sold_agg.product_id = ${this.tableName}.id`
+          )
+        )
+        .select(`${this.tableName}.*`, this.knex.raw('COALESCE(sold_agg.total_sold, 0) as total_sold'))
+        .orderBy('total_sold', sortOrder);
+    } else {
+      query = query.select(`${this.tableName}.*`).orderBy(`${this.tableName}.${sortBy}`, sortOrder);
     }
 
     const [items, [{ count }]] = await Promise.all([
-      query.orderBy(sortBy, sortOrder).limit(limit).offset(offset).select('*'),
-      countQuery.count('id as count'),
+      query.limit(limit).offset(offset),
+      countQuery.count(`${this.tableName}.id as count`),
     ]);
 
     return { items, total: parseInt(count as string, 10) };

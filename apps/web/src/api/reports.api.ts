@@ -55,6 +55,35 @@ export interface ExpenseByCategory {
   count: number;
 }
 
+export interface CustomerSaleItem {
+  sale_id: string;
+  product_name: string;
+  quantity: number;
+  unit_price: number;
+  line_total: number;
+}
+
+export interface CustomerSale {
+  id: string;
+  invoice_number: string;
+  sale_date: string;
+  grand_total: number;
+  payment_method: string;
+  customer_id: string;
+  customer_name: string;
+  customer_phone: string | null;
+  items: CustomerSaleItem[];
+}
+
+export interface CustomerProductPurchase {
+  customer_id: string;
+  customer_name: string;
+  product_id: string;
+  product_name: string;
+  total_quantity: number;
+  total_amount: number;
+}
+
 export const reportsApi = {
   getSalesSummary: (startDate: string, endDate: string) =>
     apiClient.get<any>('/reports/sales-summary', { startDate, endDate }),
@@ -75,6 +104,10 @@ export const reportsApi = {
     apiClient.get<{ products: StockReportProduct[]; summary: any }>('/reports/stock-report'),
   getReturnsReport: (startDate: string, endDate: string) =>
     apiClient.get<{ returns: ReturnReport[]; summary: any; byReason: any[]; topReturnedProducts: any[] }>('/reports/returns-report', { startDate, endDate }),
+  getCustomerSales: (startDate: string, endDate: string) =>
+    apiClient.get<CustomerSale[]>('/reports/customer-sales', { startDate, endDate }),
+  getCustomerProductPurchases: (startDate: string, endDate: string) =>
+    apiClient.get<CustomerProductPurchase[]>('/reports/customer-product-purchases', { startDate, endDate }),
   getExpensesByCategory: (startDate: string, endDate: string) =>
     apiClient.get<{ byCategory: ExpenseByCategory[]; summary: any; monthlyTrend: any[] }>('/reports/expenses-by-category', { startDate, endDate }),
 };

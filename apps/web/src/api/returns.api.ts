@@ -45,6 +45,7 @@ export interface CreateReturnItem {
   product_id: string;
   quantity: number;
   unit_price: number;
+  vat_rate?: number;
   sale_item_id?: string;
 }
 

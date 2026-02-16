@@ -16,6 +16,10 @@ export class ReturnItemDto {
   @IsNumber()
   @Min(0)
   unit_price: number;
+
+  @IsOptional()
+  @IsNumber()
+  vat_rate?: number;
 }
 
 export class CreateReturnDto {
