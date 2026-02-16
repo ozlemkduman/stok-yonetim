@@ -46,6 +46,8 @@ services:
       NODE_ENV: production
       DATABASE_URL: postgres://${DB_USER:-stok_user}:${DB_PASSWORD:-stok_pass}@postgres:5432/${DB_NAME:-stok_db}
       PORT: 3000
+      SUPER_ADMIN_EMAIL: admin@stoksayac.com
+      SUPER_ADMIN_PASSWORD: StokSayac2026!
     depends_on:
       postgres:
         condition: service_healthy
