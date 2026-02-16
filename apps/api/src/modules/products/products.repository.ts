@@ -75,12 +75,16 @@ export class ProductsRepository extends BaseTenantRepository<Product> {
 
     // Satis adedine gore siralama
     if (sortBy === 'total_sold') {
+      const subquery = this.knex('sale_items as si')
+        .join('sales as s', 'si.sale_id', 's.id')
+        .where('s.status', 'completed')
+        .select('si.product_id')
+        .sum('si.quantity as total_sold')
+        .groupBy('si.product_id')
+        .as('sold_agg');
+
       query = query
-        .leftJoin(
-          this.knex.raw(
-            `(SELECT product_id, COALESCE(SUM(si.quantity), 0) as total_sold FROM sale_items si JOIN sales s ON si.sale_id = s.id WHERE s.status = 'completed' GROUP BY si.product_id) as sold_agg ON sold_agg.product_id = ${this.tableName}.id`
-          )
-        )
+        .leftJoin(subquery, `sold_agg.product_id`, `${this.tableName}.id`)
         .select(`${this.tableName}.*`, this.knex.raw('COALESCE(sold_agg.total_sold, 0) as total_sold'))
         .orderBy('total_sold', sortOrder);
     } else {
