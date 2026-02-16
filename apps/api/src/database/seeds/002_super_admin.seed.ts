@@ -6,17 +6,23 @@ export async function seed(knex: Knex): Promise<void> {
   const password = process.env.SUPER_ADMIN_PASSWORD || 'StokSayac2026!';
   const passwordHash = await bcrypt.hash(password, 12);
 
-  // Check if this exact admin already exists
+  // Check if any super_admin exists
   const existingAdmin = await knex('users')
-    .where({ email, role: 'super_admin' })
+    .where({ role: 'super_admin' })
     .first();
 
   if (existingAdmin) {
+    // Update existing super_admin with new email and password
+    await knex('users')
+      .where({ id: existingAdmin.id })
+      .update({
+        email,
+        password_hash: passwordHash,
+        name: 'Platform Admin',
+        status: 'active',
+      });
     return;
   }
-
-  // Remove any old super_admin accounts
-  await knex('users').where({ role: 'super_admin' }).del();
 
   await knex('users').insert({
     email,
