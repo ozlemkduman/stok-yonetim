@@ -8,6 +8,7 @@ import { AuthRepository } from './auth.repository';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { LocalStrategy } from './strategies/local.strategy';
 import { GoogleStrategy } from './strategies/google.strategy';
+import { EmailService } from '../../common/services/email.service';
 import jwtConfig from '../../config/jwt.config';
 
 @Module({
@@ -26,7 +27,7 @@ import jwtConfig from '../../config/jwt.config';
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, AuthRepository, JwtStrategy, LocalStrategy, GoogleStrategy],
+  providers: [AuthService, AuthRepository, JwtStrategy, LocalStrategy, GoogleStrategy, EmailService],
   exports: [AuthService, AuthRepository],
 })
 export class AuthModule {}

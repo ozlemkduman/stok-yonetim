@@ -3,6 +3,7 @@ import { ToastProvider } from './context/ToastContext';
 import { AuthProvider } from './context/AuthContext';
 import { TenantProvider } from './context/TenantContext';
 import { ConfirmDialogProvider } from './context/ConfirmDialogContext';
+import { HelpProvider } from './context/HelpContext';
 import { ErrorBoundary } from './components/ErrorBoundary';
 
 function App() {
@@ -12,7 +13,9 @@ function App() {
         <TenantProvider>
           <ToastProvider>
             <ConfirmDialogProvider>
-              <AppRouter />
+              <HelpProvider>
+                <AppRouter />
+              </HelpProvider>
             </ConfirmDialogProvider>
           </ToastProvider>
         </TenantProvider>

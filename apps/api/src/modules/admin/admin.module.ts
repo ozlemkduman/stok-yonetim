@@ -15,6 +15,7 @@ import { TenantsRepository } from './repositories/tenants.repository';
 import { PlansRepository } from './repositories/plans.repository';
 import { AdminUsersRepository } from './repositories/admin-users.repository';
 import { InvitationsRepository } from './repositories/invitations.repository';
+import { EmailService } from '../../common/services/email.service';
 
 @Module({
   controllers: [
@@ -36,6 +37,7 @@ import { InvitationsRepository } from './repositories/invitations.repository';
     PlansRepository,
     AdminUsersRepository,
     InvitationsRepository,
+    EmailService,
   ],
   exports: [
     AdminTenantsService,

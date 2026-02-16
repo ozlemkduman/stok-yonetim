@@ -9,16 +9,16 @@ import styles from './QuoteDetailPage.module.css';
 
 const STATUS_LABELS: Record<string, string> = {
   draft: 'Taslak',
-  sent: 'Gonderildi',
+  sent: 'Gönderildi',
   accepted: 'Kabul Edildi',
   rejected: 'Reddedildi',
-  expired: 'Suresi Doldu',
-  converted: 'Satisa Donusturuldu',
+  expired: 'Süresi Doldu',
+  converted: 'Satışa Dönüştürüldü',
 };
 
 const PAYMENT_METHOD_OPTIONS = [
   { value: 'nakit', label: 'Nakit' },
-  { value: 'kredi_karti', label: 'Kredi Karti' },
+  { value: 'kredi_karti', label: 'Kredi Kartı' },
   { value: 'havale', label: 'Havale/EFT' },
   { value: 'veresiye', label: 'Veresiye' },
 ];
@@ -44,7 +44,7 @@ export function QuoteDetailPage() {
         const response = await quotesApi.getById(id);
         setQuote(response.data);
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Teklif yuklenemedi');
+        setError(err instanceof Error ? err.message : 'Teklif yüklenemedi');
       } finally {
         setLoading(false);
       }
@@ -59,9 +59,9 @@ export function QuoteDetailPage() {
     try {
       const response = await quotesApi.send(quote.id);
       setQuote({ ...quote, ...response.data });
-      showToast('success', 'Teklif gonderildi');
+      showToast('success', 'Teklif gönderildi');
     } catch (err) {
-      showToast('error', err instanceof Error ? err.message : 'Islem basarisiz');
+      showToast('error', err instanceof Error ? err.message : 'İşlem başarısız');
     } finally {
       setActionLoading(false);
     }
@@ -75,7 +75,7 @@ export function QuoteDetailPage() {
       setQuote({ ...quote, ...response.data });
       showToast('success', 'Teklif kabul edildi');
     } catch (err) {
-      showToast('error', err instanceof Error ? err.message : 'Islem basarisiz');
+      showToast('error', err instanceof Error ? err.message : 'İşlem başarısız');
     } finally {
       setActionLoading(false);
     }
@@ -83,7 +83,7 @@ export function QuoteDetailPage() {
 
   const handleReject = async () => {
     if (!quote) return;
-    const confirmed = await confirm({ message: 'Teklifi reddetmek istediginizden emin misiniz?', variant: 'warning' });
+    const confirmed = await confirm({ message: 'Teklifi reddetmek istediğinizden emin misiniz?', variant: 'warning' });
     if (!confirmed) return;
     setActionLoading(true);
     try {
@@ -91,7 +91,7 @@ export function QuoteDetailPage() {
       setQuote({ ...quote, ...response.data });
       showToast('success', 'Teklif reddedildi');
     } catch (err) {
-      showToast('error', err instanceof Error ? err.message : 'Islem basarisiz');
+      showToast('error', err instanceof Error ? err.message : 'İşlem başarısız');
     } finally {
       setActionLoading(false);
     }
@@ -102,13 +102,13 @@ export function QuoteDetailPage() {
     setActionLoading(true);
     try {
       await quotesApi.convertToSale(quote.id, { payment_method: convertPaymentMethod });
-      showToast('success', 'Teklif satisa donusturuldu');
+      showToast('success', 'Teklif satışa dönüştürüldü');
       setShowConvertModal(false);
       // Refresh quote data
       const response = await quotesApi.getById(quote.id);
       setQuote(response.data);
     } catch (err) {
-      showToast('error', err instanceof Error ? err.message : 'Islem basarisiz');
+      showToast('error', err instanceof Error ? err.message : 'İşlem başarısız');
     } finally {
       setActionLoading(false);
     }
@@ -116,7 +116,7 @@ export function QuoteDetailPage() {
 
   const handleDelete = async () => {
     if (!quote) return;
-    const confirmed = await confirm({ message: `"${quote.quote_number}" teklifini silmek istediginizden emin misiniz?`, variant: 'danger' });
+    const confirmed = await confirm({ message: `"${quote.quote_number}" teklifini silmek istediğinizden emin misiniz?`, variant: 'danger' });
     if (!confirmed) return;
     setActionLoading(true);
     try {
@@ -124,7 +124,7 @@ export function QuoteDetailPage() {
       showToast('success', 'Teklif silindi');
       navigate('/quotes');
     } catch (err) {
-      showToast('error', err instanceof Error ? err.message : 'Silme islemi basarisiz');
+      showToast('error', err instanceof Error ? err.message : 'Silme işlemi başarısız');
     } finally {
       setActionLoading(false);
     }
@@ -154,16 +154,16 @@ export function QuoteDetailPage() {
     const today = new Date();
     const diffDays = Math.ceil((validUntil.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
 
-    if (diffDays < 0) return { text: 'Suresi doldu', variant: 'danger' as const };
-    if (diffDays === 0) return { text: 'Bugun son gun', variant: 'warning' as const };
-    if (diffDays <= 3) return { text: `${diffDays} gun kaldi`, variant: 'warning' as const };
-    return { text: `${diffDays} gun kaldi`, variant: 'default' as const };
+    if (diffDays < 0) return { text: 'Süresi doldu', variant: 'danger' as const };
+    if (diffDays === 0) return { text: 'Bugün son gün', variant: 'warning' as const };
+    if (diffDays <= 3) return { text: `${diffDays} gün kaldı`, variant: 'warning' as const };
+    return { text: `${diffDays} gün kaldı`, variant: 'default' as const };
   };
 
   if (loading) {
     return (
       <div className={styles.page}>
-        <div className={styles.loading}>Yukleniyor...</div>
+        <div className={styles.loading}>Yükleniyor...</div>
       </div>
     );
   }
@@ -171,8 +171,8 @@ export function QuoteDetailPage() {
   if (error || !quote) {
     return (
       <div className={styles.page}>
-        <div className={styles.error}>{error || 'Teklif bulunamadi'}</div>
-        <Button onClick={() => navigate('/quotes')}>Geri Don</Button>
+        <div className={styles.error}>{error || 'Teklif bulunamadı'}</div>
+        <Button onClick={() => navigate('/quotes')}>Geri Dön</Button>
       </div>
     );
   }
@@ -228,18 +228,18 @@ export function QuoteDetailPage() {
               <span className={styles.infoValue}>{formatDate(quote.quote_date)}</span>
             </div>
             <div className={styles.infoItem}>
-              <span className={styles.infoLabel}>Gecerlilik Tarihi</span>
+              <span className={styles.infoLabel}>Geçerlilik Tarihi</span>
               <span className={`${styles.infoValue} ${validityStatus?.variant === 'danger' ? styles.expired : validityStatus?.variant === 'warning' ? styles.warning : ''}`}>
                 {formatDate(quote.valid_until)}
               </span>
             </div>
             <div className={styles.infoItem}>
-              <span className={styles.infoLabel}>Musteri</span>
-              <span className={styles.infoValue}>{quote.customer_name || 'Belirtilmemis'}</span>
+              <span className={styles.infoLabel}>Müşteri</span>
+              <span className={styles.infoValue}>{quote.customer_name || 'Belirtilmemiş'}</span>
             </div>
             <div className={styles.infoItem}>
               <span className={styles.infoLabel}>KDV Dahil</span>
-              <span className={styles.infoValue}>{quote.include_vat ? 'Evet' : 'Hayir'}</span>
+              <span className={styles.infoValue}>{quote.include_vat ? 'Evet' : 'Hayır'}</span>
             </div>
             {quote.notes && (
               <div className={styles.infoItem}>
@@ -251,11 +251,11 @@ export function QuoteDetailPage() {
         </Card>
 
         <Card className={styles.actionsCard}>
-          <h3>Islemler</h3>
+          <h3>İşlemler</h3>
           <div className={styles.actionButtons}>
             {canSend && (
               <Button onClick={handleSend} disabled={actionLoading}>
-                Gonder
+                Gönder
               </Button>
             )}
             {canAcceptReject && (
@@ -270,7 +270,7 @@ export function QuoteDetailPage() {
             )}
             {canConvert && (
               <Button variant="primary" onClick={() => setShowConvertModal(true)} disabled={actionLoading}>
-                Satisa Donustur
+                Satışa Dönüştür
               </Button>
             )}
             {canDelete && (
@@ -281,9 +281,9 @@ export function QuoteDetailPage() {
           </div>
           {quote.converted_sale_id && (
             <div className={styles.convertedInfo}>
-              <span className={styles.convertedLabel}>Satisa Donusturuldu</span>
+              <span className={styles.convertedLabel}>Satışa Dönüştürüldü</span>
               <Button variant="ghost" size="sm" onClick={() => navigate(`/sales/${quote.converted_sale_id}`)}>
-                Satisi Gor
+                Satışı Gör
               </Button>
             </div>
           )}
@@ -297,10 +297,10 @@ export function QuoteDetailPage() {
           <table className={styles.itemsTable}>
             <thead>
               <tr>
-                <th>Urun</th>
+                <th>Ürün</th>
                 <th className={styles.alignRight}>Miktar</th>
                 <th className={styles.alignRight}>Birim Fiyat</th>
-                <th className={styles.alignRight}>Iskonto</th>
+                <th className={styles.alignRight}>İskonto</th>
                 <th className={styles.alignRight}>KDV</th>
                 <th className={styles.alignRight}>Toplam</th>
               </tr>
@@ -324,7 +324,7 @@ export function QuoteDetailPage() {
               ) : (
                 <tr>
                   <td colSpan={6} className={styles.emptyItems}>
-                    Teklif kalemi bulunamadi
+                    Teklif kalemi bulunamadı
                   </td>
                 </tr>
               )}
@@ -342,7 +342,7 @@ export function QuoteDetailPage() {
             {(quote.discount_amount > 0 || quote.discount_rate > 0) && (
               <div className={styles.totalRow}>
                 <span className={styles.totalRowLabel}>
-                  Iskonto {quote.discount_rate > 0 && `(%${quote.discount_rate})`}
+                  İskonto {quote.discount_rate > 0 && `(%${quote.discount_rate})`}
                 </span>
                 <span className={styles.totalRowValue}>-{formatCurrency(quote.discount_amount)}</span>
               </div>
@@ -363,12 +363,12 @@ export function QuoteDetailPage() {
       {showConvertModal && (
         <div className={styles.modalOverlay} onClick={() => setShowConvertModal(false)}>
           <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
-            <h3 className={styles.modalTitle}>Satisa Donustur</h3>
+            <h3 className={styles.modalTitle}>Satışa Dönüştür</h3>
             <p className={styles.modalDescription}>
-              Bu teklifi satisa donusturmek icin odeme yontemini secin.
+              Bu teklifi satışa dönüştürmek için ödeme yöntemini seçin.
             </p>
             <div className={styles.modalField}>
-              <label className={styles.modalLabel}>Odeme Yontemi</label>
+              <label className={styles.modalLabel}>Ödeme Yöntemi</label>
               <Select
                 options={PAYMENT_METHOD_OPTIONS}
                 value={convertPaymentMethod}
@@ -377,10 +377,10 @@ export function QuoteDetailPage() {
             </div>
             <div className={styles.modalActions}>
               <Button variant="ghost" onClick={() => setShowConvertModal(false)} disabled={actionLoading}>
-                Iptal
+                İptal
               </Button>
               <Button variant="primary" onClick={handleConvertToSale} disabled={actionLoading}>
-                {actionLoading ? 'Donusturuluyor...' : 'Donustur'}
+                {actionLoading ? 'Dönüştürülüyor...' : 'Dönüştür'}
               </Button>
             </div>
           </div>

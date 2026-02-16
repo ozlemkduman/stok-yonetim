@@ -168,10 +168,10 @@ export function DashboardPage() {
   ];
 
   const debtorColumns: Column<any>[] = [
-    { key: 'name', header: 'Musteri' },
+    { key: 'name', header: 'Müşteri' },
     {
       key: 'balance',
-      header: 'Borc Tutari',
+      header: 'Borç Tutarı',
       align: 'right',
       render: (c) => (
         <span style={{ color: 'var(--color-danger)', fontWeight: 600 }}>

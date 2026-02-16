@@ -62,33 +62,33 @@ export function CustomerListPage() {
   };
 
   const handleDelete = async (customer: Customer) => {
-    const confirmed = await confirm({ message: `"${customer.name}" musterisini silmek istediginizden emin misiniz?`, variant: 'danger' });
+    const confirmed = await confirm({ message: `"${customer.name}" müşterisini silmek istediğinizden emin misiniz?`, variant: 'danger' });
     if (!confirmed) {
       return;
     }
 
     try {
       await deleteCustomer(customer.id);
-      showToast('success', 'Musteri basariyla silindi');
+      showToast('success', 'Müşteri başarıyla silindi');
     } catch (err) {
-      showToast('error', err instanceof Error ? err.message : 'Silme islemi basarisiz');
+      showToast('error', err instanceof Error ? err.message : 'Silme işlemi başarısız');
     }
   };
 
   const handleSubmit = async (data: CreateCustomerData) => {
     if (editingCustomer) {
       await updateCustomer(editingCustomer.id, data);
-      showToast('success', 'Musteri basariyla guncellendi');
+      showToast('success', 'Müşteri başarıyla güncellendi');
     } else {
       await createCustomer(data);
-      showToast('success', 'Musteri basariyla eklendi');
+      showToast('success', 'Müşteri başarıyla eklendi');
     }
   };
 
   const columns: Column<Customer>[] = [
     {
       key: 'name',
-      header: 'Musteri Adi',
+      header: 'Müşteri Adı',
       render: (customer) => (
         <div className={styles.customerName}>
           <span className={styles.name}>{customer.name}</span>
@@ -138,7 +138,7 @@ export function CustomerListPage() {
             Detay
           </Button>
           <Button size="sm" variant="ghost" onClick={(e) => { e.stopPropagation(); handleEdit(customer); }}>
-            Duzenle
+            Düzenle
           </Button>
           <Button
             size="sm"
@@ -158,18 +158,18 @@ export function CustomerListPage() {
         <div className={styles.headerLeft}>
           <h1 className={styles.title}>
             <span className={styles.titleIcon}>{icons.customers}</span>
-            Musteriler
+            Müşteriler
           </h1>
-          <p className={styles.subtitle}>Toplam {total} musteri kaydi</p>
+          <p className={styles.subtitle}>Toplam {total} müşteri kaydı</p>
         </div>
-        <Button onClick={handleCreate}>+ Yeni Musteri</Button>
+        <Button onClick={handleCreate}>+ Yeni Müşteri</Button>
       </div>
 
       <div className={styles.card}>
         <div className={styles.toolbar}>
           <form onSubmit={handleSearch} className={styles.searchForm}>
             <Input
-              placeholder="Musteri ara..."
+              placeholder="Müşteri ara..."
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
             />
@@ -186,7 +186,7 @@ export function CustomerListPage() {
           data={customers}
           keyExtractor={(customer) => customer.id}
           loading={loading}
-          emptyMessage="Musteri bulunamadi"
+          emptyMessage="Müşteri bulunamadı"
           onRowClick={handleRowClick}
         />
 

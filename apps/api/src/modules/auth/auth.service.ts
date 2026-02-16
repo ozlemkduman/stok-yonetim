@@ -10,6 +10,7 @@ import * as bcrypt from 'bcrypt';
 import { AuthRepository, User, Tenant } from './auth.repository';
 import { RegisterDto } from './dto/register.dto';
 import { JwtPayload } from './strategies/jwt.strategy';
+import { EmailService } from '../../common/services/email.service';
 
 export interface AuthTokens {
   accessToken: string;
@@ -40,6 +41,7 @@ export class AuthService {
     private readonly authRepository: AuthRepository,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
+    private readonly emailService: EmailService,
   ) {}
 
   async validateUser(email: string, password: string): Promise<User | null> {
@@ -338,9 +340,7 @@ export class AuthService {
 
     await this.authRepository.createPasswordResetToken(user.id, tokenHash, expiresAt);
 
-    // TODO: Send email with reset link
-    // For now, just log the token (remove in production)
-    console.log(`Password reset token for ${email}: ${token}`);
+    await this.emailService.sendPasswordReset(email, token);
 
     return { message: 'Şifre sıfırlama bağlantısı e-posta adresinize gönderildi' };
   }

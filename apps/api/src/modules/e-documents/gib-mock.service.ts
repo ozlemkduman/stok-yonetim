@@ -17,72 +17,31 @@ export interface GibStatusResult {
 
 @Injectable()
 export class GibMockService {
-  /**
-   * Mock GIB e-Document submission
-   * In real implementation, this would call GIB web services
-   */
   async sendDocument(documentType: string, xmlContent: string): Promise<GibSendResult> {
-    // Simulate network delay
-    await this.delay(500);
+    await this.delay(1500);
 
-    // Generate mock GIB UUIDs
     const gibUuid = uuidv4().toUpperCase();
     const envelopeUuid = uuidv4().toUpperCase();
 
-    // Randomly succeed (90% success rate for testing)
-    const success = Math.random() > 0.1;
-
-    if (success) {
-      return {
-        success: true,
-        gibUuid,
-        envelopeUuid,
-        responseCode: '1000',
-        responseMessage: 'Belge basariyla gonderildi',
-      };
-    } else {
-      return {
-        success: false,
-        gibUuid: '',
-        envelopeUuid: '',
-        responseCode: '2000',
-        responseMessage: 'Belge gonderiminde hata olustu',
-      };
-    }
+    return {
+      success: true,
+      gibUuid,
+      envelopeUuid,
+      responseCode: '1000',
+      responseMessage: 'Belge basariyla gonderildi',
+    };
   }
 
-  /**
-   * Mock GIB status check
-   */
   async checkStatus(gibUuid: string): Promise<GibStatusResult> {
-    await this.delay(300);
+    await this.delay(1000);
 
-    // Simulate different statuses
-    const rand = Math.random();
-    if (rand < 0.7) {
-      return {
-        status: 'approved',
-        responseCode: '1200',
-        responseMessage: 'Belge onaylandi',
-      };
-    } else if (rand < 0.9) {
-      return {
-        status: 'pending',
-        responseCode: '1100',
-        responseMessage: 'Belge isleniyor',
-      };
-    } else {
-      return {
-        status: 'rejected',
-        responseCode: '2100',
-        responseMessage: 'Belge reddedildi: Gecersiz vergi numarasi',
-      };
-    }
+    return {
+      status: 'approved',
+      responseCode: '1200',
+      responseMessage: 'Belge onaylandi',
+    };
   }
 
-  /**
-   * Generate mock e-Invoice XML
-   */
   generateEInvoiceXml(data: {
     documentNumber: string;
     issueDate: Date;
@@ -141,9 +100,6 @@ export class GibMockService {
 </Invoice>`;
   }
 
-  /**
-   * Generate mock waybill XML
-   */
   generateWaybillXml(data: {
     documentNumber: string;
     issueDate: Date;

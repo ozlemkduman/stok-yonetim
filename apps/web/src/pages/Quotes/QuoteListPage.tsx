@@ -21,21 +21,21 @@ const icons = {
 
 const STATUS_LABELS: Record<string, string> = {
   draft: 'Taslak',
-  sent: 'Gonderildi',
+  sent: 'Gönderildi',
   accepted: 'Kabul Edildi',
   rejected: 'Reddedildi',
-  expired: 'Suresi Doldu',
-  converted: 'Satisa Donusturuldu',
+  expired: 'Süresi Doldu',
+  converted: 'Satışa Dönüştürüldü',
 };
 
 const STATUS_OPTIONS = [
-  { value: '', label: 'Tum Durumlar' },
+  { value: '', label: 'Tüm Durumlar' },
   { value: 'draft', label: 'Taslak' },
-  { value: 'sent', label: 'Gonderildi' },
+  { value: 'sent', label: 'Gönderildi' },
   { value: 'accepted', label: 'Kabul Edildi' },
   { value: 'rejected', label: 'Reddedildi' },
-  { value: 'expired', label: 'Suresi Doldu' },
-  { value: 'converted', label: 'Satisa Donusturuldu' },
+  { value: 'expired', label: 'Süresi Doldu' },
+  { value: 'converted', label: 'Satışa Dönüştürüldü' },
 ];
 
 export function QuoteListPage() {
@@ -67,7 +67,7 @@ export function QuoteListPage() {
       setTotal(response.meta?.total || 0);
       setTotalPages(response.meta?.totalPages || 1);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Teklifler yuklenirken hata olustu');
+      setError(err instanceof Error ? err.message : 'Teklifler yüklenirken hata oluştu');
     } finally {
       setLoading(false);
     }
@@ -91,10 +91,10 @@ export function QuoteListPage() {
   const handleSend = async (quote: Quote) => {
     try {
       await quotesApi.send(quote.id);
-      showToast('success', 'Teklif gonderildi');
+      showToast('success', 'Teklif gönderildi');
       fetchQuotes();
     } catch (err) {
-      showToast('error', err instanceof Error ? err.message : 'Islem basarisiz');
+      showToast('error', err instanceof Error ? err.message : 'İşlem başarısız');
     }
   };
 
@@ -104,43 +104,43 @@ export function QuoteListPage() {
       showToast('success', 'Teklif kabul edildi');
       fetchQuotes();
     } catch (err) {
-      showToast('error', err instanceof Error ? err.message : 'Islem basarisiz');
+      showToast('error', err instanceof Error ? err.message : 'İşlem başarısız');
     }
   };
 
   const handleReject = async (quote: Quote) => {
-    const confirmed = await confirm({ message: 'Teklifi reddetmek istediginizden emin misiniz?', variant: 'warning' });
+    const confirmed = await confirm({ message: 'Teklifi reddetmek istediğinizden emin misiniz?', variant: 'warning' });
     if (!confirmed) return;
     try {
       await quotesApi.reject(quote.id);
       showToast('success', 'Teklif reddedildi');
       fetchQuotes();
     } catch (err) {
-      showToast('error', err instanceof Error ? err.message : 'Islem basarisiz');
+      showToast('error', err instanceof Error ? err.message : 'İşlem başarısız');
     }
   };
 
   const handleConvert = async (quote: Quote) => {
-    const confirmed = await confirm({ message: 'Teklifi satisa donusturmek istediginizden emin misiniz?', variant: 'warning' });
+    const confirmed = await confirm({ message: 'Teklifi satışa dönüştürmek istediğinizden emin misiniz?', variant: 'warning' });
     if (!confirmed) return;
     try {
       await quotesApi.convertToSale(quote.id, { payment_method: 'nakit' });
-      showToast('success', 'Teklif satisa donusturuldu');
+      showToast('success', 'Teklif satışa dönüştürüldü');
       fetchQuotes();
     } catch (err) {
-      showToast('error', err instanceof Error ? err.message : 'Islem basarisiz');
+      showToast('error', err instanceof Error ? err.message : 'İşlem başarısız');
     }
   };
 
   const handleDelete = async (quote: Quote) => {
-    const confirmed = await confirm({ message: `"${quote.quote_number}" teklifini silmek istediginizden emin misiniz?`, variant: 'danger' });
+    const confirmed = await confirm({ message: `"${quote.quote_number}" teklifini silmek istediğinizden emin misiniz?`, variant: 'danger' });
     if (!confirmed) return;
     try {
       await quotesApi.delete(quote.id);
       showToast('success', 'Teklif silindi');
       fetchQuotes();
     } catch (err) {
-      showToast('error', err instanceof Error ? err.message : 'Silme islemi basarisiz');
+      showToast('error', err instanceof Error ? err.message : 'Silme işlemi başarısız');
     }
   };
 
@@ -172,7 +172,7 @@ export function QuoteListPage() {
     },
     {
       key: 'valid_until',
-      header: 'Gecerlilik',
+      header: 'Geçerlilik',
       render: (q) => (
         <span className={`${styles.validUntil} ${getValidUntilClass(q.valid_until, q.status)}`}>
           {formatDate(q.valid_until)}
@@ -207,7 +207,7 @@ export function QuoteListPage() {
       render: (q) => (
         <div className={styles.actions}>
           {q.status === 'draft' && (
-            <Button size="sm" variant="ghost" onClick={() => handleSend(q)}>Gonder</Button>
+            <Button size="sm" variant="ghost" onClick={() => handleSend(q)}>Gönder</Button>
           )}
           {['draft', 'sent'].includes(q.status) && (
             <>
@@ -216,7 +216,7 @@ export function QuoteListPage() {
             </>
           )}
           {['draft', 'sent', 'accepted'].includes(q.status) && (
-            <Button size="sm" variant="ghost" onClick={() => handleConvert(q)}>Satisa Don.</Button>
+            <Button size="sm" variant="ghost" onClick={() => handleConvert(q)}>Satışa Dön.</Button>
           )}
           {q.status !== 'converted' && (
             <Button size="sm" variant="ghost" onClick={() => handleDelete(q)}>Sil</Button>
@@ -268,7 +268,7 @@ export function QuoteListPage() {
           data={quotes}
           keyExtractor={(q) => q.id}
           loading={loading}
-          emptyMessage="Teklif bulunamadi"
+          emptyMessage="Teklif bulunamadı"
         />
 
         {totalPages > 1 && (

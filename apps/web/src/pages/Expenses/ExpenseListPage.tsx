@@ -40,7 +40,7 @@ export function ExpenseListPage() {
       setTotalPages(response.meta?.totalPages || 1);
       setTotal(response.meta?.total || 0);
     } catch {
-      showToast('error', 'Giderler yuklenemedi');
+      showToast('error', 'Giderler yüklenemedi');
     }
     setLoading(false);
   };
@@ -51,7 +51,7 @@ export function ExpenseListPage() {
     try {
       if (editingExpense) {
         await expensesApi.update(editingExpense.id, formData);
-        showToast('success', 'Gider guncellendi');
+        showToast('success', 'Gider güncellendi');
       } else {
         await expensesApi.create(formData);
         showToast('success', 'Gider eklendi');
@@ -64,14 +64,14 @@ export function ExpenseListPage() {
   };
 
   const handleDelete = async (expense: Expense) => {
-    const confirmed = await confirm({ message: 'Bu gideri silmek istediginizden emin misiniz?', variant: 'danger' });
+    const confirmed = await confirm({ message: 'Bu gideri silmek istediğinizden emin misiniz?', variant: 'danger' });
     if (!confirmed) return;
     try {
       await expensesApi.delete(expense.id);
       showToast('success', 'Gider silindi');
       fetchExpenses();
     } catch {
-      showToast('error', 'Silme basarisiz');
+      showToast('error', 'Silme başarısız');
     }
   };
 
@@ -100,7 +100,7 @@ export function ExpenseListPage() {
         <Badge>{EXPENSE_CATEGORIES[e.category as keyof typeof EXPENSE_CATEGORIES] || e.category}</Badge>
       )
     },
-    { key: 'description', header: 'Aciklama', render: (e) => e.description || '-' },
+    { key: 'description', header: 'Açıklama', render: (e) => e.description || '-' },
     {
       key: 'amount',
       header: 'Tutar',
@@ -119,7 +119,7 @@ export function ExpenseListPage() {
       width: '100px',
       render: (e) => (
         <div className={styles.actions}>
-          <Button size="sm" variant="ghost" onClick={() => openModal(e)}>Duzenle</Button>
+          <Button size="sm" variant="ghost" onClick={() => openModal(e)}>Düzenle</Button>
           <Button size="sm" variant="ghost" onClick={() => handleDelete(e)}>Sil</Button>
         </div>
       )
@@ -134,7 +134,7 @@ export function ExpenseListPage() {
             <span className={styles.titleIcon}>{icons.expenses}</span>
             Giderler
           </h1>
-          <p className={styles.subtitle}>Toplam {total} gider kaydi</p>
+          <p className={styles.subtitle}>Toplam {total} gider kaydı</p>
         </div>
         <Button onClick={() => openModal()}>+ Yeni Gider</Button>
       </div>
@@ -145,7 +145,7 @@ export function ExpenseListPage() {
           data={expenses}
           keyExtractor={(e) => e.id}
           loading={loading}
-          emptyMessage="Gider bulunamadi"
+          emptyMessage="Gider bulunamadı"
         />
         {totalPages > 1 && (
           <div className={styles.pagination}>
@@ -157,11 +157,11 @@ export function ExpenseListPage() {
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        title={editingExpense ? 'Gider Duzenle' : 'Yeni Gider'}
+        title={editingExpense ? 'Gider Düzenle' : 'Yeni Gider'}
         footer={
           <>
-            <Button variant="secondary" onClick={() => setIsModalOpen(false)}>Iptal</Button>
-            <Button onClick={handleSubmit}>{editingExpense ? 'Guncelle' : 'Kaydet'}</Button>
+            <Button variant="secondary" onClick={() => setIsModalOpen(false)}>İptal</Button>
+            <Button onClick={handleSubmit}>{editingExpense ? 'Güncelle' : 'Kaydet'}</Button>
           </>
         }
       >
@@ -188,7 +188,7 @@ export function ExpenseListPage() {
             fullWidth
           />
           <Input
-            label="Aciklama"
+            label="Açıklama"
             value={formData.description || ''}
             onChange={(e) => setFormData({ ...formData, description: e.target.value })}
             fullWidth

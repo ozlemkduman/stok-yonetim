@@ -39,7 +39,7 @@ export function ProductListPage() {
       setTotalPages(response.meta?.totalPages || 1);
       setTotal(response.meta?.total || 0);
     } catch (err) {
-      showToast('error', 'Urunler yuklenemedi');
+      showToast('error', 'Ürünler yüklenemedi');
     }
     setLoading(false);
   };
@@ -50,27 +50,27 @@ export function ProductListPage() {
     try {
       if (editingProduct) {
         await productsApi.update(editingProduct.id, formData);
-        showToast('success', 'Urun guncellendi');
+        showToast('success', 'Ürün güncellendi');
       } else {
         await productsApi.create(formData);
-        showToast('success', 'Urun eklendi');
+        showToast('success', 'Ürün eklendi');
       }
       setIsModalOpen(false);
       fetchProducts();
     } catch (err) {
-      showToast('error', err instanceof Error ? err.message : 'Hata olustu');
+      showToast('error', err instanceof Error ? err.message : 'Hata oluştu');
     }
   };
 
   const handleDelete = async (product: Product) => {
-    const confirmed = await confirm({ message: `"${product.name}" urununu silmek istediginizden emin misiniz?`, variant: 'danger' });
+    const confirmed = await confirm({ message: `"${product.name}" ürününü silmek istediğinizden emin misiniz?`, variant: 'danger' });
     if (!confirmed) return;
     try {
       await productsApi.delete(product.id);
-      showToast('success', 'Urun silindi');
+      showToast('success', 'Ürün silindi');
       fetchProducts();
     } catch (err) {
-      showToast('error', err instanceof Error ? err.message : 'Silme basarisiz');
+      showToast('error', err instanceof Error ? err.message : 'Silme başarısız');
     }
   };
 
@@ -93,7 +93,7 @@ export function ProductListPage() {
   const columns: Column<Product>[] = [
     {
       key: 'name',
-      header: 'Urun Adi',
+      header: 'Ürün Adı',
       render: (p) => (
         <div className={styles.productName}>
           <span className={styles.name} onClick={() => navigate(`/products/${p.id}`)} style={{ cursor: 'pointer' }}>{p.name}</span>
@@ -112,8 +112,8 @@ export function ProductListPage() {
         </Badge>
       )
     },
-    { key: 'purchase_price', header: 'Alis Fiyati', align: 'right', render: (p) => formatCurrency(p.purchase_price) },
-    { key: 'sale_price', header: 'Satis Fiyati', align: 'right', render: (p) => formatCurrency(p.sale_price) },
+    { key: 'purchase_price', header: 'Alış Fiyatı', align: 'right', render: (p) => formatCurrency(p.purchase_price) },
+    { key: 'sale_price', header: 'Satış Fiyatı', align: 'right', render: (p) => formatCurrency(p.sale_price) },
     {
       key: 'actions',
       header: '',
@@ -121,7 +121,7 @@ export function ProductListPage() {
       render: (p) => (
         <div className={styles.actions}>
           <Button size="sm" variant="ghost" onClick={() => navigate(`/products/${p.id}`)}>Detay</Button>
-          <Button size="sm" variant="ghost" onClick={() => openModal(p)}>Duzenle</Button>
+          <Button size="sm" variant="ghost" onClick={() => openModal(p)}>Düzenle</Button>
           <Button size="sm" variant="ghost" onClick={() => handleDelete(p)}>Sil</Button>
         </div>
       )
@@ -134,18 +134,18 @@ export function ProductListPage() {
         <div className={styles.headerLeft}>
           <h1 className={styles.title}>
             <span className={styles.titleIcon}>{icons.products}</span>
-            Urunler
+            Ürünler
           </h1>
-          <p className={styles.subtitle}>Toplam {total} urun kaydi</p>
+          <p className={styles.subtitle}>Toplam {total} ürün kaydı</p>
         </div>
-        <Button onClick={() => openModal()}>+ Yeni Urun</Button>
+        <Button onClick={() => openModal()}>+ Yeni Ürün</Button>
       </div>
 
       <div className={styles.card}>
         <div className={styles.toolbar}>
           <div className={styles.searchWrapper}>
             <Input
-              placeholder="Urun ara..."
+              placeholder="Ürün ara..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
@@ -157,7 +157,7 @@ export function ProductListPage() {
           data={products}
           keyExtractor={(p) => p.id}
           loading={loading}
-          emptyMessage="Urun bulunamadi"
+          emptyMessage="Ürün bulunamadı"
         />
 
         {totalPages > 1 && (
@@ -170,24 +170,24 @@ export function ProductListPage() {
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        title={editingProduct ? 'Urun Duzenle' : 'Yeni Urun'}
+        title={editingProduct ? 'Ürün Düzenle' : 'Yeni Ürün'}
         size="lg"
         footer={
           <>
-            <Button variant="secondary" onClick={() => setIsModalOpen(false)}>Iptal</Button>
-            <Button onClick={handleSubmit}>{editingProduct ? 'Guncelle' : 'Kaydet'}</Button>
+            <Button variant="secondary" onClick={() => setIsModalOpen(false)}>İptal</Button>
+            <Button onClick={handleSubmit}>{editingProduct ? 'Güncelle' : 'Kaydet'}</Button>
           </>
         }
       >
         <div className={styles.form}>
-          <Input label="Urun Adi *" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} fullWidth />
+          <Input label="Ürün Adı *" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} fullWidth />
           <Input label="Barkod" value={formData.barcode || ''} onChange={(e) => setFormData({ ...formData, barcode: e.target.value })} fullWidth />
           <Input label="Kategori" value={formData.category || ''} onChange={(e) => setFormData({ ...formData, category: e.target.value })} fullWidth />
           <Input label="Birim" value={formData.unit || 'adet'} onChange={(e) => setFormData({ ...formData, unit: e.target.value })} fullWidth />
-          <Input label="Alis Fiyati *" type="number" value={formData.purchase_price} onChange={(e) => setFormData({ ...formData, purchase_price: parseFloat(e.target.value) || 0 })} fullWidth />
-          <Input label="Satis Fiyati *" type="number" value={formData.sale_price} onChange={(e) => setFormData({ ...formData, sale_price: parseFloat(e.target.value) || 0 })} fullWidth />
-          <Input label="KDV Orani (%)" type="number" value={formData.vat_rate || 20} onChange={(e) => setFormData({ ...formData, vat_rate: parseFloat(e.target.value) || 0 })} fullWidth />
-          <Input label="Stok Miktari" type="number" value={formData.stock_quantity || 0} onChange={(e) => setFormData({ ...formData, stock_quantity: parseInt(e.target.value) || 0 })} fullWidth />
+          <Input label="Alış Fiyatı *" type="number" value={formData.purchase_price} onChange={(e) => setFormData({ ...formData, purchase_price: parseFloat(e.target.value) || 0 })} fullWidth />
+          <Input label="Satış Fiyatı *" type="number" value={formData.sale_price} onChange={(e) => setFormData({ ...formData, sale_price: parseFloat(e.target.value) || 0 })} fullWidth />
+          <Input label="KDV Oranı (%)" type="number" value={formData.vat_rate || 20} onChange={(e) => setFormData({ ...formData, vat_rate: parseFloat(e.target.value) || 0 })} fullWidth />
+          <Input label="Stok Miktarı" type="number" value={formData.stock_quantity || 0} onChange={(e) => setFormData({ ...formData, stock_quantity: parseInt(e.target.value) || 0 })} fullWidth />
           <Input label="Kritik Stok Seviyesi" type="number" value={formData.min_stock_level || 5} onChange={(e) => setFormData({ ...formData, min_stock_level: parseInt(e.target.value) || 0 })} fullWidth />
         </div>
       </Modal>

@@ -80,7 +80,7 @@ export function SaleListPage() {
         noVatCount: allSales.filter(s => !s.include_vat).length,
       });
     } catch (err) {
-      showToast('error', 'Satislar yuklenemedi');
+      showToast('error', 'Satışlar yüklenemedi');
     }
     setLoading(false);
   };
@@ -93,14 +93,14 @@ export function SaleListPage() {
   };
 
   const handleCancel = async (sale: Sale) => {
-    const confirmed = await confirm({ message: `${sale.invoice_number} numarali satisi iptal etmek istediginizden emin misiniz?`, variant: 'danger' });
+    const confirmed = await confirm({ message: `${sale.invoice_number} numaralı satışı iptal etmek istediğinizden emin misiniz?`, variant: 'danger' });
     if (!confirmed) return;
     try {
       await salesApi.cancel(sale.id);
-      showToast('success', 'Satis iptal edildi');
+      showToast('success', 'Satış iptal edildi');
       fetchSales();
     } catch (err) {
-      showToast('error', err instanceof Error ? err.message : 'Iptal basarisiz');
+      showToast('error', err instanceof Error ? err.message : 'İptal başarısız');
     }
   };
 
@@ -114,7 +114,7 @@ export function SaleListPage() {
         </button>
       )
     },
-    { key: 'customer_name', header: 'Musteri', render: (s) => s.customer_name || 'Perakende' },
+    { key: 'customer_name', header: 'Müşteri', render: (s) => s.customer_name || 'Perakende' },
     { key: 'sale_date', header: 'Tarih', render: (s) => formatDateTime(s.sale_date) },
     {
       key: 'grand_total',
@@ -124,7 +124,7 @@ export function SaleListPage() {
     },
     {
       key: 'payment_method',
-      header: 'Odeme',
+      header: 'Ödeme',
       render: (s) => PAYMENT_METHODS[s.payment_method as keyof typeof PAYMENT_METHODS] || s.payment_method
     },
     {
@@ -146,7 +146,7 @@ export function SaleListPage() {
       header: '',
       width: '80px',
       render: (s) => s.status === 'completed' && (
-        <Button size="sm" variant="ghost" onClick={() => handleCancel(s)}>Iptal</Button>
+        <Button size="sm" variant="ghost" onClick={() => handleCancel(s)}>İptal</Button>
       )
     },
   ];
@@ -157,12 +157,12 @@ export function SaleListPage() {
         <div className={styles.headerLeft}>
           <h1 className={styles.title}>
             <span className={styles.titleIcon}>{icons.sales}</span>
-            Satislar
+            Satışlar
           </h1>
-          <p className={styles.subtitle}>Satis islemleri ve fatura yonetimi</p>
+          <p className={styles.subtitle}>Satış işlemleri ve fatura yönetimi</p>
         </div>
         <Button onClick={() => navigate('/sales/new')}>
-          + Yeni Satis
+          + Yeni Satış
         </Button>
       </div>
 
@@ -178,7 +178,7 @@ export function SaleListPage() {
           <div className={`${styles.statIcon} ${styles.success}`}>{icons.count}</div>
           <div className={styles.statContent}>
             <span className={styles.statValue}>{stats.count}</span>
-            <span className={styles.statLabel}>Toplam Satis</span>
+            <span className={styles.statLabel}>Toplam Satış</span>
           </div>
         </div>
         <div className={styles.statCard}>
@@ -192,7 +192,7 @@ export function SaleListPage() {
           <div className={`${styles.statIcon} ${styles.danger}`}>{icons.cancelled}</div>
           <div className={styles.statContent}>
             <span className={styles.statValue}>{stats.cancelled}</span>
-            <span className={styles.statLabel}>Iptal Edilen</span>
+            <span className={styles.statLabel}>İptal Edilen</span>
           </div>
         </div>
       </div>
@@ -202,7 +202,7 @@ export function SaleListPage() {
           className={`${styles.tab} ${vatFilter === 'all' ? styles.tabActive : ''}`}
           onClick={() => handleVatFilterChange('all')}
         >
-          Tum Satislar
+          Tüm Satışlar
         </button>
         <button
           className={`${styles.tab} ${vatFilter === 'with_vat' ? styles.tabActive : ''}`}
@@ -214,7 +214,7 @@ export function SaleListPage() {
           className={`${styles.tab} ${vatFilter === 'without_vat' ? styles.tabActive : ''}`}
           onClick={() => handleVatFilterChange('without_vat')}
         >
-          KDV'siz Satislar
+          KDV'siz Satışlar
           {stats.noVatCount > 0 && <span className={styles.tabBadge}>{stats.noVatCount}</span>}
         </button>
       </div>
@@ -225,7 +225,7 @@ export function SaleListPage() {
           data={sales}
           keyExtractor={(s) => s.id}
           loading={loading}
-          emptyMessage="Satis bulunamadi"
+          emptyMessage="Satış bulunamadı"
         />
         {totalPages > 1 && (
           <div className={styles.pagination}>

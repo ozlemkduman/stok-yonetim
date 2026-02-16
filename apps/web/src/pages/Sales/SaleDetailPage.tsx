@@ -29,7 +29,7 @@ export function SaleDetailPage() {
         const response = await salesApi.getDetail(id);
         setData(response.data);
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Veri yuklenemedi');
+        setError(err instanceof Error ? err.message : 'Veri yüklenemedi');
       } finally {
         setLoading(false);
       }
@@ -40,18 +40,18 @@ export function SaleDetailPage() {
 
   const handleCancel = async () => {
     if (!data || !id) return;
-    const confirmed = await confirm({ message: `${data.invoice_number} numarali satisi iptal etmek istediginizden emin misiniz?`, variant: 'danger' });
+    const confirmed = await confirm({ message: `${data.invoice_number} numaralı satışı iptal etmek istediğinizden emin misiniz?`, variant: 'danger' });
     if (!confirmed) return;
 
     setCancelling(true);
     try {
       await salesApi.cancel(id);
-      showToast('success', 'Satis iptal edildi');
+      showToast('success', 'Satış iptal edildi');
       // Refresh data
       const response = await salesApi.getDetail(id);
       setData(response.data);
     } catch (err) {
-      showToast('error', err instanceof Error ? err.message : 'Iptal basarisiz');
+      showToast('error', err instanceof Error ? err.message : 'İptal başarısız');
     } finally {
       setCancelling(false);
     }
@@ -60,7 +60,7 @@ export function SaleDetailPage() {
   if (loading) {
     return (
       <div className={styles.page}>
-        <div className={styles.loading}>Yukleniyor...</div>
+        <div className={styles.loading}>Yükleniyor...</div>
       </div>
     );
   }
@@ -68,8 +68,8 @@ export function SaleDetailPage() {
   if (error || !data) {
     return (
       <div className={styles.page}>
-        <div className={styles.error}>{error || 'Satis bulunamadi'}</div>
-        <Button onClick={() => navigate('/sales')}>Geri Don</Button>
+        <div className={styles.error}>{error || 'Satış bulunamadı'}</div>
+        <Button onClick={() => navigate('/sales')}>Geri Dön</Button>
       </div>
     );
   }
@@ -83,7 +83,7 @@ export function SaleDetailPage() {
       <div className={styles.header}>
         <div className={styles.headerLeft}>
           <Button variant="ghost" onClick={() => navigate('/sales')}>
-            &#8592; Satislar
+            &#8592; Satışlar
           </Button>
           <h1 className={styles.title}>{data.invoice_number}</h1>
           <div className={styles.saleMeta}>
@@ -100,11 +100,11 @@ export function SaleDetailPage() {
               <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" />
               <rect x="6" y="14" width="12" height="8" />
             </svg>
-            Yazdir
+            Yazdır
           </Button>
           {canCancel && (
             <Button variant="danger" onClick={handleCancel} disabled={cancelling}>
-              {cancelling ? 'Iptal Ediliyor...' : 'Satisi Iptal Et'}
+              {cancelling ? 'İptal Ediliyor...' : 'Satışı İptal Et'}
             </Button>
           )}
         </div>
@@ -114,7 +114,7 @@ export function SaleDetailPage() {
       <div className={styles.infoGrid}>
         {/* Sale Info Card */}
         <Card className={styles.infoCard}>
-          <h3>Satis Bilgileri</h3>
+          <h3>Satış Bilgileri</h3>
           <div className={styles.infoList}>
             <div className={styles.infoItem}>
               <span className={styles.infoLabel}>Fatura No</span>
@@ -125,7 +125,7 @@ export function SaleDetailPage() {
               <span className={styles.infoValue}>{formatDate(data.sale_date)}</span>
             </div>
             <div className={styles.infoItem}>
-              <span className={styles.infoLabel}>Musteri</span>
+              <span className={styles.infoLabel}>Müşteri</span>
               <span className={styles.infoValue}>
                 {data.customer_name ? (
                   <button
@@ -135,12 +135,12 @@ export function SaleDetailPage() {
                     {data.customer_name}
                   </button>
                 ) : (
-                  'Perakende Satis'
+                  'Perakende Satış'
                 )}
               </span>
             </div>
             <div className={styles.infoItem}>
-              <span className={styles.infoLabel}>Odeme Yontemi</span>
+              <span className={styles.infoLabel}>Ödeme Yöntemi</span>
               <span className={styles.infoValue}>
                 {PAYMENT_METHODS[data.payment_method as keyof typeof PAYMENT_METHODS] || data.payment_method}
               </span>
@@ -171,7 +171,7 @@ export function SaleDetailPage() {
             {data.discount_amount > 0 && (
               <div className={styles.totalItem}>
                 <span className={styles.totalLabel}>
-                  Iskonto {data.discount_rate > 0 ? `(%${data.discount_rate})` : ''}
+                  İskonto {data.discount_rate > 0 ? `(%${data.discount_rate})` : ''}
                 </span>
                 <span className={`${styles.totalValue} ${styles.discount}`}>
                   -{formatCurrency(data.discount_amount)}
@@ -192,16 +192,16 @@ export function SaleDetailPage() {
 
       {/* Sale Items */}
       <Card className={styles.itemsCard}>
-        <h3>Satis Kalemleri ({data.items.length})</h3>
+        <h3>Satış Kalemleri ({data.items.length})</h3>
         <div className={styles.tableWrapper}>
           <table className={styles.itemsTable}>
             <thead>
               <tr>
-                <th>Urun</th>
+                <th>Ürün</th>
                 <th>Barkod</th>
                 <th className={styles.alignRight}>Miktar</th>
                 <th className={styles.alignRight}>Birim Fiyat</th>
-                <th className={styles.alignRight}>Iskonto</th>
+                <th className={styles.alignRight}>İskonto</th>
                 <th className={styles.alignRight}>KDV (%)</th>
                 <th className={styles.alignRight}>KDV Tutar</th>
                 <th className={styles.alignRight}>Toplam</th>
@@ -230,7 +230,7 @@ export function SaleDetailPage() {
               </tr>
               {data.discount_amount > 0 && (
                 <tr>
-                  <td colSpan={7}>Iskonto</td>
+                  <td colSpan={7}>İskonto</td>
                   <td className={styles.alignRight}>-{formatCurrency(data.discount_amount)}</td>
                 </tr>
               )}
@@ -249,12 +249,12 @@ export function SaleDetailPage() {
 
       {/* Payments */}
       <Card className={styles.paymentsCard}>
-        <h3>Odeme Bilgileri ({data.payments.length})</h3>
+        <h3>Ödeme Bilgileri ({data.payments.length})</h3>
         {data.payments.length === 0 ? (
           <div className={styles.emptyState}>
             {data.payment_method === 'veresiye'
-              ? 'Henuz odeme yapilmamis (Veresiye satis)'
-              : 'Odeme pesin olarak alinmistir'}
+              ? 'Henüz ödeme yapılmamış (Veresiye satış)'
+              : 'Ödeme peşin olarak alınmıştır'}
           </div>
         ) : (
           <div className={styles.tableWrapper}>
@@ -262,7 +262,7 @@ export function SaleDetailPage() {
               <thead>
                 <tr>
                   <th>Tarih</th>
-                  <th>Odeme Yontemi</th>
+                  <th>Ödeme Yöntemi</th>
                   <th>Notlar</th>
                   <th className={styles.alignRight}>Tutar</th>
                 </tr>
@@ -283,7 +283,7 @@ export function SaleDetailPage() {
               </tbody>
               <tfoot>
                 <tr>
-                  <td colSpan={3}>Toplam Odeme</td>
+                  <td colSpan={3}>Toplam Ödeme</td>
                   <td className={`${styles.alignRight} ${styles.paymentAmount}`}>
                     {formatCurrency(data.payments.reduce((sum, p) => sum + p.amount, 0))}
                   </td>

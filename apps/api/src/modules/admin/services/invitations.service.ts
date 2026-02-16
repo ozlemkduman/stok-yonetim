@@ -3,6 +3,7 @@ import { randomBytes } from 'crypto';
 import { InvitationsRepository, Invitation } from '../repositories/invitations.repository';
 import { TenantsRepository } from '../repositories/tenants.repository';
 import { AdminUsersRepository } from '../repositories/admin-users.repository';
+import { EmailService } from '../../../common/services/email.service';
 
 export interface CreateInvitationDto {
   email: string;
@@ -17,6 +18,7 @@ export class InvitationsService {
     private readonly invitationsRepository: InvitationsRepository,
     private readonly tenantsRepository: TenantsRepository,
     private readonly usersRepository: AdminUsersRepository,
+    private readonly emailService: EmailService,
   ) {}
 
   async createInvitation(dto: CreateInvitationDto, invitedBy: string): Promise<Invitation> {
@@ -62,8 +64,7 @@ export class InvitationsService {
       expires_at: expiresAt,
     });
 
-    // TODO: Send invitation email
-    // await this.emailService.sendInvitation(dto.email, token, dto.tenantName);
+    await this.emailService.sendInvitation(dto.email, token, dto.tenantName);
 
     return invitation;
   }

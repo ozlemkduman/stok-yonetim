@@ -33,7 +33,10 @@ async function bootstrap() {
   const port = configService.get<number>('app.port', 3001);
   await app.listen(port);
 
-  console.log(`Application running on: http://localhost:${port}/${apiPrefix}`);
+  const logger = app.get(ConfigService).get<string>('NODE_ENV') === 'development'
+    ? console.log
+    : () => {};
+  logger(`Application running on port ${port} with prefix /${apiPrefix}`);
 }
 
 bootstrap();
