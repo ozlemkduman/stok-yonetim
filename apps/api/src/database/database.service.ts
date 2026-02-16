@@ -1,9 +1,11 @@
-import { Injectable, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
+import { Injectable, Logger, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import knex, { Knex } from 'knex';
+import { seed as demoSeed } from './seeds/003_demo_tenant.seed';
 
 @Injectable()
 export class DatabaseService implements OnModuleInit, OnModuleDestroy {
+  private readonly logger = new Logger(DatabaseService.name);
   private _knex: Knex;
 
   constructor(private readonly configService: ConfigService) {}
@@ -21,9 +23,17 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
     // Test connection
     try {
       await this._knex.raw('SELECT 1');
-      console.log('Database connected successfully');
+      this.logger.log('Database connected successfully');
+
+      // Run demo seed on startup
+      try {
+        await demoSeed(this._knex);
+        this.logger.log('Demo seed check completed');
+      } catch (seedError) {
+        this.logger.warn('Demo seed failed (non-fatal)', seedError);
+      }
     } catch (error) {
-      console.error('Database connection failed:', error);
+      this.logger.error('Database connection failed', error);
       throw error;
     }
   }
