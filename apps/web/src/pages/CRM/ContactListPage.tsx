@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Table, Button, Card, Input, Select, type Column } from '@stok/ui';
 import { crmApi, CrmContact } from '../../api/crm.api';
 import { useConfirmDialog } from '../../context/ConfirmDialogContext';
+import { useToast } from '../../context/ToastContext';
 import { ContactFormModal } from './ContactFormModal';
 import styles from './ContactListPage.module.css';
 
@@ -25,6 +26,7 @@ const sourceLabels: Record<string, string> = {
 export function ContactListPage() {
   const navigate = useNavigate();
   const { confirm } = useConfirmDialog();
+  const { showToast } = useToast();
   const [contacts, setContacts] = useState<CrmContact[]>([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
@@ -48,7 +50,7 @@ export function ContactListPage() {
         setTotalPages(response.meta.totalPages);
       }
     } catch (error) {
-      console.error('Kisiler yuklenemedi:', error);
+      showToast('error', 'Kisiler yuklenemedi');
     } finally {
       setLoading(false);
     }
@@ -80,7 +82,7 @@ export function ContactListPage() {
       await crmApi.deleteContact(id);
       fetchContacts();
     } catch (error) {
-      console.error('Silme hatasi:', error);
+      showToast('error', 'Kisi silinemedi');
     }
   };
 

@@ -4,6 +4,9 @@ import { GibMockService } from './gib-mock.service';
 import { CreateEDocumentDto } from './dto';
 import { DatabaseService } from '../../database/database.service';
 import { SalesRepository } from '../sales/sales.repository';
+import { validateSortColumn } from '../../common/utils/validate-sort';
+
+const ALLOWED_SORT_COLUMNS = ['issue_date', 'total_amount', 'document_number', 'document_type', 'status', 'created_at'];
 
 @Injectable()
 export class EDocumentsService {
@@ -35,7 +38,7 @@ export class EDocumentsService {
       customerId: params.customerId,
       startDate: params.startDate,
       endDate: params.endDate,
-      sortBy: params.sortBy || 'created_at',
+      sortBy: validateSortColumn(params.sortBy || 'created_at', ALLOWED_SORT_COLUMNS, 'created_at'),
       sortOrder: params.sortOrder || 'desc',
     });
   }

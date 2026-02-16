@@ -101,8 +101,7 @@ export function IntegrationFormModal({ integration, onClose, onSuccess }: Props)
       }
       onSuccess();
     } catch (error) {
-      console.error('Kayit hatasi:', error);
-      showToast('error', 'Islem basarisiz');
+      showToast('error', 'Entegrasyon kaydedilemedi');
     } finally {
       setLoading(false);
     }

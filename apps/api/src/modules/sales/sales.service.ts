@@ -54,7 +54,11 @@ export class SalesService {
       const saleItems: Partial<SaleItem>[] = [];
 
       for (const item of dto.items) {
-        const product = await this.productsRepository.findById(item.product_id);
+        // Lock product row and check stock inside transaction
+        const product = await trx('products')
+          .where('id', item.product_id)
+          .forUpdate()
+          .first();
         if (!product) throw new BadRequestException(`Urun bulunamadi: ${item.product_id}`);
         if (product.stock_quantity < item.quantity) {
           throw new BadRequestException(`Yetersiz stok: ${product.name}`);

@@ -61,8 +61,7 @@ export function ContactFormModal({ contact, onClose, onSuccess }: Props) {
       }
       onSuccess();
     } catch (error) {
-      console.error('Kayit hatasi:', error);
-      showToast('error', 'Islem basarisiz');
+      showToast('error', 'Kisi kaydedilemedi');
     } finally {
       setLoading(false);
     }

@@ -93,7 +93,7 @@ export function EDocumentListPage() {
       const response = await eDocumentsApi.getSummary();
       setSummary(response.data);
     } catch (err) {
-      console.error('Summary fetch error:', err);
+      showToast('error', 'Ozet bilgileri yuklenemedi');
     }
   }, []);
 

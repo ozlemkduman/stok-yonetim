@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Button, Spinner } from '@stok/ui';
+import { useToast } from '../../context/ToastContext';
 import { reportsApi, TopProduct, TopCustomer, UpcomingPayment, OverduePayment, StockReportProduct, ExpenseByCategory } from '../../api/reports.api';
 import { formatCurrency, formatDate } from '../../utils/formatters';
 import { EXPENSE_CATEGORIES } from '../../utils/constants';
@@ -75,6 +76,7 @@ const icons = {
 type TabType = 'genel' | 'satis' | 'musteri' | 'stok' | 'gider';
 
 export function ReportsPage() {
+  const { showToast } = useToast();
   const [activeTab, setActiveTab] = useState<TabType>('genel');
   const [startDate, setStartDate] = useState(() => {
     const d = new Date();
@@ -122,7 +124,7 @@ export function ReportsPage() {
       setReturnsReport(returns.data);
       setExpensesReport(expenses.data);
     } catch (err) {
-      console.error('Report fetch error:', err);
+      showToast('error', 'Rapor yuklenemedi');
     }
     setLoading(false);
   }, [startDate, endDate]);

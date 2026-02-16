@@ -33,8 +33,7 @@ export function RouteFormModal({ route, onClose, onSuccess }: Props) {
       }
       onSuccess();
     } catch (error) {
-      console.error('Kayit hatasi:', error);
-      showToast('error', 'Islem basarisiz');
+      showToast('error', 'Rota kaydedilemedi');
     } finally {
       setLoading(false);
     }

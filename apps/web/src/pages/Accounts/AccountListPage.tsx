@@ -89,7 +89,7 @@ export function AccountListPage() {
       const response = await accountsApi.getSummary();
       setSummary(response.data);
     } catch (err) {
-      console.error('Summary fetch error:', err);
+      showToast('error', 'Hesap ozeti yuklenemedi');
     }
   }, []);
 

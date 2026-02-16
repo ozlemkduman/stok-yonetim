@@ -12,6 +12,9 @@ import {
 import { CustomersService } from './customers.service';
 import { CreateCustomerDto, UpdateCustomerDto } from './dto';
 import { PaginationDto } from '../../common/dto/pagination.dto';
+import { validateSortColumn } from '../../common/utils/validate-sort';
+
+const ALLOWED_SORT_COLUMNS = ['name', 'balance', 'phone', 'email', 'created_at'];
 
 @Controller('customers')
 export class CustomersController {
@@ -25,7 +28,7 @@ export class CustomersController {
       page,
       limit,
       search: query.search,
-      sortBy: query.sortBy || 'created_at',
+      sortBy: validateSortColumn(query.sortBy || 'created_at', ALLOWED_SORT_COLUMNS, 'created_at'),
       sortOrder: query.sortOrder || 'desc',
       isActive: query.isActive === 'true' ? true : query.isActive === 'false' ? false : undefined,
     };

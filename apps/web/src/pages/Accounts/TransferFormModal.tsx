@@ -32,7 +32,7 @@ export function TransferFormModal({ isOpen, onClose, onSubmit }: TransferFormMod
       const response = await accountsApi.getAll({ isActive: true, limit: 100 });
       setAccounts(response.data);
     } catch (error) {
-      console.error('Failed to load accounts:', error);
+      showToast('error', 'Hesaplar yuklenemedi');
     }
   };
 
@@ -66,7 +66,7 @@ export function TransferFormModal({ isOpen, onClose, onSubmit }: TransferFormMod
       });
       onClose();
     } catch (error) {
-      console.error('Form submit error:', error);
+      showToast('error', 'Transfer yapilamadi');
     } finally {
       setLoading(false);
     }

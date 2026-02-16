@@ -58,7 +58,7 @@ export function IntegrationListPage() {
       const response = await integrationsApi.getIntegrations();
       setIntegrations(response.data);
     } catch (error) {
-      console.error('Entegrasyonlar yuklenemedi:', error);
+      showToast('error', 'Entegrasyonlar yuklenemedi');
     } finally {
       setLoading(false);
     }
@@ -83,9 +83,10 @@ export function IntegrationListPage() {
     if (!confirmed) return;
     try {
       await integrationsApi.deleteIntegration(id);
+      showToast('success', 'Entegrasyon silindi');
       fetchIntegrations();
     } catch (error) {
-      console.error('Silme hatasi:', error);
+      showToast('error', 'Entegrasyon silinemedi');
     }
   };
 

@@ -2,6 +2,9 @@ import { Controller, Get, Post, Body, Query } from '@nestjs/common';
 import { PaymentsService } from './payments.service';
 import { CreatePaymentDto } from './dto';
 import { PaginationDto } from '../../common/dto/pagination.dto';
+import { validateSortColumn } from '../../common/utils/validate-sort';
+
+const ALLOWED_SORT_COLUMNS = ['payment_date', 'amount', 'method', 'created_at'];
 
 @Controller('payments')
 export class PaymentsController {
@@ -16,7 +19,7 @@ export class PaymentsController {
       limit,
       customerId: query.customerId,
       method: query.method,
-      sortBy: query.sortBy || 'payment_date',
+      sortBy: validateSortColumn(query.sortBy || 'payment_date', ALLOWED_SORT_COLUMNS, 'payment_date'),
       sortOrder: query.sortOrder || 'desc',
     });
     return {

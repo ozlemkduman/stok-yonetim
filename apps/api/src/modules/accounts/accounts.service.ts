@@ -2,6 +2,9 @@ import { Injectable, NotFoundException, BadRequestException } from '@nestjs/comm
 import { AccountsRepository, Account, AccountMovement, AccountTransfer } from './accounts.repository';
 import { CreateAccountDto, UpdateAccountDto, CreateMovementDto, CreateTransferDto } from './dto';
 import { DatabaseService } from '../../database/database.service';
+import { validateSortColumn } from '../../common/utils/validate-sort';
+
+const ALLOWED_SORT_COLUMNS = ['name', 'account_type', 'current_balance', 'created_at'];
 
 @Injectable()
 export class AccountsService {
@@ -20,7 +23,7 @@ export class AccountsService {
   }) {
     const page = params.page || 1;
     const limit = params.limit || 20;
-    const sortBy = params.sortBy || 'created_at';
+    const sortBy = validateSortColumn(params.sortBy || 'created_at', ALLOWED_SORT_COLUMNS, 'created_at');
     const sortOrder = params.sortOrder || 'desc';
     const isActive = params.isActive === 'true' ? true : params.isActive === 'false' ? false : undefined;
 
@@ -153,11 +156,15 @@ export class AccountsService {
       throw new BadRequestException('Pasif hesaplar arasinda transfer yapilamaz');
     }
 
-    if (Number(fromAccount.current_balance) < dto.amount) {
-      throw new BadRequestException('Yetersiz bakiye');
-    }
-
     return this.db.transaction(async (trx) => {
+      // Lock accounts and check balance inside transaction
+      const lockedFrom = await trx('accounts').where('id', dto.from_account_id).forUpdate().first();
+      const lockedTo = await trx('accounts').where('id', dto.to_account_id).forUpdate().first();
+
+      if (Number(lockedFrom.current_balance) < dto.amount) {
+        throw new BadRequestException('Yetersiz bakiye');
+      }
+
       const transferDate = dto.transfer_date ? new Date(dto.transfer_date) : new Date();
 
       // Create transfer record
@@ -170,7 +177,7 @@ export class AccountsService {
       }, trx);
 
       // Create movement for source account
-      const fromNewBalance = Number(fromAccount.current_balance) - dto.amount;
+      const fromNewBalance = Number(lockedFrom.current_balance) - dto.amount;
       await this.repository.createMovement({
         account_id: dto.from_account_id,
         movement_type: 'transfer_out',
@@ -183,7 +190,7 @@ export class AccountsService {
       }, trx);
 
       // Create movement for destination account
-      const toNewBalance = Number(toAccount.current_balance) + dto.amount;
+      const toNewBalance = Number(lockedTo.current_balance) + dto.amount;
       await this.repository.createMovement({
         account_id: dto.to_account_id,
         movement_type: 'transfer_in',

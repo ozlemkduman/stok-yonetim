@@ -33,7 +33,7 @@ export function PlansListPage() {
       const response = await adminPlansApi.getAll(true);
       setPlans(response.data);
     } catch (error) {
-      console.error('Failed to load plans:', error);
+      showToast('error', 'Planlar yuklenemedi');
     } finally {
       setIsLoading(false);
     }
@@ -80,7 +80,7 @@ export function PlansListPage() {
       setIsModalOpen(false);
       loadPlans();
     } catch (error) {
-      console.error('Failed to save plan:', error);
+      showToast('error', 'Plan kaydedilemedi');
     }
   };
 
@@ -92,7 +92,6 @@ export function PlansListPage() {
       await adminPlansApi.delete(id);
       loadPlans();
     } catch (error) {
-      console.error('Failed to delete plan:', error);
       showToast('error', 'Plan silinemedi. Plan kullanımda olabilir.');
     }
   };

@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Card, Table, Button, Input, Badge, Pagination, type Column } from '@stok/ui';
 import { adminTenantsApi, Tenant } from '../../api/admin/tenants.api';
 import { useConfirmDialog } from '../../context/ConfirmDialogContext';
+import { useToast } from '../../context/ToastContext';
 import styles from './AdminPages.module.css';
 
 const statusColors: Record<string, 'success' | 'warning' | 'danger' | 'default'> = {
@@ -22,6 +23,7 @@ const statusLabels: Record<string, string> = {
 export function TenantsListPage() {
   const navigate = useNavigate();
   const { confirm } = useConfirmDialog();
+  const { showToast } = useToast();
   const [tenants, setTenants] = useState<Tenant[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -46,7 +48,7 @@ export function TenantsListPage() {
       setTenants(response.data);
       setTotalPages(response.meta?.totalPages || 1);
     } catch (error) {
-      console.error('Failed to load tenants:', error);
+      showToast('error', 'Organizasyonlar yuklenemedi');
     } finally {
       setIsLoading(false);
     }
@@ -60,7 +62,7 @@ export function TenantsListPage() {
       await adminTenantsApi.suspend(id);
       loadTenants();
     } catch (error) {
-      console.error('Failed to suspend tenant:', error);
+      showToast('error', 'Organizasyon askiya alinamadi');
     }
   };
 
@@ -69,7 +71,7 @@ export function TenantsListPage() {
       await adminTenantsApi.activate(id);
       loadTenants();
     } catch (error) {
-      console.error('Failed to activate tenant:', error);
+      showToast('error', 'Organizasyon aktif edilemedi');
     }
   };
 

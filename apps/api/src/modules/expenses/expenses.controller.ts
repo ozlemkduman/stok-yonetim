@@ -2,6 +2,9 @@ import { Controller, Get, Post, Patch, Delete, Body, Param, Query, ParseUUIDPipe
 import { ExpensesService } from './expenses.service';
 import { CreateExpenseDto, UpdateExpenseDto } from './dto';
 import { PaginationDto } from '../../common/dto/pagination.dto';
+import { validateSortColumn } from '../../common/utils/validate-sort';
+
+const ALLOWED_SORT_COLUMNS = ['expense_date', 'amount', 'category', 'description', 'created_at'];
 
 @Controller('expenses')
 export class ExpensesController {
@@ -17,7 +20,7 @@ export class ExpensesController {
       category: query.category,
       startDate: query.startDate,
       endDate: query.endDate,
-      sortBy: query.sortBy || 'expense_date',
+      sortBy: validateSortColumn(query.sortBy || 'expense_date', ALLOWED_SORT_COLUMNS, 'expense_date'),
       sortOrder: query.sortOrder || 'desc',
     });
     return {

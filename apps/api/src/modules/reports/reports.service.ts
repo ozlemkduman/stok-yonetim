@@ -1,12 +1,23 @@
 import { Injectable } from '@nestjs/common';
 import { DatabaseService } from '../../database/database.service';
+import { getCurrentTenantId } from '../../common/context/tenant.context';
+import { Knex } from 'knex';
 
 @Injectable()
 export class ReportsService {
   constructor(private readonly db: DatabaseService) {}
 
+  private tenantQuery(table: string): Knex.QueryBuilder {
+    const tenantId = getCurrentTenantId();
+    const query = this.db.knex(table);
+    if (tenantId) {
+      return query.where(`${table}.tenant_id`, tenantId);
+    }
+    return query;
+  }
+
   async getSalesSummary(startDate: string, endDate: string) {
-    const [summary] = await this.db.knex('sales')
+    const [summary] = await this.tenantQuery('sales')
       .where('status', 'completed')
       .whereBetween('sale_date', [startDate, endDate])
       .select(
@@ -17,7 +28,7 @@ export class ReportsService {
         this.db.knex.raw('COALESCE(SUM(grand_total), 0) as grand_total'),
       );
 
-    const byPaymentMethod = await this.db.knex('sales')
+    const byPaymentMethod = await this.tenantQuery('sales')
       .where('status', 'completed')
       .whereBetween('sale_date', [startDate, endDate])
       .select('payment_method')
@@ -25,7 +36,7 @@ export class ReportsService {
       .count('id as count')
       .groupBy('payment_method');
 
-    const dailySales = await this.db.knex('sales')
+    const dailySales = await this.tenantQuery('sales')
       .where('status', 'completed')
       .whereBetween('sale_date', [startDate, endDate])
       .select(this.db.knex.raw('DATE(sale_date) as date'))
@@ -38,13 +49,13 @@ export class ReportsService {
   }
 
   async getDebtOverview() {
-    const customers = await this.db.knex('customers')
+    const customers = await this.tenantQuery('customers')
       .where('is_active', true)
       .whereNot('balance', 0)
       .orderBy('balance', 'asc')
       .select('id', 'name', 'phone', 'balance');
 
-    const [totals] = await this.db.knex('customers')
+    const [totals] = await this.tenantQuery('customers')
       .where('is_active', true)
       .select(
         this.db.knex.raw('COALESCE(SUM(CASE WHEN balance < 0 THEN balance ELSE 0 END), 0) as total_debt'),
@@ -60,19 +71,27 @@ export class ReportsService {
   }
 
   async getVatReport(startDate: string, endDate: string) {
-    const salesVat = await this.db.knex('sale_items')
+    const tenantId = getCurrentTenantId();
+
+    let salesVatQuery = this.db.knex('sale_items')
       .join('sales', 'sale_items.sale_id', 'sales.id')
       .where('sales.status', 'completed')
-      .whereBetween('sales.sale_date', [startDate, endDate])
+      .whereBetween('sales.sale_date', [startDate, endDate]);
+    if (tenantId) salesVatQuery = salesVatQuery.where('sales.tenant_id', tenantId);
+
+    const salesVat = await salesVatQuery
       .select('sale_items.vat_rate')
       .sum('sale_items.vat_amount as vat_amount')
       .sum('sale_items.line_total as total')
       .groupBy('sale_items.vat_rate');
 
-    const returnsVat = await this.db.knex('return_items')
+    let returnsVatQuery = this.db.knex('return_items')
       .join('returns', 'return_items.return_id', 'returns.id')
       .where('returns.status', 'completed')
-      .whereBetween('returns.return_date', [startDate, endDate])
+      .whereBetween('returns.return_date', [startDate, endDate]);
+    if (tenantId) returnsVatQuery = returnsVatQuery.where('returns.tenant_id', tenantId);
+
+    const returnsVat = await returnsVatQuery
       .select(this.db.knex.raw('0 as vat_rate'))
       .sum('return_items.vat_amount as vat_amount')
       .groupBy(this.db.knex.raw('1'));
@@ -81,23 +100,28 @@ export class ReportsService {
   }
 
   async getProfitLoss(startDate: string, endDate: string) {
-    const [salesTotal] = await this.db.knex('sales')
+    const tenantId = getCurrentTenantId();
+
+    const [salesTotal] = await this.tenantQuery('sales')
       .where('status', 'completed')
       .whereBetween('sale_date', [startDate, endDate])
       .sum('grand_total as revenue');
 
-    const [costOfGoods] = await this.db.knex('sale_items')
+    let costQuery = this.db.knex('sale_items')
       .join('sales', 'sale_items.sale_id', 'sales.id')
       .join('products', 'sale_items.product_id', 'products.id')
       .where('sales.status', 'completed')
-      .whereBetween('sales.sale_date', [startDate, endDate])
+      .whereBetween('sales.sale_date', [startDate, endDate]);
+    if (tenantId) costQuery = costQuery.where('sales.tenant_id', tenantId);
+
+    const [costOfGoods] = await costQuery
       .select(this.db.knex.raw('COALESCE(SUM(sale_items.quantity * products.purchase_price), 0) as cost'));
 
-    const [expensesTotal] = await this.db.knex('expenses')
+    const [expensesTotal] = await this.tenantQuery('expenses')
       .whereBetween('expense_date', [startDate, endDate])
       .sum('amount as total');
 
-    const [returnsTotal] = await this.db.knex('returns')
+    const [returnsTotal] = await this.tenantQuery('returns')
       .where('status', 'completed')
       .whereBetween('return_date', [startDate, endDate])
       .sum('total_amount as total');
@@ -113,11 +137,16 @@ export class ReportsService {
   }
 
   async getTopProducts(startDate: string, endDate: string, limit: number = 10) {
-    return this.db.knex('sale_items')
+    const tenantId = getCurrentTenantId();
+
+    let query = this.db.knex('sale_items')
       .join('sales', 'sale_items.sale_id', 'sales.id')
       .join('products', 'sale_items.product_id', 'products.id')
       .where('sales.status', 'completed')
-      .whereBetween('sales.sale_date', [startDate, endDate])
+      .whereBetween('sales.sale_date', [startDate, endDate]);
+    if (tenantId) query = query.where('sales.tenant_id', tenantId);
+
+    return query
       .select('products.id', 'products.name')
       .sum('sale_items.quantity as total_quantity')
       .sum('sale_items.line_total as total_revenue')
@@ -127,7 +156,7 @@ export class ReportsService {
   }
 
   async getTopCustomers(startDate: string, endDate: string, limit: number = 10) {
-    return this.db.knex('sales')
+    return this.tenantQuery('sales')
       .join('customers', 'sales.customer_id', 'customers.id')
       .where('sales.status', 'completed')
       .whereBetween('sales.sale_date', [startDate, endDate])
@@ -143,7 +172,7 @@ export class ReportsService {
     const today = new Date().toISOString().split('T')[0];
     const futureDate = new Date(Date.now() + days * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
 
-    return this.db.knex('sales')
+    return this.tenantQuery('sales')
       .leftJoin('customers', 'sales.customer_id', 'customers.id')
       .where('sales.status', 'completed')
       .where('sales.payment_method', 'veresiye')
@@ -164,7 +193,7 @@ export class ReportsService {
   async getOverduePayments() {
     const today = new Date().toISOString().split('T')[0];
 
-    const overdueList = await this.db.knex('sales')
+    const overdueList = await this.tenantQuery('sales')
       .leftJoin('customers', 'sales.customer_id', 'customers.id')
       .where('sales.status', 'completed')
       .where('sales.payment_method', 'veresiye')
@@ -183,7 +212,7 @@ export class ReportsService {
       )
       .orderBy('sales.due_date', 'asc');
 
-    const [totals] = await this.db.knex('sales')
+    const [totals] = await this.tenantQuery('sales')
       .where('status', 'completed')
       .where('payment_method', 'veresiye')
       .whereNotNull('due_date')
@@ -201,7 +230,7 @@ export class ReportsService {
   }
 
   async getStockReport() {
-    const products = await this.db.knex('products')
+    const products = await this.tenantQuery('products')
       .where('is_active', true)
       .select(
         'id',
@@ -233,7 +262,9 @@ export class ReportsService {
   }
 
   async getReturnsReport(startDate: string, endDate: string) {
-    const returns = await this.db.knex('returns')
+    const tenantId = getCurrentTenantId();
+
+    const returns = await this.tenantQuery('returns')
       .leftJoin('customers', 'returns.customer_id', 'customers.id')
       .where('returns.status', 'completed')
       .whereBetween('returns.return_date', [startDate, endDate])
@@ -247,7 +278,7 @@ export class ReportsService {
       )
       .orderBy('returns.return_date', 'desc');
 
-    const [summary] = await this.db.knex('returns')
+    const [summary] = await this.tenantQuery('returns')
       .where('status', 'completed')
       .whereBetween('return_date', [startDate, endDate])
       .select(
@@ -255,7 +286,7 @@ export class ReportsService {
         this.db.knex.raw('COALESCE(SUM(total_amount), 0) as total')
       );
 
-    const byReason = await this.db.knex('returns')
+    const byReason = await this.tenantQuery('returns')
       .where('status', 'completed')
       .whereBetween('return_date', [startDate, endDate])
       .select('reason')
@@ -263,11 +294,14 @@ export class ReportsService {
       .sum('total_amount as total')
       .groupBy('reason');
 
-    const topReturnedProducts = await this.db.knex('return_items')
+    let topReturnedQuery = this.db.knex('return_items')
       .join('returns', 'return_items.return_id', 'returns.id')
       .join('products', 'return_items.product_id', 'products.id')
       .where('returns.status', 'completed')
-      .whereBetween('returns.return_date', [startDate, endDate])
+      .whereBetween('returns.return_date', [startDate, endDate]);
+    if (tenantId) topReturnedQuery = topReturnedQuery.where('returns.tenant_id', tenantId);
+
+    const topReturnedProducts = await topReturnedQuery
       .select('products.id', 'products.name')
       .sum('return_items.quantity as total_quantity')
       .sum('return_items.line_total as total_amount')
@@ -287,7 +321,7 @@ export class ReportsService {
   }
 
   async getExpensesByCategory(startDate: string, endDate: string) {
-    const byCategory = await this.db.knex('expenses')
+    const byCategory = await this.tenantQuery('expenses')
       .whereBetween('expense_date', [startDate, endDate])
       .select('category')
       .sum('amount as total')
@@ -295,14 +329,14 @@ export class ReportsService {
       .groupBy('category')
       .orderBy('total', 'desc');
 
-    const [totals] = await this.db.knex('expenses')
+    const [totals] = await this.tenantQuery('expenses')
       .whereBetween('expense_date', [startDate, endDate])
       .select(
         this.db.knex.raw('COUNT(*) as count'),
         this.db.knex.raw('COALESCE(SUM(amount), 0) as total')
       );
 
-    const monthlyTrend = await this.db.knex('expenses')
+    const monthlyTrend = await this.tenantQuery('expenses')
       .whereBetween('expense_date', [startDate, endDate])
       .select(this.db.knex.raw("TO_CHAR(expense_date, 'YYYY-MM') as month"))
       .sum('amount as total')

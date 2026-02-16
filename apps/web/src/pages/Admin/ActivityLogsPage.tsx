@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
 import { Card, Table, Pagination, type Column } from '@stok/ui';
 import { adminLogsApi, ActivityLog } from '../../api/admin/dashboard.api';
+import { useToast } from '../../context/ToastContext';
 import styles from './AdminPages.module.css';
 
 export function ActivityLogsPage() {
+  const { showToast } = useToast();
   const [logs, setLogs] = useState<ActivityLog[]>([]);
   const [actionTypes, setActionTypes] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -24,7 +26,7 @@ export function ActivityLogsPage() {
       const response = await adminLogsApi.getActionTypes();
       setActionTypes(response.data);
     } catch (error) {
-      console.error('Failed to load action types:', error);
+      showToast('error', 'Islem turleri yuklenemedi');
     }
   };
 
@@ -40,7 +42,7 @@ export function ActivityLogsPage() {
       setLogs(response.data);
       setTotalPages(response.meta?.totalPages || 1);
     } catch (error) {
-      console.error('Failed to load logs:', error);
+      showToast('error', 'Aktivite kayitlari yuklenemedi');
     } finally {
       setIsLoading(false);
     }

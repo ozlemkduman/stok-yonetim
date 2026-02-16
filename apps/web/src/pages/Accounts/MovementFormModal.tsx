@@ -52,7 +52,7 @@ export function MovementFormModal({ isOpen, onClose, onSubmit, accountName }: Mo
       });
       onClose();
     } catch (error) {
-      console.error('Form submit error:', error);
+      showToast('error', 'Hareket eklenemedi');
     } finally {
       setLoading(false);
     }

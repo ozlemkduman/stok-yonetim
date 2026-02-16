@@ -2,6 +2,9 @@ import { Controller, Get, Post, Body, Param, Query, ParseUUIDPipe } from '@nestj
 import { ReturnsService } from './returns.service';
 import { CreateReturnDto } from './dto';
 import { PaginationDto } from '../../common/dto/pagination.dto';
+import { validateSortColumn } from '../../common/utils/validate-sort';
+
+const ALLOWED_SORT_COLUMNS = ['return_date', 'total_amount', 'return_number', 'status', 'created_at'];
 
 @Controller('returns')
 export class ReturnsController {
@@ -15,7 +18,7 @@ export class ReturnsController {
       page,
       limit,
       customerId: query.customerId,
-      sortBy: query.sortBy || 'return_date',
+      sortBy: validateSortColumn(query.sortBy || 'return_date', ALLOWED_SORT_COLUMNS, 'return_date'),
       sortOrder: query.sortOrder || 'desc',
     });
     return {

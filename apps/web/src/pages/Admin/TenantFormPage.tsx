@@ -3,12 +3,14 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Card, Button, Input, Spinner } from '@stok/ui';
 import { adminTenantsApi, CreateTenantData, UpdateTenantData } from '../../api/admin/tenants.api';
 import { adminPlansApi, Plan } from '../../api/admin/plans.api';
+import { useToast } from '../../context/ToastContext';
 import styles from './AdminPages.module.css';
 
 export function TenantFormPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const isEditing = Boolean(id);
+  const { showToast } = useToast();
 
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -36,7 +38,7 @@ export function TenantFormPage() {
       const response = await adminPlansApi.getAll(true);
       setPlans(response.data);
     } catch (err) {
-      console.error('Failed to load plans:', err);
+      showToast('error', 'Planlar yuklenemedi');
     }
   };
 
@@ -54,7 +56,7 @@ export function TenantFormPage() {
         status: tenant.status,
       });
     } catch (err) {
-      console.error('Failed to load tenant:', err);
+      showToast('error', 'Organizasyon yuklenemedi');
       setError('Organizasyon yuklenemedi');
     } finally {
       setIsLoading(false);
@@ -90,7 +92,7 @@ export function TenantFormPage() {
 
       navigate('/admin/tenants');
     } catch (err: any) {
-      console.error('Failed to save tenant:', err);
+      showToast('error', 'Organizasyon kaydedilemedi');
       setError(err instanceof Error ? err.message : 'Organizasyon kaydedilemedi');
     } finally {
       setIsSaving(false);

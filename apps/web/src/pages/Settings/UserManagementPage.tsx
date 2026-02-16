@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Card, Table, Button, Input, Badge, Modal, Pagination, type Column } from '@stok/ui';
 import { apiClient } from '../../api/client';
 import { useConfirmDialog } from '../../context/ConfirmDialogContext';
+import { useToast } from '../../context/ToastContext';
 import styles from './SettingsPages.module.css';
 
 interface User {
@@ -39,6 +40,7 @@ const statusColors: Record<string, 'success' | 'danger' | 'default'> = {
 
 export function UserManagementPage() {
   const { confirm } = useConfirmDialog();
+  const { showToast } = useToast();
   const [users, setUsers] = useState<User[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -64,7 +66,7 @@ export function UserManagementPage() {
       setUsers(response.data);
       setTotalPages(response.meta?.totalPages || 1);
     } catch (error) {
-      console.error('Failed to load users:', error);
+      showToast('error', 'Kullanicilar yuklenemedi');
     } finally {
       setIsLoading(false);
     }
@@ -86,7 +88,7 @@ export function UserManagementPage() {
       });
       loadUsers();
     } catch (error) {
-      console.error('Failed to create user:', error);
+      showToast('error', 'Kullanici olusturulamadi');
     }
   };
 
@@ -98,7 +100,7 @@ export function UserManagementPage() {
       await apiClient.delete(`/users/${id}`);
       loadUsers();
     } catch (error) {
-      console.error('Failed to delete user:', error);
+      showToast('error', 'Kullanici silinemedi');
     }
   };
 

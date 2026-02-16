@@ -2,6 +2,9 @@ import { Controller, Get, Post, Patch, Delete, Body, Param, Query, ParseUUIDPipe
 import { ProductsService } from './products.service';
 import { CreateProductDto, UpdateProductDto } from './dto';
 import { PaginationDto } from '../../common/dto/pagination.dto';
+import { validateSortColumn } from '../../common/utils/validate-sort';
+
+const ALLOWED_SORT_COLUMNS = ['name', 'stock_quantity', 'sale_price', 'purchase_price', 'category', 'barcode', 'created_at'];
 
 @Controller('products')
 export class ProductsController {
@@ -16,7 +19,7 @@ export class ProductsController {
       limit,
       search: query.search,
       category: query.category,
-      sortBy: query.sortBy || 'created_at',
+      sortBy: validateSortColumn(query.sortBy || 'created_at', ALLOWED_SORT_COLUMNS, 'created_at'),
       sortOrder: query.sortOrder || 'desc',
       isActive: query.isActive === 'true' ? true : query.isActive === 'false' ? false : undefined,
       lowStock: query.lowStock === 'true',

@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
 import { Card, Spinner } from '@stok/ui';
 import { adminDashboardApi, DashboardStats, PlanDistribution, ActivityLog } from '../../api/admin/dashboard.api';
+import { useToast } from '../../context/ToastContext';
 import styles from './AdminPages.module.css';
 
 export function AdminDashboardPage() {
+  const { showToast } = useToast();
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [planDistribution, setPlanDistribution] = useState<PlanDistribution[]>([]);
   const [recentActivity, setRecentActivity] = useState<ActivityLog[]>([]);
@@ -26,7 +28,7 @@ export function AdminDashboardPage() {
       setPlanDistribution(planRes.data);
       setRecentActivity(activityRes.data);
     } catch (error) {
-      console.error('Failed to load dashboard data:', error);
+      showToast('error', 'Admin ozet verileri yuklenemedi');
     } finally {
       setIsLoading(false);
     }

@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Card, Table, Button, Input, Badge, Pagination, type Column } from '@stok/ui';
 import { adminUsersApi, AdminUser } from '../../api/admin/users.api';
 import { useConfirmDialog } from '../../context/ConfirmDialogContext';
+import { useToast } from '../../context/ToastContext';
 import styles from './AdminPages.module.css';
 
 const roleLabels: Record<string, string> = {
@@ -27,6 +28,7 @@ const statusLabels: Record<string, string> = {
 export function AdminUsersPage() {
   const navigate = useNavigate();
   const { confirm } = useConfirmDialog();
+  const { showToast } = useToast();
   const [users, setUsers] = useState<AdminUser[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -53,7 +55,7 @@ export function AdminUsersPage() {
       setUsers(response.data);
       setTotalPages(response.meta?.totalPages || 1);
     } catch (error) {
-      console.error('Failed to load users:', error);
+      showToast('error', 'Kullanicilar yuklenemedi');
     } finally {
       setIsLoading(false);
     }
@@ -67,7 +69,7 @@ export function AdminUsersPage() {
       await adminUsersApi.suspend(id);
       loadUsers();
     } catch (error) {
-      console.error('Failed to suspend user:', error);
+      showToast('error', 'Kullanici askiya alinamadi');
     }
   };
 
@@ -76,7 +78,7 @@ export function AdminUsersPage() {
       await adminUsersApi.activate(id);
       loadUsers();
     } catch (error) {
-      console.error('Failed to activate user:', error);
+      showToast('error', 'Kullanici aktif edilemedi');
     }
   };
 

@@ -2,6 +2,9 @@ import { Controller, Get, Post, Patch, Body, Param, Query, ParseUUIDPipe } from 
 import { SalesService } from './sales.service';
 import { CreateSaleDto } from './dto';
 import { PaginationDto } from '../../common/dto/pagination.dto';
+import { validateSortColumn } from '../../common/utils/validate-sort';
+
+const ALLOWED_SORT_COLUMNS = ['sale_date', 'grand_total', 'invoice_number', 'status', 'created_at'];
 
 @Controller('sales')
 export class SalesController {
@@ -20,7 +23,7 @@ export class SalesController {
       startDate: query.startDate,
       endDate: query.endDate,
       includeVat: query.includeVat,
-      sortBy: query.sortBy || 'sale_date',
+      sortBy: validateSortColumn(query.sortBy || 'sale_date', ALLOWED_SORT_COLUMNS, 'sale_date'),
       sortOrder: query.sortOrder || 'desc',
     });
     return {

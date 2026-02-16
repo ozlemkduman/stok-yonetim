@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Card, Button, Input, Spinner } from '@stok/ui';
 import { adminUsersApi, CreateUserData, UpdateUserData } from '../../api/admin/users.api';
 import { adminTenantsApi, Tenant } from '../../api/admin/tenants.api';
+import { useToast } from '../../context/ToastContext';
 import styles from './AdminPages.module.css';
 
 const roleOptions = [
@@ -15,6 +16,7 @@ export function UserFormPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const isEditing = Boolean(id);
+  const { showToast } = useToast();
 
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -43,7 +45,7 @@ export function UserFormPage() {
       const response = await adminTenantsApi.getAll({ limit: 100 });
       setTenants(response.data);
     } catch (err) {
-      console.error('Failed to load tenants:', err);
+      showToast('error', 'Organizasyonlar yuklenemedi');
     }
   };
 
@@ -62,7 +64,7 @@ export function UserFormPage() {
         status: user.status,
       });
     } catch (err) {
-      console.error('Failed to load user:', err);
+      showToast('error', 'Kullanici yuklenemedi');
       setError('Kullanici yuklenemedi');
     } finally {
       setIsLoading(false);
@@ -119,7 +121,7 @@ export function UserFormPage() {
 
       navigate('/admin/users');
     } catch (err: any) {
-      console.error('Failed to save user:', err);
+      showToast('error', 'Kullanici kaydedilemedi');
       setError(err instanceof Error ? err.message : 'Kullanici kaydedilemedi');
     } finally {
       setIsSaving(false);

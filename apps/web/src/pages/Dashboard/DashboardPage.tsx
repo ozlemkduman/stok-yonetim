@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Table, Badge, Spinner, type Column } from '@stok/ui';
-import { dashboardApi, DashboardSummary } from '../../api/dashboard.api';
+import { useToast } from '../../context/ToastContext';
+import { dashboardApi, DashboardSummary, LowStockProduct, TopDebtor } from '../../api/dashboard.api';
 import { formatCurrency } from '../../utils/formatters';
 import styles from './DashboardPage.module.css';
 
@@ -115,9 +116,10 @@ const icons = {
 };
 
 export function DashboardPage() {
+  const { showToast } = useToast();
   const [summary, setSummary] = useState<DashboardSummary | null>(null);
-  const [lowStock, setLowStock] = useState<any[]>([]);
-  const [topDebtors, setTopDebtors] = useState<any[]>([]);
+  const [lowStock, setLowStock] = useState<LowStockProduct[]>([]);
+  const [topDebtors, setTopDebtors] = useState<TopDebtor[]>([]);
   const [loading, setLoading] = useState(true);
 
   const loadData = async () => {
@@ -132,7 +134,7 @@ export function DashboardPage() {
       setLowStock(lowStockRes.data);
       setTopDebtors(debtorsRes.data);
     } catch (err) {
-      console.error('Dashboard error:', err);
+      showToast('error', 'Ozet verileri yuklenemedi');
     }
     setLoading(false);
   };

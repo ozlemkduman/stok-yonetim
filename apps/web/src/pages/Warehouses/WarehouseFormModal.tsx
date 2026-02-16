@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Modal, Input, Button } from '@stok/ui';
 import { Warehouse, CreateWarehouseData } from '../../api/warehouses.api';
+import { useToast } from '../../context/ToastContext';
 
 interface WarehouseFormModalProps {
   isOpen: boolean;
@@ -10,6 +11,7 @@ interface WarehouseFormModalProps {
 }
 
 export function WarehouseFormModal({ isOpen, onClose, onSubmit, warehouse }: WarehouseFormModalProps) {
+  const { showToast } = useToast();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState<CreateWarehouseData>({
     name: '',
@@ -50,7 +52,7 @@ export function WarehouseFormModal({ isOpen, onClose, onSubmit, warehouse }: War
       await onSubmit(formData);
       onClose();
     } catch (error) {
-      console.error('Form submit error:', error);
+      showToast('error', 'Depo kaydedilemedi');
     } finally {
       setLoading(false);
     }

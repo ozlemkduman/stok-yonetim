@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button, Badge, Card } from '@stok/ui';
 import { fieldTeamApi, RouteDetail, FieldVisit } from '../../api/field-team.api';
+import { useToast } from '../../context/ToastContext';
 import { formatDate } from '../../utils/formatters';
 import styles from './RouteDetailPage.module.css';
 
@@ -32,6 +33,7 @@ const visitTypeLabels: Record<string, string> = {
 export function RouteDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { showToast } = useToast();
   const [data, setData] = useState<RouteDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -64,7 +66,7 @@ export function RouteDetailPage() {
         setData(response.data);
       }
     } catch (err) {
-      console.error('Check-in hatasi:', err);
+      showToast('error', 'Giris yapilirken hata olustu');
     }
   };
 
@@ -77,7 +79,7 @@ export function RouteDetailPage() {
         setData(response.data);
       }
     } catch (err) {
-      console.error('Check-out hatasi:', err);
+      showToast('error', 'Cikis yapilirken hata olustu');
     }
   };
 
@@ -90,7 +92,7 @@ export function RouteDetailPage() {
         setData(response.data);
       }
     } catch (err) {
-      console.error('Atlama hatasi:', err);
+      showToast('error', 'Ziyaret atlanamadi');
     }
   };
 
@@ -101,7 +103,7 @@ export function RouteDetailPage() {
       const response = await fieldTeamApi.getRouteDetail(id);
       setData(response.data);
     } catch (err) {
-      console.error('Baslat hatasi:', err);
+      showToast('error', 'Rota baslatilamadi');
     }
   };
 
@@ -112,7 +114,7 @@ export function RouteDetailPage() {
       const response = await fieldTeamApi.getRouteDetail(id);
       setData(response.data);
     } catch (err) {
-      console.error('Tamamla hatasi:', err);
+      showToast('error', 'Rota tamamlanamadi');
     }
   };
 

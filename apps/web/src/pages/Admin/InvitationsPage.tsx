@@ -3,6 +3,7 @@ import { Card, Table, Button, Badge, type Column } from '@stok/ui';
 import { adminInvitationsApi, Invitation } from '../../api/admin/invitations.api';
 import { adminTenantsApi, Tenant } from '../../api/admin/tenants.api';
 import { useConfirmDialog } from '../../context/ConfirmDialogContext';
+import { useToast } from '../../context/ToastContext';
 import styles from './AdminPages.module.css';
 
 const roleLabels: Record<string, string> = {
@@ -14,6 +15,7 @@ const roleLabels: Record<string, string> = {
 
 export function InvitationsPage() {
   const { confirm } = useConfirmDialog();
+  const { showToast } = useToast();
   const [invitations, setInvitations] = useState<Invitation[]>([]);
   const [tenants, setTenants] = useState<Tenant[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -46,7 +48,7 @@ export function InvitationsPage() {
       setInvitations(invitationsRes.data);
       setTenants(tenantsRes.data);
     } catch (error) {
-      console.error('Failed to load data:', error);
+      showToast('error', 'Veriler yuklenemedi');
     } finally {
       setIsLoading(false);
     }
@@ -91,8 +93,6 @@ export function InvitationsPage() {
         tenantName: newInvitation.tenantName.trim() || undefined,
       });
 
-      console.log('Invitation response:', response);
-
       // Davet linkini goster
       const link = response.data?.invitationLink;
       if (link) {
@@ -106,7 +106,7 @@ export function InvitationsPage() {
         loadData();
       }
     } catch (error) {
-      console.error('Invitation error:', error);
+      showToast('error', 'Davet gonderilemedi');
       setInviteError(error instanceof Error ? error.message : 'Davet gonderilemedi');
     } finally {
       setIsSubmitting(false);
@@ -118,7 +118,7 @@ export function InvitationsPage() {
       await adminInvitationsApi.resend(id);
       loadData();
     } catch (error) {
-      console.error('Failed to resend:', error);
+      showToast('error', 'Davet yeniden gonderilemedi');
     }
   };
 
@@ -130,7 +130,7 @@ export function InvitationsPage() {
       await adminInvitationsApi.cancel(id);
       loadData();
     } catch (error) {
-      console.error('Failed to cancel:', error);
+      showToast('error', 'Davet iptal edilemedi');
     }
   };
 

@@ -2,6 +2,9 @@ import { Injectable, NotFoundException, BadRequestException, ConflictException }
 import { WarehousesRepository, Warehouse, StockTransfer } from './warehouses.repository';
 import { CreateWarehouseDto, UpdateWarehouseDto, CreateTransferDto, AdjustStockDto } from './dto';
 import { DatabaseService } from '../../database/database.service';
+import { validateSortColumn } from '../../common/utils/validate-sort';
+
+const ALLOWED_SORT_COLUMNS = ['name', 'code', 'is_active', 'created_at'];
 
 @Injectable()
 export class WarehousesService {
@@ -20,7 +23,7 @@ export class WarehousesService {
   }) {
     const page = params.page || 1;
     const limit = params.limit || 20;
-    const sortBy = params.sortBy || 'created_at';
+    const sortBy = validateSortColumn(params.sortBy || 'created_at', ALLOWED_SORT_COLUMNS, 'created_at');
     const sortOrder = params.sortOrder || 'desc';
     const isActive = params.isActive === 'true' ? true : params.isActive === 'false' ? false : undefined;
 
@@ -211,15 +214,18 @@ export class WarehousesService {
       throw new BadRequestException('Pasif depolar arasinda transfer yapilamaz');
     }
 
-    // Check stock availability
-    for (const item of dto.items) {
-      const stock = await this.repository.getStockByProduct(dto.from_warehouse_id, item.product_id);
-      if (!stock || stock.quantity < item.quantity) {
-        throw new BadRequestException(`Yetersiz stok: ${item.product_id}`);
-      }
-    }
-
     return this.db.transaction(async (trx) => {
+      // Check stock availability inside transaction with row locking
+      for (const item of dto.items) {
+        const stock = await trx('warehouse_stocks')
+          .where({ warehouse_id: dto.from_warehouse_id, product_id: item.product_id })
+          .forUpdate()
+          .first();
+        if (!stock || stock.quantity < item.quantity) {
+          throw new BadRequestException(`Yetersiz stok: ${item.product_id}`);
+        }
+      }
+
       const transferNumber = await this.repository.generateTransferNumber();
       const transferDate = dto.transfer_date ? new Date(dto.transfer_date) : new Date();
 

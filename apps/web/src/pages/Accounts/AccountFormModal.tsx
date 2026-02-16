@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Modal, Input, Select, Button } from '@stok/ui';
 import { Account, CreateAccountData } from '../../api/accounts.api';
+import { useToast } from '../../context/ToastContext';
 
 interface AccountFormModalProps {
   isOpen: boolean;
@@ -10,6 +11,7 @@ interface AccountFormModalProps {
 }
 
 export function AccountFormModal({ isOpen, onClose, onSubmit, account }: AccountFormModalProps) {
+  const { showToast } = useToast();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState<CreateAccountData>({
     name: '',
@@ -59,7 +61,7 @@ export function AccountFormModal({ isOpen, onClose, onSubmit, account }: Account
       await onSubmit(formData);
       onClose();
     } catch (error) {
-      console.error('Form submit error:', error);
+      showToast('error', 'Hesap kaydedilemedi');
     } finally {
       setLoading(false);
     }

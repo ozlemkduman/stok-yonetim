@@ -70,7 +70,7 @@ export function TenantDetailPage() {
       setTenant(tenantRes.data);
       setStats(statsRes.data);
     } catch (error) {
-      console.error('Failed to load tenant:', error);
+      showToast('error', 'Organizasyon yuklenemedi');
     } finally {
       setIsLoading(false);
     }
@@ -83,9 +83,10 @@ export function TenantDetailPage() {
 
     try {
       await adminTenantsApi.suspend(id);
+      showToast('success', 'Organizasyon askiya alindi');
       loadTenant();
     } catch (error) {
-      console.error('Failed to suspend tenant:', error);
+      showToast('error', 'Organizasyon askiya alinamadi');
     }
   };
 
@@ -94,9 +95,10 @@ export function TenantDetailPage() {
 
     try {
       await adminTenantsApi.activate(id);
+      showToast('success', 'Organizasyon aktif edildi');
       loadTenant();
     } catch (error) {
-      console.error('Failed to activate tenant:', error);
+      showToast('error', 'Organizasyon aktif edilemedi');
     }
   };
 
@@ -109,8 +111,7 @@ export function TenantDetailPage() {
       await adminTenantsApi.delete(id);
       navigate('/admin/tenants');
     } catch (error) {
-      console.error('Failed to delete tenant:', error);
-      showToast('error', 'Organizasyon silinemedi: ' + (error instanceof Error ? error.message : 'Bilinmeyen hata'));
+      showToast('error', 'Organizasyon silinemedi');
     }
   };
 

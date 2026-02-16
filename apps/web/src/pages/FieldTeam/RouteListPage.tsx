@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Table, Button, Card, Select, type Column } from '@stok/ui';
 import { fieldTeamApi, FieldRoute } from '../../api/field-team.api';
 import { useConfirmDialog } from '../../context/ConfirmDialogContext';
+import { useToast } from '../../context/ToastContext';
 import { RouteFormModal } from './RouteFormModal';
 import styles from './RouteListPage.module.css';
 
@@ -16,6 +17,7 @@ const statusLabels: Record<string, string> = {
 export function RouteListPage() {
   const navigate = useNavigate();
   const { confirm } = useConfirmDialog();
+  const { showToast } = useToast();
   const [routes, setRoutes] = useState<FieldRoute[]>([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
@@ -37,7 +39,7 @@ export function RouteListPage() {
         setTotalPages(response.meta.totalPages);
       }
     } catch (error) {
-      console.error('Rotalar yuklenemedi:', error);
+      showToast('error', 'Rotalar yuklenemedi');
     } finally {
       setLoading(false);
     }
@@ -64,7 +66,7 @@ export function RouteListPage() {
       await fieldTeamApi.deleteRoute(id);
       fetchRoutes();
     } catch (error) {
-      console.error('Silme hatasi:', error);
+      showToast('error', 'Rota silinemedi');
     }
   };
 
@@ -73,7 +75,7 @@ export function RouteListPage() {
       await fieldTeamApi.startRoute(id);
       fetchRoutes();
     } catch (error) {
-      console.error('Baslat hatasi:', error);
+      showToast('error', 'Rota baslatilamadi');
     }
   };
 
@@ -82,7 +84,7 @@ export function RouteListPage() {
       await fieldTeamApi.completeRoute(id);
       fetchRoutes();
     } catch (error) {
-      console.error('Tamamla hatasi:', error);
+      showToast('error', 'Rota tamamlanamadi');
     }
   };
 

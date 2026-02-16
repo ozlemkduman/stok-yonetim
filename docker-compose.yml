@@ -48,6 +48,8 @@ services:
       PORT: 3000
       SUPER_ADMIN_EMAIL: admin@stoksayac.com
       SUPER_ADMIN_PASSWORD: StokSayac2026!
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost}
+      CORS_ORIGIN: ${CORS_ORIGIN:-*}
     depends_on:
       postgres:
         condition: service_healthy
