@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Table, Button, Card, Input, Select, type Column } from '@stok/ui';
 import { crmApi, CrmContact } from '../../api/crm.api';
+import { useConfirmDialog } from '../../context/ConfirmDialogContext';
 import { ContactFormModal } from './ContactFormModal';
 import styles from './ContactListPage.module.css';
 
@@ -23,6 +24,7 @@ const sourceLabels: Record<string, string> = {
 
 export function ContactListPage() {
   const navigate = useNavigate();
+  const { confirm } = useConfirmDialog();
   const [contacts, setContacts] = useState<CrmContact[]>([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
@@ -72,7 +74,8 @@ export function ContactListPage() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Bu kisiyi silmek istediginize emin misiniz?')) return;
+    const confirmed = await confirm({ message: 'Bu kisiyi silmek istediginize emin misiniz?', variant: 'danger' });
+    if (!confirmed) return;
     try {
       await crmApi.deleteContact(id);
       fetchContacts();

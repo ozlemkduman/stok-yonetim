@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Button, Select } from '@stok/ui';
 import { fieldTeamApi, FieldVisit } from '../../api/field-team.api';
 import { useToast } from '../../context/ToastContext';
+import { useConfirmDialog } from '../../context/ConfirmDialogContext';
 import styles from './VisitFormModal.module.css';
 
 interface Props {
@@ -29,6 +30,7 @@ const STATUS_OPTIONS = [
 
 export function VisitFormModal({ visit, onClose, onSuccess }: Props) {
   const { showToast } = useToast();
+  const { confirm } = useConfirmDialog();
   const [saving, setSaving] = useState(false);
 
   const [status, setStatus] = useState(visit.status);
@@ -99,7 +101,8 @@ export function VisitFormModal({ visit, onClose, onSuccess }: Props) {
   };
 
   const handleSkip = async () => {
-    if (!confirm('Bu ziyareti atlamak istediginize emin misiniz?')) return;
+    const confirmed = await confirm({ message: 'Bu ziyareti atlamak istediginize emin misiniz?', variant: 'warning' });
+    if (!confirmed) return;
     setSaving(true);
     try {
       await fieldTeamApi.skipVisit(visit.id, notes);

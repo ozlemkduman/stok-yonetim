@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Button, Badge, Card } from '@stok/ui';
 import { integrationsApi, IntegrationDetail, IntegrationLog } from '../../api/integrations.api';
 import { formatDateTime } from '../../utils/formatters';
+import { useToast } from '../../context/ToastContext';
 import styles from './IntegrationDetailPage.module.css';
 
 type TabType = 'logs' | 'config';
@@ -59,6 +60,7 @@ const logActionLabels: Record<string, string> = {
 export function IntegrationDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { showToast } = useToast();
   const [data, setData] = useState<IntegrationDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -91,10 +93,10 @@ export function IntegrationDetailPage() {
     setSyncing(true);
     try {
       const response = await integrationsApi.syncOrders(id);
-      alert(`${response.data.syncedCount} siparis senkronize edildi`);
+      showToast('success', `${response.data.syncedCount} siparis senkronize edildi`);
       fetchData();
     } catch (err) {
-      alert('Senkronizasyon basarisiz');
+      showToast('error', 'Senkronizasyon basarisiz');
     } finally {
       setSyncing(false);
     }
@@ -106,10 +108,10 @@ export function IntegrationDetailPage() {
     setTesting(true);
     try {
       const response = await integrationsApi.testConnection(id);
-      alert(response.data?.message || (response.success ? 'Baglanti basarili' : 'Baglanti basarisiz'));
+      showToast('success', response.data?.message || (response.success ? 'Baglanti basarili' : 'Baglanti basarisiz'));
       fetchData();
     } catch (err) {
-      alert('Baglanti testi basarisiz');
+      showToast('error', 'Baglanti testi basarisiz');
     } finally {
       setTesting(false);
     }
@@ -124,7 +126,7 @@ export function IntegrationDetailPage() {
       await integrationsApi.updateIntegration(id, { status: newStatus });
       fetchData();
     } catch (err) {
-      alert('Durum degistirilemedi');
+      showToast('error', 'Durum degistirilemedi');
     } finally {
       setToggling(false);
     }

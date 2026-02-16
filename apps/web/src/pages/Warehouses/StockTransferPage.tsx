@@ -8,6 +8,7 @@ import {
 } from '../../api/warehouses.api';
 import { Product, productsApi } from '../../api/products.api';
 import { useToast } from '../../context/ToastContext';
+import { useConfirmDialog } from '../../context/ConfirmDialogContext';
 import { formatDate } from '../../utils/formatters';
 import styles from './StockTransferPage.module.css';
 
@@ -20,6 +21,7 @@ const STATUS_LABELS: Record<string, string> = {
 
 export function StockTransferPage() {
   const { showToast } = useToast();
+  const { confirm } = useConfirmDialog();
 
   const [transfers, setTransfers] = useState<StockTransfer[]>([]);
   const [warehouses, setWarehouses] = useState<Warehouse[]>([]);
@@ -133,7 +135,8 @@ export function StockTransferPage() {
   };
 
   const handleComplete = async (transfer: StockTransfer) => {
-    if (!confirm('Transferi tamamlamak istediginize emin misiniz?')) return;
+    const confirmed = await confirm({ message: 'Transferi tamamlamak istediginize emin misiniz?', variant: 'warning' });
+    if (!confirmed) return;
     try {
       await warehousesApi.completeTransfer(transfer.id);
       showToast('success', 'Transfer tamamlandi');
@@ -144,7 +147,8 @@ export function StockTransferPage() {
   };
 
   const handleCancel = async (transfer: StockTransfer) => {
-    if (!confirm('Transferi iptal etmek istediginize emin misiniz?')) return;
+    const confirmed = await confirm({ message: 'Transferi iptal etmek istediginize emin misiniz?', variant: 'danger' });
+    if (!confirmed) return;
     try {
       await warehousesApi.cancelTransfer(transfer.id);
       showToast('success', 'Transfer iptal edildi');

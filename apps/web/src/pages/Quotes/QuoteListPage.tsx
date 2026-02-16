@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Table, Button, Input, Select, Badge, Pagination, type Column } from '@stok/ui';
 import { Quote, quotesApi } from '../../api/quotes.api';
 import { useToast } from '../../context/ToastContext';
+import { useConfirmDialog } from '../../context/ConfirmDialogContext';
 import { formatCurrency, formatDate } from '../../utils/formatters';
 import styles from './QuoteListPage.module.css';
 
@@ -50,6 +51,7 @@ export function QuoteListPage() {
   const [statusFilter, setStatusFilter] = useState('');
 
   const { showToast } = useToast();
+  const { confirm } = useConfirmDialog();
 
   const fetchQuotes = useCallback(async () => {
     setLoading(true);
@@ -107,7 +109,8 @@ export function QuoteListPage() {
   };
 
   const handleReject = async (quote: Quote) => {
-    if (!confirm('Teklifi reddetmek istediginizden emin misiniz?')) return;
+    const confirmed = await confirm({ message: 'Teklifi reddetmek istediginizden emin misiniz?', variant: 'warning' });
+    if (!confirmed) return;
     try {
       await quotesApi.reject(quote.id);
       showToast('success', 'Teklif reddedildi');
@@ -118,7 +121,8 @@ export function QuoteListPage() {
   };
 
   const handleConvert = async (quote: Quote) => {
-    if (!confirm('Teklifi satisa donusturmek istediginizden emin misiniz?')) return;
+    const confirmed = await confirm({ message: 'Teklifi satisa donusturmek istediginizden emin misiniz?', variant: 'warning' });
+    if (!confirmed) return;
     try {
       await quotesApi.convertToSale(quote.id, { payment_method: 'nakit' });
       showToast('success', 'Teklif satisa donusturuldu');
@@ -129,7 +133,8 @@ export function QuoteListPage() {
   };
 
   const handleDelete = async (quote: Quote) => {
-    if (!confirm(`"${quote.quote_number}" teklifini silmek istediginizden emin misiniz?`)) return;
+    const confirmed = await confirm({ message: `"${quote.quote_number}" teklifini silmek istediginizden emin misiniz?`, variant: 'danger' });
+    if (!confirmed) return;
     try {
       await quotesApi.delete(quote.id);
       showToast('success', 'Teklif silindi');

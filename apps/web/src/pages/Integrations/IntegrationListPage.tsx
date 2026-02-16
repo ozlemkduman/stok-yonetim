@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { Table, Button, Card, type Column } from '@stok/ui';
 import { integrationsApi, Integration } from '../../api/integrations.api';
 import { IntegrationFormModal } from './IntegrationFormModal';
+import { useToast } from '../../context/ToastContext';
+import { useConfirmDialog } from '../../context/ConfirmDialogContext';
 import styles from './IntegrationListPage.module.css';
 
 const typeLabels: Record<string, string> = {
@@ -42,6 +44,8 @@ const providerLabels: Record<string, string> = {
 
 export function IntegrationListPage() {
   const navigate = useNavigate();
+  const { showToast } = useToast();
+  const { confirm } = useConfirmDialog();
   const [integrations, setIntegrations] = useState<Integration[]>([]);
   const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
@@ -75,7 +79,8 @@ export function IntegrationListPage() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Bu entegrasyonu silmek istediginize emin misiniz?')) return;
+    const confirmed = await confirm({ message: 'Bu entegrasyonu silmek istediginize emin misiniz?', variant: 'danger' });
+    if (!confirmed) return;
     try {
       await integrationsApi.deleteIntegration(id);
       fetchIntegrations();
@@ -88,10 +93,10 @@ export function IntegrationListPage() {
     setTestingId(id);
     try {
       const response = await integrationsApi.testConnection(id);
-      alert(response.data.message);
+      showToast('success', response.data.message);
       fetchIntegrations();
     } catch (error) {
-      alert('Baglanti testi basarisiz');
+      showToast('error', 'Baglanti testi basarisiz');
     } finally {
       setTestingId(null);
     }
@@ -101,9 +106,9 @@ export function IntegrationListPage() {
     setSyncingId(id);
     try {
       const response = await integrationsApi.syncOrders(id);
-      alert(`${response.data.syncedCount} siparis senkronize edildi`);
+      showToast('success', `${response.data.syncedCount} siparis senkronize edildi`);
     } catch (error) {
-      alert('Senkronizasyon basarisiz');
+      showToast('error', 'Senkronizasyon basarisiz');
     } finally {
       setSyncingId(null);
     }

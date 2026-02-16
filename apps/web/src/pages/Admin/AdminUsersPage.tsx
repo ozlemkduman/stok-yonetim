@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Card, Table, Button, Input, Badge, Pagination, type Column } from '@stok/ui';
 import { adminUsersApi, AdminUser } from '../../api/admin/users.api';
+import { useConfirmDialog } from '../../context/ConfirmDialogContext';
 import styles from './AdminPages.module.css';
 
 const roleLabels: Record<string, string> = {
@@ -25,6 +26,7 @@ const statusLabels: Record<string, string> = {
 
 export function AdminUsersPage() {
   const navigate = useNavigate();
+  const { confirm } = useConfirmDialog();
   const [users, setUsers] = useState<AdminUser[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -58,7 +60,8 @@ export function AdminUsersPage() {
   };
 
   const handleSuspend = async (id: string) => {
-    if (!confirm('Bu kullaniciyi askiya almak istediginize emin misiniz?')) return;
+    const confirmed = await confirm({ message: 'Bu kullaniciyi askiya almak istediginize emin misiniz?', variant: 'danger' });
+    if (!confirmed) return;
 
     try {
       await adminUsersApi.suspend(id);

@@ -5,6 +5,7 @@ import { AccountFormModal } from './AccountFormModal';
 import { MovementFormModal } from './MovementFormModal';
 import { TransferFormModal } from './TransferFormModal';
 import { useToast } from '../../context/ToastContext';
+import { useConfirmDialog } from '../../context/ConfirmDialogContext';
 import { formatCurrency } from '../../utils/formatters';
 import styles from './AccountListPage.module.css';
 
@@ -55,6 +56,7 @@ export function AccountListPage() {
   const [selectedAccount, setSelectedAccount] = useState<Account | null>(null);
 
   const { showToast } = useToast();
+  const { confirm } = useConfirmDialog();
 
   const fetchAccounts = useCallback(async () => {
     setLoading(true);
@@ -120,9 +122,8 @@ export function AccountListPage() {
   };
 
   const handleDeleteAccount = async (account: Account) => {
-    if (!confirm(`"${account.name}" hesabini silmek istediginizden emin misiniz?`)) {
-      return;
-    }
+    const confirmed = await confirm({ message: `"${account.name}" hesabini silmek istediginizden emin misiniz?`, variant: 'danger' });
+    if (!confirmed) return;
 
     try {
       await accountsApi.delete(account.id);

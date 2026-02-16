@@ -23,24 +23,24 @@ const menuGroups: MenuGroup[] = [
     id: 'main',
     label: 'Ana Sayfa',
     items: [
-      { path: '/dashboard', label: 'Dashboard' },
+      { path: '/dashboard', label: 'Özet' },
     ],
   },
   {
     id: 'sales',
-    label: 'Satis Yonetimi',
+    label: 'Satış Yönetimi',
     items: [
-      { path: '/customers', label: 'Musteriler' },
+      { path: '/customers', label: 'Müşteriler' },
       { path: '/quotes', label: 'Teklifler' },
-      { path: '/sales', label: 'Satislar' },
-      { path: '/returns', label: 'Iadeler' },
+      { path: '/sales', label: 'Satışlar' },
+      { path: '/returns', label: 'İadeler' },
     ],
   },
   {
     id: 'inventory',
-    label: 'Stok Yonetimi',
+    label: 'Stok Yönetimi',
     items: [
-      { path: '/products', label: 'Urunler' },
+      { path: '/products', label: 'Ürünler' },
       { path: '/warehouses', label: 'Depolar' },
     ],
   },
@@ -73,8 +73,8 @@ const menuGroups: MenuGroup[] = [
     id: 'settings',
     label: 'Ayarlar',
     items: [
-      { path: '/settings', label: 'Sirket Ayarlari' },
-      { path: '/settings/users', label: 'Kullanicilar' },
+      { path: '/settings', label: 'Şirket Ayarları' },
+      { path: '/settings/users', label: 'Kullanıcılar' },
       { path: '/profile', label: 'Profil' },
     ],
   },
@@ -125,8 +125,8 @@ export function MainLayout() {
           newNotifications.push({
             id: 'overdue',
             type: 'danger',
-            title: 'Geciken Odemeler',
-            message: `${overdueRes.data.totalCount} adet geciken odeme var`,
+            title: 'Geciken Ödemeler',
+            message: `${overdueRes.data.totalCount} adet geciken ödeme var`,
             link: '/reports',
           });
         }
@@ -136,8 +136,8 @@ export function MainLayout() {
           newNotifications.push({
             id: 'lowstock',
             type: 'warning',
-            title: 'Dusuk Stok',
-            message: `${stockRes.data.summary.lowStockCount} urun stok seviyesi dusuk`,
+            title: 'Düşük Stok',
+            message: `${stockRes.data.summary.lowStockCount} ürün stok seviyesi düşük`,
             link: '/reports',
           });
         }
@@ -148,7 +148,7 @@ export function MainLayout() {
             id: 'outofstock',
             type: 'danger',
             title: 'Stok Bitti',
-            message: `${stockRes.data.summary.outOfStockCount} urun stokta yok`,
+            message: `${stockRes.data.summary.outOfStockCount} ürün stokta yok`,
             link: '/products',
           });
         }
@@ -219,8 +219,8 @@ export function MainLayout() {
               </svg>
             </div>
             <div className={styles.logoText}>
-              <span className={styles.logoTitle}>StokPro</span>
-              <span className={styles.logoSubtitle}>Yonetim Sistemi</span>
+              <span className={styles.logoTitle}>Stok Sayaç</span>
+              <span className={styles.logoSubtitle}>Yönetim Sistemi</span>
             </div>
           </div>
         </div>
@@ -287,7 +287,7 @@ export function MainLayout() {
             <button className={styles.userButton} onClick={() => setShowUserMenu(!showUserMenu)}>
               <div className={styles.avatar}>{user?.name?.charAt(0).toUpperCase() || 'U'}</div>
               <div className={styles.userDetails}>
-                <span className={styles.userName}>{user?.name || 'Kullanici'}</span>
+                <span className={styles.userName}>{user?.name || 'Kullanıcı'}</span>
                 <span className={styles.userRole}>{user?.tenant?.name || user?.role}</span>
               </div>
               <svg
@@ -315,7 +315,7 @@ export function MainLayout() {
                 </NavLink>
                 <div className={styles.userMenuDivider} />
                 <button className={`${styles.userMenuItem} ${styles.userMenuItemDanger}`} onClick={handleLogout}>
-                  <span>🚪</span> Cikis Yap
+                  <span>🚪</span> Çıkış Yap
                 </button>
               </div>
             )}
@@ -406,7 +406,7 @@ export function MainLayout() {
         {isImpersonating && impersonatedTenant && (
           <div className={styles.impersonationBanner}>
             <span>
-              <strong>{impersonatedTenant.name}</strong> olarak goruntuluyorsunuz
+              <strong>{impersonatedTenant.name}</strong> olarak görüntülüyorsunuz
             </span>
             <button
               onClick={() => {
@@ -415,7 +415,7 @@ export function MainLayout() {
               }}
               className={styles.impersonationButton}
             >
-              Admin Paneline Don
+              Admin Paneline Dön
             </button>
           </div>
         )}

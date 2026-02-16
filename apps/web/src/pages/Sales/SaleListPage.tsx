@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Table, Button, Badge, Pagination, type Column } from '@stok/ui';
 import { salesApi, Sale } from '../../api/sales.api';
 import { useToast } from '../../context/ToastContext';
+import { useConfirmDialog } from '../../context/ConfirmDialogContext';
 import { formatCurrency, formatDateTime } from '../../utils/formatters';
 import { PAYMENT_METHODS, SALE_STATUSES } from '../../utils/constants';
 import styles from './SaleListPage.module.css';
@@ -56,6 +57,7 @@ export function SaleListPage() {
   const [stats, setStats] = useState({ total: 0, count: 0, completed: 0, cancelled: 0, noVatCount: 0 });
   const [vatFilter, setVatFilter] = useState<VatFilter>('all');
   const { showToast } = useToast();
+  const { confirm } = useConfirmDialog();
 
   const fetchSales = async () => {
     setLoading(true);
@@ -91,7 +93,8 @@ export function SaleListPage() {
   };
 
   const handleCancel = async (sale: Sale) => {
-    if (!confirm(`${sale.invoice_number} numarali satisi iptal etmek istediginizden emin misiniz?`)) return;
+    const confirmed = await confirm({ message: `${sale.invoice_number} numarali satisi iptal etmek istediginizden emin misiniz?`, variant: 'danger' });
+    if (!confirmed) return;
     try {
       await salesApi.cancel(sale.id);
       showToast('success', 'Satis iptal edildi');

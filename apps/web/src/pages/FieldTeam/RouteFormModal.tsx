@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Modal, Input, Button } from '@stok/ui';
 import { fieldTeamApi, FieldRoute, CreateRouteInput } from '../../api/field-team.api';
+import { useToast } from '../../context/ToastContext';
 import styles from './RouteFormModal.module.css';
 
 interface Props {
@@ -11,6 +12,7 @@ interface Props {
 
 export function RouteFormModal({ route, onClose, onSuccess }: Props) {
   const isEdit = !!route;
+  const { showToast } = useToast();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState<CreateRouteInput>({
     name: route?.name || '',
@@ -32,7 +34,7 @@ export function RouteFormModal({ route, onClose, onSuccess }: Props) {
       onSuccess();
     } catch (error) {
       console.error('Kayit hatasi:', error);
-      alert('Islem basarisiz');
+      showToast('error', 'Islem basarisiz');
     } finally {
       setLoading(false);
     }

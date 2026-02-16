@@ -5,6 +5,7 @@ import { useCustomers } from '../../hooks/useCustomers';
 import { Customer, CreateCustomerData } from '../../api/customers.api';
 import { CustomerFormModal } from './CustomerFormModal';
 import { useToast } from '../../context/ToastContext';
+import { useConfirmDialog } from '../../context/ConfirmDialogContext';
 import { formatCurrency } from '../../utils/formatters';
 import styles from './CustomerListPage.module.css';
 
@@ -26,6 +27,7 @@ export function CustomerListPage() {
   const [searchInput, setSearchInput] = useState('');
 
   const { showToast } = useToast();
+  const { confirm } = useConfirmDialog();
   const {
     customers,
     loading,
@@ -60,7 +62,8 @@ export function CustomerListPage() {
   };
 
   const handleDelete = async (customer: Customer) => {
-    if (!confirm(`"${customer.name}" musterisini silmek istediginizden emin misiniz?`)) {
+    const confirmed = await confirm({ message: `"${customer.name}" musterisini silmek istediginizden emin misiniz?`, variant: 'danger' });
+    if (!confirmed) {
       return;
     }
 

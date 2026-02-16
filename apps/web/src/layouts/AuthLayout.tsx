@@ -6,15 +6,15 @@ export function AuthLayout() {
     <div className={styles.container}>
       <div className={styles.content}>
         <div className={styles.logo}>
-          <h1>StokPro</h1>
-          <p>Stok Yonetim Sistemi</p>
+          <h1>Stok Sayaç</h1>
+          <p>Stok Yönetim Sistemi</p>
         </div>
         <div className={styles.formContainer}>
           <Outlet />
         </div>
       </div>
       <div className={styles.footer}>
-        <p>&copy; {new Date().getFullYear()} StokPro. Tum haklari saklidir.</p>
+        <p>&copy; {new Date().getFullYear()} Stok Sayaç. Tüm hakları saklıdır.</p>
       </div>
     </div>
   );

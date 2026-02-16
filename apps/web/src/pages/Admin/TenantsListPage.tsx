@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Card, Table, Button, Input, Badge, Pagination, type Column } from '@stok/ui';
 import { adminTenantsApi, Tenant } from '../../api/admin/tenants.api';
+import { useConfirmDialog } from '../../context/ConfirmDialogContext';
 import styles from './AdminPages.module.css';
 
 const statusColors: Record<string, 'success' | 'warning' | 'danger' | 'default'> = {
@@ -20,6 +21,7 @@ const statusLabels: Record<string, string> = {
 
 export function TenantsListPage() {
   const navigate = useNavigate();
+  const { confirm } = useConfirmDialog();
   const [tenants, setTenants] = useState<Tenant[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -51,7 +53,8 @@ export function TenantsListPage() {
   };
 
   const handleSuspend = async (id: string) => {
-    if (!confirm('Bu organizasyonu askiya almak istediginize emin misiniz?')) return;
+    const confirmed = await confirm({ message: 'Bu organizasyonu askiya almak istediginize emin misiniz?', variant: 'danger' });
+    if (!confirmed) return;
 
     try {
       await adminTenantsApi.suspend(id);

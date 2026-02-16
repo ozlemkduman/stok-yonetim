@@ -4,6 +4,8 @@ import { Card, Button, Badge, Spinner, Input } from '@stok/ui';
 import { adminTenantsApi, Tenant, TenantStats } from '../../api/admin/tenants.api';
 import { adminInvitationsApi } from '../../api/admin/invitations.api';
 import { useTenant } from '../../context/TenantContext';
+import { useConfirmDialog } from '../../context/ConfirmDialogContext';
+import { useToast } from '../../context/ToastContext';
 import styles from './AdminPages.module.css';
 
 const statusColors: Record<string, 'success' | 'warning' | 'danger' | 'default'> = {
@@ -24,6 +26,8 @@ export function TenantDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { impersonate } = useTenant();
+  const { confirm } = useConfirmDialog();
+  const { showToast } = useToast();
   const [tenant, setTenant] = useState<Tenant | null>(null);
   const [stats, setStats] = useState<TenantStats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -73,7 +77,9 @@ export function TenantDetailPage() {
   };
 
   const handleSuspend = async () => {
-    if (!id || !confirm('Bu organizasyonu askiya almak istediginize emin misiniz?')) return;
+    if (!id) return;
+    const confirmed = await confirm({ message: 'Bu organizasyonu askiya almak istediginize emin misiniz?', variant: 'danger' });
+    if (!confirmed) return;
 
     try {
       await adminTenantsApi.suspend(id);
@@ -95,14 +101,16 @@ export function TenantDetailPage() {
   };
 
   const handleDelete = async () => {
-    if (!id || !confirm('Bu organizasyonu silmek istediginize emin misiniz? Bu islem geri alinamaz!')) return;
+    if (!id) return;
+    const confirmed = await confirm({ message: 'Bu organizasyonu silmek istediginize emin misiniz? Bu islem geri alinamaz!', variant: 'danger' });
+    if (!confirmed) return;
 
     try {
       await adminTenantsApi.delete(id);
       navigate('/admin/tenants');
     } catch (error) {
       console.error('Failed to delete tenant:', error);
-      alert('Organizasyon silinemedi: ' + (error instanceof Error ? error.message : 'Bilinmeyen hata'));
+      showToast('error', 'Organizasyon silinemedi: ' + (error instanceof Error ? error.message : 'Bilinmeyen hata'));
     }
   };
 

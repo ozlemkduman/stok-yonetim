@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Table, Button, Card, Select, type Column } from '@stok/ui';
 import { fieldTeamApi, FieldRoute } from '../../api/field-team.api';
+import { useConfirmDialog } from '../../context/ConfirmDialogContext';
 import { RouteFormModal } from './RouteFormModal';
 import styles from './RouteListPage.module.css';
 
@@ -14,6 +15,7 @@ const statusLabels: Record<string, string> = {
 
 export function RouteListPage() {
   const navigate = useNavigate();
+  const { confirm } = useConfirmDialog();
   const [routes, setRoutes] = useState<FieldRoute[]>([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
@@ -56,7 +58,8 @@ export function RouteListPage() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Bu rotayi silmek istediginize emin misiniz?')) return;
+    const confirmed = await confirm({ message: 'Bu rotayi silmek istediginize emin misiniz?', variant: 'danger' });
+    if (!confirmed) return;
     try {
       await fieldTeamApi.deleteRoute(id);
       fetchRoutes();

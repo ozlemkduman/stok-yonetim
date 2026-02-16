@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Modal, Input, Button, Select } from '@stok/ui';
 import { integrationsApi, Integration, CreateIntegrationInput, UpdateIntegrationInput } from '../../api/integrations.api';
+import { useToast } from '../../context/ToastContext';
 import styles from './IntegrationFormModal.module.css';
 
 interface Props {
@@ -53,6 +54,7 @@ const statusOptions = [
 
 export function IntegrationFormModal({ integration, onClose, onSuccess }: Props) {
   const isEdit = !!integration;
+  const { showToast } = useToast();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: integration?.name || '',
@@ -100,7 +102,7 @@ export function IntegrationFormModal({ integration, onClose, onSuccess }: Props)
       onSuccess();
     } catch (error) {
       console.error('Kayit hatasi:', error);
-      alert('Islem basarisiz');
+      showToast('error', 'Islem basarisiz');
     } finally {
       setLoading(false);
     }

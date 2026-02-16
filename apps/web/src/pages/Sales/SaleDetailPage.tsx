@@ -5,6 +5,7 @@ import { salesApi, SaleDetail } from '../../api/sales.api';
 import { formatCurrency, formatDate, formatDateTime } from '../../utils/formatters';
 import { PAYMENT_METHODS, SALE_STATUSES } from '../../utils/constants';
 import { useToast } from '../../context/ToastContext';
+import { useConfirmDialog } from '../../context/ConfirmDialogContext';
 import { PrintModal } from './PrintModal';
 import styles from './SaleDetailPage.module.css';
 
@@ -12,6 +13,7 @@ export function SaleDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { showToast } = useToast();
+  const { confirm } = useConfirmDialog();
   const [data, setData] = useState<SaleDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -38,7 +40,8 @@ export function SaleDetailPage() {
 
   const handleCancel = async () => {
     if (!data || !id) return;
-    if (!confirm(`${data.invoice_number} numarali satisi iptal etmek istediginizden emin misiniz?`)) return;
+    const confirmed = await confirm({ message: `${data.invoice_number} numarali satisi iptal etmek istediginizden emin misiniz?`, variant: 'danger' });
+    if (!confirmed) return;
 
     setCancelling(true);
     try {

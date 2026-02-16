@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Modal, Input, Select, Button } from '@stok/ui';
 import { CreateMovementData } from '../../api/accounts.api';
+import { useToast } from '../../context/ToastContext';
 
 interface MovementFormModalProps {
   isOpen: boolean;
@@ -22,6 +23,7 @@ const MOVEMENT_CATEGORIES = [
 ];
 
 export function MovementFormModal({ isOpen, onClose, onSubmit, accountName }: MovementFormModalProps) {
+  const { showToast } = useToast();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState<CreateMovementData>({
     movement_type: 'gelir',
@@ -34,7 +36,7 @@ export function MovementFormModal({ isOpen, onClose, onSubmit, accountName }: Mo
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (formData.amount <= 0) {
-      alert('Tutar 0\'dan buyuk olmalidir');
+      showToast('error', 'Tutar 0\'dan buyuk olmalidir');
       return;
     }
 

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Card, Table, Button, Input, Badge, Modal, Pagination, type Column } from '@stok/ui';
 import { apiClient } from '../../api/client';
+import { useConfirmDialog } from '../../context/ConfirmDialogContext';
 import styles from './SettingsPages.module.css';
 
 interface User {
@@ -37,6 +38,7 @@ const statusColors: Record<string, 'success' | 'danger' | 'default'> = {
 };
 
 export function UserManagementPage() {
+  const { confirm } = useConfirmDialog();
   const [users, setUsers] = useState<User[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -89,7 +91,8 @@ export function UserManagementPage() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Bu kullaniciyi silmek istediginize emin misiniz?')) return;
+    const confirmed = await confirm({ message: 'Bu kullaniciyi silmek istediginize emin misiniz?', variant: 'danger' });
+    if (!confirmed) return;
 
     try {
       await apiClient.delete(`/users/${id}`);

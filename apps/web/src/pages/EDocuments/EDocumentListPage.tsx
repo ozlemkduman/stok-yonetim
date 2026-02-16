@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Table, Button, Select, Badge, Pagination, type Column } from '@stok/ui';
 import { EDocument, EDocumentSummary, eDocumentsApi } from '../../api/e-documents.api';
 import { useToast } from '../../context/ToastContext';
+import { useConfirmDialog } from '../../context/ConfirmDialogContext';
 import { CreateEDocumentModal } from './CreateEDocumentModal';
 import { formatCurrency, formatDate } from '../../utils/formatters';
 import styles from './EDocumentListPage.module.css';
@@ -65,6 +66,7 @@ export function EDocumentListPage() {
   const [showCreateModal, setShowCreateModal] = useState(false);
 
   const { showToast } = useToast();
+  const { confirm } = useConfirmDialog();
 
   const fetchDocuments = useCallback(async () => {
     setLoading(true);
@@ -126,7 +128,8 @@ export function EDocumentListPage() {
   };
 
   const handleCancel = async (doc: EDocument) => {
-    if (!confirm('Belgeyi iptal etmek istediginizden emin misiniz?')) return;
+    const confirmed = await confirm({ message: 'Belgeyi iptal etmek istediginizden emin misiniz?', variant: 'danger' });
+    if (!confirmed) return;
     try {
       await eDocumentsApi.cancel(doc.id);
       showToast('success', 'Belge iptal edildi');

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Modal, Input, Button, Select } from '@stok/ui';
 import { crmApi, CrmContact, CreateContactInput } from '../../api/crm.api';
+import { useToast } from '../../context/ToastContext';
 import styles from './ContactFormModal.module.css';
 
 interface Props {
@@ -28,6 +29,7 @@ const sourceOptions = [
 
 export function ContactFormModal({ contact, onClose, onSuccess }: Props) {
   const isEdit = !!contact;
+  const { showToast } = useToast();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState<CreateContactInput>({
     name: contact?.name || '',
@@ -60,7 +62,7 @@ export function ContactFormModal({ contact, onClose, onSuccess }: Props) {
       onSuccess();
     } catch (error) {
       console.error('Kayit hatasi:', error);
-      alert('Islem basarisiz');
+      showToast('error', 'Islem basarisiz');
     } finally {
       setLoading(false);
     }

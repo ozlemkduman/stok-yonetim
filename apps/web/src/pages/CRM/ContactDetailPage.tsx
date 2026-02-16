@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button, Badge, Card } from '@stok/ui';
 import { crmApi, ContactDetail, CrmActivity } from '../../api/crm.api';
+import { useConfirmDialog } from '../../context/ConfirmDialogContext';
+import { useToast } from '../../context/ToastContext';
 import { formatDate, formatDateTime } from '../../utils/formatters';
 import styles from './ContactDetailPage.module.css';
 
@@ -40,6 +42,8 @@ const activityStatusLabels: Record<string, string> = {
 export function ContactDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { confirm } = useConfirmDialog();
+  const { showToast } = useToast();
   const [data, setData] = useState<ContactDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -68,21 +72,20 @@ export function ContactDetailPage() {
     if (!id || !data) return;
 
     if (data.contact.customer_id) {
-      alert('Bu kisi zaten bir musteriye baglidir.');
+      showToast('info', 'Bu kisi zaten bir musteriye baglidir.');
       return;
     }
 
-    if (!confirm('Bu kisiyi musteriye donusturmek istediginize emin misiniz?')) {
-      return;
-    }
+    const confirmed = await confirm({ message: 'Bu kisiyi musteriye donusturmek istediginize emin misiniz?', variant: 'warning' });
+    if (!confirmed) return;
 
     try {
       setConverting(true);
       const response = await crmApi.convertToCustomer(id);
-      alert('Kisi basariyla musteriye donusturuldu!');
+      showToast('success', 'Kisi basariyla musteriye donusturuldu!');
       navigate(`/customers/${response.data.customerId}`);
     } catch (err) {
-      alert(err instanceof Error ? err.message : 'Donusturme islemi basarisiz oldu');
+      showToast('error', err instanceof Error ? err.message : 'Donusturme islemi basarisiz oldu');
     } finally {
       setConverting(false);
     }

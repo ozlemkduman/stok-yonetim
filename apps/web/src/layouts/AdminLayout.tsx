@@ -4,12 +4,12 @@ import { useAuth } from '../context/AuthContext';
 import styles from './AdminLayout.module.css';
 
 const menuItems = [
-  { path: '/admin', label: 'Dashboard', icon: '📊' },
+  { path: '/admin', label: 'Özet', icon: '📊' },
   { path: '/admin/tenants', label: 'Organizasyonlar', icon: '🏢' },
   { path: '/admin/plans', label: 'Planlar', icon: '📋' },
-  { path: '/admin/users', label: 'Kullanicilar', icon: '👥' },
+  { path: '/admin/users', label: 'Kullanıcılar', icon: '👥' },
   { path: '/admin/invitations', label: 'Davetler', icon: '✉️' },
-  { path: '/admin/logs', label: 'Aktivite Kayitlari', icon: '📜' },
+  { path: '/admin/logs', label: 'Aktivite Kayıtları', icon: '📜' },
 ];
 
 export function AdminLayout() {
@@ -39,7 +39,7 @@ export function AdminLayout() {
     <div className={styles.layout}>
       <aside className={`${styles.sidebar} ${isSidebarOpen ? styles.open : styles.closed}`}>
         <div className={styles.logo}>
-          <h1>StokPro</h1>
+          <h1>Stok Sayaç</h1>
           <span className={styles.adminBadge}>Admin</span>
         </div>
 
@@ -62,7 +62,7 @@ export function AdminLayout() {
         <div className={styles.sidebarFooter}>
           <NavLink to="/dashboard" className={styles.navLink}>
             <span className={styles.icon}>🏠</span>
-            <span className={styles.label}>Ana Uygulamaya Don</span>
+            <span className={styles.label}>Ana Uygulamaya Dön</span>
           </NavLink>
         </div>
       </aside>
@@ -122,7 +122,7 @@ export function AdminLayout() {
                     onClick={handleLogout}
                   >
                     <span role="img" aria-label="logout">🚪</span>
-                    <span>Cikis Yap</span>
+                    <span>Çıkış Yap</span>
                   </button>
                 </div>
               )}

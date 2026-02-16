@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Button, Badge, Card, Select } from '@stok/ui';
 import { Quote, QuoteItem, quotesApi, ConvertToSaleData } from '../../api/quotes.api';
 import { useToast } from '../../context/ToastContext';
+import { useConfirmDialog } from '../../context/ConfirmDialogContext';
 import { formatCurrency, formatDate } from '../../utils/formatters';
 import styles from './QuoteDetailPage.module.css';
 
@@ -26,6 +27,7 @@ export function QuoteDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { showToast } = useToast();
+  const { confirm } = useConfirmDialog();
   const [quote, setQuote] = useState<Quote | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -81,7 +83,8 @@ export function QuoteDetailPage() {
 
   const handleReject = async () => {
     if (!quote) return;
-    if (!confirm('Teklifi reddetmek istediginizden emin misiniz?')) return;
+    const confirmed = await confirm({ message: 'Teklifi reddetmek istediginizden emin misiniz?', variant: 'warning' });
+    if (!confirmed) return;
     setActionLoading(true);
     try {
       const response = await quotesApi.reject(quote.id);
@@ -113,7 +116,8 @@ export function QuoteDetailPage() {
 
   const handleDelete = async () => {
     if (!quote) return;
-    if (!confirm(`"${quote.quote_number}" teklifini silmek istediginizden emin misiniz?`)) return;
+    const confirmed = await confirm({ message: `"${quote.quote_number}" teklifini silmek istediginizden emin misiniz?`, variant: 'danger' });
+    if (!confirmed) return;
     setActionLoading(true);
     try {
       await quotesApi.delete(quote.id);

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Button, Card, Input, Select, Table, Badge, type Column } from '@stok/ui';
 import { BankStatement, integrationsApi, Integration } from '../../api/integrations.api';
 import { useToast } from '../../context/ToastContext';
+import { useConfirmDialog } from '../../context/ConfirmDialogContext';
 import { formatCurrency, formatDate } from '../../utils/formatters';
 import styles from './BankStatementsPage.module.css';
 
@@ -13,6 +14,7 @@ const MATCH_STATUS_LABELS: Record<string, string> = {
 
 export function BankStatementsPage() {
   const { showToast } = useToast();
+  const { confirm } = useConfirmDialog();
 
   const [statements, setStatements] = useState<BankStatement[]>([]);
   const [integrations, setIntegrations] = useState<Integration[]>([]);
@@ -71,7 +73,8 @@ export function BankStatementsPage() {
   };
 
   const handleIgnore = async (statement: BankStatement) => {
-    if (!confirm('Bu hareketi yoksaymak istediginize emin misiniz?')) return;
+    const confirmed = await confirm({ message: 'Bu hareketi yoksaymak istediginize emin misiniz?', variant: 'warning' });
+    if (!confirmed) return;
     try {
       await integrationsApi.ignoreBankStatement(statement.id);
       showToast('success', 'Hareket yoksayildi');
@@ -153,7 +156,7 @@ export function BankStatementsPage() {
         <div className={styles.actions}>
           {s.match_status === 'unmatched' && (
             <>
-              <Button size="sm" variant="ghost" onClick={() => alert('Esleme modali yakin zamanda eklenecek')}>
+              <Button size="sm" variant="ghost" onClick={() => showToast('info', 'Esleme ozelligi yakin zamanda aktif olacaktir.')}>
                 Esle
               </Button>
               <Button size="sm" variant="ghost" onClick={() => handleIgnore(s)}>

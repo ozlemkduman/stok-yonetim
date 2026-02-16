@@ -16,7 +16,7 @@ interface ReceiptPrintViewProps {
 export const ReceiptPrintView = forwardRef<HTMLDivElement, ReceiptPrintViewProps>(
   ({ data, companyInfo }, ref) => {
     const company = companyInfo || {
-      name: 'Stok Yonetim',
+      name: 'Stok Sayac',
       address: 'Kadikoy, Istanbul',
       phone: '0216 123 45 67',
     };

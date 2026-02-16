@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Table, Button, Input, Badge, Modal, Select, Pagination, type Column } from '@stok/ui';
 import { expensesApi, Expense, CreateExpenseData } from '../../api/expenses.api';
 import { useToast } from '../../context/ToastContext';
+import { useConfirmDialog } from '../../context/ConfirmDialogContext';
 import { formatCurrency, formatDate } from '../../utils/formatters';
 import { EXPENSE_CATEGORIES } from '../../utils/constants';
 import styles from './ExpenseListPage.module.css';
@@ -29,6 +30,7 @@ export function ExpenseListPage() {
     expense_date: new Date().toISOString().split('T')[0]
   });
   const { showToast } = useToast();
+  const { confirm } = useConfirmDialog();
 
   const fetchExpenses = async () => {
     setLoading(true);
@@ -62,7 +64,8 @@ export function ExpenseListPage() {
   };
 
   const handleDelete = async (expense: Expense) => {
-    if (!confirm('Bu gideri silmek istediginizden emin misiniz?')) return;
+    const confirmed = await confirm({ message: 'Bu gideri silmek istediginizden emin misiniz?', variant: 'danger' });
+    if (!confirmed) return;
     try {
       await expensesApi.delete(expense.id);
       showToast('success', 'Gider silindi');

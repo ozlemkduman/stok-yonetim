@@ -3,12 +3,14 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from '@stok/ui';
 import { Quote, quotesApi } from '../../api/quotes.api';
 import { formatCurrency, formatDate } from '../../utils/formatters';
+import { useTenant } from '../../context/TenantContext';
 import styles from './QuotePrintView.module.css';
 
 export function QuotePrintView() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const printRef = useRef<HTMLDivElement>(null);
+  const { settings: tenantSettings } = useTenant();
   const [quote, setQuote] = useState<Quote | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -66,9 +68,12 @@ export function QuotePrintView() {
           {/* Header */}
           <div className={styles.printHeader}>
             <div className={styles.companyInfo}>
-              <h1 className={styles.companyName}>Sirket Adi</h1>
-              <p>Adres Bilgisi</p>
-              <p>Tel: (XXX) XXX XX XX</p>
+              <h1 className={styles.companyName}>{tenantSettings?.name || 'Sirket Adi'}</h1>
+              {tenantSettings?.settings?.address && <p>{tenantSettings.settings.address}</p>}
+              {tenantSettings?.settings?.phone && <p>Tel: {tenantSettings.settings.phone}</p>}
+              {tenantSettings?.settings?.taxOffice && tenantSettings?.settings?.taxNumber && (
+                <p>{tenantSettings.settings.taxOffice} V.D. - {tenantSettings.settings.taxNumber}</p>
+              )}
             </div>
             <div className={styles.documentInfo}>
               <h2 className={styles.documentTitle}>TEKLIF</h2>

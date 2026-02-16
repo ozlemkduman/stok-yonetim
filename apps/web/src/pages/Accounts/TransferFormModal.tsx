@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Modal, Input, Select, Button } from '@stok/ui';
 import { Account, CreateTransferData, accountsApi } from '../../api/accounts.api';
+import { useToast } from '../../context/ToastContext';
 
 interface TransferFormModalProps {
   isOpen: boolean;
@@ -9,6 +10,7 @@ interface TransferFormModalProps {
 }
 
 export function TransferFormModal({ isOpen, onClose, onSubmit }: TransferFormModalProps) {
+  const { showToast } = useToast();
   const [loading, setLoading] = useState(false);
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [formData, setFormData] = useState<CreateTransferData>({
@@ -38,17 +40,17 @@ export function TransferFormModal({ isOpen, onClose, onSubmit }: TransferFormMod
     e.preventDefault();
 
     if (!formData.from_account_id || !formData.to_account_id) {
-      alert('Lutfen kaynak ve hedef hesaplari secin');
+      showToast('error', 'Lutfen kaynak ve hedef hesaplari secin');
       return;
     }
 
     if (formData.from_account_id === formData.to_account_id) {
-      alert('Kaynak ve hedef hesaplar ayni olamaz');
+      showToast('error', 'Kaynak ve hedef hesaplar ayni olamaz');
       return;
     }
 
     if (formData.amount <= 0) {
-      alert('Tutar 0\'dan buyuk olmalidir');
+      showToast('error', 'Tutar 0\'dan buyuk olmalidir');
       return;
     }
 

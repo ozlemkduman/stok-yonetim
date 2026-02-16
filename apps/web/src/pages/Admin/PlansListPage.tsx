@@ -1,9 +1,13 @@
 import { useState, useEffect } from 'react';
 import { Card, Table, Button, Badge, Modal, Input, type Column } from '@stok/ui';
 import { adminPlansApi, Plan, CreatePlanData, UpdatePlanData } from '../../api/admin/plans.api';
+import { useToast } from '../../context/ToastContext';
+import { useConfirmDialog } from '../../context/ConfirmDialogContext';
 import styles from './AdminPages.module.css';
 
 export function PlansListPage() {
+  const { showToast } = useToast();
+  const { confirm } = useConfirmDialog();
   const [plans, setPlans] = useState<Plan[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -81,14 +85,15 @@ export function PlansListPage() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Bu plani silmek istediginize emin misiniz?')) return;
+    const confirmed = await confirm({ message: 'Bu plani silmek istediginize emin misiniz?', variant: 'danger' });
+    if (!confirmed) return;
 
     try {
       await adminPlansApi.delete(id);
       loadPlans();
     } catch (error) {
       console.error('Failed to delete plan:', error);
-      alert('Plan silinemedi. Plan kullanımda olabilir.');
+      showToast('error', 'Plan silinemedi. Plan kullanımda olabilir.');
     }
   };
 

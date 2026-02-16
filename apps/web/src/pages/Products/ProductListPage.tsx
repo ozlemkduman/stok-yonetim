@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Table, Button, Input, Badge, Pagination, Modal, type Column } from '@stok/ui';
 import { productsApi, Product, CreateProductData } from '../../api/products.api';
 import { useToast } from '../../context/ToastContext';
+import { useConfirmDialog } from '../../context/ConfirmDialogContext';
 import { formatCurrency } from '../../utils/formatters';
 import styles from './ProductListPage.module.css';
 
@@ -28,6 +29,7 @@ export function ProductListPage() {
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [formData, setFormData] = useState<CreateProductData>({ name: '', purchase_price: 0, sale_price: 0 });
   const { showToast } = useToast();
+  const { confirm } = useConfirmDialog();
 
   const fetchProducts = async () => {
     setLoading(true);
@@ -61,7 +63,8 @@ export function ProductListPage() {
   };
 
   const handleDelete = async (product: Product) => {
-    if (!confirm(`"${product.name}" urununu silmek istediginizden emin misiniz?`)) return;
+    const confirmed = await confirm({ message: `"${product.name}" urununu silmek istediginizden emin misiniz?`, variant: 'danger' });
+    if (!confirmed) return;
     try {
       await productsApi.delete(product.id);
       showToast('success', 'Urun silindi');

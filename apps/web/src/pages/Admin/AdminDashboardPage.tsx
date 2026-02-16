@@ -42,7 +42,7 @@ export function AdminDashboardPage() {
 
   return (
     <div className={styles.page}>
-      <h1 className={styles.pageTitle}>Admin Dashboard</h1>
+      <h1 className={styles.pageTitle}>Admin Özet</h1>
 
       <div className={styles.statsGrid}>
         <Card className={styles.statCard}>
@@ -55,11 +55,11 @@ export function AdminDashboardPage() {
         </Card>
         <Card className={styles.statCard}>
           <div className={styles.statValue}>{stats?.trialTenants || 0}</div>
-          <div className={styles.statLabel}>Deneme Surecinde</div>
+          <div className={styles.statLabel}>Deneme Sürecinde</div>
         </Card>
         <Card className={styles.statCard}>
           <div className={styles.statValue}>{stats?.totalUsers || 0}</div>
-          <div className={styles.statLabel}>Toplam Kullanici</div>
+          <div className={styles.statLabel}>Toplam Kullanıcı</div>
         </Card>
       </div>
 
@@ -78,11 +78,11 @@ export function AdminDashboardPage() {
         </Card>
         <Card className={styles.statCard}>
           <div className={styles.statValue}>{stats?.activeUsers || 0}</div>
-          <div className={styles.statLabel}>Aktif Kullanici</div>
+          <div className={styles.statLabel}>Aktif Kullanıcı</div>
         </Card>
         <Card className={styles.statCard}>
           <div className={styles.statValue}>{stats?.suspendedTenants || 0}</div>
-          <div className={styles.statLabel}>Askiya Alinan</div>
+          <div className={styles.statLabel}>Askıya Alınan</div>
         </Card>
       </div>
 

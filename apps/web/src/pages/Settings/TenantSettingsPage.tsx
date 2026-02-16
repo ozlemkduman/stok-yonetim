@@ -10,6 +10,10 @@ export function TenantSettingsPage() {
     name: '',
     domain: '',
     billingEmail: '',
+    address: '',
+    phone: '',
+    taxOffice: '',
+    taxNumber: '',
   });
   const [isSaving, setIsSaving] = useState(false);
   const [message, setMessage] = useState('');
@@ -20,6 +24,10 @@ export function TenantSettingsPage() {
         name: settings.name || '',
         domain: settings.domain || '',
         billingEmail: settings.billing_email || '',
+        address: settings.settings?.address || '',
+        phone: settings.settings?.phone || '',
+        taxOffice: settings.settings?.taxOffice || '',
+        taxNumber: settings.settings?.taxNumber || '',
       });
     }
   }, [settings]);
@@ -30,7 +38,18 @@ export function TenantSettingsPage() {
     setMessage('');
 
     try {
-      await apiClient.patch('/settings', formData);
+      await apiClient.patch('/settings', {
+        name: formData.name,
+        domain: formData.domain,
+        billingEmail: formData.billingEmail,
+        settings: {
+          ...settings?.settings,
+          address: formData.address,
+          phone: formData.phone,
+          taxOffice: formData.taxOffice,
+          taxNumber: formData.taxNumber,
+        },
+      });
       await refreshSettings();
       setMessage('Ayarlar kaydedildi.');
     } catch (error) {
@@ -80,6 +99,42 @@ export function TenantSettingsPage() {
                 type="email"
                 value={formData.billingEmail}
                 onChange={(e) => setFormData({ ...formData, billingEmail: e.target.value })}
+              />
+            </div>
+
+            <div className={styles.field}>
+              <label>Adres</label>
+              <Input
+                value={formData.address}
+                onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                placeholder="Sirket adresi"
+              />
+            </div>
+
+            <div className={styles.field}>
+              <label>Telefon</label>
+              <Input
+                value={formData.phone}
+                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                placeholder="(XXX) XXX XX XX"
+              />
+            </div>
+
+            <div className={styles.field}>
+              <label>Vergi Dairesi</label>
+              <Input
+                value={formData.taxOffice}
+                onChange={(e) => setFormData({ ...formData, taxOffice: e.target.value })}
+                placeholder="Vergi dairesi"
+              />
+            </div>
+
+            <div className={styles.field}>
+              <label>Vergi No</label>
+              <Input
+                value={formData.taxNumber}
+                onChange={(e) => setFormData({ ...formData, taxNumber: e.target.value })}
+                placeholder="Vergi numarasi"
               />
             </div>
 

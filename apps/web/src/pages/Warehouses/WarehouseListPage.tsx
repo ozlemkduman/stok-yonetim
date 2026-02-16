@@ -4,6 +4,7 @@ import { Table, Button, Badge, Pagination, type Column } from '@stok/ui';
 import { Warehouse, StockTransfer, StockMovement, CreateWarehouseData, warehousesApi } from '../../api/warehouses.api';
 import { WarehouseFormModal } from './WarehouseFormModal';
 import { useToast } from '../../context/ToastContext';
+import { useConfirmDialog } from '../../context/ConfirmDialogContext';
 import { formatDate, formatDateTime } from '../../utils/formatters';
 import styles from './WarehouseListPage.module.css';
 
@@ -51,6 +52,7 @@ export function WarehouseListPage() {
   const [editingWarehouse, setEditingWarehouse] = useState<Warehouse | null>(null);
 
   const { showToast } = useToast();
+  const { confirm } = useConfirmDialog();
 
   const fetchWarehouses = useCallback(async () => {
     setLoading(true);
@@ -133,9 +135,8 @@ export function WarehouseListPage() {
     if (e) {
       e.stopPropagation();
     }
-    if (!confirm(`"${warehouse.name}" deposunu silmek istediginizden emin misiniz?`)) {
-      return;
-    }
+    const confirmed = await confirm({ message: `"${warehouse.name}" deposunu silmek istediginizden emin misiniz?`, variant: 'danger' });
+    if (!confirmed) return;
     try {
       await warehousesApi.delete(warehouse.id);
       showToast('success', 'Depo basariyla silindi');
@@ -157,7 +158,8 @@ export function WarehouseListPage() {
   };
 
   const handleCompleteTransfer = async (transfer: StockTransfer) => {
-    if (!confirm('Transferi tamamlamak istediginizden emin misiniz?')) return;
+    const confirmed = await confirm({ message: 'Transferi tamamlamak istediginizden emin misiniz?', variant: 'warning' });
+    if (!confirmed) return;
     try {
       await warehousesApi.completeTransfer(transfer.id);
       showToast('success', 'Transfer tamamlandi');
@@ -168,7 +170,8 @@ export function WarehouseListPage() {
   };
 
   const handleCancelTransfer = async (transfer: StockTransfer) => {
-    if (!confirm('Transferi iptal etmek istediginizden emin misiniz?')) return;
+    const confirmed = await confirm({ message: 'Transferi iptal etmek istediginizden emin misiniz?', variant: 'danger' });
+    if (!confirmed) return;
     try {
       await warehousesApi.cancelTransfer(transfer.id);
       showToast('success', 'Transfer iptal edildi');

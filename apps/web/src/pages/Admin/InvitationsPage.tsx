@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Card, Table, Button, Badge, type Column } from '@stok/ui';
 import { adminInvitationsApi, Invitation } from '../../api/admin/invitations.api';
 import { adminTenantsApi, Tenant } from '../../api/admin/tenants.api';
+import { useConfirmDialog } from '../../context/ConfirmDialogContext';
 import styles from './AdminPages.module.css';
 
 const roleLabels: Record<string, string> = {
@@ -12,6 +13,7 @@ const roleLabels: Record<string, string> = {
 };
 
 export function InvitationsPage() {
+  const { confirm } = useConfirmDialog();
   const [invitations, setInvitations] = useState<Invitation[]>([]);
   const [tenants, setTenants] = useState<Tenant[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -121,7 +123,8 @@ export function InvitationsPage() {
   };
 
   const handleCancel = async (id: string) => {
-    if (!confirm('Bu daveti iptal etmek istediginize emin misiniz?')) return;
+    const confirmed = await confirm({ message: 'Bu daveti iptal etmek istediginize emin misiniz?', variant: 'danger' });
+    if (!confirmed) return;
 
     try {
       await adminInvitationsApi.cancel(id);

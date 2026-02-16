@@ -1,6 +1,6 @@
 export const PAYMENT_METHODS = {
   nakit: 'Nakit',
-  kredi_karti: 'Kredi Karti',
+  kredi_karti: 'Kredi Kartı',
   havale: 'Havale',
   veresiye: 'Veresiye',
 } as const;
@@ -8,15 +8,15 @@ export const PAYMENT_METHODS = {
 export const EXPENSE_CATEGORIES = {
   kira: 'Kira',
   vergi: 'Vergi',
-  maas: 'Maas',
+  maas: 'Maaş',
   fatura: 'Fatura',
-  diger: 'Diger',
+  diger: 'Diğer',
 } as const;
 
 export const SALE_STATUSES = {
-  completed: 'Tamamlandi',
-  cancelled: 'Iptal',
-  refunded: 'Iade Edildi',
+  completed: 'Tamamlandı',
+  cancelled: 'İptal',
+  refunded: 'İade Edildi',
 } as const;
 
 export const VAT_RATES = [0, 1, 10, 20] as const;
