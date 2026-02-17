@@ -1,14 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { DatabaseService } from '../../database/database.service';
-import { getCurrentTenantId } from '../../common/context/tenant.context';
 import { Knex } from 'knex';
 
 @Injectable()
 export class DashboardService {
   constructor(private readonly db: DatabaseService) {}
 
-  private tenantQuery(table: string): Knex.QueryBuilder {
-    const tenantId = getCurrentTenantId();
+  private tenantQuery(table: string, tenantId?: string | null): Knex.QueryBuilder {
     const query = this.db.knex(table);
     if (tenantId) {
       return query.where(`${table}.tenant_id`, tenantId);
@@ -16,7 +14,7 @@ export class DashboardService {
     return query;
   }
 
-  async getSummary() {
+  async getSummary(tenantId?: string | null) {
     const today = new Date().toISOString().split('T')[0];
 
     const [
@@ -28,33 +26,33 @@ export class DashboardService {
       totalCredit,
       monthlyExpenses,
     ] = await Promise.all([
-      this.tenantQuery('sales')
+      this.tenantQuery('sales', tenantId)
         .where('status', 'completed')
         .whereRaw('DATE(sale_date) = ?', [today])
         .select(this.db.knex.raw('COUNT(*) as count, COALESCE(SUM(grand_total), 0) as total'))
         .first(),
 
-      this.tenantQuery('customers').where('is_active', true).count('id as count').first(),
+      this.tenantQuery('customers', tenantId).where('is_active', true).count('id as count').first(),
 
-      this.tenantQuery('products').where('is_active', true).count('id as count').first(),
+      this.tenantQuery('products', tenantId).where('is_active', true).count('id as count').first(),
 
-      this.tenantQuery('products')
+      this.tenantQuery('products', tenantId)
         .where('is_active', true)
         .whereRaw('stock_quantity <= min_stock_level')
         .count('id as count')
         .first(),
 
-      this.tenantQuery('customers')
+      this.tenantQuery('customers', tenantId)
         .where('balance', '<', 0)
         .sum('balance as total')
         .first(),
 
-      this.tenantQuery('customers')
+      this.tenantQuery('customers', tenantId)
         .where('balance', '>', 0)
         .sum('balance as total')
         .first(),
 
-      this.tenantQuery('expenses')
+      this.tenantQuery('expenses', tenantId)
         .whereRaw("expense_date >= DATE_TRUNC('month', CURRENT_DATE)")
         .sum('amount as total')
         .first(),
@@ -75,8 +73,8 @@ export class DashboardService {
     };
   }
 
-  async getRecentSales(limit: number = 5) {
-    return this.tenantQuery('sales')
+  async getRecentSales(limit: number = 5, tenantId?: string | null) {
+    return this.tenantQuery('sales', tenantId)
       .leftJoin('customers', 'sales.customer_id', 'customers.id')
       .select('sales.*', 'customers.name as customer_name')
       .where('sales.status', 'completed')
@@ -84,16 +82,16 @@ export class DashboardService {
       .limit(limit);
   }
 
-  async getLowStockProducts(limit: number = 5) {
-    return this.tenantQuery('products')
+  async getLowStockProducts(limit: number = 5, tenantId?: string | null) {
+    return this.tenantQuery('products', tenantId)
       .where('is_active', true)
       .whereRaw('stock_quantity <= min_stock_level')
       .orderBy('stock_quantity', 'asc')
       .limit(limit);
   }
 
-  async getTopCustomersWithDebt(limit: number = 5) {
-    return this.tenantQuery('customers')
+  async getTopCustomersWithDebt(limit: number = 5, tenantId?: string | null) {
+    return this.tenantQuery('customers', tenantId)
       .where('is_active', true)
       .where('balance', '<', 0)
       .orderBy('balance', 'asc')

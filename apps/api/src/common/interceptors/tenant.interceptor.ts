@@ -32,6 +32,10 @@ export class TenantInterceptor implements NestInterceptor {
       permissions: user.permissions || [],
     };
 
+    // Store context on request object as fallback
+    request.tenantContext = tenantContext;
+
+    // Set global context for current async chain
     return new Observable((subscriber) => {
       tenantContextStorage.run(tenantContext, () => {
         next.handle().subscribe({
