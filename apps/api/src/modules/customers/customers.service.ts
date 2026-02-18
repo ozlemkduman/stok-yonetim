@@ -107,11 +107,12 @@ export class CustomersService {
 
   async getCustomerDetail(id: string) {
     const customer = await this.findById(id);
-    const [sales, returns, payments, stats] = await Promise.all([
+    const [sales, returns, payments, stats, productPurchases] = await Promise.all([
       this.customersRepository.getCustomerSalesWithItems(id),
       this.customersRepository.getCustomerReturns(id),
       this.customersRepository.getCustomerPayments(id),
       this.customersRepository.getCustomerStats(id),
+      this.customersRepository.getCustomerProductPurchases(id),
     ]);
 
     return {
@@ -120,6 +121,7 @@ export class CustomersService {
       returns,
       payments,
       stats,
+      productPurchases,
     };
   }
 }

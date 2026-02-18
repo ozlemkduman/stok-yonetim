@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button, Badge, Card } from '@stok/ui';
-import { customersApi, CustomerDetail, CustomerSale, CustomerReturn, CustomerPayment } from '../../api/customers.api';
+import { customersApi, CustomerDetail, CustomerSale, CustomerReturn, CustomerPayment, ProductPurchase } from '../../api/customers.api';
 import { formatCurrency, formatDate } from '../../utils/formatters';
 import styles from './CustomerDetailPage.module.css';
 
-type TabType = 'sales' | 'returns' | 'payments';
+type TabType = 'sales' | 'returns' | 'payments' | 'products';
 
 export function CustomerDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -13,7 +13,7 @@ export function CustomerDetailPage() {
   const [data, setData] = useState<CustomerDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<TabType>('sales');
+  const [activeTab, setActiveTab] = useState<TabType>('products');
 
   useEffect(() => {
     if (!id) return;
@@ -50,7 +50,7 @@ export function CustomerDetailPage() {
     );
   }
 
-  const { customer, sales, returns, payments, stats } = data;
+  const { customer, sales, returns, payments, stats, productPurchases } = data;
 
   const paymentMethodLabels: Record<string, string> = {
     cash: 'Nakit',
@@ -151,6 +151,12 @@ export function CustomerDetailPage() {
       <div className={styles.tabsContainer}>
         <div className={styles.tabs}>
           <button
+            className={`${styles.tab} ${activeTab === 'products' ? styles.tabActive : ''}`}
+            onClick={() => setActiveTab('products')}
+          >
+            Urun Istatistikleri ({productPurchases?.length || 0})
+          </button>
+          <button
             className={`${styles.tab} ${activeTab === 'sales' ? styles.tabActive : ''}`}
             onClick={() => setActiveTab('sales')}
           >
@@ -171,6 +177,9 @@ export function CustomerDetailPage() {
         </div>
 
         <div className={styles.tabContent}>
+          {activeTab === 'products' && (
+            <ProductsTab productPurchases={productPurchases || []} />
+          )}
           {activeTab === 'sales' && (
             <SalesTab sales={sales} paymentMethodLabels={paymentMethodLabels} statusLabels={statusLabels} />
           )}
@@ -328,6 +337,47 @@ function ReturnsTab({ returns, statusLabels }: { returns: CustomerReturn[]; stat
           )}
         </div>
       ))}
+    </div>
+  );
+}
+
+function ProductsTab({ productPurchases }: { productPurchases: ProductPurchase[] }) {
+  if (productPurchases.length === 0) {
+    return <div className={styles.emptyState}>Henuz urun satisi yapilmamis</div>;
+  }
+
+  const totalQuantity = productPurchases.reduce((sum, p) => sum + Number(p.total_quantity), 0);
+  const totalAmount = productPurchases.reduce((sum, p) => sum + Number(p.total_amount), 0);
+
+  return (
+    <div className={styles.paymentsList}>
+      <table className={styles.paymentsTable}>
+        <thead>
+          <tr>
+            <th>Urun</th>
+            <th>Barkod</th>
+            <th>Toplam Adet</th>
+            <th>Toplam Tutar</th>
+          </tr>
+        </thead>
+        <tbody>
+          {productPurchases.map((pp) => (
+            <tr key={pp.product_id}>
+              <td>{pp.product_name}</td>
+              <td>{pp.barcode || '-'}</td>
+              <td><strong>{Number(pp.total_quantity)}</strong></td>
+              <td>{formatCurrency(Number(pp.total_amount))}</td>
+            </tr>
+          ))}
+        </tbody>
+        <tfoot>
+          <tr className={styles.grandTotal}>
+            <td colSpan={2}>Toplam</td>
+            <td><strong>{totalQuantity}</strong></td>
+            <td>{formatCurrency(totalAmount)}</td>
+          </tr>
+        </tfoot>
+      </table>
     </div>
   );
 }

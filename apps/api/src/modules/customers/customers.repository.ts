@@ -197,6 +197,24 @@ export class CustomersRepository extends BaseTenantRepository<Customer> {
       .select('*');
   }
 
+  async getCustomerProductPurchases(customerId: string): Promise<any[]> {
+    return this.applyTenantFilter(this.knex('sale_items'), 'sales')
+      .join('sales', 'sale_items.sale_id', 'sales.id')
+      .join('products', 'sale_items.product_id', 'products.id')
+      .where('sales.customer_id', customerId)
+      .where('sales.status', 'completed')
+      .select(
+        'products.id as product_id',
+        'products.name as product_name',
+        'products.barcode',
+      )
+      .sum('sale_items.quantity as total_quantity')
+      .sum('sale_items.line_total as total_amount')
+      .count('sale_items.id as purchase_count')
+      .groupBy('products.id', 'products.name', 'products.barcode')
+      .orderBy('total_quantity', 'desc');
+  }
+
   async getCustomerStats(customerId: string): Promise<{
     totalSales: number;
     totalReturns: number;

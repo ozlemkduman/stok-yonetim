@@ -14,6 +14,7 @@ interface ReturnFormItem {
   product_id: string;
   product_name: string;
   quantity: number;
+  max_quantity?: number;
   unit_price: number;
   vat_rate: number;
   line_total: number;
@@ -92,18 +93,24 @@ export function ReturnFormPage() {
       const sale = response.data;
       setCustomerId(sale.customer_id || '');
 
-      // Populate items from sale
+      // Populate items from sale with quantity=1 (user selects how many to return)
       if (sale.items) {
-        setItems(sale.items.map(item => ({
-          product_id: item.product_id,
-          product_name: item.product_name || '',
-          quantity: item.quantity,
-          unit_price: item.unit_price,
-          vat_rate: item.vat_rate,
-          line_total: item.line_total,
-          vat_amount: item.vat_amount,
-          sale_item_id: item.id,
-        })));
+        setItems(sale.items.map(item => {
+          const qty = 1;
+          const subtotal = qty * item.unit_price;
+          const vatAmount = subtotal * ((item.vat_rate || 0) / 100);
+          return {
+            product_id: item.product_id,
+            product_name: item.product_name || '',
+            quantity: qty,
+            max_quantity: item.quantity,
+            unit_price: item.unit_price,
+            vat_rate: item.vat_rate,
+            line_total: subtotal + vatAmount,
+            vat_amount: vatAmount,
+            sale_item_id: item.id,
+          };
+        }));
       }
     } catch (err) {
       showToast('error', 'Satis detaylari yuklenemedi');
@@ -306,7 +313,7 @@ export function ReturnFormPage() {
                     <th className={styles.alignRight}>Birim Fiyat</th>
                     <th className={styles.alignRight}>KDV</th>
                     <th className={styles.alignRight}>Toplam</th>
-                    {!saleId && <th></th>}
+                    <th></th>
                   </tr>
                 </thead>
                 <tbody>
@@ -330,10 +337,16 @@ export function ReturnFormPage() {
                         <Input
                           type="number"
                           min="1"
+                          max={item.max_quantity || undefined}
                           value={item.quantity}
                           onChange={(e) => updateItem(index, 'quantity', Number(e.target.value))}
                           className={styles.numberInput}
                         />
+                        {item.max_quantity && (
+                          <span style={{ fontSize: '11px', color: 'var(--color-text-muted)' }}>
+                            max: {item.max_quantity}
+                          </span>
+                        )}
                       </td>
                       <td className={styles.alignRight}>
                         {formatCurrency(item.unit_price)}
@@ -344,19 +357,17 @@ export function ReturnFormPage() {
                       <td className={styles.alignRight}>
                         {formatCurrency(item.line_total)}
                       </td>
-                      {!saleId && (
-                        <td>
-                          <Button
-                            type="button"
-                            size="sm"
-                            variant="ghost"
-                            onClick={() => removeItem(index)}
-                            className={styles.deleteButton}
-                          >
-                            Sil
-                          </Button>
-                        </td>
-                      )}
+                      <td>
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => removeItem(index)}
+                          className={styles.deleteButton}
+                        >
+                          Sil
+                        </Button>
+                      </td>
                     </tr>
                   ))}
                 </tbody>

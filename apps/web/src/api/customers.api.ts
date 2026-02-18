@@ -103,12 +103,22 @@ export interface CustomerStats {
   paymentsCount: number;
 }
 
+export interface ProductPurchase {
+  product_id: string;
+  product_name: string;
+  barcode: string | null;
+  total_quantity: number;
+  total_amount: number;
+  purchase_count: number;
+}
+
 export interface CustomerDetail {
   customer: Customer;
   sales: CustomerSale[];
   returns: CustomerReturn[];
   payments: CustomerPayment[];
   stats: CustomerStats;
+  productPurchases: ProductPurchase[];
 }
 
 export const customersApi = {
