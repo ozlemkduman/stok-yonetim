@@ -57,14 +57,7 @@ export class CustomersService {
   }
 
   async delete(id: string): Promise<void> {
-    const customer = await this.findById(id);
-
-    // Check if customer has balance
-    if (customer.balance !== 0) {
-      throw new ConflictException(
-        'Bakiyesi olan musteri silinemez. Once bakiyeyi sifirlayin.'
-      );
-    }
+    await this.findById(id);
 
     const deleted = await this.customersRepository.deleteCustomer(id);
     if (!deleted) {
