@@ -8,7 +8,6 @@ import styles from './AdminPages.module.css';
 
 const roleOptions = [
   { value: 'tenant_admin', label: 'Organizasyon Yoneticisi' },
-  { value: 'manager', label: 'Yonetici' },
   { value: 'user', label: 'Kullanici' },
 ];
 

@@ -113,6 +113,7 @@ export function ExpenseListPage() {
       header: 'Tekrar',
       render: (e) => e.is_recurring ? <Badge variant="info">{e.recurrence_period}</Badge> : '-'
     },
+    { key: 'created_by_name', header: 'Kaydeden', render: (e) => e.created_by_name || '-' },
     {
       key: 'actions',
       header: '',

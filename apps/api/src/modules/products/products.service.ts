@@ -13,17 +13,17 @@ export class ProductsService {
   }
 
   async findById(id: string): Promise<Product> {
-    const product = await this.productsRepository.findById(id);
+    const product = await this.productsRepository.findProductById(id);
     if (!product) throw new NotFoundException(`Urun bulunamadi: ${id}`);
     return product;
   }
 
-  async create(dto: CreateProductDto): Promise<Product> {
+  async create(dto: CreateProductDto, userId?: string): Promise<Product> {
     if (dto.barcode) {
       const existing = await this.productsRepository.findByBarcode(dto.barcode);
       if (existing) throw new ConflictException('Bu barkod zaten kullaniliyor');
     }
-    return this.productsRepository.createProduct(dto);
+    return this.productsRepository.createProduct(dto, userId);
   }
 
   async update(id: string, dto: UpdateProductDto): Promise<Product> {
@@ -74,11 +74,12 @@ export class ProductsService {
 
   async getProductDetail(id: string) {
     const product = await this.findById(id);
-    const [sales, returns, movements, stats] = await Promise.all([
+    const [sales, returns, movements, stats, warehouseStocks] = await Promise.all([
       this.productsRepository.getProductSalesWithItems(id),
       this.productsRepository.getProductReturns(id),
       this.productsRepository.getProductStockMovements(id),
       this.productsRepository.getProductStats(id),
+      this.productsRepository.getWarehouseStocks(id),
     ]);
 
     return {
@@ -87,6 +88,7 @@ export class ProductsService {
       returns,
       movements,
       stats,
+      warehouseStocks,
     };
   }
 }

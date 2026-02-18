@@ -9,7 +9,6 @@ import styles from './AdminPages.module.css';
 const roleLabels: Record<string, string> = {
   super_admin: 'Super Admin',
   tenant_admin: 'Tenant Admin',
-  manager: 'Yonetici',
   user: 'Kullanici',
 };
 
@@ -189,7 +188,6 @@ export function AdminUsersPage() {
             <option value="">Tum Roller</option>
             <option value="super_admin">Super Admin</option>
             <option value="tenant_admin">Tenant Admin</option>
-            <option value="manager">Yonetici</option>
             <option value="user">Kullanici</option>
           </select>
           <select

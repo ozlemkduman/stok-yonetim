@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Patch, Delete, Body, Param, Query } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Delete, Body, Param, Query, Req } from '@nestjs/common';
 import { QuotesService } from './quotes.service';
 import { CreateQuoteDto, UpdateQuoteDto, ConvertToSaleDto } from './dto';
 
@@ -52,8 +52,8 @@ export class QuotesController {
   }
 
   @Post()
-  async create(@Body() dto: CreateQuoteDto) {
-    const quote = await this.service.create(dto);
+  async create(@Body() dto: CreateQuoteDto, @Req() req: any) {
+    const quote = await this.service.create(dto, req.user?.sub);
     return { success: true, data: quote };
   }
 

@@ -122,6 +122,12 @@ export function CustomerDetailPage() {
                 <span className={styles.infoValue}>{customer.notes}</span>
               </div>
             )}
+            {customer.created_by_name && (
+              <div className={styles.infoItem}>
+                <span className={styles.infoLabel}>Kaydeden</span>
+                <span className={styles.infoValue}>{customer.created_by_name}</span>
+              </div>
+            )}
           </div>
         </Card>
 

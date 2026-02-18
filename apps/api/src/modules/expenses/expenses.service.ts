@@ -13,13 +13,13 @@ export class ExpensesService {
   }
 
   async findById(id: string): Promise<Expense> {
-    const expense = await this.expensesRepository.findById(id);
+    const expense = await this.expensesRepository.findExpenseById(id);
     if (!expense) throw new NotFoundException(`Gider bulunamadi: ${id}`);
     return expense;
   }
 
-  async create(dto: CreateExpenseDto): Promise<Expense> {
-    return this.expensesRepository.createExpense(dto);
+  async create(dto: CreateExpenseDto, userId?: string): Promise<Expense> {
+    return this.expensesRepository.createExpense(dto, userId);
   }
 
   async update(id: string, dto: UpdateExpenseDto): Promise<Expense> {

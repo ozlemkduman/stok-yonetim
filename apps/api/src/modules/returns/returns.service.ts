@@ -25,7 +25,7 @@ export class ReturnsService {
     return { ...ret, items };
   }
 
-  async create(dto: CreateReturnDto): Promise<Return> {
+  async create(dto: CreateReturnDto, userId?: string): Promise<Return> {
     return this.db.transaction(async (trx) => {
       const returnNumber = await this.returnsRepository.generateReturnNumber();
       let totalAmount = 0;
@@ -124,6 +124,7 @@ export class ReturnsService {
         vat_total: vatTotal,
         reason: dto.reason || null,
         status: 'completed',
+        created_by: userId || null,
       }, returnItems, trx);
 
       if (dto.customer_id) {

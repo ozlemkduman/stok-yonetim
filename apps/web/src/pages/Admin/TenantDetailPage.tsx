@@ -358,7 +358,6 @@ export function TenantDetailPage() {
                       className={styles.select}
                     >
                       <option value="tenant_admin">Organizasyon Yoneticisi</option>
-                      <option value="manager">Yonetici</option>
                       <option value="user">Kullanici</option>
                     </select>
                   </div>

@@ -1,0 +1,41 @@
+import { Product } from '../../api/products.api';
+
+export interface SaleFormItem {
+  product_id: string;
+  product_name: string;
+  quantity: number;
+  unit_price: number;
+  discount_rate: number;
+  vat_rate: number;
+  line_total: number;
+  vat_amount: number;
+  stock_quantity?: number;
+  unit?: string;
+}
+
+export interface WizardFormData {
+  // Step 1: Products
+  saleType: 'retail' | 'wholesale';
+  items: SaleFormItem[];
+  // Step 2: Customer
+  customerId: string;
+  // Step 3: Settings
+  warehouseId: string;
+  paymentMethod: string;
+  dueDate: string;
+  includeVat: boolean;
+  discountRate: number;
+  discountAmount: number;
+  notes: string;
+}
+
+export interface WizardStepProps {
+  products: Product[];
+}
+
+export const WIZARD_STEPS = [
+  { number: 1, label: 'Urunler' },
+  { number: 2, label: 'Musteri' },
+  { number: 3, label: 'Ayarlar' },
+  { number: 4, label: 'Ozet' },
+] as const;

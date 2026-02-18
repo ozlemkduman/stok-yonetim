@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Knex } from 'knex';
 import { DatabaseService } from '../../database/database.service';
-import { getCurrentTenantId, getCurrentUserRole } from '../context/tenant.context';
+import { getCurrentTenantId } from '../context/tenant.context';
 
 @Injectable()
 export abstract class BaseTenantRepository<T = any> {
@@ -15,13 +15,10 @@ export abstract class BaseTenantRepository<T = any> {
 
   protected get query(): Knex.QueryBuilder {
     const tenantId = getCurrentTenantId();
-    const role = getCurrentUserRole();
 
     let query = this.knex(this.tableName);
 
-    // Super admin can see all data
-    // Regular users can only see their tenant's data
-    if (role !== 'super_admin' && tenantId) {
+    if (tenantId) {
       query = query.where(`${this.tableName}.tenant_id`, tenantId);
     }
 
@@ -30,9 +27,8 @@ export abstract class BaseTenantRepository<T = any> {
 
   protected applyTenantFilter(query: Knex.QueryBuilder, alias?: string): Knex.QueryBuilder {
     const tenantId = getCurrentTenantId();
-    const role = getCurrentUserRole();
 
-    if (role !== 'super_admin' && tenantId) {
+    if (tenantId) {
       const column = alias ? `${alias}.tenant_id` : `${this.tableName}.tenant_id`;
       return query.where(column, tenantId);
     }
@@ -42,9 +38,8 @@ export abstract class BaseTenantRepository<T = any> {
 
   protected getInsertData(data: Partial<T>): Partial<T> & { tenant_id?: string } {
     const tenantId = getCurrentTenantId();
-    const role = getCurrentUserRole();
 
-    if (role !== 'super_admin' && tenantId) {
+    if (tenantId) {
       return { ...data, tenant_id: tenantId };
     }
 

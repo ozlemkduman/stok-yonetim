@@ -50,7 +50,7 @@ export function ProductDetailPage() {
     );
   }
 
-  const { product, sales, returns, movements, stats } = data;
+  const { product, sales, returns, movements, stats, warehouseStocks } = data;
 
   const paymentMethodLabels: Record<string, string> = {
     cash: 'Nakit',
@@ -116,6 +116,10 @@ export function ProductDetailPage() {
               <span className={styles.infoValue}>{formatCurrency(product.sale_price)}</span>
             </div>
             <div className={styles.infoItem}>
+              <span className={styles.infoLabel}>Toptan Satis Fiyati</span>
+              <span className={styles.infoValue}>{formatCurrency(product.wholesale_price)}</span>
+            </div>
+            <div className={styles.infoItem}>
               <span className={styles.infoLabel}>Alis Fiyati</span>
               <span className={styles.infoValue}>{formatCurrency(product.purchase_price)}</span>
             </div>
@@ -131,6 +135,12 @@ export function ProductDetailPage() {
               <span className={styles.infoLabel}>Olusturulma</span>
               <span className={styles.infoValue}>{formatDate(product.created_at)}</span>
             </div>
+            {product.created_by_name && (
+              <div className={styles.infoItem}>
+                <span className={styles.infoLabel}>Kaydeden</span>
+                <span className={styles.infoValue}>{product.created_by_name}</span>
+              </div>
+            )}
           </div>
         </Card>
 
@@ -155,6 +165,31 @@ export function ProductDetailPage() {
           </div>
         </Card>
       </div>
+
+      {/* Warehouse Stocks */}
+      {warehouseStocks && warehouseStocks.length > 0 && (
+        <Card className={styles.warehouseStocksCard}>
+          <h3>Depo Stoklari</h3>
+          <div className={styles.tableContainer}>
+            <table className={styles.dataTable}>
+              <thead>
+                <tr>
+                  <th>Depo</th>
+                  <th>Stok Miktari</th>
+                </tr>
+              </thead>
+              <tbody>
+                {warehouseStocks.map((ws) => (
+                  <tr key={ws.warehouse_id}>
+                    <td>{ws.warehouse_name}</td>
+                    <td>{formatNumber(ws.quantity)} {product.unit}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </Card>
+      )}
 
       {/* Tabs */}
       <div className={styles.tabsContainer}>

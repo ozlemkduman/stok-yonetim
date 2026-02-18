@@ -11,6 +11,8 @@ export interface Customer {
   balance: number;
   notes: string | null;
   is_active: boolean;
+  created_by?: string | null;
+  created_by_name?: string | null;
   created_at: string;
   updated_at: string;
 }

@@ -41,6 +41,11 @@ export class CreateProductDto {
   @IsOptional()
   @IsNumber()
   @Min(0)
+  wholesale_price?: number = 0;
+
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
   @Max(100)
   vat_rate?: number = 20;
 

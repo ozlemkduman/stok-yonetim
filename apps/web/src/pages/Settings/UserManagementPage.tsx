@@ -28,7 +28,6 @@ interface CreateUserData {
 
 const roleLabels: Record<string, string> = {
   tenant_admin: 'Yonetici',
-  manager: 'Mudur',
   user: 'Kullanici',
 };
 
@@ -230,7 +229,6 @@ export function UserManagementPage() {
               className={styles.select}
             >
               <option value="user">Kullanici</option>
-              <option value="manager">Mudur</option>
             </select>
           </div>
 

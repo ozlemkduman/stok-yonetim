@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Patch, Delete, Body, Param, Query, ParseUUIDPipe } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Delete, Body, Param, Query, ParseUUIDPipe, Req } from '@nestjs/common';
 import { ExpensesService } from './expenses.service';
 import { CreateExpenseDto, UpdateExpenseDto } from './dto';
 import { PaginationDto } from '../../common/dto/pagination.dto';
@@ -48,8 +48,8 @@ export class ExpensesController {
   }
 
   @Post()
-  async create(@Body() dto: CreateExpenseDto) {
-    const data = await this.expensesService.create(dto);
+  async create(@Body() dto: CreateExpenseDto, @Req() req: any) {
+    const data = await this.expensesService.create(dto, req.user?.sub);
     return { success: true, data };
   }
 

@@ -57,5 +57,10 @@ export class CreateSaleDto {
 
   @IsOptional()
   @IsString()
+  @IsIn(['retail', 'wholesale'])
+  sale_type?: string = 'retail';
+
+  @IsOptional()
+  @IsString()
   notes?: string;
 }

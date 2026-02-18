@@ -12,12 +12,15 @@ export interface Product {
   unit: string;
   purchase_price: number;
   sale_price: number;
+  wholesale_price: number;
   vat_rate: number;
   stock_quantity: number;
   min_stock_level: number;
   is_active: boolean;
+  created_by: string | null;
   created_at: Date;
   updated_at: Date;
+  created_by_name?: string;
 }
 
 export interface ProductListParams {
@@ -73,6 +76,9 @@ export class ProductsRepository extends BaseTenantRepository<Product> {
       countQuery = countQuery.where(searchFilter);
     }
 
+    // Join users for created_by_name
+    query = query.leftJoin('users', `${this.tableName}.created_by`, 'users.id');
+
     // Satis adedine gore siralama
     if (sortBy === 'total_sold') {
       const subquery = this.knex('sale_items as si')
@@ -85,10 +91,10 @@ export class ProductsRepository extends BaseTenantRepository<Product> {
 
       query = query
         .leftJoin(subquery, `sold_agg.product_id`, `${this.tableName}.id`)
-        .select(`${this.tableName}.*`, this.knex.raw('COALESCE(sold_agg.total_sold, 0) as total_sold'))
+        .select(`${this.tableName}.*`, 'users.name as created_by_name', this.knex.raw('COALESCE(sold_agg.total_sold, 0) as total_sold'))
         .orderBy('total_sold', sortOrder);
     } else {
-      query = query.select(`${this.tableName}.*`).orderBy(`${this.tableName}.${sortBy}`, sortOrder);
+      query = query.select(`${this.tableName}.*`, 'users.name as created_by_name').orderBy(`${this.tableName}.${sortBy}`, sortOrder);
     }
 
     const [items, [{ count }]] = await Promise.all([
@@ -103,8 +109,16 @@ export class ProductsRepository extends BaseTenantRepository<Product> {
     return this.query.where('barcode', barcode).first() || null;
   }
 
-  async createProduct(data: CreateProductDto): Promise<Product> {
-    const insertData = this.getInsertData(data);
+  async findProductById(id: string): Promise<Product | null> {
+    return this.query.clone()
+      .leftJoin('users', `${this.tableName}.created_by`, 'users.id')
+      .select(`${this.tableName}.*`, 'users.name as created_by_name')
+      .where(`${this.tableName}.id`, id)
+      .first() || null;
+  }
+
+  async createProduct(data: CreateProductDto, userId?: string): Promise<Product> {
+    const insertData = this.getInsertData({ ...data, created_by: userId || null });
     const [product] = await this.knex(this.tableName).insert(insertData).returning('*');
     return product;
   }
@@ -210,6 +224,20 @@ export class ProductsRepository extends BaseTenantRepository<Product> {
       );
 
     return this.applyTenantFilter(baseQuery, 'stock_movements');
+  }
+
+  async getWarehouseStocks(productId: string): Promise<{ warehouse_id: string; warehouse_name: string; quantity: number }[]> {
+    const baseQuery = this.knex('warehouse_stocks')
+      .leftJoin('warehouses', 'warehouse_stocks.warehouse_id', 'warehouses.id')
+      .where('warehouse_stocks.product_id', productId)
+      .select(
+        'warehouse_stocks.warehouse_id',
+        'warehouses.name as warehouse_name',
+        'warehouse_stocks.quantity',
+      )
+      .orderBy('warehouses.name', 'asc');
+
+    return this.applyTenantFilter(baseQuery, 'warehouse_stocks');
   }
 
   async getProductStats(productId: string): Promise<{

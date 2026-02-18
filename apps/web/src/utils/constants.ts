@@ -19,6 +19,11 @@ export const SALE_STATUSES = {
   refunded: 'İade Edildi',
 } as const;
 
+export const SALE_TYPES = {
+  retail: 'Perakende',
+  wholesale: 'Toptan',
+} as const;
+
 export const VAT_RATES = [0, 1, 10, 20] as const;
 
 export const UNITS = ['adet', 'kg', 'litre', 'metre', 'paket', 'kutu'] as const;

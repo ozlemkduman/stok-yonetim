@@ -13,8 +13,10 @@ export interface Return {
   vat_total: number;
   reason: string | null;
   status: string;
+  created_by: string | null;
   created_at: Date;
   customer_name?: string;
+  created_by_name?: string;
 }
 
 export interface ReturnItem {
@@ -43,7 +45,8 @@ export class ReturnsRepository extends BaseTenantRepository<Return> {
 
     let query = this.query.clone()
       .leftJoin('customers', 'returns.customer_id', 'customers.id')
-      .select('returns.*', 'customers.name as customer_name');
+      .leftJoin('users', 'returns.created_by', 'users.id')
+      .select('returns.*', 'customers.name as customer_name', 'users.name as created_by_name');
     let countQuery = this.query.clone();
 
     if (customerId) {
@@ -62,11 +65,13 @@ export class ReturnsRepository extends BaseTenantRepository<Return> {
     return this.query.clone()
       .leftJoin('customers', 'returns.customer_id', 'customers.id')
       .leftJoin('sales', 'returns.sale_id', 'sales.id')
+      .leftJoin('users', 'returns.created_by', 'users.id')
       .select(
         'returns.*',
         'customers.name as customer_name',
         'sales.invoice_number as sale_invoice_number',
-        'sales.sale_date as sale_date'
+        'sales.sale_date as sale_date',
+        'users.name as created_by_name'
       )
       .where('returns.id', id)
       .first() || null;

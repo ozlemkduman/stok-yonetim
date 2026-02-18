@@ -15,10 +15,13 @@ export interface Sale {
   vat_total: number;
   grand_total: number;
   include_vat: boolean;
+  invoice_issued: boolean;
   payment_method: string;
   due_date: Date | null;
+  sale_type: string;
   status: string;
   notes: string | null;
+  created_by: string | null;
   created_at: Date;
   updated_at: Date;
   customer_name?: string;
@@ -26,6 +29,7 @@ export interface Sale {
   customer_address?: string;
   customer_tax_number?: string;
   customer_tax_office?: string;
+  created_by_name?: string;
 }
 
 export interface SaleItem {
@@ -50,13 +54,14 @@ export class SalesRepository extends BaseTenantRepository<Sale> {
     super(db);
   }
 
-  async findAll(params: { page: number; limit: number; search?: string; customerId?: string; status?: string; startDate?: string; endDate?: string; includeVat?: string; sortBy: string; sortOrder: 'asc' | 'desc' }): Promise<{ items: Sale[]; total: number }> {
-    const { page, limit, search, customerId, status, startDate, endDate, includeVat, sortBy, sortOrder } = params;
+  async findAll(params: { page: number; limit: number; search?: string; customerId?: string; status?: string; startDate?: string; endDate?: string; includeVat?: string; invoiceIssued?: string; saleType?: string; sortBy: string; sortOrder: 'asc' | 'desc' }): Promise<{ items: Sale[]; total: number }> {
+    const { page, limit, search, customerId, status, startDate, endDate, includeVat, invoiceIssued, saleType, sortBy, sortOrder } = params;
     const offset = (page - 1) * limit;
 
     let query = this.query.clone()
       .leftJoin('customers', 'sales.customer_id', 'customers.id')
-      .select('sales.*', 'customers.name as customer_name');
+      .leftJoin('users', 'sales.created_by', 'users.id')
+      .select('sales.*', 'customers.name as customer_name', 'users.name as created_by_name');
     let countQuery = this.query.clone();
 
     if (customerId) {
@@ -82,6 +87,17 @@ export class SalesRepository extends BaseTenantRepository<Sale> {
       query = query.where('sales.include_vat', false);
       countQuery = countQuery.where('include_vat', false);
     }
+    if (invoiceIssued === 'true') {
+      query = query.where('sales.invoice_issued', true);
+      countQuery = countQuery.where('invoice_issued', true);
+    } else if (invoiceIssued === 'false') {
+      query = query.where('sales.invoice_issued', false);
+      countQuery = countQuery.where('invoice_issued', false);
+    }
+    if (saleType) {
+      query = query.where('sales.sale_type', saleType);
+      countQuery = countQuery.where('sale_type', saleType);
+    }
     if (search) {
       query = query.where((b) => b.whereILike('sales.invoice_number', `%${search}%`).orWhereILike('customers.name', `%${search}%`));
       countQuery = countQuery.whereILike('invoice_number', `%${search}%`);
@@ -92,6 +108,24 @@ export class SalesRepository extends BaseTenantRepository<Sale> {
       countQuery.count('id as count'),
     ]);
     return { items, total: parseInt(count as string, 10) };
+  }
+
+  async findById(id: string): Promise<Sale | null> {
+    const result = await this.query
+      .leftJoin('customers', 'sales.customer_id', 'customers.id')
+      .leftJoin('users', 'sales.created_by', 'users.id')
+      .select(
+        'sales.*',
+        'customers.name as customer_name',
+        'customers.phone as customer_phone',
+        'customers.address as customer_address',
+        'customers.tax_number as customer_tax_number',
+        'customers.tax_office as customer_tax_office',
+        'users.name as created_by_name',
+      )
+      .where('sales.id', id)
+      .first();
+    return result || null;
   }
 
   async findItemsBySaleId(saleId: string): Promise<SaleItem[]> {

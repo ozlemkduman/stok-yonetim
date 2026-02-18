@@ -8,6 +8,7 @@ import {
   Param,
   Query,
   ParseUUIDPipe,
+  Req,
 } from '@nestjs/common';
 import { CustomersService } from './customers.service';
 import { CreateCustomerDto, UpdateCustomerDto } from './dto';
@@ -95,8 +96,8 @@ export class CustomersController {
   }
 
   @Post()
-  async create(@Body() dto: CreateCustomerDto) {
-    const data = await this.customersService.create(dto);
+  async create(@Body() dto: CreateCustomerDto, @Req() req: any) {
+    const data = await this.customersService.create(dto, req.user?.sub);
     return { success: true, data };
   }
 

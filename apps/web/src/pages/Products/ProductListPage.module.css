@@ -104,7 +104,79 @@
   gap: var(--space-4);
 }
 
-@media (max-width: 640px) { .form { grid-template-columns: 1fr; } }
+.vatRateRow {
+  grid-column: 1 / -1;
+  max-width: 200px;
+}
+
+.priceSection {
+  grid-column: 1 / -1;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.priceSectionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.priceSectionTitle {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+}
+
+.vatToggle {
+  display: flex;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.vatToggleBtn {
+  padding: var(--space-1) var(--space-3);
+  border: none;
+  background: var(--color-bg);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.vatToggleBtn:hover {
+  background: var(--color-bg-hover);
+}
+
+.vatToggleActive {
+  background: var(--color-primary) !important;
+  color: white !important;
+  font-weight: var(--font-weight-semibold);
+}
+
+.priceField {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.priceHint {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  padding-left: var(--space-1);
+}
+
+@media (max-width: 640px) {
+  .form { grid-template-columns: 1fr; }
+  .priceSectionHeader { flex-direction: column; align-items: flex-start; }
+}
 
 /* ══════════════════════════════════════════════════════════════════════════
    RESPONSIVE DESIGN

@@ -17,14 +17,14 @@ export class CustomersService {
   }
 
   async findById(id: string): Promise<Customer> {
-    const customer = await this.customersRepository.findById(id);
+    const customer = await this.customersRepository.findCustomerById(id);
     if (!customer) {
       throw new NotFoundException(`Musteri bulunamadi: ${id}`);
     }
     return customer;
   }
 
-  async create(dto: CreateCustomerDto): Promise<Customer> {
+  async create(dto: CreateCustomerDto, userId?: string): Promise<Customer> {
     // Check for duplicate email if provided
     if (dto.email) {
       const existing = await this.customersRepository.findByEmail(dto.email);
@@ -33,7 +33,7 @@ export class CustomersService {
       }
     }
 
-    return this.customersRepository.createCustomer(dto);
+    return this.customersRepository.createCustomer(dto, userId);
   }
 
   async update(id: string, dto: UpdateCustomerDto): Promise<Customer> {

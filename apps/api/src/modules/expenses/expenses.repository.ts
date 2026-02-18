@@ -11,8 +11,10 @@ export interface Expense {
   expense_date: Date;
   is_recurring: boolean;
   recurrence_period: string | null;
+  created_by: string | null;
   created_at: Date;
   updated_at: Date;
+  created_by_name?: string;
 }
 
 @Injectable()
@@ -23,34 +25,43 @@ export class ExpensesRepository extends BaseTenantRepository<Expense> {
     super(db);
   }
 
+  async findExpenseById(id: string): Promise<Expense | null> {
+    return this.query.clone()
+      .leftJoin('users', `${this.tableName}.created_by`, 'users.id')
+      .select(`${this.tableName}.*`, 'users.name as created_by_name')
+      .where(`${this.tableName}.id`, id)
+      .first() || null;
+  }
+
   async findAll(params: { page: number; limit: number; category?: string; startDate?: string; endDate?: string; sortBy: string; sortOrder: 'asc' | 'desc' }): Promise<{ items: Expense[]; total: number }> {
     const { page, limit, category, startDate, endDate, sortBy, sortOrder } = params;
 
-    let query = this.query.clone();
+    let query = this.query.clone()
+      .leftJoin('users', `${this.tableName}.created_by`, 'users.id');
     let countQuery = this.query.clone();
 
     if (category) {
-      query = query.where('category', category);
+      query = query.where(`${this.tableName}.category`, category);
       countQuery = countQuery.where('category', category);
     }
     if (startDate) {
-      query = query.where('expense_date', '>=', startDate);
+      query = query.where(`${this.tableName}.expense_date`, '>=', startDate);
       countQuery = countQuery.where('expense_date', '>=', startDate);
     }
     if (endDate) {
-      query = query.where('expense_date', '<=', endDate);
+      query = query.where(`${this.tableName}.expense_date`, '<=', endDate);
       countQuery = countQuery.where('expense_date', '<=', endDate);
     }
 
     const [items, [{ count }]] = await Promise.all([
-      query.orderBy(sortBy, sortOrder).limit(limit).offset((page - 1) * limit).select('*'),
+      query.orderBy(`${this.tableName}.${sortBy}`, sortOrder).limit(limit).offset((page - 1) * limit).select(`${this.tableName}.*`, 'users.name as created_by_name'),
       countQuery.count('id as count'),
     ]);
     return { items, total: parseInt(count as string, 10) };
   }
 
-  async createExpense(data: CreateExpenseDto): Promise<Expense> {
-    const insertData = this.getInsertData(data as any);
+  async createExpense(data: CreateExpenseDto, userId?: string): Promise<Expense> {
+    const insertData = this.getInsertData({ ...data, created_by: userId || null } as any);
     const [expense] = await this.knex(this.tableName).insert(insertData).returning('*');
     return expense;
   }

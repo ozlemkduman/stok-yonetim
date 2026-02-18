@@ -40,7 +40,7 @@ export class QuotesService {
   }
 
   async findById(id: string) {
-    const quote = await this.repository.findById(id);
+    const quote = await this.repository.findQuoteById(id);
     if (!quote) {
       throw new NotFoundException('Teklif bulunamadi');
     }
@@ -49,7 +49,7 @@ export class QuotesService {
     return { ...quote, items };
   }
 
-  async create(dto: CreateQuoteDto): Promise<Quote> {
+  async create(dto: CreateQuoteDto, userId?: string): Promise<Quote> {
     const quoteNumber = await this.repository.generateQuoteNumber();
 
     // Calculate totals
@@ -95,6 +95,7 @@ export class QuotesService {
       include_vat: dto.include_vat ?? true,
       status: 'draft',
       notes: dto.notes,
+      created_by: userId || null,
     }, itemsData);
   }
 

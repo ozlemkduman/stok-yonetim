@@ -63,7 +63,6 @@ export type Permission = (typeof PERMISSIONS)[keyof typeof PERMISSIONS];
 export const USER_ROLES = {
   SUPER_ADMIN: 'super_admin',
   TENANT_ADMIN: 'tenant_admin',
-  MANAGER: 'manager',
   USER: 'user',
 } as const;
 

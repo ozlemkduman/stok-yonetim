@@ -37,10 +37,14 @@ export interface Sale {
   vat_total: number;
   grand_total: number;
   include_vat: boolean;
+  invoice_issued: boolean;
   payment_method: string;
   due_date: string | null;
+  sale_type: string;
   status: string;
   notes: string | null;
+  created_by?: string | null;
+  created_by_name?: string | null;
   items?: SaleItem[];
 }
 
@@ -57,6 +61,7 @@ export interface CreateSaleData {
   include_vat?: boolean;
   payment_method: string;
   due_date?: string;
+  sale_type?: string;
   notes?: string;
 }
 
@@ -66,4 +71,5 @@ export const salesApi = {
   getDetail: (id: string) => apiClient.get<SaleDetail>(`/sales/${id}/detail`),
   create: (data: CreateSaleData) => apiClient.post<Sale>('/sales', data),
   cancel: (id: string) => apiClient.patch<{ message: string }>(`/sales/${id}/cancel`, {}),
+  updateInvoiceIssued: (id: string, issued: boolean) => apiClient.patch<{ message: string }>(`/sales/${id}/invoice-issued`, { invoice_issued: issued }),
 };

@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Button, Badge, Card } from '@stok/ui';
 import { salesApi, SaleDetail } from '../../api/sales.api';
 import { formatCurrency, formatDate, formatDateTime } from '../../utils/formatters';
-import { PAYMENT_METHODS, SALE_STATUSES } from '../../utils/constants';
+import { PAYMENT_METHODS, SALE_STATUSES, SALE_TYPES } from '../../utils/constants';
 import { useToast } from '../../context/ToastContext';
 import { useConfirmDialog } from '../../context/ConfirmDialogContext';
 import { PrintModal } from './PrintModal';
@@ -19,6 +19,7 @@ export function SaleDetailPage() {
   const [error, setError] = useState<string | null>(null);
   const [cancelling, setCancelling] = useState(false);
   const [showPrintModal, setShowPrintModal] = useState(false);
+  const [togglingInvoice, setTogglingInvoice] = useState(false);
 
   useEffect(() => {
     if (!id) return;
@@ -54,6 +55,21 @@ export function SaleDetailPage() {
       showToast('error', err instanceof Error ? err.message : 'İptal başarısız');
     } finally {
       setCancelling(false);
+    }
+  };
+
+  const handleToggleInvoice = async () => {
+    if (!data || !id) return;
+    setTogglingInvoice(true);
+    try {
+      await salesApi.updateInvoiceIssued(id, !data.invoice_issued);
+      showToast('success', data.invoice_issued ? 'Fatura durumu kaldırıldı' : 'Fatura kesildi olarak işaretlendi');
+      const response = await salesApi.getDetail(id);
+      setData(response.data);
+    } catch (err) {
+      showToast('error', 'Fatura durumu güncellenemedi');
+    } finally {
+      setTogglingInvoice(false);
     }
   };
 
@@ -140,11 +156,40 @@ export function SaleDetailPage() {
               </span>
             </div>
             <div className={styles.infoItem}>
+              <span className={styles.infoLabel}>Satış Tipi</span>
+              <span className={styles.infoValue}>
+                {SALE_TYPES[data.sale_type as keyof typeof SALE_TYPES] || 'Perakende'}
+              </span>
+            </div>
+            <div className={styles.infoItem}>
               <span className={styles.infoLabel}>Ödeme Yöntemi</span>
               <span className={styles.infoValue}>
                 {PAYMENT_METHODS[data.payment_method as keyof typeof PAYMENT_METHODS] || data.payment_method}
               </span>
             </div>
+            <div className={styles.infoItem}>
+              <span className={styles.infoLabel}>Fatura Durumu</span>
+              <span className={styles.infoValue}>
+                <Badge variant={data.invoice_issued ? 'success' : 'warning'}>
+                  {data.invoice_issued ? 'Fatura Kesildi' : 'Fatura Kesilmedi'}
+                </Badge>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={handleToggleInvoice}
+                  disabled={togglingInvoice}
+                  style={{ marginLeft: 8 }}
+                >
+                  {togglingInvoice ? '...' : data.invoice_issued ? 'Kaldır' : 'Kesildi İşaretle'}
+                </Button>
+              </span>
+            </div>
+            {data.created_by_name && (
+              <div className={styles.infoItem}>
+                <span className={styles.infoLabel}>Satisi Yapan</span>
+                <span className={styles.infoValue}>{data.created_by_name}</span>
+              </div>
+            )}
             {data.due_date && (
               <div className={styles.infoItem}>
                 <span className={styles.infoLabel}>Vade Tarihi</span>

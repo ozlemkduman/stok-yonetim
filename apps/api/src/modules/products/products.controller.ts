@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Patch, Delete, Body, Param, Query, ParseUUIDPipe } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Delete, Body, Param, Query, ParseUUIDPipe, Req } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { CreateProductDto, UpdateProductDto } from './dto';
 import { PaginationDto } from '../../common/dto/pagination.dto';
@@ -85,8 +85,8 @@ export class ProductsController {
   }
 
   @Post()
-  async create(@Body() dto: CreateProductDto) {
-    const data = await this.productsService.create(dto);
+  async create(@Body() dto: CreateProductDto, @Req() req: any) {
+    const data = await this.productsService.create(dto, req.user?.sub);
     return { success: true, data };
   }
 

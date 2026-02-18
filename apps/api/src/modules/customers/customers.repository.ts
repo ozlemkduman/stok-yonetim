@@ -15,8 +15,10 @@ export interface Customer {
   balance: number;
   notes: string | null;
   is_active: boolean;
+  created_by: string | null;
   created_at: Date;
   updated_at: Date;
+  created_by_name?: string;
 }
 
 export interface CustomerListParams {
@@ -36,17 +38,26 @@ export class CustomersRepository extends BaseTenantRepository<Customer> {
     super(db);
   }
 
+  async findCustomerById(id: string): Promise<Customer | null> {
+    return this.query.clone()
+      .leftJoin('users', `${this.tableName}.created_by`, 'users.id')
+      .select(`${this.tableName}.*`, 'users.name as created_by_name')
+      .where(`${this.tableName}.id`, id)
+      .first() || null;
+  }
+
   async findAll(params: CustomerListParams): Promise<{ items: Customer[]; total: number }> {
     const { page, limit, search, sortBy, sortOrder, isActive } = params;
     const offset = (page - 1) * limit;
 
-    let query = this.query;
+    let query = this.query.clone()
+      .leftJoin('users', `${this.tableName}.created_by`, 'users.id');
     let countQuery = this.query.clone();
 
     // Filter by active status
     if (isActive !== undefined) {
-      query = query.where('is_active', isActive);
-      countQuery = countQuery.where('is_active', isActive);
+      query = query.where(`${this.tableName}.is_active`, isActive);
+      countQuery = countQuery.where(`${this.tableName}.is_active`, isActive);
     }
 
     // Search
@@ -54,25 +65,25 @@ export class CustomersRepository extends BaseTenantRepository<Customer> {
       const searchTerm = `%${search}%`;
       query = query.where((builder) => {
         builder
-          .whereILike('name', searchTerm)
-          .orWhereILike('phone', searchTerm)
-          .orWhereILike('email', searchTerm);
+          .whereILike(`${this.tableName}.name`, searchTerm)
+          .orWhereILike(`${this.tableName}.phone`, searchTerm)
+          .orWhereILike(`${this.tableName}.email`, searchTerm);
       });
       countQuery = countQuery.where((builder) => {
         builder
-          .whereILike('name', searchTerm)
-          .orWhereILike('phone', searchTerm)
-          .orWhereILike('email', searchTerm);
+          .whereILike(`${this.tableName}.name`, searchTerm)
+          .orWhereILike(`${this.tableName}.phone`, searchTerm)
+          .orWhereILike(`${this.tableName}.email`, searchTerm);
       });
     }
 
     const [items, [{ count }]] = await Promise.all([
       query
-        .orderBy(sortBy, sortOrder)
+        .orderBy(`${this.tableName}.${sortBy}`, sortOrder)
         .limit(limit)
         .offset(offset)
-        .select('*'),
-      countQuery.count('id as count'),
+        .select(`${this.tableName}.*`, 'users.name as created_by_name'),
+      countQuery.count(`${this.tableName}.id as count`),
     ]);
 
     return {
@@ -89,11 +100,12 @@ export class CustomersRepository extends BaseTenantRepository<Customer> {
     return customer || null;
   }
 
-  async createCustomer(data: CreateCustomerDto): Promise<Customer> {
+  async createCustomer(data: CreateCustomerDto, userId?: string): Promise<Customer> {
     const insertData = this.getInsertData({
       ...data,
       balance: 0,
       is_active: true,
+      created_by: userId || null,
     });
     const [customer] = await this.knex(this.tableName)
       .insert(insertData)

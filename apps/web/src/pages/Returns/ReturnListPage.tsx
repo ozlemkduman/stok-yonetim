@@ -23,6 +23,7 @@ interface Return {
   total_amount: number;
   reason: string | null;
   status: string;
+  created_by_name?: string | null;
 }
 
 export function ReturnListPage() {
@@ -68,6 +69,7 @@ export function ReturnListPage() {
       render: (r) => <span className={styles.total}>{formatCurrency(r.total_amount)}</span>
     },
     { key: 'reason', header: 'Neden', render: (r) => r.reason || '-' },
+    { key: 'created_by_name', header: 'Kaydeden', render: (r) => r.created_by_name || '-' },
     {
       key: 'status',
       header: 'Durum',

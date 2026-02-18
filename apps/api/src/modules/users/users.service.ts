@@ -70,7 +70,7 @@ export class UsersService {
       name: dto.name,
       phone: dto.phone || null,
       role: dto.role || 'user',
-      permissions: dto.permissions || [],
+      permissions: dto.permissions || ['*'],
       status: 'active',
     });
 

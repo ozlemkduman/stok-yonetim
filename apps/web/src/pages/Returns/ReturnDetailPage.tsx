@@ -113,6 +113,12 @@ export function ReturnDetailPage() {
                 <span className={styles.infoValue}>{data.reason}</span>
               </div>
             )}
+            {data.created_by_name && (
+              <div className={styles.infoItem}>
+                <span className={styles.infoLabel}>Kaydeden</span>
+                <span className={styles.infoValue}>{data.created_by_name}</span>
+              </div>
+            )}
           </div>
         </Card>
 

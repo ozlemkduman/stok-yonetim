@@ -15,6 +15,8 @@ export interface Quote {
   status: 'draft' | 'sent' | 'accepted' | 'rejected' | 'expired' | 'converted';
   converted_sale_id: string | null;
   notes: string | null;
+  created_by?: string | null;
+  created_by_name?: string | null;
   created_at: string;
   updated_at: string;
   customer_name?: string;

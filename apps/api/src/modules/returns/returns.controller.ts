@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, Query, ParseUUIDPipe } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Query, ParseUUIDPipe, Req } from '@nestjs/common';
 import { ReturnsService } from './returns.service';
 import { CreateReturnDto } from './dto';
 import { PaginationDto } from '../../common/dto/pagination.dto';
@@ -40,8 +40,8 @@ export class ReturnsController {
   }
 
   @Post()
-  async create(@Body() dto: CreateReturnDto) {
-    const data = await this.returnsService.create(dto);
+  async create(@Body() dto: CreateReturnDto, @Req() req: any) {
+    const data = await this.returnsService.create(dto, req.user?.sub);
     return { success: true, data };
   }
 }

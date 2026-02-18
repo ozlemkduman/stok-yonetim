@@ -129,6 +129,11 @@ export function CustomerListPage() {
       ),
     },
     {
+      key: 'created_by_name',
+      header: 'Kaydeden',
+      render: (customer) => customer.created_by_name || '-',
+    },
+    {
       key: 'actions',
       header: '',
       width: '180px',

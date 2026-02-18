@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Patch, Body, Param, Query, ParseUUIDPipe } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Body, Param, Query, ParseUUIDPipe, Req } from '@nestjs/common';
 import { SalesService } from './sales.service';
 import { CreateSaleDto } from './dto';
 import { PaginationDto } from '../../common/dto/pagination.dto';
@@ -11,7 +11,7 @@ export class SalesController {
   constructor(private readonly salesService: SalesService) {}
 
   @Get()
-  async findAll(@Query() query: PaginationDto & { customerId?: string; status?: string; startDate?: string; endDate?: string; includeVat?: string }) {
+  async findAll(@Query() query: PaginationDto & { customerId?: string; status?: string; startDate?: string; endDate?: string; includeVat?: string; invoiceIssued?: string; saleType?: string }) {
     const page = query.page || 1;
     const limit = query.limit || 20;
     const result = await this.salesService.findAll({
@@ -23,6 +23,8 @@ export class SalesController {
       startDate: query.startDate,
       endDate: query.endDate,
       includeVat: query.includeVat,
+      invoiceIssued: query.invoiceIssued,
+      saleType: query.saleType,
       sortBy: validateSortColumn(query.sortBy || 'sale_date', ALLOWED_SORT_COLUMNS, 'sale_date'),
       sortOrder: query.sortOrder || 'desc',
     });
@@ -51,8 +53,8 @@ export class SalesController {
   }
 
   @Post()
-  async create(@Body() dto: CreateSaleDto) {
-    const data = await this.salesService.create(dto);
+  async create(@Body() dto: CreateSaleDto, @Req() req: any) {
+    const data = await this.salesService.create(dto, req.user?.sub);
     return { success: true, data };
   }
 
@@ -60,5 +62,11 @@ export class SalesController {
   async cancel(@Param('id', ParseUUIDPipe) id: string) {
     await this.salesService.cancel(id);
     return { success: true, message: 'Satis iptal edildi' };
+  }
+
+  @Patch(':id/invoice-issued')
+  async updateInvoiceIssued(@Param('id', ParseUUIDPipe) id: string, @Body() body: { invoice_issued: boolean }) {
+    await this.salesService.updateInvoiceIssued(id, body.invoice_issued);
+    return { success: true, message: 'Fatura durumu guncellendi' };
   }
 }

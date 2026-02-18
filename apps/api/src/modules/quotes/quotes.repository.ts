@@ -18,9 +18,11 @@ export interface Quote {
   status: string;
   converted_sale_id: string | null;
   notes: string | null;
+  created_by: string | null;
   created_at: Date;
   updated_at: Date;
   customer_name?: string;
+  created_by_name?: string;
 }
 
 export interface QuoteItem {
@@ -61,7 +63,8 @@ export class QuotesRepository extends BaseTenantRepository<Quote> {
 
     let query = this.query.clone()
       .leftJoin('customers', 'quotes.customer_id', 'customers.id')
-      .select('quotes.*', 'customers.name as customer_name');
+      .leftJoin('users', 'quotes.created_by', 'users.id')
+      .select('quotes.*', 'customers.name as customer_name', 'users.name as created_by_name');
     let countQuery = this.query.clone();
 
     if (customerId) {
@@ -98,6 +101,15 @@ export class QuotesRepository extends BaseTenantRepository<Quote> {
     ]);
 
     return { items, total: parseInt(count as string, 10) };
+  }
+
+  async findQuoteById(id: string): Promise<Quote | null> {
+    return this.query.clone()
+      .leftJoin('customers', 'quotes.customer_id', 'customers.id')
+      .leftJoin('users', 'quotes.created_by', 'users.id')
+      .select('quotes.*', 'customers.name as customer_name', 'users.name as created_by_name')
+      .where('quotes.id', id)
+      .first() || null;
   }
 
   async findItemsByQuoteId(quoteId: string): Promise<QuoteItem[]> {

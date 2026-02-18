@@ -9,7 +9,6 @@ import styles from './AdminPages.module.css';
 const roleLabels: Record<string, string> = {
   super_admin: 'Super Admin',
   tenant_admin: 'Organizasyon Admini',
-  manager: 'Yonetici',
   user: 'Kullanici',
 };
 
@@ -78,7 +77,7 @@ export function InvitationsPage() {
       return;
     }
 
-    if ((newInvitation.role === 'manager' || newInvitation.role === 'user') && !newInvitation.tenantId) {
+    if (newInvitation.role === 'user' && !newInvitation.tenantId) {
       setInviteError('Organizasyon secimi gerekli');
       return;
     }
@@ -316,7 +315,6 @@ export function InvitationsPage() {
                   })}
                 >
                   <option value="tenant_admin">Organizasyon Admini (Yeni Org. Olusturur)</option>
-                  <option value="manager">Yonetici (Mevcut Org.)</option>
                   <option value="user">Kullanici (Mevcut Org.)</option>
                 </select>
               </div>
@@ -354,7 +352,7 @@ export function InvitationsPage() {
                 </>
               )}
 
-              {(newInvitation.role === 'manager' || newInvitation.role === 'user') && (
+              {newInvitation.role === 'user' && (
                 <div className={styles.formField}>
                   <label>Organizasyon *</label>
                   <select

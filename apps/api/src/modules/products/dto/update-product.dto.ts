@@ -44,6 +44,11 @@ export class UpdateProductDto {
   @IsOptional()
   @IsNumber()
   @Min(0)
+  wholesale_price?: number;
+
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
   @Max(100)
   vat_rate?: number;
 

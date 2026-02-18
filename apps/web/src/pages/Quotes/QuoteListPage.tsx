@@ -201,6 +201,11 @@ export function QuoteListPage() {
       ),
     },
     {
+      key: 'created_by_name',
+      header: 'Kaydeden',
+      render: (q) => q.created_by_name || '-',
+    },
+    {
       key: 'actions',
       header: '',
       width: '200px',

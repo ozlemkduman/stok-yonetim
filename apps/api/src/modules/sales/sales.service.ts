@@ -37,7 +37,7 @@ export class SalesService {
     return { ...sale, items, payments };
   }
 
-  async create(dto: CreateSaleDto): Promise<Sale> {
+  async create(dto: CreateSaleDto, userId?: string): Promise<Sale> {
     if (dto.customer_id) {
       const customer = await this.customersRepository.findById(dto.customer_id);
       if (!customer) throw new BadRequestException('Musteri bulunamadi');
@@ -99,10 +99,12 @@ export class SalesService {
         vat_total: vatTotal,
         grand_total: grandTotal,
         include_vat: dto.include_vat !== false,
+        sale_type: dto.sale_type || 'retail',
         payment_method: dto.payment_method,
         due_date: dto.due_date ? new Date(dto.due_date) : null,
         status: 'completed',
         notes: dto.notes || null,
+        created_by: userId || null,
       }, saleItems, trx);
 
       if (dto.customer_id && dto.payment_method === 'veresiye') {
@@ -123,6 +125,12 @@ export class SalesService {
 
       return sale;
     });
+  }
+
+  async updateInvoiceIssued(id: string, issued: boolean): Promise<void> {
+    const sale = await this.salesRepository.findById(id);
+    if (!sale) throw new NotFoundException(`Satis bulunamadi: ${id}`);
+    await this.salesRepository.update(id, { invoice_issued: issued } as Partial<Sale>);
   }
 
   async cancel(id: string): Promise<void> {

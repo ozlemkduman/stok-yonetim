@@ -8,10 +8,13 @@ export interface Product {
   unit: string;
   purchase_price: number;
   sale_price: number;
+  wholesale_price: number;
   vat_rate: number;
   stock_quantity: number;
   min_stock_level: number;
   is_active: boolean;
+  created_by?: string | null;
+  created_by_name?: string | null;
   created_at: string;
   updated_at: string;
   total_sold?: number;
@@ -24,6 +27,7 @@ export interface CreateProductData {
   unit?: string;
   purchase_price: number;
   sale_price: number;
+  wholesale_price?: number;
   vat_rate?: number;
   stock_quantity?: number;
   min_stock_level?: number;
@@ -84,12 +88,19 @@ export interface ProductStats {
   returnsCount: number;
 }
 
+export interface WarehouseStock {
+  warehouse_id: string;
+  warehouse_name: string;
+  quantity: number;
+}
+
 export interface ProductDetail {
   product: Product;
   sales: ProductSale[];
   returns: ProductReturn[];
   movements: StockMovement[];
   stats: ProductStats;
+  warehouseStocks: WarehouseStock[];
 }
 
 export const productsApi = {

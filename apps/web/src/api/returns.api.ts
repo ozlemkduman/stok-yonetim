@@ -24,6 +24,8 @@ export interface Return {
   vat_total: number;
   reason: string | null;
   status: string;
+  created_by?: string | null;
+  created_by_name?: string | null;
   created_at: string;
   sale_invoice_number?: string;
   sale_date?: string;

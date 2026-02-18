@@ -188,7 +188,7 @@ export class AuthService {
     const passwordHash = await bcrypt.hash(dto.password, 12);
 
     // Determine permissions based on role
-    const permissions = invitation.role === 'tenant_admin' ? ['*'] : [];
+    const permissions = ['*'];
 
     // Create user
     const user = await this.authRepository.createUser({

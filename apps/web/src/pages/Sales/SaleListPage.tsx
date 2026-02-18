@@ -5,7 +5,7 @@ import { salesApi, Sale } from '../../api/sales.api';
 import { useToast } from '../../context/ToastContext';
 import { useConfirmDialog } from '../../context/ConfirmDialogContext';
 import { formatCurrency, formatDateTime } from '../../utils/formatters';
-import { PAYMENT_METHODS, SALE_STATUSES } from '../../utils/constants';
+import { PAYMENT_METHODS, SALE_STATUSES, SALE_TYPES } from '../../utils/constants';
 import styles from './SaleListPage.module.css';
 
 const icons = {
@@ -47,6 +47,8 @@ const icons = {
 };
 
 type VatFilter = 'all' | 'with_vat' | 'without_vat';
+type InvoiceFilter = 'all' | 'issued' | 'not_issued';
+type SaleTypeFilter = 'all' | 'retail' | 'wholesale';
 
 export function SaleListPage() {
   const navigate = useNavigate();
@@ -56,6 +58,8 @@ export function SaleListPage() {
   const [totalPages, setTotalPages] = useState(1);
   const [stats, setStats] = useState({ total: 0, count: 0, completed: 0, cancelled: 0, noVatCount: 0 });
   const [vatFilter, setVatFilter] = useState<VatFilter>('all');
+  const [invoiceFilter, setInvoiceFilter] = useState<InvoiceFilter>('all');
+  const [saleTypeFilter, setSaleTypeFilter] = useState<SaleTypeFilter>('all');
   const { showToast } = useToast();
   const { confirm } = useConfirmDialog();
 
@@ -65,6 +69,9 @@ export function SaleListPage() {
       const params: Record<string, string | number> = { page, limit: 20 };
       if (vatFilter === 'with_vat') params.includeVat = 'true';
       if (vatFilter === 'without_vat') params.includeVat = 'false';
+      if (invoiceFilter === 'issued') params.invoiceIssued = 'true';
+      if (invoiceFilter === 'not_issued') params.invoiceIssued = 'false';
+      if (saleTypeFilter !== 'all') params.saleType = saleTypeFilter;
 
       const response = await salesApi.getAll(params);
       setSales(response.data);
@@ -85,11 +92,31 @@ export function SaleListPage() {
     setLoading(false);
   };
 
-  useEffect(() => { fetchSales(); }, [page, vatFilter]);
+  useEffect(() => { fetchSales(); }, [page, vatFilter, invoiceFilter, saleTypeFilter]);
 
   const handleVatFilterChange = (filter: VatFilter) => {
     setVatFilter(filter);
     setPage(1);
+  };
+
+  const handleInvoiceFilterChange = (filter: InvoiceFilter) => {
+    setInvoiceFilter(filter);
+    setPage(1);
+  };
+
+  const handleSaleTypeFilterChange = (filter: SaleTypeFilter) => {
+    setSaleTypeFilter(filter);
+    setPage(1);
+  };
+
+  const handleToggleInvoice = async (sale: Sale) => {
+    try {
+      await salesApi.updateInvoiceIssued(sale.id, !sale.invoice_issued);
+      showToast('success', sale.invoice_issued ? 'Fatura durumu kaldırıldı' : 'Fatura kesildi olarak işaretlendi');
+      fetchSales();
+    } catch (err) {
+      showToast('error', 'Fatura durumu güncellenemedi');
+    }
   };
 
   const handleCancel = async (sale: Sale) => {
@@ -115,6 +142,11 @@ export function SaleListPage() {
       )
     },
     { key: 'customer_name', header: 'Müşteri', render: (s) => s.customer_name || 'Perakende' },
+    {
+      key: 'sale_type',
+      header: 'Tip',
+      render: (s) => SALE_TYPES[s.sale_type as keyof typeof SALE_TYPES] || s.sale_type || 'Perakende'
+    },
     { key: 'sale_date', header: 'Tarih', render: (s) => formatDateTime(s.sale_date) },
     {
       key: 'grand_total',
@@ -126,6 +158,24 @@ export function SaleListPage() {
       key: 'payment_method',
       header: 'Ödeme',
       render: (s) => PAYMENT_METHODS[s.payment_method as keyof typeof PAYMENT_METHODS] || s.payment_method
+    },
+    {
+      key: 'created_by_name',
+      header: 'Satisi Yapan',
+      render: (s) => s.created_by_name || '-'
+    },
+    {
+      key: 'invoice_issued',
+      header: 'Fatura',
+      render: (s) => (
+        <button
+          className={`${styles.invoiceToggle} ${s.invoice_issued ? styles.invoiceIssued : styles.invoiceNotIssued}`}
+          onClick={(e) => { e.stopPropagation(); handleToggleInvoice(s); }}
+          title={s.invoice_issued ? 'Fatura kesildi - değiştirmek için tıklayın' : 'Fatura kesilmedi - değiştirmek için tıklayın'}
+        >
+          {s.invoice_issued ? 'Kesildi' : 'Kesilmedi'}
+        </button>
+      )
     },
     {
       key: 'include_vat',
@@ -197,26 +247,83 @@ export function SaleListPage() {
         </div>
       </div>
 
-      <div className={styles.tabs}>
-        <button
-          className={`${styles.tab} ${vatFilter === 'all' ? styles.tabActive : ''}`}
-          onClick={() => handleVatFilterChange('all')}
-        >
-          Tüm Satışlar
-        </button>
-        <button
-          className={`${styles.tab} ${vatFilter === 'with_vat' ? styles.tabActive : ''}`}
-          onClick={() => handleVatFilterChange('with_vat')}
-        >
-          KDV Dahil
-        </button>
-        <button
-          className={`${styles.tab} ${vatFilter === 'without_vat' ? styles.tabActive : ''}`}
-          onClick={() => handleVatFilterChange('without_vat')}
-        >
-          KDV'siz Satışlar
-          {stats.noVatCount > 0 && <span className={styles.tabBadge}>{stats.noVatCount}</span>}
-        </button>
+      <div className={styles.filtersBar}>
+        <div className={styles.filterGroup}>
+          <span className={styles.filterLabel}>KDV</span>
+          <div className={styles.tabs}>
+            <button
+              className={`${styles.tab} ${vatFilter === 'all' ? styles.tabActive : ''}`}
+              onClick={() => handleVatFilterChange('all')}
+            >
+              Tumu
+            </button>
+            <button
+              className={`${styles.tab} ${vatFilter === 'with_vat' ? styles.tabActive : ''}`}
+              onClick={() => handleVatFilterChange('with_vat')}
+            >
+              Dahil
+            </button>
+            <button
+              className={`${styles.tab} ${vatFilter === 'without_vat' ? styles.tabActive : ''}`}
+              onClick={() => handleVatFilterChange('without_vat')}
+            >
+              KDV'siz
+              {stats.noVatCount > 0 && <span className={styles.tabBadge}>{stats.noVatCount}</span>}
+            </button>
+          </div>
+        </div>
+
+        <div className={styles.filterDivider} />
+
+        <div className={styles.filterGroup}>
+          <span className={styles.filterLabel}>Tip</span>
+          <div className={styles.tabs}>
+            <button
+              className={`${styles.tab} ${saleTypeFilter === 'all' ? styles.tabActive : ''}`}
+              onClick={() => handleSaleTypeFilterChange('all')}
+            >
+              Tumu
+            </button>
+            <button
+              className={`${styles.tab} ${saleTypeFilter === 'retail' ? styles.tabActive : ''}`}
+              onClick={() => handleSaleTypeFilterChange('retail')}
+            >
+              Perakende
+            </button>
+            <button
+              className={`${styles.tab} ${saleTypeFilter === 'wholesale' ? styles.tabActive : ''}`}
+              onClick={() => handleSaleTypeFilterChange('wholesale')}
+            >
+              Toptan
+            </button>
+          </div>
+        </div>
+
+        <div className={styles.filterDivider} />
+
+        <div className={styles.filterGroup}>
+          <span className={styles.filterLabel}>Fatura</span>
+          <div className={styles.tabs}>
+            <button
+              className={`${styles.tab} ${invoiceFilter === 'all' ? styles.tabActive : ''}`}
+              onClick={() => handleInvoiceFilterChange('all')}
+            >
+              Tumu
+            </button>
+            <button
+              className={`${styles.tab} ${invoiceFilter === 'issued' ? styles.tabActive : ''}`}
+              onClick={() => handleInvoiceFilterChange('issued')}
+            >
+              Kesildi
+            </button>
+            <button
+              className={`${styles.tab} ${invoiceFilter === 'not_issued' ? styles.tabActive : ''}`}
+              onClick={() => handleInvoiceFilterChange('not_issued')}
+            >
+              Kesilmedi
+            </button>
+          </div>
+        </div>
       </div>
 
       <div className={styles.card}>

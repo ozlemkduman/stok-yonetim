@@ -8,6 +8,8 @@ export interface Expense {
   expense_date: string;
   is_recurring: boolean;
   recurrence_period: string | null;
+  created_by?: string | null;
+  created_by_name?: string | null;
   created_at: string;
   updated_at: string;
 }
