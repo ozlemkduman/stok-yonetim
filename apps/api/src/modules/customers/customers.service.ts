@@ -2,14 +2,19 @@ import {
   Injectable,
   NotFoundException,
   ConflictException,
+  ForbiddenException,
 } from '@nestjs/common';
 import { CustomersRepository, Customer, CustomerListParams } from './customers.repository';
 import { CreateCustomerDto, UpdateCustomerDto } from './dto';
 import { createPaginatedResult, PaginatedResult } from '../../common/dto/pagination.dto';
+import { TenantSettingsService } from '../tenant-settings/tenant-settings.service';
 
 @Injectable()
 export class CustomersService {
-  constructor(private readonly customersRepository: CustomersRepository) {}
+  constructor(
+    private readonly customersRepository: CustomersRepository,
+    private readonly tenantSettingsService: TenantSettingsService,
+  ) {}
 
   async findAll(params: CustomerListParams): Promise<PaginatedResult<Customer>> {
     const { items, total } = await this.customersRepository.findAll(params);
@@ -25,6 +30,11 @@ export class CustomersService {
   }
 
   async create(dto: CreateCustomerDto, userId?: string): Promise<Customer> {
+    const limitCheck = await this.tenantSettingsService.checkLimit('customers');
+    if (!limitCheck.allowed) {
+      throw new ForbiddenException(`Musteri limitinize ulastiniz (${limitCheck.current}/${limitCheck.limit}). Planinizi yukseltin.`);
+    }
+
     // Check for duplicate email if provided
     if (dto.email) {
       const existing = await this.customersRepository.findByEmail(dto.email);

@@ -11,6 +11,7 @@ import styles from './MainLayout.module.css';
 interface MenuItem {
   path: string;
   label: string;
+  feature?: string;
 }
 
 interface MenuGroup {
@@ -32,7 +33,7 @@ const menuGroups: MenuGroup[] = [
     label: 'Satış Yönetimi',
     items: [
       { path: '/customers', label: 'Müşteriler' },
-      { path: '/quotes', label: 'Teklifler' },
+      { path: '/quotes', label: 'Teklifler', feature: 'quotes' },
       { path: '/sales', label: 'Satışlar' },
       { path: '/returns', label: 'İadeler' },
     ],
@@ -42,7 +43,7 @@ const menuGroups: MenuGroup[] = [
     label: 'Stok Yönetimi',
     items: [
       { path: '/products', label: 'Ürünler' },
-      { path: '/warehouses', label: 'Depolar' },
+      { path: '/warehouses', label: 'Depolar', feature: 'warehouses' },
     ],
   },
   {
@@ -51,16 +52,16 @@ const menuGroups: MenuGroup[] = [
     items: [
       { path: '/accounts', label: 'Kasa/Banka' },
       { path: '/expenses', label: 'Giderler' },
-      { path: '/e-documents', label: 'e-Belgeler' },
+      { path: '/e-documents', label: 'e-Belgeler', feature: 'eDocuments' },
     ],
   },
   {
     id: 'crm',
     label: 'CRM & Saha',
     items: [
-      { path: '/crm', label: 'CRM' },
-      { path: '/field-team', label: 'Saha Ekip' },
-      { path: '/integrations', label: 'Entegrasyonlar' },
+      { path: '/crm', label: 'CRM', feature: 'crm' },
+      { path: '/field-team', label: 'Saha Ekip', feature: 'fieldTeam' },
+      { path: '/integrations', label: 'Entegrasyonlar', feature: 'integrations' },
     ],
   },
   {
@@ -96,7 +97,7 @@ export function MainLayout() {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
   const { isSuperAdmin } = usePermissions();
-  const { impersonatedTenant, isImpersonating, stopImpersonating } = useTenant();
+  const { impersonatedTenant, isImpersonating, stopImpersonating, hasFeature } = useTenant();
   const { openHelp, hasHelp } = useHelp();
   const [sidebarOpen, setSidebarOpen] = useState(!isMobile);
   const [expandedGroups, setExpandedGroups] = useState<string[]>([]);
@@ -228,55 +229,63 @@ export function MainLayout() {
         </div>
 
         <nav className={styles.nav}>
-          {menuGroups.map((group) => (
-            <div key={group.id} className={styles.menuGroup}>
-              {group.items.length === 1 ? (
-                <NavLink
-                  to={group.items[0].path}
-                  className={({ isActive }) =>
-                    `${styles.menuItem} ${isActive ? styles.menuItemActive : ''}`
-                  }
-                  onClick={closeSidebar}
-                >
-                  <span className={styles.menuLabel}>{group.items[0].label}</span>
-                </NavLink>
-              ) : (
-                <>
-                  <button
-                    className={`${styles.groupHeader} ${isGroupActive(group) ? styles.groupHeaderActive : ''}`}
-                    onClick={() => toggleGroup(group.id)}
+          {menuGroups.map((group) => {
+            const isBypass = isSuperAdmin();
+            const visibleItems = group.items.filter(
+              (item) => !item.feature || isBypass || hasFeature(item.feature)
+            );
+            if (visibleItems.length === 0) return null;
+
+            return (
+              <div key={group.id} className={styles.menuGroup}>
+                {visibleItems.length === 1 ? (
+                  <NavLink
+                    to={visibleItems[0].path}
+                    className={({ isActive }) =>
+                      `${styles.menuItem} ${isActive ? styles.menuItemActive : ''}`
+                    }
+                    onClick={closeSidebar}
                   >
-                    <span>{group.label}</span>
-                    <svg
-                      className={`${styles.chevron} ${expandedGroups.includes(group.id) ? styles.chevronOpen : ''}`}
-                      width="14"
-                      height="14"
-                      viewBox="0 0 24 24"
-                      fill="currentColor"
+                    <span className={styles.menuLabel}>{visibleItems[0].label}</span>
+                  </NavLink>
+                ) : (
+                  <>
+                    <button
+                      className={`${styles.groupHeader} ${isGroupActive(group) ? styles.groupHeaderActive : ''}`}
+                      onClick={() => toggleGroup(group.id)}
                     >
-                      <path d="M7 10l5 5 5-5z" />
-                    </svg>
-                  </button>
-                  <div
-                    className={`${styles.groupItems} ${expandedGroups.includes(group.id) ? styles.groupItemsOpen : ''}`}
-                  >
-                    {group.items.map((item) => (
-                      <NavLink
-                        key={item.path}
-                        to={item.path}
-                        className={({ isActive }) =>
-                          `${styles.menuItem} ${styles.menuItemNested} ${isActive ? styles.menuItemActive : ''}`
-                        }
-                        onClick={closeSidebar}
+                      <span>{group.label}</span>
+                      <svg
+                        className={`${styles.chevron} ${expandedGroups.includes(group.id) ? styles.chevronOpen : ''}`}
+                        width="14"
+                        height="14"
+                        viewBox="0 0 24 24"
+                        fill="currentColor"
                       >
-                        <span className={styles.menuLabel}>{item.label}</span>
-                      </NavLink>
-                    ))}
-                  </div>
-                </>
-              )}
-            </div>
-          ))}
+                        <path d="M7 10l5 5 5-5z" />
+                      </svg>
+                    </button>
+                    <div
+                      className={`${styles.groupItems} ${expandedGroups.includes(group.id) ? styles.groupItemsOpen : ''}`}
+                    >
+                      {visibleItems.map((item) => (
+                        <NavLink
+                          key={item.path}
+                          to={item.path}
+                          className={({ isActive }) =>
+                            `${styles.menuItem} ${styles.menuItemNested} ${isActive ? styles.menuItemActive : ''}`
+                          }
+                          onClick={closeSidebar}
+                        >
+                          <span className={styles.menuLabel}>{item.label}</span>
+                        </NavLink>
+                      ))}
+                    </div>
+                  </>
+                )}
+              </div>
+            );
+          })}
         </nav>
 
         <div className={styles.sidebarFooter}>

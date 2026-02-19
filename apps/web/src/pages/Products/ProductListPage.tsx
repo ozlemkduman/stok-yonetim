@@ -4,6 +4,8 @@ import { Table, Button, Input, Badge, Pagination, Modal, type Column } from '@st
 import { productsApi, Product, CreateProductData } from '../../api/products.api';
 import { useToast } from '../../context/ToastContext';
 import { useConfirmDialog } from '../../context/ConfirmDialogContext';
+import { useTenant } from '../../context/TenantContext';
+import { UpgradePrompt } from '../../components/UpgradePrompt';
 import { formatCurrency } from '../../utils/formatters';
 import styles from './ProductListPage.module.css';
 
@@ -37,6 +39,8 @@ export function ProductListPage() {
   const [displayWholesalePrice, setDisplayWholesalePrice] = useState('0');
   const { showToast } = useToast();
   const { confirm } = useConfirmDialog();
+  const { isWithinLimit } = useTenant();
+  const canAddProduct = isWithinLimit('products');
 
   const fetchProducts = async () => {
     setLoading(true);
@@ -217,9 +221,9 @@ export function ProductListPage() {
       width: '150px',
       render: (p) => (
         <div className={styles.actions}>
-          <Button size="sm" variant="ghost" onClick={() => navigate(`/products/${p.id}`)}>Detay</Button>
-          <Button size="sm" variant="ghost" onClick={() => openModal(p)}>Düzenle</Button>
-          <Button size="sm" variant="ghost" onClick={() => handleDelete(p)}>Sil</Button>
+          <Button size="sm" variant="secondary" onClick={() => navigate(`/products/${p.id}`)}>Detay</Button>
+          <Button size="sm" variant="primary" onClick={() => openModal(p)}>Düzenle</Button>
+          <Button size="sm" variant="danger" onClick={() => handleDelete(p)}>Sil</Button>
         </div>
       )
     },
@@ -235,8 +239,12 @@ export function ProductListPage() {
           </h1>
           <p className={styles.subtitle}>Toplam {total} ürün kaydı</p>
         </div>
-        <Button onClick={() => openModal()}>+ Yeni Ürün</Button>
+        {canAddProduct && <Button onClick={() => openModal()}>+ Yeni Ürün</Button>}
       </div>
+
+      {!canAddProduct && (
+        <UpgradePrompt variant="inline" message="Urun limitinize ulastiniz. Daha fazla urun eklemek icin planinizi yukseltin." />
+      )}
 
       <div className={styles.card}>
         <div className={styles.toolbar}>

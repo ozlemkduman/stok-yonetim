@@ -178,7 +178,7 @@ export class AuthRepository {
 
   async getDefaultPlan(): Promise<Plan | null> {
     const plan = await this.db.knex<Plan>('plans')
-      .where({ code: 'starter', is_active: true })
+      .where({ code: 'basic', is_active: true })
       .first();
     return plan || null;
   }

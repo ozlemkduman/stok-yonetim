@@ -171,7 +171,7 @@ export class AuthService {
 
       // Create tenant with trial period
       const trialEndDate = new Date();
-      trialEndDate.setDate(trialEndDate.getDate() + 14); // 14 days trial
+      trialEndDate.setDate(trialEndDate.getDate() + 90); // 90 days trial
 
       tenant = await this.authRepository.createTenant({
         name: invitation.tenant_name,
@@ -404,7 +404,7 @@ export class AuthService {
 
       // Create tenant with trial period
       const trialEndDate = new Date();
-      trialEndDate.setDate(trialEndDate.getDate() + 14);
+      trialEndDate.setDate(trialEndDate.getDate() + 90);
 
       const tenant = await this.authRepository.createTenant({
         name: `${googleUser.name} Sirket`,

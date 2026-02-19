@@ -4,6 +4,7 @@ import { AuthLayout } from './layouts/AuthLayout';
 import { AdminLayout } from './layouts/AdminLayout';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { RoleGate } from './components/RoleGate';
+import { FeatureGate } from './components/FeatureGate';
 import { USER_ROLES } from './hooks/usePermissions';
 
 // Auth Pages
@@ -29,7 +30,7 @@ import { TenantSettingsPage, UserManagementPage, ProfilePage } from './pages/Set
 import { DashboardPage } from './pages/Dashboard';
 import { CustomerListPage, CustomerDetailPage } from './pages/Customers';
 import { ProductListPage, ProductDetailPage } from './pages/Products';
-import { SaleListPage, SaleDetailPage, SaleFormPage } from './pages/Sales';
+import { SaleListPage, SaleDetailPage, SaleFormPage, InvoiceImportPage } from './pages/Sales';
 import { ReturnListPage, ReturnDetailPage, ReturnFormPage } from './pages/Returns';
 import { ExpenseListPage } from './pages/Expenses';
 import { ReportsPage } from './pages/Reports';
@@ -104,15 +105,16 @@ export function AppRouter() {
         <Route path="products/:id" element={<ProductDetailPage />} />
 
         {/* Quotes */}
-        <Route path="quotes" element={<QuoteListPage />} />
-        <Route path="quotes/new" element={<QuoteFormPage />} />
-        <Route path="quotes/:id" element={<QuoteDetailPage />} />
-        <Route path="quotes/:id/edit" element={<QuoteFormPage />} />
-        <Route path="quotes/:id/print" element={<QuotePrintView />} />
+        <Route path="quotes" element={<FeatureGate feature="quotes"><QuoteListPage /></FeatureGate>} />
+        <Route path="quotes/new" element={<FeatureGate feature="quotes"><QuoteFormPage /></FeatureGate>} />
+        <Route path="quotes/:id" element={<FeatureGate feature="quotes"><QuoteDetailPage /></FeatureGate>} />
+        <Route path="quotes/:id/edit" element={<FeatureGate feature="quotes"><QuoteFormPage /></FeatureGate>} />
+        <Route path="quotes/:id/print" element={<FeatureGate feature="quotes"><QuotePrintView /></FeatureGate>} />
 
         {/* Sales */}
         <Route path="sales" element={<SaleListPage />} />
         <Route path="sales/new" element={<SaleFormPage />} />
+        <Route path="sales/import" element={<FeatureGate feature="invoiceImport"><InvoiceImportPage /></FeatureGate>} />
         <Route path="sales/:id" element={<SaleDetailPage />} />
 
         {/* Returns */}
@@ -128,29 +130,29 @@ export function AppRouter() {
         <Route path="accounts/:id" element={<AccountDetailPage />} />
 
         {/* Warehouses */}
-        <Route path="warehouses" element={<WarehouseListPage />} />
-        <Route path="warehouses/transfers" element={<StockTransferPage />} />
-        <Route path="warehouses/movements" element={<StockMovementsPage />} />
-        <Route path="warehouses/:id" element={<WarehouseDetailPage />} />
+        <Route path="warehouses" element={<FeatureGate feature="warehouses"><WarehouseListPage /></FeatureGate>} />
+        <Route path="warehouses/transfers" element={<FeatureGate feature="warehouses"><StockTransferPage /></FeatureGate>} />
+        <Route path="warehouses/movements" element={<FeatureGate feature="warehouses"><StockMovementsPage /></FeatureGate>} />
+        <Route path="warehouses/:id" element={<FeatureGate feature="warehouses"><WarehouseDetailPage /></FeatureGate>} />
 
         {/* E-Documents */}
-        <Route path="e-documents" element={<EDocumentListPage />} />
-        <Route path="e-documents/:id" element={<EDocumentDetailPage />} />
+        <Route path="e-documents" element={<FeatureGate feature="eDocuments"><EDocumentListPage /></FeatureGate>} />
+        <Route path="e-documents/:id" element={<FeatureGate feature="eDocuments"><EDocumentDetailPage /></FeatureGate>} />
 
         {/* Integrations */}
-        <Route path="integrations" element={<IntegrationListPage />} />
-        <Route path="integrations/e-commerce-orders" element={<ECommerceOrdersPage />} />
-        <Route path="integrations/bank-statements" element={<BankStatementsPage />} />
-        <Route path="integrations/:id" element={<IntegrationDetailPage />} />
+        <Route path="integrations" element={<FeatureGate feature="integrations"><IntegrationListPage /></FeatureGate>} />
+        <Route path="integrations/e-commerce-orders" element={<FeatureGate feature="integrations"><ECommerceOrdersPage /></FeatureGate>} />
+        <Route path="integrations/bank-statements" element={<FeatureGate feature="integrations"><BankStatementsPage /></FeatureGate>} />
+        <Route path="integrations/:id" element={<FeatureGate feature="integrations"><IntegrationDetailPage /></FeatureGate>} />
 
         {/* CRM */}
-        <Route path="crm" element={<ContactListPage />} />
-        <Route path="crm/:id" element={<ContactDetailPage />} />
+        <Route path="crm" element={<FeatureGate feature="crm"><ContactListPage /></FeatureGate>} />
+        <Route path="crm/:id" element={<FeatureGate feature="crm"><ContactDetailPage /></FeatureGate>} />
 
         {/* Field Team */}
-        <Route path="field-team" element={<RouteListPage />} />
-        <Route path="field-team/planner" element={<RoutePlannerPage />} />
-        <Route path="field-team/:id" element={<RouteDetailPage />} />
+        <Route path="field-team" element={<FeatureGate feature="fieldTeam"><RouteListPage /></FeatureGate>} />
+        <Route path="field-team/planner" element={<FeatureGate feature="fieldTeam"><RoutePlannerPage /></FeatureGate>} />
+        <Route path="field-team/:id" element={<FeatureGate feature="fieldTeam"><RouteDetailPage /></FeatureGate>} />
 
         {/* Reports */}
         <Route path="reports" element={<ReportsPage />} />

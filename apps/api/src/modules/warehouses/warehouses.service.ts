@@ -1,8 +1,9 @@
-import { Injectable, NotFoundException, BadRequestException, ConflictException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException, ConflictException, ForbiddenException } from '@nestjs/common';
 import { WarehousesRepository, Warehouse, StockTransfer } from './warehouses.repository';
 import { CreateWarehouseDto, UpdateWarehouseDto, CreateTransferDto, AdjustStockDto } from './dto';
 import { DatabaseService } from '../../database/database.service';
 import { validateSortColumn } from '../../common/utils/validate-sort';
+import { TenantSettingsService } from '../tenant-settings/tenant-settings.service';
 
 const ALLOWED_SORT_COLUMNS = ['name', 'code', 'is_active', 'created_at'];
 
@@ -11,6 +12,7 @@ export class WarehousesService {
   constructor(
     private readonly repository: WarehousesRepository,
     private readonly db: DatabaseService,
+    private readonly tenantSettingsService: TenantSettingsService,
   ) {}
 
   // Warehouses
@@ -70,6 +72,18 @@ export class WarehousesService {
   }
 
   async create(dto: CreateWarehouseDto): Promise<Warehouse> {
+    // Check feature access
+    const hasFeature = await this.tenantSettingsService.checkFeature('warehouses');
+    if (!hasFeature) {
+      throw new ForbiddenException('Depo yonetimi ozelligi planinizda bulunmuyor. Planinizi yukseltin.');
+    }
+
+    // Check plan limit
+    const limitCheck = await this.tenantSettingsService.checkLimit('warehouses');
+    if (!limitCheck.allowed) {
+      throw new ForbiddenException(`Depo limitinize ulastiniz (${limitCheck.current}/${limitCheck.limit}). Planinizi yukseltin.`);
+    }
+
     // Check code uniqueness
     const existing = await this.repository.findByCode(dto.code);
     if (existing) {

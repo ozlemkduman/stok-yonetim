@@ -1,13 +1,17 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException, ForbiddenException } from '@nestjs/common';
 import { IntegrationsRepository, Integration, ECommerceOrder, BankStatement } from './integrations.repository';
 import { CreateIntegrationDto } from './dto/create-integration.dto';
 import { UpdateIntegrationDto } from './dto/update-integration.dto';
 import { BaseProvider, SyncResult } from './providers/base.provider';
 import { TrendyolProvider } from './providers/trendyol.provider';
+import { TenantSettingsService } from '../tenant-settings/tenant-settings.service';
 
 @Injectable()
 export class IntegrationsService {
-  constructor(private readonly repository: IntegrationsRepository) {}
+  constructor(
+    private readonly repository: IntegrationsRepository,
+    private readonly tenantSettingsService: TenantSettingsService,
+  ) {}
 
   async findAll(type?: string, status?: string): Promise<Integration[]> {
     return this.repository.findAll({ type, status });
@@ -22,6 +26,16 @@ export class IntegrationsService {
   }
 
   async create(dto: CreateIntegrationDto): Promise<Integration> {
+    const hasFeature = await this.tenantSettingsService.checkFeature('integrations');
+    if (!hasFeature) {
+      throw new ForbiddenException('Entegrasyon ozelligi planinizda bulunmuyor. Planinizi yukseltin.');
+    }
+
+    const limitCheck = await this.tenantSettingsService.checkLimit('integrations');
+    if (!limitCheck.allowed) {
+      throw new ForbiddenException(`Entegrasyon limitinize ulastiniz (${limitCheck.current}/${limitCheck.limit}). Planinizi yukseltin.`);
+    }
+
     return this.repository.createIntegration({
       name: dto.name,
       type: dto.type,

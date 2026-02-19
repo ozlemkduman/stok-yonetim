@@ -152,9 +152,22 @@ export function TenantSettingsPage() {
           <div className={styles.planInfo}>
             <div className={styles.planName}>{settings?.plan_name || 'Plan Yok'}</div>
             <div className={styles.planStatus}>
-              Durum: <strong>{settings?.status}</strong>
+              Durum: <strong>{settings?.status === 'trial' ? 'Deneme' : settings?.status === 'active' ? 'Aktif' : settings?.status}</strong>
             </div>
+            {settings?.status === 'trial' && settings?.trial_ends_at && (
+              <div className={styles.planStatus}>
+                Deneme suresi: <strong>{Math.max(0, Math.ceil((new Date(settings.trial_ends_at).getTime() - Date.now()) / (1000 * 60 * 60 * 24)))} gun kaldi</strong>
+              </div>
+            )}
           </div>
+
+          {settings?.plan_code !== 'plus' && (
+            <div style={{ marginTop: '1rem' }}>
+              <Button variant="primary" onClick={() => window.open('mailto:destek@stoksayac.com?subject=Plan%20Yükseltme', '_blank')}>
+                Plani Yukselt
+              </Button>
+            </div>
+          )}
 
           <h3 className={styles.subsectionTitle}>Kullanim</h3>
 

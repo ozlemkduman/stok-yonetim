@@ -6,6 +6,8 @@ import { Customer, CreateCustomerData } from '../../api/customers.api';
 import { CustomerFormModal } from './CustomerFormModal';
 import { useToast } from '../../context/ToastContext';
 import { useConfirmDialog } from '../../context/ConfirmDialogContext';
+import { useTenant } from '../../context/TenantContext';
+import { UpgradePrompt } from '../../components/UpgradePrompt';
 import { formatCurrency } from '../../utils/formatters';
 import styles from './CustomerListPage.module.css';
 
@@ -28,6 +30,8 @@ export function CustomerListPage() {
 
   const { showToast } = useToast();
   const { confirm } = useConfirmDialog();
+  const { isWithinLimit } = useTenant();
+  const canAddCustomer = isWithinLimit('customers');
   const {
     customers,
     loading,
@@ -139,15 +143,15 @@ export function CustomerListPage() {
       width: '180px',
       render: (customer) => (
         <div className={styles.actions}>
-          <Button size="sm" variant="ghost" onClick={(e) => { e.stopPropagation(); handleRowClick(customer); }}>
+          <Button size="sm" variant="secondary" onClick={(e) => { e.stopPropagation(); handleRowClick(customer); }}>
             Detay
           </Button>
-          <Button size="sm" variant="ghost" onClick={(e) => { e.stopPropagation(); handleEdit(customer); }}>
+          <Button size="sm" variant="primary" onClick={(e) => { e.stopPropagation(); handleEdit(customer); }}>
             Düzenle
           </Button>
           <Button
             size="sm"
-            variant="ghost"
+            variant="danger"
             onClick={(e) => { e.stopPropagation(); handleDelete(customer); }}
           >
             Sil
@@ -167,8 +171,12 @@ export function CustomerListPage() {
           </h1>
           <p className={styles.subtitle}>Toplam {total} müşteri kaydı</p>
         </div>
-        <Button onClick={handleCreate}>+ Yeni Müşteri</Button>
+        {canAddCustomer && <Button onClick={handleCreate}>+ Yeni Müşteri</Button>}
       </div>
+
+      {!canAddCustomer && (
+        <UpgradePrompt variant="inline" message="Musteri limitinize ulastiniz. Daha fazla musteri eklemek icin planinizi yukseltin." />
+      )}
 
       <div className={styles.card}>
         <div className={styles.toolbar}>

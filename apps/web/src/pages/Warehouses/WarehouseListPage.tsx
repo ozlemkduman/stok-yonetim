@@ -5,6 +5,8 @@ import { Warehouse, StockTransfer, StockMovement, CreateWarehouseData, warehouse
 import { WarehouseFormModal } from './WarehouseFormModal';
 import { useToast } from '../../context/ToastContext';
 import { useConfirmDialog } from '../../context/ConfirmDialogContext';
+import { useTenant } from '../../context/TenantContext';
+import { UpgradePrompt } from '../../components/UpgradePrompt';
 import { formatDate, formatDateTime } from '../../utils/formatters';
 import styles from './WarehouseListPage.module.css';
 
@@ -53,6 +55,8 @@ export function WarehouseListPage() {
 
   const { showToast } = useToast();
   const { confirm } = useConfirmDialog();
+  const { isWithinLimit } = useTenant();
+  const canAddWarehouse = isWithinLimit('warehouses');
 
   const fetchWarehouses = useCallback(async () => {
     setLoading(true);
@@ -215,9 +219,9 @@ export function WarehouseListPage() {
       width: '150px',
       render: (wh) => (
         <div className={styles.actions}>
-          <Button size="sm" variant="ghost" onClick={() => handleView(wh)}>Detay</Button>
-          <Button size="sm" variant="ghost" onClick={(e) => handleEdit(wh, e)}>Duzenle</Button>
-          <Button size="sm" variant="ghost" onClick={(e) => handleDelete(wh, e)}>Sil</Button>
+          <Button size="sm" variant="secondary" onClick={() => handleView(wh)}>Detay</Button>
+          <Button size="sm" variant="primary" onClick={(e) => handleEdit(wh, e)}>Duzenle</Button>
+          <Button size="sm" variant="danger" onClick={(e) => handleDelete(wh, e)}>Sil</Button>
         </div>
       ),
     },
@@ -327,10 +331,14 @@ export function WarehouseListPage() {
             {activeTab === 'movements' && `${total} hareket`}
           </p>
         </div>
-        {activeTab === 'warehouses' && (
+        {activeTab === 'warehouses' && canAddWarehouse && (
           <Button onClick={handleCreate}>+ Yeni Depo</Button>
         )}
       </div>
+
+      {activeTab === 'warehouses' && !canAddWarehouse && (
+        <UpgradePrompt variant="inline" message="Depo limitinize ulastiniz. Daha fazla depo eklemek icin planinizi yukseltin." />
+      )}
 
       <div className={styles.card}>
         <div className={styles.tabs}>

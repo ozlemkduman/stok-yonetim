@@ -1,11 +1,15 @@
-import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
+import { Injectable, NotFoundException, ConflictException, ForbiddenException } from '@nestjs/common';
 import { ProductsRepository, Product, ProductListParams } from './products.repository';
 import { CreateProductDto, UpdateProductDto } from './dto';
 import { createPaginatedResult, PaginatedResult } from '../../common/dto/pagination.dto';
+import { TenantSettingsService } from '../tenant-settings/tenant-settings.service';
 
 @Injectable()
 export class ProductsService {
-  constructor(private readonly productsRepository: ProductsRepository) {}
+  constructor(
+    private readonly productsRepository: ProductsRepository,
+    private readonly tenantSettingsService: TenantSettingsService,
+  ) {}
 
   async findAll(params: ProductListParams): Promise<PaginatedResult<Product>> {
     const { items, total } = await this.productsRepository.findAll(params);
@@ -19,6 +23,11 @@ export class ProductsService {
   }
 
   async create(dto: CreateProductDto, userId?: string): Promise<Product> {
+    const limitCheck = await this.tenantSettingsService.checkLimit('products');
+    if (!limitCheck.allowed) {
+      throw new ForbiddenException(`Urun limitinize ulastiniz (${limitCheck.current}/${limitCheck.limit}). Planinizi yukseltin.`);
+    }
+
     if (dto.barcode) {
       const existing = await this.productsRepository.findByBarcode(dto.barcode);
       if (existing) throw new ConflictException('Bu barkod zaten kullaniliyor');
