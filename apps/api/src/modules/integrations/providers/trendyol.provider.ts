@@ -1,106 +1,239 @@
 import { BaseProvider, OrderData } from './base.provider';
 
+interface TrendyolShipmentPackage {
+  id: number;
+  shipmentPackageId: number;
+  orderNumber: string;
+  orderDate: number;
+  status: string;
+  shipmentPackageStatus: string;
+  customerFirstName: string;
+  customerLastName: string;
+  customerEmail: string;
+  customerId: number;
+  grossAmount: number;
+  packageGrossAmount: number;
+  totalDiscount: number;
+  packageTotalDiscount: number;
+  totalPrice: number;
+  packageTotalPrice: number;
+  currencyCode: string;
+  cargoTrackingNumber: number;
+  cargoProviderName: string;
+  cargoTrackingLink: string;
+  shipmentAddress: {
+    firstName: string;
+    lastName: string;
+    fullName: string;
+    fullAddress: string;
+    city: string;
+    district: string;
+    phone: string;
+  };
+  invoiceAddress: {
+    fullName: string;
+    fullAddress: string;
+    city: string;
+    district: string;
+    phone: string;
+  };
+  lines: Array<{
+    id: number;
+    lineId: number;
+    quantity: number;
+    merchantSku: string;
+    sku: string;
+    productName: string;
+    productCode: number;
+    barcode: string;
+    amount: number;
+    lineGrossAmount: number;
+    discount: number;
+    lineTotalDiscount: number;
+    price: number;
+    lineUnitPrice: number;
+    vatBaseAmount: number;
+    vatRate: number;
+    currencyCode: string;
+    commission: number;
+    orderLineItemStatusName: string;
+  }>;
+  lastModifiedDate: number;
+}
+
+interface TrendyolOrdersResponse {
+  totalElements: number;
+  totalPages: number;
+  page: number;
+  size: number;
+  content: TrendyolShipmentPackage[];
+}
+
+const STATUS_MAP: Record<string, string> = {
+  Created: 'pending',
+  Picking: 'processing',
+  Invoiced: 'processing',
+  Shipped: 'shipped',
+  Delivered: 'delivered',
+  Cancelled: 'cancelled',
+  UnDelivered: 'shipped',
+  Returned: 'returned',
+  UnSupplied: 'cancelled',
+};
+
 export class TrendyolProvider extends BaseProvider {
-  private readonly apiUrl = 'https://api.trendyol.com/sapigw';
+  private readonly baseUrl = 'https://apigw.trendyol.com/integration';
+
+  private getAuthHeader(): string {
+    const apiKey = this.credentials['apiKey'] as string;
+    const apiSecret = this.credentials['apiSecret'] as string;
+    return 'Basic ' + Buffer.from(`${apiKey}:${apiSecret}`).toString('base64');
+  }
+
+  private getSupplierId(): string {
+    return (this.config['supplierId'] as string) || '';
+  }
 
   async testConnection(): Promise<boolean> {
     const apiKey = this.credentials['apiKey'] as string;
     const apiSecret = this.credentials['apiSecret'] as string;
-    const supplierId = this.config['supplierId'] as string;
+    const supplierId = this.getSupplierId();
 
     if (!apiKey || !apiSecret || !supplierId) {
       return false;
     }
 
-    await this.delay(800);
-    return true;
+    // Test with a small request to verify credentials
+    const url = `${this.baseUrl}/order/sellers/${supplierId}/orders?size=1`;
+
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Authorization': this.getAuthHeader(),
+        'Content-Type': 'application/json',
+      },
+    });
+
+    return response.ok;
   }
 
   async fetchOrders(startDate?: Date, endDate?: Date): Promise<OrderData[]> {
-    await this.delay(1200);
+    const supplierId = this.getSupplierId();
+    if (!supplierId) {
+      throw new Error('Supplier ID eksik');
+    }
 
+    const allOrders: OrderData[] = [];
+    let currentPage = 0;
+    let totalPages = 1;
+    const pageSize = 200; // maximum allowed
+
+    // Default: last 7 days
     const start = startDate || new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
     const end = endDate || new Date();
 
-    const customerNames = [
-      'Ahmet Yilmaz', 'Mehmet Demir', 'Ayse Kaya', 'Fatma Celik', 'Ali Sahin',
-      'Zeynep Ozturk', 'Hasan Arslan', 'Elif Dogan', 'Mustafa Kilic', 'Selin Acar',
-    ];
-    const productNames = [
-      'Kablosuz Bluetooth Kulaklik', 'USB-C Hub Adaptoru', 'Mekanik Klavye RGB',
-      'Ergonomik Mouse Pad', 'Laptop Stand Aluminyum', 'Webcam 1080p HD',
-      'Tasinabilir SSD 1TB', 'Akilli Saat Kordon', 'Telefon Kilifi Silikon',
-      'HDMI Kablo 2m', 'Sarj Kablosu 3\'lu Set', 'Ekran Koruyucu Cam',
-    ];
-    const districts = [
-      'Kadikoy', 'Besiktas', 'Sisli', 'Uskudar', 'Bakirkoy',
-      'Atasehir', 'Maltepe', 'Kartal', 'Pendik', 'Beylikduzu',
-    ];
+    // Trendyol expects timestamps in milliseconds
+    const startTs = start.getTime();
+    const endTs = end.getTime();
 
-    const orders: OrderData[] = [];
-    const orderCount = Math.floor(Math.random() * 5) + 2;
+    // Trendyol allows max 14-day windows
+    const maxWindow = 14 * 24 * 60 * 60 * 1000;
+    let windowStart = startTs;
 
-    for (let i = 0; i < orderCount; i++) {
-      const orderDate = new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
-      const itemCount = Math.floor(Math.random() * 3) + 1;
-      const items = [];
-      let subtotal = 0;
-      const customer = customerNames[Math.floor(Math.random() * customerNames.length)];
-      const district = districts[Math.floor(Math.random() * districts.length)];
+    while (windowStart < endTs) {
+      const windowEnd = Math.min(windowStart + maxWindow, endTs);
+      currentPage = 0;
+      totalPages = 1;
 
-      for (let j = 0; j < itemCount; j++) {
-        const quantity = Math.floor(Math.random() * 3) + 1;
-        const unitPrice = Math.floor(Math.random() * 500) + 50;
-        const total = quantity * unitPrice;
-        subtotal += total;
-        const productName = productNames[Math.floor(Math.random() * productNames.length)];
-
-        items.push({
-          sku: `SKU-${(1000 + Math.floor(Math.random() * 9000))}`,
-          name: productName,
-          quantity,
-          unitPrice,
-          total,
+      while (currentPage < totalPages) {
+        const params = new URLSearchParams({
+          startDate: String(windowStart),
+          endDate: String(windowEnd),
+          page: String(currentPage),
+          size: String(pageSize),
+          orderByField: 'PackageLastModifiedDate',
+          orderByDirection: 'DESC',
         });
+
+        const url = `${this.baseUrl}/order/sellers/${supplierId}/orders?${params}`;
+
+        const response = await fetch(url, {
+          method: 'GET',
+          headers: {
+            'Authorization': this.getAuthHeader(),
+            'Content-Type': 'application/json',
+          },
+        });
+
+        if (!response.ok) {
+          const errorText = await response.text().catch(() => '');
+          throw new Error(`Trendyol API hatasi: ${response.status} ${response.statusText} - ${errorText}`);
+        }
+
+        const data = await response.json() as TrendyolOrdersResponse;
+        totalPages = data.totalPages;
+
+        for (const pkg of data.content) {
+          allOrders.push(this.mapToOrderData(pkg));
+        }
+
+        currentPage++;
       }
 
-      const shippingCost = [0, 14.99, 24.99, 34.99][Math.floor(Math.random() * 4)];
-      const commissionRate = 0.12 + Math.random() * 0.08;
-      const commission = Math.round(subtotal * commissionRate * 100) / 100;
-      const total = subtotal + shippingCost;
-
-      const nameParts = customer.toLowerCase().split(' ');
-      orders.push({
-        externalOrderId: `TY${orderDate.getFullYear()}${String(orderDate.getMonth() + 1).padStart(2, '0')}${String(Math.floor(Math.random() * 900000) + 100000)}`,
-        externalOrderNumber: `${Math.floor(Math.random() * 900000000) + 100000000}`,
-        status: ['pending', 'processing', 'shipped'][Math.floor(Math.random() * 3)],
-        customerName: customer,
-        customerEmail: `${nameParts[0]}.${nameParts[1]}@gmail.com`,
-        customerPhone: `05${3 + Math.floor(Math.random() * 5)}${Math.floor(Math.random() * 10000000).toString().padStart(7, '0')}`,
-        shippingAddress: `${district} Mah. ${Math.floor(Math.random() * 50) + 1}. Sok. No:${Math.floor(Math.random() * 100) + 1}, ${district}/Istanbul`,
-        subtotal,
-        shippingCost,
-        commission,
-        total,
-        currency: 'TRY',
-        items,
-        orderDate,
-        rawData: {
-          platform: 'trendyol',
-          supplierId: this.config['supplierId'],
-        },
-      });
+      windowStart = windowEnd;
     }
 
-    return orders;
+    return allOrders;
   }
 
   async updateOrderStatus(orderId: string, status: string): Promise<boolean> {
-    await this.delay(600);
-    return true;
+    // Trendyol doesn't support generic status updates via API
+    // Status changes happen through specific endpoints (pick, invoice, ship, etc.)
+    return false;
   }
 
-  private delay(ms: number): Promise<void> {
-    return new Promise((resolve) => setTimeout(resolve, ms));
+  private mapToOrderData(pkg: TrendyolShipmentPackage): OrderData {
+    const items = pkg.lines.map((line) => ({
+      productId: String(line.productCode),
+      sku: line.merchantSku || line.sku || line.barcode,
+      name: line.productName,
+      quantity: line.quantity,
+      unitPrice: line.price || line.lineUnitPrice || line.amount,
+      total: line.lineGrossAmount || (line.price * line.quantity),
+    }));
+
+    const subtotal = items.reduce((sum, item) => sum + item.total, 0);
+    const totalCommission = pkg.lines.reduce((sum, line) => {
+      // commission is percentage in Trendyol API
+      const lineTotal = line.lineGrossAmount || (line.price * line.quantity);
+      return sum + (lineTotal * (line.commission || 0) / 100);
+    }, 0);
+
+    const customerName = pkg.shipmentAddress?.fullName
+      || `${pkg.customerFirstName || ''} ${pkg.customerLastName || ''}`.trim();
+
+    const address = pkg.shipmentAddress
+      ? `${pkg.shipmentAddress.fullAddress}, ${pkg.shipmentAddress.district}/${pkg.shipmentAddress.city}`
+      : '';
+
+    const phone = pkg.shipmentAddress?.phone || pkg.invoiceAddress?.phone || '';
+
+    return {
+      externalOrderId: String(pkg.shipmentPackageId || pkg.id),
+      externalOrderNumber: pkg.orderNumber,
+      status: STATUS_MAP[pkg.status] || STATUS_MAP[pkg.shipmentPackageStatus] || 'pending',
+      customerName,
+      customerEmail: pkg.customerEmail || undefined,
+      customerPhone: phone || undefined,
+      shippingAddress: address || undefined,
+      subtotal,
+      shippingCost: 0, // Trendyol doesn't expose shipping cost to seller
+      commission: Math.round(totalCommission * 100) / 100,
+      total: pkg.packageTotalPrice || pkg.totalPrice || subtotal,
+      currency: pkg.currencyCode || 'TRY',
+      items,
+      orderDate: new Date(pkg.orderDate),
+      rawData: pkg as unknown as Record<string, unknown>,
+    };
   }
 }
