@@ -81,7 +81,7 @@ export async function up(knex: Knex): Promise<void> {
     const [insertedBasic] = await knex('plans').insert({
       name: 'Basic',
       code: 'basic',
-      price: 79.00,
+      price: 199.00,
       billing_period: 'monthly',
       features: basicFeatures,
       limits: basicLimits,
@@ -106,7 +106,7 @@ export async function up(knex: Knex): Promise<void> {
     if (existingPro) {
       await knex('plans').where({ code: 'pro' }).update({
         name: 'Pro',
-        price: 179.00,
+        price: 449.00,
         features: proFeatures,
         limits: proLimits,
         sort_order: 2,
@@ -115,7 +115,7 @@ export async function up(knex: Knex): Promise<void> {
       await knex('plans').insert({
         name: 'Pro',
         code: 'pro',
-        price: 179.00,
+        price: 449.00,
         billing_period: 'monthly',
         features: proFeatures,
         limits: proLimits,
@@ -128,7 +128,7 @@ export async function up(knex: Knex): Promise<void> {
     const [insertedPlus] = await knex('plans').insert({
       name: 'Plus',
       code: 'plus',
-      price: 349.00,
+      price: 799.00,
       billing_period: 'monthly',
       features: plusFeatures,
       limits: plusLimits,
@@ -147,7 +147,7 @@ export async function up(knex: Knex): Promise<void> {
     // Basic already exists - update all plans idempotently
     await knex('plans').where({ code: 'basic' }).update({
       name: 'Basic',
-      price: 79.00,
+      price: 199.00,
       features: basicFeatures,
       limits: basicLimits,
       sort_order: 1,
@@ -155,7 +155,7 @@ export async function up(knex: Knex): Promise<void> {
 
     await knex('plans').where({ code: 'pro' }).update({
       name: 'Pro',
-      price: 179.00,
+      price: 449.00,
       features: proFeatures,
       limits: proLimits,
       sort_order: 2,
@@ -165,7 +165,7 @@ export async function up(knex: Knex): Promise<void> {
     if (plusPlan) {
       await knex('plans').where({ code: 'plus' }).update({
         name: 'Plus',
-        price: 349.00,
+        price: 799.00,
         features: plusFeatures,
         limits: plusLimits,
         sort_order: 3,
@@ -174,7 +174,7 @@ export async function up(knex: Knex): Promise<void> {
       await knex('plans').insert({
         name: 'Plus',
         code: 'plus',
-        price: 349.00,
+        price: 799.00,
         billing_period: 'monthly',
         features: plusFeatures,
         limits: plusLimits,

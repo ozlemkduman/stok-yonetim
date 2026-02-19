@@ -9,7 +9,7 @@ export async function seed(knex: Knex): Promise<void> {
     {
       name: 'Basic',
       code: 'basic',
-      price: 79.00,
+      price: 199.00,
       billing_period: 'monthly',
       features: JSON.stringify({
         sales: true,
@@ -39,7 +39,7 @@ export async function seed(knex: Knex): Promise<void> {
     {
       name: 'Pro',
       code: 'pro',
-      price: 179.00,
+      price: 449.00,
       billing_period: 'monthly',
       features: JSON.stringify({
         sales: true,
@@ -69,7 +69,7 @@ export async function seed(knex: Knex): Promise<void> {
     {
       name: 'Plus',
       code: 'plus',
-      price: 349.00,
+      price: 799.00,
       billing_period: 'monthly',
       features: JSON.stringify({
         sales: true,
