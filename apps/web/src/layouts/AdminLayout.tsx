@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { Logo } from '../components/Logo';
 import styles from './AdminLayout.module.css';
 
 const menuItems = [
@@ -39,8 +40,7 @@ export function AdminLayout() {
     <div className={styles.layout}>
       <aside className={`${styles.sidebar} ${isSidebarOpen ? styles.open : styles.closed}`}>
         <div className={styles.logo}>
-          <h1>Stok Sayaç</h1>
-          <span className={styles.adminBadge}>Admin</span>
+          <Logo size="sm" subtitle="Admin Panel" />
         </div>
 
         <nav className={styles.nav}>

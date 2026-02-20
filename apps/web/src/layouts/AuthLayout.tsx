@@ -1,4 +1,5 @@
 import { Outlet } from 'react-router-dom';
+import { Logo } from '../components/Logo';
 import styles from './AuthLayout.module.css';
 
 export function AuthLayout() {
@@ -6,8 +7,7 @@ export function AuthLayout() {
     <div className={styles.container}>
       <div className={styles.content}>
         <div className={styles.logo}>
-          <h1>Stok Sayaç</h1>
-          <p>Stok Yönetim Sistemi</p>
+          <Logo size="lg" subtitle="Stok Yönetim Sistemi" />
         </div>
         <div className={styles.formContainer}>
           <Outlet />

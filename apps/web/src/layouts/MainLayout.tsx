@@ -6,6 +6,7 @@ import { useAuth } from '../context/AuthContext';
 import { useTenant } from '../context/TenantContext';
 import { usePermissions } from '../hooks/usePermissions';
 import { useHelp } from '../context/HelpContext';
+import { Logo } from '../components/Logo';
 import styles from './MainLayout.module.css';
 
 interface MenuItem {
@@ -215,17 +216,7 @@ export function MainLayout() {
         className={`${styles.sidebar} ${sidebarOpen ? styles.sidebarOpen : styles.sidebarClosed}`}
       >
         <div className={styles.sidebarHeader}>
-          <div className={styles.logoContainer}>
-            <div className={styles.logoIcon}>
-              <svg viewBox="0 0 24 24" fill="currentColor" width="24" height="24">
-                <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14l-5-5 1.41-1.41L12 14.17l4.59-4.58L18 11l-6 6z" />
-              </svg>
-            </div>
-            <div className={styles.logoText}>
-              <span className={styles.logoTitle}>Stok Sayaç</span>
-              <span className={styles.logoSubtitle}>Yönetim Sistemi</span>
-            </div>
-          </div>
+          <Logo size="sm" subtitle="Yönetim Sistemi" />
         </div>
 
         <nav className={styles.nav}>
