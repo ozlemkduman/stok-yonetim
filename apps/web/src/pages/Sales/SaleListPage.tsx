@@ -196,7 +196,7 @@ export function SaleListPage() {
       header: '',
       width: '80px',
       render: (s) => s.status === 'completed' && (
-        <Button size="sm" variant="ghost" onClick={() => handleCancel(s)}>İptal</Button>
+        <Button size="sm" variant="danger" onClick={() => handleCancel(s)}>İptal</Button>
       )
     },
   ];
@@ -211,9 +211,14 @@ export function SaleListPage() {
           </h1>
           <p className={styles.subtitle}>Satış işlemleri ve fatura yönetimi</p>
         </div>
-        <Button onClick={() => navigate('/sales/new')}>
-          + Yeni Satış
-        </Button>
+        <div style={{ display: 'flex', gap: '8px' }}>
+          <Button variant="secondary" onClick={() => navigate('/sales/import')}>
+            Fatura Yükle
+          </Button>
+          <Button onClick={() => navigate('/sales/new')}>
+            + Yeni Satış
+          </Button>
+        </div>
       </div>
 
       <div className={styles.statsRow}>

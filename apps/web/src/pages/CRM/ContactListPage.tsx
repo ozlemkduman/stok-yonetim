@@ -143,7 +143,7 @@ export function ContactListPage() {
       width: '14%',
       render: (item) => (
         <div className={styles.actions}>
-          <Button size="sm" variant="ghost" onClick={() => navigate(`/crm/${item.id}`)}>
+          <Button size="sm" variant="secondary" onClick={() => navigate(`/crm/${item.id}`)}>
             Detay
           </Button>
           <Button size="sm" variant="secondary" onClick={() => handleEdit(item)}>

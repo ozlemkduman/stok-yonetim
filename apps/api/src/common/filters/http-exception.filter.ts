@@ -20,6 +20,12 @@ export class HttpExceptionFilter implements ExceptionFilter {
     // Log the actual error for debugging
     if (!(exception instanceof HttpException)) {
       console.error('Unhandled exception:', exception);
+      try {
+        const request = ctx.getRequest();
+        const fs = require('fs');
+        const err = exception as any;
+        fs.appendFileSync('/tmp/nestjs-errors.log', `${new Date().toISOString()} ${request?.method} ${request?.url}\n${err?.stack || err?.message || JSON.stringify(exception)}\n\n`);
+      } catch (_) {}
     }
 
     if (exception instanceof HttpException) {
@@ -37,6 +43,16 @@ export class HttpExceptionFilter implements ExceptionFilter {
           message = 'Validation failed';
         }
       }
+    }
+
+    // Log all 500+ errors to file for debugging
+    if (status >= 500) {
+      try {
+        const request = ctx.getRequest();
+        const fs = require('fs');
+        const err = exception as any;
+        fs.appendFileSync('/tmp/nestjs-errors.log', `${new Date().toISOString()} ${request?.method} ${request?.url}\nStatus: ${status}\n${err?.stack || err?.message || JSON.stringify(exception)}\n\n`);
+      } catch (_) {}
     }
 
     response.status(status).json({

@@ -188,13 +188,13 @@ export function EDocumentListPage() {
       render: (d) => (
         <div className={styles.actions}>
           {d.status === 'draft' && (
-            <Button size="sm" variant="ghost" onClick={() => handleSend(d)}>Gonder</Button>
+            <Button size="sm" variant="primary" onClick={() => handleSend(d)}>Gonder</Button>
           )}
           {d.status === 'pending' && (
-            <Button size="sm" variant="ghost" onClick={() => handleCheckStatus(d)}>Sorgula</Button>
+            <Button size="sm" variant="secondary" onClick={() => handleCheckStatus(d)}>Sorgula</Button>
           )}
           {['draft', 'pending'].includes(d.status) && (
-            <Button size="sm" variant="ghost" onClick={() => handleCancel(d)}>Iptal</Button>
+            <Button size="sm" variant="danger" onClick={() => handleCancel(d)}>Iptal</Button>
           )}
         </div>
       ),

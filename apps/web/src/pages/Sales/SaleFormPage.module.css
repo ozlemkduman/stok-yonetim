@@ -26,6 +26,8 @@
   margin: 0;
 }
 
+.headerSpacer { flex: 1; }
+
 /* ── Step Indicator ── */
 .stepIndicator {
   display: flex;

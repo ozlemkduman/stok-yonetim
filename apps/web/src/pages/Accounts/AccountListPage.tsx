@@ -209,13 +209,13 @@ export function AccountListPage() {
       width: '200px',
       render: (account) => (
         <div className={styles.actions}>
-          <Button size="sm" variant="ghost" onClick={() => handleAddMovement(account)}>
+          <Button size="sm" variant="secondary" onClick={() => handleAddMovement(account)}>
             Hareket
           </Button>
-          <Button size="sm" variant="ghost" onClick={() => handleEditAccount(account)}>
+          <Button size="sm" variant="primary" onClick={() => handleEditAccount(account)}>
             Duzenle
           </Button>
-          <Button size="sm" variant="ghost" onClick={() => handleDeleteAccount(account)}>
+          <Button size="sm" variant="danger" onClick={() => handleDeleteAccount(account)}>
             Sil
           </Button>
         </div>

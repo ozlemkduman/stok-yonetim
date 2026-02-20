@@ -3,7 +3,7 @@ import styles from './Button.module.css';
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary' | 'danger' | 'ghost';
-  size?: 'sm' | 'md' | 'lg';
+  size?: 'xs' | 'sm' | 'md' | 'lg';
   fullWidth?: boolean;
   loading?: boolean;
   leftIcon?: ReactNode;

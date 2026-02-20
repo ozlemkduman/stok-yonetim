@@ -199,6 +199,50 @@ class ApiClient {
   async delete<T>(endpoint: string): Promise<ApiResponse<T>> {
     return this.request<T>(endpoint, { method: 'DELETE' });
   }
+
+  async upload<T>(endpoint: string, file: File, fieldName = 'file'): Promise<ApiResponse<T>> {
+    const url = `${this.baseUrl}${endpoint}`;
+    const formData = new FormData();
+    formData.append(fieldName, file);
+
+    const headers: Record<string, string> = {};
+
+    const token = this.getAccessToken();
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
+    const impersonatedTenant = localStorage.getItem('impersonated_tenant');
+    if (impersonatedTenant) {
+      const tenant = JSON.parse(impersonatedTenant);
+      headers['X-Impersonate-Tenant'] = tenant.id;
+    }
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers,
+      body: formData,
+    });
+
+    if (response.status === 401) {
+      const refreshed = await this.tryRefreshToken();
+      if (refreshed) {
+        headers['Authorization'] = `Bearer ${this.getAccessToken()}`;
+        const retryResponse = await fetch(url, { method: 'POST', headers, body: formData });
+        const retryData = await retryResponse.json();
+        if (!retryResponse.ok) throw new Error(retryData.message || 'API error');
+        return retryData as ApiResponse<T>;
+      } else {
+        this.clearTokens();
+        window.dispatchEvent(new CustomEvent('auth:logout'));
+        throw new Error('Oturum süresi doldu');
+      }
+    }
+
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || 'API error');
+    return data as ApiResponse<T>;
+  }
 }
 
 export const apiClient = new ApiClient(API_BASE_URL);

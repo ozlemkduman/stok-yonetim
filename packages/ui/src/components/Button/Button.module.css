@@ -28,14 +28,14 @@
 }
 
 .secondary {
-  background-color: var(--color-bg);
-  color: var(--color-text-primary);
-  border: 1px solid var(--color-border);
+  background-color: #faf8ff;
+  color: var(--color-primary);
+  border: 1px solid var(--color-primary);
 }
 
 .secondary:hover:not(:disabled) {
-  background-color: var(--color-border);
-  border-color: var(--color-border-hover);
+  background-color: #f0ebff;
+  border-color: var(--color-primary-hover);
 }
 
 .danger {
@@ -57,6 +57,13 @@
 }
 
 /* Sizes */
+.xs {
+  height: 26px;
+  padding: 0 var(--space-2);
+  font-size: var(--font-size-xs);
+  border-radius: var(--radius-sm);
+}
+
 .sm {
   height: 32px;
   padding: 0 var(--space-3);

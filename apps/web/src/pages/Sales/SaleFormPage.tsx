@@ -109,6 +109,14 @@ export function SaleFormPage() {
             showToast('error', 'Tum urun satirlari icin urun seciniz');
             return false;
           }
+          if (item.stock_quantity !== undefined && item.stock_quantity <= 0) {
+            showToast('error', `"${item.product_name}" icin yeterli stok yok (Mevcut: ${item.stock_quantity})`);
+            return false;
+          }
+          if (item.stock_quantity !== undefined && item.quantity > item.stock_quantity) {
+            showToast('error', `"${item.product_name}" icin yeterli stok yok (Mevcut: ${item.stock_quantity}, Istenen: ${item.quantity})`);
+            return false;
+          }
         }
         return true;
       case 2:
@@ -235,6 +243,10 @@ export function SaleFormPage() {
           ← Satislar
         </Button>
         <h1 className={styles.title}>Yeni Satis</h1>
+        <div className={styles.headerSpacer} />
+        <Button variant="secondary" onClick={() => navigate('/sales/import')}>
+          Fatura Yukle
+        </Button>
       </div>
 
       <WizardStepIndicator

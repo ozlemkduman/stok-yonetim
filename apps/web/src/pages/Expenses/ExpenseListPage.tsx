@@ -120,8 +120,8 @@ export function ExpenseListPage() {
       width: '100px',
       render: (e) => (
         <div className={styles.actions}>
-          <Button size="sm" variant="ghost" onClick={() => openModal(e)}>Düzenle</Button>
-          <Button size="sm" variant="ghost" onClick={() => handleDelete(e)}>Sil</Button>
+          <Button size="sm" variant="primary" onClick={() => openModal(e)}>Düzenle</Button>
+          <Button size="sm" variant="danger" onClick={() => handleDelete(e)}>Sil</Button>
         </div>
       )
     },

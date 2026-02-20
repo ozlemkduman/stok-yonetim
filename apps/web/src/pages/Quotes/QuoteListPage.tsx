@@ -208,23 +208,23 @@ export function QuoteListPage() {
     {
       key: 'actions',
       header: '',
-      width: '200px',
+      width: '230px',
       render: (q) => (
         <div className={styles.actions}>
           {q.status === 'draft' && (
-            <Button size="sm" variant="ghost" onClick={() => handleSend(q)}>Gönder</Button>
+            <Button size="xs" variant="secondary" onClick={() => handleSend(q)}>Gönder</Button>
           )}
           {['draft', 'sent'].includes(q.status) && (
             <>
-              <Button size="sm" variant="ghost" onClick={() => handleAccept(q)}>Kabul</Button>
-              <Button size="sm" variant="ghost" onClick={() => handleReject(q)}>Ret</Button>
+              <Button size="xs" variant="secondary" onClick={() => handleAccept(q)}>Kabul</Button>
+              <Button size="xs" variant="secondary" onClick={() => handleReject(q)}>Ret</Button>
             </>
           )}
           {['draft', 'sent', 'accepted'].includes(q.status) && (
-            <Button size="sm" variant="ghost" onClick={() => handleConvert(q)}>Satışa Dön.</Button>
+            <Button size="xs" variant="secondary" onClick={() => handleConvert(q)}>Satışa Dön.</Button>
           )}
           {q.status !== 'converted' && (
-            <Button size="sm" variant="ghost" onClick={() => handleDelete(q)}>Sil</Button>
+            <Button size="xs" variant="danger" onClick={() => handleDelete(q)}>Sil</Button>
           )}
         </div>
       ),
