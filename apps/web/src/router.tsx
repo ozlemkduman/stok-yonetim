@@ -1,11 +1,15 @@
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 import { MainLayout } from './layouts/MainLayout';
 import { AuthLayout } from './layouts/AuthLayout';
 import { AdminLayout } from './layouts/AdminLayout';
 import { ProtectedRoute } from './components/ProtectedRoute';
+import { PublicRoute } from './components/PublicRoute';
 import { RoleGate } from './components/RoleGate';
 import { FeatureGate } from './components/FeatureGate';
 import { USER_ROLES } from './hooks/usePermissions';
+
+// Landing Page
+import { LandingPage } from './pages/Landing';
 
 // Auth Pages
 import { LoginPage, RegisterPage, ForgotPasswordPage, ResetPasswordPage, GoogleCallbackPage } from './pages/Auth';
@@ -46,6 +50,9 @@ import { NotFoundPage } from './pages/NotFound';
 export function AppRouter() {
   return (
     <Routes>
+      {/* Landing Page - Public */}
+      <Route path="/" element={<PublicRoute><LandingPage /></PublicRoute>} />
+
       {/* Auth Routes */}
       <Route element={<AuthLayout />}>
         <Route path="/login" element={<LoginPage />} />
@@ -81,14 +88,12 @@ export function AppRouter() {
 
       {/* Main App Routes - Protected */}
       <Route
-        path="/"
         element={
           <ProtectedRoute>
             <MainLayout />
           </ProtectedRoute>
         }
       >
-        <Route index element={<Navigate to="/dashboard" replace />} />
         <Route path="dashboard" element={<DashboardPage />} />
 
         {/* Settings */}
