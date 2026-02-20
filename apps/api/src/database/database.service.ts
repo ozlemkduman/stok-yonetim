@@ -1,6 +1,7 @@
 import { Injectable, Logger, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import knex, { Knex } from 'knex';
+import * as path from 'path';
 
 @Injectable()
 export class DatabaseService implements OnModuleInit, OnModuleDestroy {
@@ -26,6 +27,21 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
     } catch (error) {
       this.logger.error('Database connection failed', error);
       throw error;
+    }
+
+    // Auto-run migrations
+    try {
+      const migrationsDir = path.resolve(__dirname, 'migrations');
+      const [batch, migrations] = await this._knex.migrate.latest({
+        directory: migrationsDir,
+      });
+      if (migrations.length > 0) {
+        this.logger.log(`Ran ${migrations.length} migrations (batch ${batch})`);
+      } else {
+        this.logger.log('Database schema is up to date');
+      }
+    } catch (error) {
+      this.logger.error('Migration failed', error);
     }
   }
 
