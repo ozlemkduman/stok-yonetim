@@ -1,11 +1,17 @@
 import { Knex } from 'knex';
 
-const TENANT_EMAIL = 'demo206@stoksayac.com';
+const TENANT_USER_EMAIL = 'demo206@stoksayac.com';
 
 export async function seed(knex: Knex): Promise<void> {
-  const tenant = await knex('tenants').where({ billing_email: TENANT_EMAIL }).first();
+  // Find tenant via user email (billing_email may be null)
+  const user = await knex('users').where({ email: TENANT_USER_EMAIL }).first();
+  if (!user || !user.tenant_id) {
+    console.log(`⚠️ User not found for ${TENANT_USER_EMAIL}, skipping seed`);
+    return;
+  }
+  const tenant = await knex('tenants').where({ id: user.tenant_id }).first();
   if (!tenant) {
-    console.log(`⚠️ Tenant not found for ${TENANT_EMAIL}, skipping seed`);
+    console.log(`⚠️ Tenant not found for ${TENANT_USER_EMAIL}, skipping seed`);
     return;
   }
 
@@ -20,8 +26,7 @@ export async function seed(knex: Knex): Promise<void> {
     return;
   }
 
-  const user = await knex('users').where({ tenant_id: tenantId }).first();
-  const userId = user?.id || null;
+  const userId = user.id;
 
   const date = (y: number, m: number, d: number) => new Date(y, m - 1, d);
 
@@ -354,5 +359,5 @@ export async function seed(knex: Knex): Promise<void> {
     });
   }
 
-  console.log(`✅ demo206 seed completed: 50 expenses + 10 sales + 10 returns + 10 quotes + 10 transfers + 10 accounts + 10 contacts + 10 activities for ${TENANT_EMAIL}`);
+  console.log(`✅ demo206 seed completed: 50 expenses + 10 sales + 10 returns + 10 quotes + 10 transfers + 10 accounts + 10 contacts + 10 activities for ${TENANT_USER_EMAIL}`);
 }
