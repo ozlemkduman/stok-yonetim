@@ -49,6 +49,8 @@ export function QuoteListPage() {
   const [searchInput, setSearchInput] = useState('');
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
 
   const { showToast } = useToast();
   const { confirm } = useConfirmDialog();
@@ -62,6 +64,8 @@ export function QuoteListPage() {
         limit: 20,
         search: search || undefined,
         status: statusFilter || undefined,
+        startDate: startDate || undefined,
+        endDate: endDate || undefined,
       });
       setQuotes(response.data);
       setTotal(response.meta?.total || 0);
@@ -71,7 +75,7 @@ export function QuoteListPage() {
     } finally {
       setLoading(false);
     }
-  }, [page, search, statusFilter]);
+  }, [page, search, statusFilter, startDate, endDate]);
 
   useEffect(() => {
     fetchQuotes();
@@ -85,6 +89,16 @@ export function QuoteListPage() {
 
   const handleStatusChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setStatusFilter(e.target.value);
+    setPage(1);
+  };
+
+  const handleStartDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setStartDate(e.target.value);
+    setPage(1);
+  };
+
+  const handleEndDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setEndDate(e.target.value);
     setPage(1);
   };
 
@@ -263,6 +277,8 @@ export function QuoteListPage() {
               value={statusFilter}
               onChange={handleStatusChange}
             />
+            <Input type="date" value={startDate} onChange={handleStartDateChange} />
+            <Input type="date" value={endDate} onChange={handleEndDateChange} />
           </div>
         </div>
 

@@ -11,13 +11,16 @@ export class ReturnsController {
   constructor(private readonly returnsService: ReturnsService) {}
 
   @Get()
-  async findAll(@Query() query: PaginationDto & { customerId?: string }) {
+  async findAll(@Query() query: PaginationDto & { customerId?: string; status?: string; startDate?: string; endDate?: string }) {
     const page = query.page || 1;
     const limit = query.limit || 20;
     const result = await this.returnsService.findAll({
       page,
       limit,
       customerId: query.customerId,
+      status: query.status,
+      startDate: query.startDate,
+      endDate: query.endDate,
       sortBy: validateSortColumn(query.sortBy || 'return_date', ALLOWED_SORT_COLUMNS, 'return_date'),
       sortOrder: query.sortOrder || 'desc',
     });

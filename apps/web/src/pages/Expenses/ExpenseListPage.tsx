@@ -22,6 +22,9 @@ export function ExpenseListPage() {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [total, setTotal] = useState(0);
+  const [categoryFilter, setCategoryFilter] = useState('');
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingExpense, setEditingExpense] = useState<Expense | null>(null);
   const [formData, setFormData] = useState<CreateExpenseData>({
@@ -35,7 +38,11 @@ export function ExpenseListPage() {
   const fetchExpenses = async () => {
     setLoading(true);
     try {
-      const response = await expensesApi.getAll({ page, limit: 20 });
+      const params: Record<string, string | number> = { page, limit: 20 };
+      if (categoryFilter) params.category = categoryFilter;
+      if (startDate) params.startDate = startDate;
+      if (endDate) params.endDate = endDate;
+      const response = await expensesApi.getAll(params);
       setExpenses(response.data);
       setTotalPages(response.meta?.totalPages || 1);
       setTotal(response.meta?.total || 0);
@@ -45,7 +52,22 @@ export function ExpenseListPage() {
     setLoading(false);
   };
 
-  useEffect(() => { fetchExpenses(); }, [page]);
+  useEffect(() => { fetchExpenses(); }, [page, categoryFilter, startDate, endDate]);
+
+  const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setCategoryFilter(e.target.value);
+    setPage(1);
+  };
+
+  const handleStartDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setStartDate(e.target.value);
+    setPage(1);
+  };
+
+  const handleEndDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setEndDate(e.target.value);
+    setPage(1);
+  };
 
   const handleSubmit = async () => {
     try {
@@ -141,6 +163,20 @@ export function ExpenseListPage() {
       </div>
 
       <div className={styles.card}>
+        <div className={styles.toolbar}>
+          <Select
+            options={[
+              { value: '', label: 'Tüm Kategoriler' },
+              ...Object.entries(EXPENSE_CATEGORIES).map(([v, l]) => ({ value: v, label: l })),
+            ]}
+            value={categoryFilter}
+            onChange={handleCategoryChange}
+          />
+          <div className={styles.dateFilters}>
+            <Input type="date" value={startDate} onChange={handleStartDateChange} placeholder="Başlangıç" />
+            <Input type="date" value={endDate} onChange={handleEndDateChange} placeholder="Bitiş" />
+          </div>
+        </div>
         <Table
           columns={columns}
           data={expenses}

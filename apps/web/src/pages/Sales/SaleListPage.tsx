@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Table, Button, Badge, Pagination, type Column } from '@stok/ui';
+import { Table, Button, Badge, Input, Pagination, type Column } from '@stok/ui';
 import { salesApi, Sale } from '../../api/sales.api';
 import { useToast } from '../../context/ToastContext';
 import { useConfirmDialog } from '../../context/ConfirmDialogContext';
@@ -57,6 +57,10 @@ export function SaleListPage() {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [stats, setStats] = useState({ total: 0, count: 0, completed: 0, cancelled: 0, noVatCount: 0 });
+  const [searchInput, setSearchInput] = useState('');
+  const [search, setSearch] = useState('');
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
   const [vatFilter, setVatFilter] = useState<VatFilter>('all');
   const [invoiceFilter, setInvoiceFilter] = useState<InvoiceFilter>('all');
   const [saleTypeFilter, setSaleTypeFilter] = useState<SaleTypeFilter>('all');
@@ -67,6 +71,9 @@ export function SaleListPage() {
     setLoading(true);
     try {
       const params: Record<string, string | number> = { page, limit: 20 };
+      if (search) params.search = search;
+      if (startDate) params.startDate = startDate;
+      if (endDate) params.endDate = endDate;
       if (vatFilter === 'with_vat') params.includeVat = 'true';
       if (vatFilter === 'without_vat') params.includeVat = 'false';
       if (invoiceFilter === 'issued') params.invoiceIssued = 'true';
@@ -92,7 +99,23 @@ export function SaleListPage() {
     setLoading(false);
   };
 
-  useEffect(() => { fetchSales(); }, [page, vatFilter, invoiceFilter, saleTypeFilter]);
+  useEffect(() => { fetchSales(); }, [page, search, startDate, endDate, vatFilter, invoiceFilter, saleTypeFilter]);
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    setSearch(searchInput);
+    setPage(1);
+  };
+
+  const handleStartDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setStartDate(e.target.value);
+    setPage(1);
+  };
+
+  const handleEndDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setEndDate(e.target.value);
+    setPage(1);
+  };
 
   const handleVatFilterChange = (filter: VatFilter) => {
     setVatFilter(filter);
@@ -249,6 +272,21 @@ export function SaleListPage() {
             <span className={styles.statValue}>{stats.cancelled}</span>
             <span className={styles.statLabel}>İptal Edilen</span>
           </div>
+        </div>
+      </div>
+
+      <div className={styles.searchBar}>
+        <form onSubmit={handleSearch} className={styles.searchForm}>
+          <Input
+            placeholder="Fatura no veya müşteri ara..."
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+          />
+          <Button type="submit" variant="secondary">Ara</Button>
+        </form>
+        <div className={styles.dateFilters}>
+          <Input type="date" value={startDate} onChange={handleStartDateChange} />
+          <Input type="date" value={endDate} onChange={handleEndDateChange} />
         </div>
       </div>
 

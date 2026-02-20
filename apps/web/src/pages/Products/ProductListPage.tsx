@@ -27,6 +27,8 @@ export function ProductListPage() {
   const [totalPages, setTotalPages] = useState(1);
   const [total, setTotal] = useState(0);
   const [search, setSearch] = useState('');
+  const [categoryFilter, setCategoryFilter] = useState('');
+  const [categories, setCategories] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState('total_sold');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -45,7 +47,9 @@ export function ProductListPage() {
   const fetchProducts = async () => {
     setLoading(true);
     try {
-      const response = await productsApi.getAll({ page, limit: 20, search, sortBy, sortOrder });
+      const params: Record<string, string | number> = { page, limit: 20, search, sortBy, sortOrder };
+      if (categoryFilter) params.category = categoryFilter;
+      const response = await productsApi.getAll(params);
       setProducts(response.data);
       setTotalPages(response.meta?.totalPages || 1);
       setTotal(response.meta?.total || 0);
@@ -55,7 +59,13 @@ export function ProductListPage() {
     setLoading(false);
   };
 
-  useEffect(() => { fetchProducts(); }, [page, search, sortBy, sortOrder]);
+  useEffect(() => { fetchProducts(); }, [page, search, categoryFilter, sortBy, sortOrder]);
+
+  useEffect(() => {
+    productsApi.getCategories().then(res => {
+      setCategories(res.data || []);
+    }).catch(() => {});
+  }, []);
 
   const handleSubmit = async () => {
     try {
@@ -256,6 +266,16 @@ export function ProductListPage() {
             />
           </div>
           <div className={styles.sortWrapper}>
+            <select
+              className={styles.sortSelect}
+              value={categoryFilter}
+              onChange={(e) => { setCategoryFilter(e.target.value); setPage(1); }}
+            >
+              <option value="">Tüm Kategoriler</option>
+              {categories.map((cat) => (
+                <option key={cat} value={cat}>{cat}</option>
+              ))}
+            </select>
             <select
               className={styles.sortSelect}
               value={`${sortBy}_${sortOrder}`}

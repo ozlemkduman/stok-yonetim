@@ -40,8 +40,8 @@ export class ReturnsRepository extends BaseTenantRepository<Return> {
     super(db);
   }
 
-  async findAll(params: { page: number; limit: number; customerId?: string; sortBy: string; sortOrder: 'asc' | 'desc' }): Promise<{ items: Return[]; total: number }> {
-    const { page, limit, customerId, sortBy, sortOrder } = params;
+  async findAll(params: { page: number; limit: number; customerId?: string; status?: string; startDate?: string; endDate?: string; sortBy: string; sortOrder: 'asc' | 'desc' }): Promise<{ items: Return[]; total: number }> {
+    const { page, limit, customerId, status, startDate, endDate, sortBy, sortOrder } = params;
 
     let query = this.query.clone()
       .leftJoin('customers', 'returns.customer_id', 'customers.id')
@@ -52,6 +52,21 @@ export class ReturnsRepository extends BaseTenantRepository<Return> {
     if (customerId) {
       query = query.where('returns.customer_id', customerId);
       countQuery = countQuery.where('customer_id', customerId);
+    }
+
+    if (status) {
+      query = query.where('returns.status', status);
+      countQuery = countQuery.where('status', status);
+    }
+
+    if (startDate) {
+      query = query.where('returns.return_date', '>=', startDate);
+      countQuery = countQuery.where('return_date', '>=', startDate);
+    }
+
+    if (endDate) {
+      query = query.where('returns.return_date', '<=', `${endDate}T23:59:59`);
+      countQuery = countQuery.where('return_date', '<=', `${endDate}T23:59:59`);
     }
 
     const [items, [{ count }]] = await Promise.all([

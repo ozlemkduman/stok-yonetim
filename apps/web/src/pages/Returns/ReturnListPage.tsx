@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Table, Button, Badge, Pagination, type Column } from '@stok/ui';
+import { Table, Button, Badge, Input, Select, Pagination, type Column } from '@stok/ui';
 import { apiClient } from '../../api/client';
 import { useToast } from '../../context/ToastContext';
 import { formatCurrency, formatDateTime } from '../../utils/formatters';
@@ -33,13 +33,20 @@ export function ReturnListPage() {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [total, setTotal] = useState(0);
+  const [statusFilter, setStatusFilter] = useState('');
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
   const { showToast } = useToast();
 
   useEffect(() => {
     (async () => {
       setLoading(true);
       try {
-        const response = await apiClient.get<Return[]>('/returns', { page, limit: 20 });
+        const params: Record<string, string | number> = { page, limit: 20 };
+        if (statusFilter) params.status = statusFilter;
+        if (startDate) params.startDate = startDate;
+        if (endDate) params.endDate = endDate;
+        const response = await apiClient.get<Return[]>('/returns', params);
         setReturns(response.data);
         setTotalPages(response.meta?.totalPages || 1);
         setTotal(response.meta?.total || 0);
@@ -48,7 +55,22 @@ export function ReturnListPage() {
       }
       setLoading(false);
     })();
-  }, [page]);
+  }, [page, statusFilter, startDate, endDate]);
+
+  const handleStatusChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setStatusFilter(e.target.value);
+    setPage(1);
+  };
+
+  const handleStartDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setStartDate(e.target.value);
+    setPage(1);
+  };
+
+  const handleEndDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setEndDate(e.target.value);
+    setPage(1);
+  };
 
   const columns: Column<Return>[] = [
     {
@@ -93,6 +115,22 @@ export function ReturnListPage() {
       </div>
 
       <div className={styles.card}>
+        <div className={styles.toolbar}>
+          <Select
+            options={[
+              { value: '', label: 'Tüm Durumlar' },
+              { value: 'completed', label: 'Tamamlandi' },
+              { value: 'pending', label: 'Bekliyor' },
+              { value: 'cancelled', label: 'Iptal' },
+            ]}
+            value={statusFilter}
+            onChange={handleStatusChange}
+          />
+          <div className={styles.dateFilters}>
+            <Input type="date" value={startDate} onChange={handleStartDateChange} />
+            <Input type="date" value={endDate} onChange={handleEndDateChange} />
+          </div>
+        </div>
         <Table
           columns={columns}
           data={returns}

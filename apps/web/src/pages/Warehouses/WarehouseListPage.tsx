@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Table, Button, Badge, Pagination, type Column } from '@stok/ui';
+import { Table, Button, Badge, Input, Select, Pagination, type Column } from '@stok/ui';
 import { Warehouse, StockTransfer, StockMovement, CreateWarehouseData, warehousesApi } from '../../api/warehouses.api';
 import { WarehouseFormModal } from './WarehouseFormModal';
 import { useToast } from '../../context/ToastContext';
@@ -50,6 +50,10 @@ export function WarehouseListPage() {
   const [totalPages, setTotalPages] = useState(1);
   const [total, setTotal] = useState(0);
 
+  const [transferStatusFilter, setTransferStatusFilter] = useState('');
+  const [movementStartDate, setMovementStartDate] = useState('');
+  const [movementEndDate, setMovementEndDate] = useState('');
+
   const [isFormModalOpen, setIsFormModalOpen] = useState(false);
   const [editingWarehouse, setEditingWarehouse] = useState<Warehouse | null>(null);
 
@@ -77,7 +81,10 @@ export function WarehouseListPage() {
     setLoading(true);
     setError(null);
     try {
-      const response = await warehousesApi.getTransfers({ page, limit: 20 });
+      const response = await warehousesApi.getTransfers({
+        page, limit: 20,
+        status: transferStatusFilter || undefined,
+      });
       setTransfers(response.data);
       setTotal(response.meta?.total || 0);
       setTotalPages(response.meta?.totalPages || 1);
@@ -86,13 +93,17 @@ export function WarehouseListPage() {
     } finally {
       setLoading(false);
     }
-  }, [page]);
+  }, [page, transferStatusFilter]);
 
   const fetchMovements = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await warehousesApi.getMovements({ page, limit: 20 });
+      const response = await warehousesApi.getMovements({
+        page, limit: 20,
+        startDate: movementStartDate || undefined,
+        endDate: movementEndDate || undefined,
+      });
       setMovements(response.data);
       setTotal(response.meta?.total || 0);
       setTotalPages(response.meta?.totalPages || 1);
@@ -101,7 +112,7 @@ export function WarehouseListPage() {
     } finally {
       setLoading(false);
     }
-  }, [page]);
+  }, [page, movementStartDate, movementEndDate]);
 
   useEffect(() => {
     if (activeTab === 'warehouses') {
@@ -115,6 +126,21 @@ export function WarehouseListPage() {
 
   const handleTabChange = (tab: TabType) => {
     setActiveTab(tab);
+    setPage(1);
+  };
+
+  const handleTransferStatusChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setTransferStatusFilter(e.target.value);
+    setPage(1);
+  };
+
+  const handleMovementStartDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setMovementStartDate(e.target.value);
+    setPage(1);
+  };
+
+  const handleMovementEndDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setMovementEndDate(e.target.value);
     setPage(1);
   };
 
@@ -361,6 +387,29 @@ export function WarehouseListPage() {
             Stok Hareketleri
           </button>
         </div>
+
+        {activeTab === 'transfers' && (
+          <div className={styles.tabFilters}>
+            <Select
+              options={[
+                { value: '', label: 'Tüm Durumlar' },
+                { value: 'pending', label: 'Bekliyor' },
+                { value: 'in_transit', label: 'Yolda' },
+                { value: 'completed', label: 'Tamamlandi' },
+                { value: 'cancelled', label: 'Iptal' },
+              ]}
+              value={transferStatusFilter}
+              onChange={handleTransferStatusChange}
+            />
+          </div>
+        )}
+
+        {activeTab === 'movements' && (
+          <div className={styles.tabFilters}>
+            <Input type="date" value={movementStartDate} onChange={handleMovementStartDateChange} />
+            <Input type="date" value={movementEndDate} onChange={handleMovementEndDateChange} />
+          </div>
+        )}
 
         {error && <div className={styles.error}>{error}</div>}
 
