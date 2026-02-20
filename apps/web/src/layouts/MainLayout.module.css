@@ -52,8 +52,10 @@
 
 /* ── Sidebar Header ── */
 .sidebarHeader {
-  padding: 1.5rem;
+  padding: 1.25rem 1.25rem;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
 }
 
 .logoContainer {

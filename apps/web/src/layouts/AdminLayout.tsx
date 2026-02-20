@@ -40,7 +40,7 @@ export function AdminLayout() {
     <div className={styles.layout}>
       <aside className={`${styles.sidebar} ${isSidebarOpen ? styles.open : styles.closed}`}>
         <div className={styles.logo}>
-          <Logo size="sm" subtitle="Admin Panel" />
+          <Logo size="sm" subtitle="Admin Panel" dark />
         </div>
 
         <nav className={styles.nav}>

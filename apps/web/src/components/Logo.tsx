@@ -33,8 +33,8 @@ export function LogoIcon({ size = 24 }: { size?: number }) {
 }
 
 const sizes = {
-  sm: { icon: 28, title: '1.1rem', subtitle: '0.65rem', gap: '0.5rem' },
-  md: { icon: 36, title: '1.35rem', subtitle: '0.72rem', gap: '0.6rem' },
+  sm: { icon: 32, title: '1.15rem', subtitle: '0.65rem', gap: '0.6rem' },
+  md: { icon: 38, title: '1.35rem', subtitle: '0.72rem', gap: '0.7rem' },
   lg: { icon: 48, title: '1.8rem', subtitle: '0.85rem', gap: '0.75rem' },
 };
 

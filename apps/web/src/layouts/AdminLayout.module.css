@@ -24,11 +24,10 @@
 }
 
 .logo {
-  padding: 1.5rem;
+  padding: 1.25rem 1.25rem;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   display: flex;
   align-items: center;
-  gap: 0.75rem;
 }
 
 .logo h1 {

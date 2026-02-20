@@ -216,7 +216,7 @@ export function MainLayout() {
         className={`${styles.sidebar} ${sidebarOpen ? styles.sidebarOpen : styles.sidebarClosed}`}
       >
         <div className={styles.sidebarHeader}>
-          <Logo size="sm" subtitle="Yönetim Sistemi" />
+          <Logo size="sm" subtitle="Yönetim Sistemi" dark />
         </div>
 
         <nav className={styles.nav}>
