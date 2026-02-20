@@ -4,8 +4,20 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(160deg, #f0f4ff 0%, #e8eaff 30%, #fce4ec 100%);
   padding: 1rem;
+  position: relative;
+}
+
+.container::before {
+  content: '';
+  position: absolute;
+  top: -20%;
+  left: -10%;
+  width: 60%;
+  height: 60%;
+  background: radial-gradient(circle, rgba(67,97,238,0.1) 0%, transparent 70%);
+  pointer-events: none;
 }
 
 .content {
@@ -16,7 +28,8 @@
 .logo {
   text-align: center;
   margin-bottom: 2rem;
-  color: white;
+  display: flex;
+  justify-content: center;
 }
 
 .logo h1 {
@@ -33,15 +46,16 @@
 
 .formContainer {
   background: white;
-  border-radius: 12px;
+  border-radius: 16px;
   padding: 2rem;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 8px 32px rgba(67, 97, 238, 0.1), 0 2px 8px rgba(0, 0, 0, 0.06);
+  border: 1px solid rgba(67, 97, 238, 0.08);
 }
 
 .footer {
   margin-top: 2rem;
   text-align: center;
-  color: rgba(255, 255, 255, 0.8);
+  color: #666;
   font-size: 0.875rem;
 }
 
