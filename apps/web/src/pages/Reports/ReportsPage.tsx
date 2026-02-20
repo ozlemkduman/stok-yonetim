@@ -1,7 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Button, Spinner } from '@stok/ui';
 import { useToast } from '../../context/ToastContext';
-import { reportsApi, TopProduct, TopCustomer, UpcomingPayment, OverduePayment, StockReportProduct, ExpenseByCategory, CustomerProductPurchase, CustomerSale } from '../../api/reports.api';
+import { reportsApi, TopProduct, TopCustomer, UpcomingPayment, OverduePayment, StockReportProduct, ExpenseByCategory, CustomerProductPurchase, CustomerSale, EmployeePerformanceReport } from '../../api/reports.api';
+import { useAuth } from '../../hooks/useAuth';
 import { formatCurrency, formatDate } from '../../utils/formatters';
 import { EXPENSE_CATEGORIES, PAYMENT_METHODS } from '../../utils/constants';
 import styles from './ReportsPage.module.css';
@@ -73,10 +74,11 @@ const icons = {
   ),
 };
 
-type TabType = 'genel' | 'satis' | 'musteri' | 'musteriSatis' | 'stok' | 'gider';
+type TabType = 'genel' | 'satis' | 'musteri' | 'musteriSatis' | 'stok' | 'gider' | 'personel';
 
 export function ReportsPage() {
   const { showToast } = useToast();
+  const { user } = useAuth();
   const [activeTab, setActiveTab] = useState<TabType>('genel');
   const [startDate, setStartDate] = useState(() => {
     const d = new Date();
@@ -100,11 +102,12 @@ export function ReportsPage() {
   const [customerProducts, setCustomerProducts] = useState<CustomerProductPurchase[]>([]);
   const [customerSales, setCustomerSales] = useState<CustomerSale[]>([]);
   const [expandedCustomer, setExpandedCustomer] = useState<string | null>(null);
+  const [employeePerformance, setEmployeePerformance] = useState<EmployeePerformanceReport | null>(null);
 
   const fetchReports = useCallback(async () => {
     setLoading(true);
     try {
-      const [sales, profit, debt, products, customers, upcoming, overdue, stock, returns, expenses, custProducts, custSales] = await Promise.all([
+      const [sales, profit, debt, products, customers, upcoming, overdue, stock, returns, expenses, custProducts, custSales, empPerf] = await Promise.all([
         reportsApi.getSalesSummary(startDate, endDate),
         reportsApi.getProfitLoss(startDate, endDate),
         reportsApi.getDebtOverview(),
@@ -117,6 +120,7 @@ export function ReportsPage() {
         reportsApi.getExpensesByCategory(startDate, endDate),
         reportsApi.getCustomerProductPurchases(startDate, endDate),
         reportsApi.getCustomerSales(startDate, endDate),
+        reportsApi.getEmployeePerformance(startDate, endDate),
       ]);
       setSalesSummary(sales.data);
       setProfitLoss(profit.data);
@@ -130,6 +134,7 @@ export function ReportsPage() {
       setExpensesReport(expenses.data);
       setCustomerProducts(custProducts.data);
       setCustomerSales(custSales.data);
+      setEmployeePerformance(empPerf.data);
     } catch (err) {
       showToast('error', 'Rapor yuklenemedi');
     }
@@ -414,7 +419,6 @@ export function ReportsPage() {
   );
 
   const renderMusteriTab = () => {
-    // Musteri bazli gruplama
     const groupedByCustomer = customerProducts.reduce<Record<string, { name: string; products: { product_name: string; total_quantity: number; total_amount: number }[] }>>((acc, item) => {
       if (!acc[item.customer_id]) {
         acc[item.customer_id] = { name: item.customer_name, products: [] };
@@ -427,78 +431,78 @@ export function ReportsPage() {
       return acc;
     }, {});
 
-    return (
-      <div className={styles.grid}>
-        <div className={`${styles.grid} ${styles.twoColGrid}`}>
-          {/* Top Customers */}
-          <div className={styles.reportCard}>
-            <div className={styles.reportCardHeader}>
-              {icons.customer}
-              <h3 className={styles.reportCardTitle}>En Cok Alisveris Yapan Musteriler</h3>
-            </div>
-            <div className={styles.reportCardBody}>
-              {topCustomers.length > 0 ? (
-                <table className={styles.reportTable}>
-                  <thead>
-                    <tr>
-                      <th>#</th>
-                      <th>Musteri</th>
-                      <th className={styles.alignRight}>Satis</th>
-                      <th className={styles.alignRight}>Toplam</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {topCustomers.map((c, i) => (
-                      <tr key={c.id}>
-                        <td>{i + 1}</td>
-                        <td>
-                          <div>{c.name}</div>
-                          {c.phone && <small style={{ color: 'var(--color-text-muted)' }}>{c.phone}</small>}
-                        </td>
-                        <td className={styles.alignRight}>{c.sale_count}</td>
-                        <td className={styles.alignRight}><strong className={styles.success}>{formatCurrency(parseFloat(String(c.total_amount)))}</strong></td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              ) : (
-                <div className={styles.emptyState}>Veri bulunamadi</div>
-              )}
-            </div>
-          </div>
+    const debtCustomers = debtOverview?.customers?.filter((c: any) => c.balance < 0) || [];
 
-          {/* Customers with Debt */}
-          <div className={styles.reportCard}>
-            <div className={styles.reportCardHeader}>
-              {icons.debt}
-              <h3 className={styles.reportCardTitle}>Borclu Musteriler</h3>
-            </div>
-            <div className={styles.reportCardBody}>
-              {debtOverview?.customers?.length > 0 ? (
-                <table className={styles.reportTable}>
-                  <thead>
-                    <tr>
-                      <th>Musteri</th>
-                      <th>Telefon</th>
-                      <th className={styles.alignRight}>Bakiye</th>
+    return (
+      <div className={`${styles.grid} ${styles.twoColGrid}`}>
+        {/* Top Customers */}
+        <div className={styles.reportCard}>
+          <div className={styles.reportCardHeader}>
+            {icons.customer}
+            <h3 className={styles.reportCardTitle}>En Cok Alisveris Yapan Musteriler</h3>
+          </div>
+          <div className={styles.reportCardBody}>
+            {topCustomers.length > 0 ? (
+              <table className={styles.reportTable}>
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Musteri</th>
+                    <th className={styles.alignRight}>Satis</th>
+                    <th className={styles.alignRight}>Toplam</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {topCustomers.map((c, i) => (
+                    <tr key={c.id}>
+                      <td>{i + 1}</td>
+                      <td>
+                        <div>{c.name}</div>
+                        {c.phone && <small className={styles.accordionPhone}>{c.phone}</small>}
+                      </td>
+                      <td className={styles.alignRight}>{c.sale_count}</td>
+                      <td className={styles.alignRight}><strong className={styles.success}>{formatCurrency(parseFloat(String(c.total_amount)))}</strong></td>
                     </tr>
-                  </thead>
-                  <tbody>
-                    {debtOverview.customers.filter((c: any) => c.balance < 0).slice(0, 10).map((c: any) => (
-                      <tr key={c.id}>
-                        <td>{c.name}</td>
-                        <td>{c.phone || '-'}</td>
-                        <td className={styles.alignRight}>
-                          <strong className={styles.danger}>{formatCurrency(Math.abs(c.balance))}</strong>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              ) : (
-                <div className={styles.emptyState}>Borclu musteri bulunmuyor</div>
-              )}
-            </div>
+                  ))}
+                </tbody>
+              </table>
+            ) : (
+              <div className={styles.emptyState}>Veri bulunamadi</div>
+            )}
+          </div>
+        </div>
+
+        {/* Customers with Debt */}
+        <div className={styles.reportCard}>
+          <div className={styles.reportCardHeader}>
+            {icons.debt}
+            <h3 className={styles.reportCardTitle}>Borclu Musteriler</h3>
+          </div>
+          <div className={styles.reportCardBody}>
+            {debtCustomers.length > 0 ? (
+              <table className={styles.reportTable}>
+                <thead>
+                  <tr>
+                    <th>Musteri</th>
+                    <th>Telefon</th>
+                    <th className={styles.alignRight}>Bakiye</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {debtCustomers.slice(0, 10).map((c: any) => (
+                    <tr key={c.id}>
+                      <td>{c.name}</td>
+                      <td>{c.phone || '-'}</td>
+                      <td className={styles.alignRight}>
+                        <strong className={styles.danger}>{formatCurrency(Math.abs(c.balance))}</strong>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            ) : (
+              <div className={styles.emptyState}>Borclu musteri bulunmuyor</div>
+            )}
           </div>
         </div>
 
@@ -511,10 +515,10 @@ export function ReportsPage() {
           <div className={styles.reportCardBody}>
             {Object.keys(groupedByCustomer).length > 0 ? (
               Object.entries(groupedByCustomer).map(([customerId, customer]) => (
-                <div key={customerId} style={{ marginBottom: 'var(--space-4)' }}>
-                  <h4 style={{ margin: '0 0 var(--space-2) 0', fontSize: 'var(--font-size-sm)', color: 'var(--color-text-primary)' }}>
+                <div key={customerId} className={styles.customerProductGroup}>
+                  <h4 className={styles.customerProductGroupHeader}>
                     {customer.name}
-                    <span style={{ color: 'var(--color-text-muted)', fontWeight: 'normal', marginLeft: 'var(--space-2)' }}>
+                    <span className={styles.customerProductGroupCount}>
                       ({customer.products.reduce((s, p) => s + p.total_quantity, 0)} adet toplam)
                     </span>
                   </h4>
@@ -633,7 +637,6 @@ export function ReportsPage() {
   );
 
   const renderMusteriSatisTab = () => {
-    // Musteri bazli gruplama
     const grouped = customerSales.reduce<Record<string, { name: string; phone: string | null; sales: CustomerSale[] }>>((acc, sale) => {
       if (!acc[sale.customer_id]) {
         acc[sale.customer_id] = { name: sale.customer_name, phone: sale.customer_phone, sales: [] };
@@ -642,87 +645,115 @@ export function ReportsPage() {
       return acc;
     }, {});
 
+    const entries = Object.entries(grouped);
+    const totalCustomerCount = entries.length;
+    const totalSaleCount = customerSales.length;
+    const totalAmount = customerSales.reduce((s, sale) => s + parseFloat(String(sale.grand_total)), 0);
+
     const toggleCustomer = (id: string) => {
       setExpandedCustomer(expandedCustomer === id ? null : id);
     };
 
     return (
       <div className={styles.grid}>
+        {/* Summary */}
         <div className={`${styles.reportCard} ${styles.fullWidthCard}`}>
           <div className={styles.reportCardHeader}>
             {icons.customer}
+            <h3 className={styles.reportCardTitle}>Musteri Satislari Ozeti</h3>
+          </div>
+          <div className={styles.reportCardBody}>
+            <div className={styles.summaryGrid}>
+              <div className={styles.summaryCard}>
+                <div className={styles.summaryValue}>{totalCustomerCount}</div>
+                <div className={styles.summaryLabel}>Musteri</div>
+              </div>
+              <div className={styles.summaryCard}>
+                <div className={styles.summaryValue}>{totalSaleCount}</div>
+                <div className={styles.summaryLabel}>Toplam Satis</div>
+              </div>
+              <div className={styles.summaryCard}>
+                <div className={`${styles.summaryValue} ${styles.success}`}>{formatCurrency(totalAmount)}</div>
+                <div className={styles.summaryLabel}>Toplam Ciro</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Accordion */}
+        <div className={`${styles.reportCard} ${styles.fullWidthCard}`}>
+          <div className={styles.reportCardHeader}>
+            {icons.sales}
             <h3 className={styles.reportCardTitle}>Musteri Bazli Satislar</h3>
           </div>
           <div className={styles.reportCardBody}>
-            {Object.keys(grouped).length > 0 ? (
-              Object.entries(grouped).map(([customerId, customer]) => {
-                const totalAmount = customer.sales.reduce((s, sale) => s + parseFloat(String(sale.grand_total)), 0);
-                const isExpanded = expandedCustomer === customerId;
+            {entries.length > 0 ? (
+              <div className={styles.accordion}>
+                {entries.map(([customerId, customer]) => {
+                  const custTotal = customer.sales.reduce((s, sale) => s + parseFloat(String(sale.grand_total)), 0);
+                  const isExpanded = expandedCustomer === customerId;
 
-                return (
-                  <div key={customerId} style={{ marginBottom: 'var(--space-3)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-md)', overflow: 'hidden' }}>
-                    <div
-                      onClick={() => toggleCustomer(customerId)}
-                      style={{
-                        display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                        padding: 'var(--space-3) var(--space-4)', cursor: 'pointer',
-                        background: isExpanded ? 'var(--color-bg-secondary)' : 'transparent',
-                      }}
-                    >
-                      <div>
-                        <strong>{customer.name}</strong>
-                        {customer.phone && <span style={{ color: 'var(--color-text-muted)', marginLeft: 'var(--space-2)', fontSize: 'var(--font-size-sm)' }}>{customer.phone}</span>}
+                  return (
+                    <div key={customerId} className={styles.accordionItem}>
+                      <div
+                        onClick={() => toggleCustomer(customerId)}
+                        className={`${styles.accordionHeader} ${isExpanded ? styles.accordionHeaderActive : ''}`}
+                      >
+                        <div className={styles.accordionCustomer}>
+                          <strong>{customer.name}</strong>
+                          {customer.phone && <span className={styles.accordionPhone}>{customer.phone}</span>}
+                        </div>
+                        <div className={styles.accordionMeta}>
+                          <span className={styles.accordionCount}>{customer.sales.length} satis</span>
+                          <strong className={styles.success}>{formatCurrency(custTotal)}</strong>
+                          <span className={`${styles.accordionArrow} ${isExpanded ? styles.accordionArrowOpen : ''}`}>&#9660;</span>
+                        </div>
                       </div>
-                      <div style={{ display: 'flex', gap: 'var(--space-4)', alignItems: 'center' }}>
-                        <span style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-muted)' }}>{customer.sales.length} satis</span>
-                        <strong className={styles.success}>{formatCurrency(totalAmount)}</strong>
-                        <span style={{ fontSize: '12px' }}>{isExpanded ? '▲' : '▼'}</span>
-                      </div>
-                    </div>
 
-                    {isExpanded && (
-                      <div style={{ padding: '0 var(--space-4) var(--space-3)' }}>
-                        {customer.sales.map((sale) => (
-                          <div key={sale.id} style={{ marginBottom: 'var(--space-3)', borderBottom: '1px solid var(--color-border)', paddingBottom: 'var(--space-2)' }}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 'var(--space-1)' }}>
-                              <span style={{ fontSize: 'var(--font-size-sm)' }}>
-                                <strong>{sale.invoice_number}</strong>
-                                <span style={{ color: 'var(--color-text-muted)', marginLeft: 'var(--space-2)' }}>{formatDate(sale.sale_date)}</span>
-                                <span style={{ color: 'var(--color-text-muted)', marginLeft: 'var(--space-2)' }}>
-                                  ({PAYMENT_METHODS[sale.payment_method as keyof typeof PAYMENT_METHODS] || sale.payment_method})
+                      {isExpanded && (
+                        <div className={styles.accordionBody}>
+                          {customer.sales.map((sale) => (
+                            <div key={sale.id} className={styles.accordionSaleItem}>
+                              <div className={styles.accordionSaleHeader}>
+                                <span>
+                                  <strong>{sale.invoice_number}</strong>
+                                  <span className={styles.accordionSaleMeta}>{formatDate(sale.sale_date)}</span>
+                                  <span className={styles.accordionSaleMeta}>
+                                    ({PAYMENT_METHODS[sale.payment_method as keyof typeof PAYMENT_METHODS] || sale.payment_method})
+                                  </span>
                                 </span>
-                              </span>
-                              <strong>{formatCurrency(parseFloat(String(sale.grand_total)))}</strong>
-                            </div>
-                            {sale.items.length > 0 && (
-                              <table className={styles.reportTable} style={{ marginTop: 'var(--space-1)' }}>
-                                <thead>
-                                  <tr>
-                                    <th>Urun</th>
-                                    <th className={styles.alignRight}>Adet</th>
-                                    <th className={styles.alignRight}>Birim Fiyat</th>
-                                    <th className={styles.alignRight}>Toplam</th>
-                                  </tr>
-                                </thead>
-                                <tbody>
-                                  {sale.items.map((item, idx) => (
-                                    <tr key={idx}>
-                                      <td>{item.product_name}</td>
-                                      <td className={styles.alignRight}>{item.quantity}</td>
-                                      <td className={styles.alignRight}>{formatCurrency(parseFloat(String(item.unit_price)))}</td>
-                                      <td className={styles.alignRight}>{formatCurrency(parseFloat(String(item.line_total)))}</td>
+                                <strong>{formatCurrency(parseFloat(String(sale.grand_total)))}</strong>
+                              </div>
+                              {sale.items.length > 0 && (
+                                <table className={styles.reportTable}>
+                                  <thead>
+                                    <tr>
+                                      <th>Urun</th>
+                                      <th className={styles.alignRight}>Adet</th>
+                                      <th className={styles.alignRight}>Birim Fiyat</th>
+                                      <th className={styles.alignRight}>Toplam</th>
                                     </tr>
-                                  ))}
-                                </tbody>
-                              </table>
-                            )}
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                );
-              })
+                                  </thead>
+                                  <tbody>
+                                    {sale.items.map((item, idx) => (
+                                      <tr key={idx}>
+                                        <td>{item.product_name}</td>
+                                        <td className={styles.alignRight}>{item.quantity}</td>
+                                        <td className={styles.alignRight}>{formatCurrency(parseFloat(String(item.unit_price)))}</td>
+                                        <td className={styles.alignRight}>{formatCurrency(parseFloat(String(item.line_total)))}</td>
+                                      </tr>
+                                    ))}
+                                  </tbody>
+                                </table>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
             ) : (
               <div className={styles.emptyState}>Musteri satisi bulunamadi</div>
             )}
@@ -810,6 +841,96 @@ export function ReportsPage() {
     </div>
   );
 
+  const isAdmin = user?.role === 'super_admin' || user?.role === 'tenant_admin';
+
+  const renderPersonelTab = () => {
+    if (!employeePerformance) return <div className={styles.emptyState}>Veri bulunamadi</div>;
+
+    const { employees, summary } = employeePerformance;
+    const topEmployee = employees.length > 0 ? employees[0] : null;
+
+    return (
+      <div className={styles.grid}>
+        {/* Summary Cards */}
+        <div className={`${styles.reportCard} ${styles.fullWidthCard}`}>
+          <div className={styles.reportCardHeader}>
+            {icons.customer}
+            <h3 className={styles.reportCardTitle}>Personel Performans Ozeti</h3>
+          </div>
+          <div className={styles.reportCardBody}>
+            <div className={styles.summaryGrid}>
+              <div className={styles.summaryCard}>
+                <div className={styles.summaryValue}>{summary.totalSales}</div>
+                <div className={styles.summaryLabel}>Toplam Satis</div>
+              </div>
+              <div className={styles.summaryCard}>
+                <div className={`${styles.summaryValue} ${styles.success}`}>{formatCurrency(summary.totalRevenue)}</div>
+                <div className={styles.summaryLabel}>Toplam Ciro</div>
+              </div>
+              {isAdmin && topEmployee && (
+                <div className={styles.summaryCard}>
+                  <div className={styles.summaryValue} style={{ fontSize: 'var(--font-size-base)' }}>{topEmployee.name}</div>
+                  <div className={styles.summaryLabel}>En Cok Satan Calisan</div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Leaderboard - only for admin */}
+        {isAdmin && employees.length > 0 && (
+          <div className={`${styles.reportCard} ${styles.fullWidthCard}`}>
+            <div className={styles.reportCardHeader}>
+              {icons.reports}
+              <h3 className={styles.reportCardTitle}>Calisan Siralamasi</h3>
+            </div>
+            <div className={styles.reportCardBody}>
+              <table className={styles.reportTable}>
+                <thead>
+                  <tr>
+                    <th>Sira</th>
+                    <th>Calisan</th>
+                    <th className={styles.alignRight}>Satis</th>
+                    <th className={styles.alignRight}>Ciro</th>
+                    <th className={styles.alignRight}>Faturali</th>
+                    <th className={styles.alignRight}>Iptal</th>
+                    <th className={styles.alignRight}>Ort. Satis</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {employees.map((emp, i) => (
+                    <tr key={emp.id} className={i < 3 ? styles.leaderboardTop : undefined}>
+                      <td>
+                        <span className={i < 3 ? styles.leaderboardRank : undefined}>
+                          {i + 1}
+                        </span>
+                      </td>
+                      <td>
+                        <div>{emp.name}</div>
+                        <small style={{ color: 'var(--color-text-muted)' }}>{emp.email}</small>
+                      </td>
+                      <td className={styles.alignRight}>{emp.saleCount}</td>
+                      <td className={styles.alignRight}><strong className={styles.success}>{formatCurrency(emp.totalRevenue)}</strong></td>
+                      <td className={styles.alignRight}>{emp.invoiceCount}</td>
+                      <td className={styles.alignRight}>
+                        {emp.cancelledCount > 0 ? (
+                          <span className={styles.danger}>{emp.cancelledCount}</span>
+                        ) : (
+                          <span>0</span>
+                        )}
+                      </td>
+                      <td className={styles.alignRight}>{formatCurrency(emp.avgSale)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  };
+
   return (
     <div className={styles.page}>
       <div className={styles.header}>
@@ -856,6 +977,9 @@ export function ReportsPage() {
         <button className={`${styles.tab} ${activeTab === 'gider' ? styles.tabActive : ''}`} onClick={() => setActiveTab('gider')}>
           Giderler
         </button>
+        <button className={`${styles.tab} ${activeTab === 'personel' ? styles.tabActive : ''}`} onClick={() => setActiveTab('personel')}>
+          Personel
+        </button>
       </div>
 
       {loading ? (
@@ -868,6 +992,7 @@ export function ReportsPage() {
           {activeTab === 'musteriSatis' && renderMusteriSatisTab()}
           {activeTab === 'stok' && renderStokTab()}
           {activeTab === 'gider' && renderGiderTab()}
+          {activeTab === 'personel' && renderPersonelTab()}
         </>
       )}
     </div>

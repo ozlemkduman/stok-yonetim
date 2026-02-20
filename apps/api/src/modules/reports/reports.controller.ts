@@ -77,6 +77,14 @@ export class ReportsController {
     return { success: true, data };
   }
 
+  @Get('employee-performance')
+  async getEmployeePerformance(@Query('startDate') startDate: string, @Query('endDate') endDate: string, @Req() req: any) {
+    const data = await this.reportsService.getEmployeePerformance(
+      startDate, endDate, req.user?.tenantId, req.user?.sub, req.user?.role,
+    );
+    return { success: true, data };
+  }
+
   @Get('expenses-by-category')
   async getExpensesByCategory(@Query('startDate') startDate: string, @Query('endDate') endDate: string, @Req() req: any) {
     const data = await this.reportsService.getExpensesByCategory(startDate, endDate, req.user?.tenantId);

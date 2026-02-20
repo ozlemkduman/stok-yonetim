@@ -381,6 +381,62 @@ export class ReportsService {
       .orderByRaw('SUM(sale_items.quantity) DESC');
   }
 
+  async getEmployeePerformance(startDate: string, endDate: string, tenantId?: string | null, userId?: string, userRole?: string) {
+    const isAdmin = userRole === 'super_admin' || userRole === 'tenant_admin';
+
+    let usersQuery = this.db.knex('users')
+      .leftJoin('sales', 'users.id', 'sales.created_by')
+      .where('users.status', 'active');
+
+    if (tenantId) {
+      usersQuery = usersQuery.where('users.tenant_id', tenantId);
+    }
+
+    if (!isAdmin && userId) {
+      usersQuery = usersQuery.where('users.id', userId);
+    }
+
+    const employees = await usersQuery
+      .select(
+        'users.id',
+        'users.name',
+        'users.email',
+        'users.role',
+      )
+      .count({ sale_count: this.db.knex.raw("CASE WHEN sales.status = 'completed' AND sales.sale_date BETWEEN ? AND ? THEN 1 END", [startDate, endDate]) })
+      .sum({ total_revenue: this.db.knex.raw("CASE WHEN sales.status = 'completed' AND sales.sale_date BETWEEN ? AND ? THEN sales.grand_total ELSE 0 END", [startDate, endDate]) })
+      .count({ invoice_count: this.db.knex.raw("CASE WHEN sales.invoice_issued = true AND sales.sale_date BETWEEN ? AND ? THEN 1 END", [startDate, endDate]) })
+      .count({ cancelled_count: this.db.knex.raw("CASE WHEN sales.status = 'cancelled' AND sales.sale_date BETWEEN ? AND ? THEN 1 END", [startDate, endDate]) })
+      .groupBy('users.id', 'users.name', 'users.email', 'users.role')
+      .orderByRaw("COALESCE(SUM(CASE WHEN sales.status = 'completed' AND sales.sale_date BETWEEN ? AND ? THEN sales.grand_total ELSE 0 END), 0) DESC", [startDate, endDate]);
+
+    const formatted = employees.map((e: any) => ({
+      id: e.id,
+      name: e.name,
+      email: e.email,
+      role: e.role,
+      saleCount: parseInt(e.sale_count || '0'),
+      totalRevenue: parseFloat(e.total_revenue || '0'),
+      invoiceCount: parseInt(e.invoice_count || '0'),
+      cancelledCount: parseInt(e.cancelled_count || '0'),
+      avgSale: parseInt(e.sale_count || '0') > 0
+        ? parseFloat(e.total_revenue || '0') / parseInt(e.sale_count || '0')
+        : 0,
+    }));
+
+    const totalSales = formatted.reduce((s: number, e: any) => s + e.saleCount, 0);
+    const totalRevenue = formatted.reduce((s: number, e: any) => s + e.totalRevenue, 0);
+
+    return {
+      employees: formatted,
+      summary: {
+        totalSales,
+        totalRevenue,
+        avgPerEmployee: formatted.length > 0 ? totalRevenue / formatted.length : 0,
+      },
+    };
+  }
+
   async getExpensesByCategory(startDate: string, endDate: string, tenantId?: string | null) {
     const byCategory = await this.tenantQuery('expenses', tenantId)
       .whereBetween('expense_date', [startDate, endDate])

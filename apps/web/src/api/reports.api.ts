@@ -84,6 +84,27 @@ export interface CustomerProductPurchase {
   total_amount: number;
 }
 
+export interface EmployeePerformance {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+  saleCount: number;
+  totalRevenue: number;
+  invoiceCount: number;
+  cancelledCount: number;
+  avgSale: number;
+}
+
+export interface EmployeePerformanceReport {
+  employees: EmployeePerformance[];
+  summary: {
+    totalSales: number;
+    totalRevenue: number;
+    avgPerEmployee: number;
+  };
+}
+
 export const reportsApi = {
   getSalesSummary: (startDate: string, endDate: string) =>
     apiClient.get<any>('/reports/sales-summary', { startDate, endDate }),
@@ -110,4 +131,6 @@ export const reportsApi = {
     apiClient.get<CustomerProductPurchase[]>('/reports/customer-product-purchases', { startDate, endDate }),
   getExpensesByCategory: (startDate: string, endDate: string) =>
     apiClient.get<{ byCategory: ExpenseByCategory[]; summary: any; monthlyTrend: any[] }>('/reports/expenses-by-category', { startDate, endDate }),
+  getEmployeePerformance: (startDate: string, endDate: string) =>
+    apiClient.get<EmployeePerformanceReport>('/reports/employee-performance', { startDate, endDate }),
 };
