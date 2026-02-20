@@ -2,6 +2,7 @@ import { Injectable, Logger, OnModuleDestroy, OnModuleInit } from '@nestjs/commo
 import { ConfigService } from '@nestjs/config';
 import knex, { Knex } from 'knex';
 import * as path from 'path';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class DatabaseService implements OnModuleInit, OnModuleDestroy {
@@ -42,6 +43,44 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
       }
     } catch (error) {
       this.logger.error('Migration failed', error);
+    }
+
+    // Auto-seed plans and super admin
+    await this.ensurePlansAndAdmin();
+  }
+
+  private async ensurePlansAndAdmin() {
+    try {
+      // Ensure plans exist
+      const planCount = await this._knex('plans').count('* as count').first();
+      if (Number(planCount?.count) === 0) {
+        await this._knex('plans').insert([
+          { name: 'Basic', code: 'basic', price: 199, billing_period: 'monthly', features: JSON.stringify({ sales: true, returns: true }), limits: JSON.stringify({ maxUsers: 1, maxProducts: 200 }), is_active: true, sort_order: 1 },
+          { name: 'Pro', code: 'pro', price: 449, billing_period: 'monthly', features: JSON.stringify({ sales: true, returns: true, quotes: true, eDocuments: true, warehouses: true, integrations: true, invoiceImport: true, advancedReports: true, multiWarehouse: true }), limits: JSON.stringify({ maxUsers: 5, maxProducts: 5000 }), is_active: true, sort_order: 2 },
+          { name: 'Plus', code: 'plus', price: 799, billing_period: 'monthly', features: JSON.stringify({ sales: true, returns: true, quotes: true, eDocuments: true, warehouses: true, integrations: true, crm: true, fieldTeam: true, invoiceImport: true, advancedReports: true, multiWarehouse: true, apiAccess: true }), limits: JSON.stringify({ maxUsers: -1, maxProducts: -1 }), is_active: true, sort_order: 3 },
+        ]);
+        this.logger.log('Plans seeded');
+      }
+
+      // Ensure super admin exists
+      const adminExists = await this._knex('users').where({ role: 'super_admin' }).first();
+      if (!adminExists) {
+        const email = process.env.SUPER_ADMIN_EMAIL || 'admin@stoksayac.com';
+        const password = process.env.SUPER_ADMIN_PASSWORD || 'StokSayac2026!';
+        const passwordHash = await bcrypt.hash(password, 12);
+        await this._knex('users').insert({
+          email,
+          password_hash: passwordHash,
+          name: 'Platform Admin',
+          role: 'super_admin',
+          permissions: JSON.stringify(['*']),
+          status: 'active',
+          email_verified_at: this._knex.fn.now(),
+        });
+        this.logger.log('Super admin created');
+      }
+    } catch (error) {
+      this.logger.error('Seed failed', error);
     }
   }
 
