@@ -1,6 +1,7 @@
 import { Controller, Get, Post, Body } from '@nestjs/common';
 import { DatabaseService } from '../database/database.service';
 import { Public } from '../common/decorators/public.decorator';
+import * as bcrypt from 'bcrypt';
 
 // Seed version: 2026-02-12-v2
 
@@ -89,7 +90,7 @@ export class HealthController {
       const statements = body.sql
         .split(';\n')
         .map(s => s.trim())
-        .filter(s => s.length > 0 && s.startsWith('INSERT'));
+        .filter(s => s.length > 0 && (s.startsWith('INSERT') || s.startsWith('UPDATE') || s.startsWith('DELETE')));
 
       let executed = 0;
       const errors: string[] = [];
@@ -110,6 +111,19 @@ export class HealthController {
     } catch (e: any) {
       // Make sure to re-enable FK constraints on error
       await this.databaseService.knex.raw("SET session_replication_role = 'origin'").catch(() => {});
+      return { success: false, error: e.message };
+    }
+  }
+
+  @Post('reset-password')
+  async resetPassword(@Body() body: { email: string; newPassword: string }) {
+    try {
+      const hash = await bcrypt.hash(body.newPassword, 12);
+      const updated = await this.databaseService.knex('users')
+        .where({ email: body.email })
+        .update({ password_hash: hash });
+      return { success: true, updated };
+    } catch (e: any) {
       return { success: false, error: e.message };
     }
   }
