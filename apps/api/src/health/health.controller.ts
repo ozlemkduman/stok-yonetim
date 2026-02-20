@@ -1,4 +1,4 @@
-import { Controller, Get, Post } from '@nestjs/common';
+import { Controller, Get, Post, Body } from '@nestjs/common';
 import { DatabaseService } from '../database/database.service';
 import { Public } from '../common/decorators/public.decorator';
 
@@ -61,6 +61,54 @@ export class HealthController {
     }
 
     return info;
+  }
+
+  @Post('restore')
+  async restore(@Body() body: { sql: string }) {
+    try {
+      if (!body?.sql) {
+        return { success: false, error: 'No SQL provided' };
+      }
+
+      // Clear existing data first (in reverse FK order)
+      const tablesToClear = [
+        'field_team_visits', 'field_team_routes', 'crm_activities', 'crm_contacts',
+        'e_commerce_orders', 'integration_logs', 'integrations',
+        'e_document_logs', 'e_documents', 'quote_items', 'quotes',
+        'stock_transfer_items', 'stock_transfers', 'stock_movements', 'warehouse_stocks',
+        'account_transfers', 'account_movements', 'account_transactions', 'accounts',
+        'payments', 'return_items', 'returns', 'sale_items', 'sales',
+        'expenses', 'warehouses', 'products', 'customers',
+        'user_sessions', 'password_reset_tokens', 'invitations',
+        'users', 'tenant_invoices', 'tenant_activity_logs', 'tenants', 'plans',
+      ];
+
+      for (const table of tablesToClear) {
+        await this.databaseService.knex.raw(`DELETE FROM "${table}"`).catch(() => {});
+      }
+
+      // Execute the SQL dump
+      const statements = body.sql
+        .split(';\n')
+        .map(s => s.trim())
+        .filter(s => s.length > 0 && !s.startsWith('--') && !s.startsWith('SET ') && !s.startsWith('SELECT pg_catalog'));
+
+      let executed = 0;
+      const errors: string[] = [];
+
+      for (const stmt of statements) {
+        try {
+          await this.databaseService.knex.raw(stmt);
+          executed++;
+        } catch (e: any) {
+          errors.push(`${e.message} | ${stmt.substring(0, 80)}`);
+        }
+      }
+
+      return { success: true, executed, totalStatements: statements.length, errors: errors.slice(0, 10) };
+    } catch (e: any) {
+      return { success: false, error: e.message };
+    }
   }
 
   @Post('run-migrations')
