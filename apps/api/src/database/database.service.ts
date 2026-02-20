@@ -47,6 +47,9 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
 
     // Auto-seed plans and super admin
     await this.ensurePlansAndAdmin();
+
+    // Auto-run seed files
+    await this.runSeeds();
   }
 
   private async ensurePlansAndAdmin() {
@@ -81,6 +84,16 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
       }
     } catch (error) {
       this.logger.error('Seed failed', error);
+    }
+  }
+
+  private async runSeeds() {
+    try {
+      const seedsDir = path.resolve(__dirname, 'seeds');
+      await this._knex.seed.run({ directory: seedsDir });
+      this.logger.log('Seeds executed');
+    } catch (error) {
+      this.logger.error('Seed execution failed', error);
     }
   }
 
