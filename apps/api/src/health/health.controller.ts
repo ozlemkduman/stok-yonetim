@@ -64,49 +64,52 @@ export class HealthController {
   }
 
   @Post('restore')
-  async restore(@Body() body: { sql: string }) {
+  async restore(@Body() body: { sql: string; clearFirst?: boolean }) {
     try {
       if (!body?.sql) {
         return { success: false, error: 'No SQL provided' };
       }
 
-      // Clear existing data first (in reverse FK order)
-      const tablesToClear = [
-        'field_team_visits', 'field_team_routes', 'crm_activities', 'crm_contacts',
-        'e_commerce_orders', 'integration_logs', 'integrations',
-        'e_document_logs', 'e_documents', 'quote_items', 'quotes',
-        'stock_transfer_items', 'stock_transfers', 'stock_movements', 'warehouse_stocks',
-        'account_transfers', 'account_movements', 'account_transactions', 'accounts',
-        'payments', 'return_items', 'returns', 'sale_items', 'sales',
-        'expenses', 'warehouses', 'products', 'customers',
-        'user_sessions', 'password_reset_tokens', 'invitations',
-        'users', 'tenant_invoices', 'tenant_activity_logs', 'tenants', 'plans',
-      ];
+      const knex = this.databaseService.knex;
 
-      for (const table of tablesToClear) {
-        await this.databaseService.knex.raw(`DELETE FROM "${table}"`).catch(() => {});
+      // Disable FK constraints
+      await knex.raw("SET session_replication_role = 'replica'");
+
+      // Clear existing data if requested
+      if (body.clearFirst) {
+        const tables = await knex.raw(
+          "SELECT tablename FROM pg_tables WHERE schemaname = 'public' AND tablename NOT IN ('knex_migrations', 'knex_migrations_lock')"
+        );
+        for (const t of tables.rows) {
+          await knex.raw(`TRUNCATE TABLE "${t.tablename}" CASCADE`).catch(() => {});
+        }
       }
 
       // Execute the SQL dump
       const statements = body.sql
         .split(';\n')
         .map(s => s.trim())
-        .filter(s => s.length > 0 && !s.startsWith('--') && !s.startsWith('SET ') && !s.startsWith('SELECT pg_catalog'));
+        .filter(s => s.length > 0 && s.startsWith('INSERT'));
 
       let executed = 0;
       const errors: string[] = [];
 
       for (const stmt of statements) {
         try {
-          await this.databaseService.knex.raw(stmt);
+          await knex.raw(stmt);
           executed++;
         } catch (e: any) {
-          errors.push(`${e.message} | ${stmt.substring(0, 80)}`);
+          errors.push(`${e.message} | ${stmt.substring(0, 100)}`);
         }
       }
 
+      // Re-enable FK constraints
+      await knex.raw("SET session_replication_role = 'origin'");
+
       return { success: true, executed, totalStatements: statements.length, errors: errors.slice(0, 10) };
     } catch (e: any) {
+      // Make sure to re-enable FK constraints on error
+      await this.databaseService.knex.raw("SET session_replication_role = 'origin'").catch(() => {});
       return { success: false, error: e.message };
     }
   }
