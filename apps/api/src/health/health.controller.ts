@@ -12,10 +12,37 @@ export class HealthController {
   @Get()
   async check() {
     let dbStatus = 'disconnected';
+    let tables: string[] = [];
+    let migrationStatus = '';
+    let userCount: number | null = null;
 
     try {
       await this.databaseService.knex.raw('SELECT 1');
       dbStatus = 'connected';
+
+      // Check which tables exist
+      const result = await this.databaseService.knex.raw(
+        "SELECT tablename FROM pg_tables WHERE schemaname = 'public' ORDER BY tablename"
+      );
+      tables = result.rows.map((r: any) => r.tablename);
+
+      // Check migration status
+      try {
+        const migrations = await this.databaseService.knex('knex_migrations')
+          .orderBy('id', 'desc')
+          .limit(5);
+        migrationStatus = migrations.map((m: any) => m.name).join(', ');
+      } catch {
+        migrationStatus = 'knex_migrations table not found';
+      }
+
+      // Check users table
+      try {
+        const count = await this.databaseService.knex('users').count('* as count').first();
+        userCount = Number(count?.count || 0);
+      } catch (e: any) {
+        migrationStatus += ` | users error: ${e.message}`;
+      }
     } catch {
       dbStatus = 'error';
     }
@@ -24,6 +51,9 @@ export class HealthController {
       status: 'ok',
       timestamp: new Date().toISOString(),
       database: dbStatus,
+      tables,
+      migrationStatus,
+      userCount,
     };
   }
 
