@@ -63,6 +63,35 @@ export class HealthController {
     return info;
   }
 
+  @Post('run-migrations')
+  async runMigrations() {
+    try {
+      const knex = require('knex')({
+        client: 'pg',
+        connection: process.env.DATABASE_URL,
+        migrations: {
+          directory: __dirname + '/../../database/migrations',
+        },
+      });
+
+      const [batch, migrations] = await knex.migrate.latest();
+      const result = {
+        success: true,
+        batch,
+        migrations,
+      };
+
+      await knex.destroy();
+      return result;
+    } catch (e: any) {
+      return {
+        success: false,
+        error: e.message,
+        stack: e.stack,
+      };
+    }
+  }
+
   @Post('seed')
   async seed() {
     const knex = this.databaseService.knex;
