@@ -56,24 +56,6 @@ export class HealthController {
       } catch (e: any) {
         info.usersError = e.message;
       }
-
-      try {
-        const tenants = await this.databaseService.knex('tenants').select('id', 'name', 'billing_email', 'status');
-        info.tenants = tenants;
-      } catch (e: any) {
-        info.tenantsError = e.message;
-      }
-
-      try {
-        const counts: any = {};
-        for (const table of ['customers', 'products', 'expenses', 'sales', 'returns', 'quotes', 'accounts', 'crm_contacts', 'crm_activities', 'warehouses']) {
-          const r = await this.databaseService.knex(table).count('* as count').first();
-          counts[table] = Number(r?.count || 0);
-        }
-        info.dataCounts = counts;
-      } catch (e: any) {
-        info.countsError = e.message;
-      }
     } catch (e: any) {
       info.db = 'error';
       info.dbError = e.message;

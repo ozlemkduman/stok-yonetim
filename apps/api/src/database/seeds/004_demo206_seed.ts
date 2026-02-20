@@ -1,17 +1,11 @@
 import { Knex } from 'knex';
 
-const TENANT_USER_EMAIL = 'demo206@stoksayac.com';
+const TENANT_EMAIL = 'demo206@stoksayac.com';
 
 export async function seed(knex: Knex): Promise<void> {
-  // Find tenant via user email (billing_email may be null)
-  const user = await knex('users').where({ email: TENANT_USER_EMAIL }).first();
-  if (!user || !user.tenant_id) {
-    console.log(`⚠️ User not found for ${TENANT_USER_EMAIL}, skipping seed`);
-    return;
-  }
-  const tenant = await knex('tenants').where({ id: user.tenant_id }).first();
+  const tenant = await knex('tenants').where({ billing_email: TENANT_EMAIL }).first();
   if (!tenant) {
-    console.log(`⚠️ Tenant not found for ${TENANT_USER_EMAIL}, skipping seed`);
+    console.log(`⚠️ Tenant not found for ${TENANT_EMAIL}, skipping seed`);
     return;
   }
 
@@ -26,7 +20,8 @@ export async function seed(knex: Knex): Promise<void> {
     return;
   }
 
-  const userId = user.id;
+  const user = await knex('users').where({ tenant_id: tenantId }).first();
+  const userId = user?.id || null;
 
   const date = (y: number, m: number, d: number) => new Date(y, m - 1, d);
 
@@ -285,79 +280,5 @@ export async function seed(knex: Knex): Promise<void> {
     );
   }
 
-  // ─── 10 Hesap (Kasa & Banka) ─────────────────────────────
-  const accountsData = [
-    { name: 'Ana Kasa', account_type: 'kasa', bank_name: null, iban: null, currency: 'TRY', opening_balance: 50000, current_balance: 128500, is_default: true },
-    { name: 'Garanti Bankası', account_type: 'banka', bank_name: 'Garanti BBVA', iban: 'TR330006200123400006789012', currency: 'TRY', opening_balance: 200000, current_balance: 345200, is_default: false },
-    { name: 'İş Bankası', account_type: 'banka', bank_name: 'İş Bankası', iban: 'TR440006400012345678901234', currency: 'TRY', opening_balance: 100000, current_balance: 187600, is_default: false },
-    { name: 'Ziraat Bankası', account_type: 'banka', bank_name: 'Ziraat Bankası', iban: 'TR550001000012345678901234', currency: 'TRY', opening_balance: 75000, current_balance: 92400, is_default: false },
-    { name: 'Yapı Kredi', account_type: 'banka', bank_name: 'Yapı Kredi', iban: 'TR660006700012345678901234', currency: 'TRY', opening_balance: 50000, current_balance: 63800, is_default: false },
-    { name: 'Dolar Hesabı', account_type: 'banka', bank_name: 'Garanti BBVA', iban: 'TR770006200098700001234567', currency: 'USD', opening_balance: 5000, current_balance: 8200, is_default: false },
-    { name: 'Euro Hesabı', account_type: 'banka', bank_name: 'İş Bankası', iban: 'TR880006400098700009876543', currency: 'EUR', opening_balance: 3000, current_balance: 4100, is_default: false },
-    { name: 'Şube Kasası', account_type: 'kasa', bank_name: null, iban: null, currency: 'TRY', opening_balance: 10000, current_balance: 22800, is_default: false },
-    { name: 'Halkbank', account_type: 'banka', bank_name: 'Halkbank', iban: 'TR990001200012345678901234', currency: 'TRY', opening_balance: 30000, current_balance: 41500, is_default: false },
-    { name: 'POS Hesabı', account_type: 'banka', bank_name: 'Garanti BBVA', iban: 'TR110006200055500003456789', currency: 'TRY', opening_balance: 0, current_balance: 67300, is_default: false },
-  ];
-
-  await knex('accounts').insert(
-    accountsData.map(a => ({
-      tenant_id: tenantId, name: a.name, account_type: a.account_type,
-      bank_name: a.bank_name, iban: a.iban, currency: a.currency,
-      opening_balance: a.opening_balance, current_balance: a.current_balance,
-      is_default: a.is_default, is_active: true,
-    })),
-  );
-
-  // ─── 10 CRM Kontak ─────────────────────────────────────
-  const contactsData = [
-    { name: 'Ali Yılmaz', title: 'Satın Alma Müdürü', email: 'ali.yilmaz@yildizbilisim.com', phone: '0212 555 1010', mobile: '0532 100 2001', status: 'customer', source: 'referral', cust: 0 },
-    { name: 'Zeynep Kaya', title: 'Genel Müdür', email: 'zeynep.kaya@egemakina.com', phone: '0232 444 2020', mobile: '0533 200 3002', status: 'customer', source: 'website', cust: 1 },
-    { name: 'Murat Demir', title: 'IT Direktörü', email: 'murat.demir@dogulojistik.com', phone: '0442 333 3030', mobile: '0534 300 4003', status: 'prospect', source: 'cold_call', cust: 2 },
-    { name: 'Elif Aksoy', title: 'Finans Müdürü', email: 'elif.aksoy@marmaragida.com', phone: '0224 222 4040', mobile: '0535 400 5004', status: 'customer', source: 'event', cust: 3 },
-    { name: 'Burak Şahin', title: 'Operasyon Sorumlusu', email: 'burak.sahin@akdeniztur.com', phone: '0242 111 5050', mobile: '0536 500 6005', status: 'lead', source: 'social', cust: 4 },
-    { name: 'Seda Öztürk', title: 'Satış Direktörü', email: 'seda.ozturk@karadenizorman.com', phone: '0462 666 6060', mobile: '0537 600 7006', status: 'prospect', source: 'referral', cust: 5 },
-    { name: 'Emre Çelik', title: 'Proje Yöneticisi', email: 'emre.celik@baskentenerji.com', phone: '0312 777 7070', mobile: '0538 700 8007', status: 'customer', source: 'website', cust: 6 },
-    { name: 'Ayşe Koç', title: 'Üretim Müdürü', email: 'ayse.koc@trakyatekstil.com', phone: '0284 888 8080', mobile: '0539 800 9008', status: 'lead', source: 'cold_call', cust: 7 },
-    { name: 'Hakan Arslan', title: 'CEO', email: 'hakan.arslan@teknopark.com', phone: '0216 999 1234', mobile: '0541 111 2222', status: 'lead', source: 'event', cust: null },
-    { name: 'Deniz Yıldırım', title: 'Tedarik Zinciri Uzmanı', email: 'deniz.yildirim@lojistikcenter.com', phone: '0312 888 5678', mobile: '0542 333 4444', status: 'prospect', source: 'social', cust: null },
-  ];
-
-  const contactIds: string[] = [];
-  for (const c of contactsData) {
-    const [contact] = await knex('crm_contacts')
-      .insert({
-        tenant_id: tenantId, customer_id: c.cust !== null ? customerIds[c.cust] : null,
-        name: c.name, title: c.title, email: c.email, phone: c.phone, mobile: c.mobile,
-        status: c.status, source: c.source, assigned_to: userId,
-        last_contact_date: date(2026, 2, 10), next_follow_up: date(2026, 3, 1),
-      })
-      .returning('id');
-    contactIds.push(contact.id);
-  }
-
-  // ─── 10 CRM Aktivite ───────────────────────────────────
-  const activitiesData = [
-    { contact: 0, type: 'call', subject: 'Yeni sipariş görüşmesi', description: 'Laptop siparişi hakkında bilgi verildi', status: 'completed', scheduled: date(2026, 1, 15), completed: date(2026, 1, 15), duration: 25 },
-    { contact: 1, type: 'meeting', subject: 'Yüz yüze toplantı', description: 'Ofiste ürün tanıtımı yapıldı', status: 'completed', scheduled: date(2026, 1, 20), completed: date(2026, 1, 20), duration: 60 },
-    { contact: 2, type: 'email', subject: 'Teklif gönderimi', description: 'Pro plan teklifi e-posta ile gönderildi', status: 'completed', scheduled: date(2026, 1, 25), completed: date(2026, 1, 25), duration: 10 },
-    { contact: 3, type: 'call', subject: 'Ödeme takibi', description: 'Vadesi gelen fatura hakkında arandı', status: 'completed', scheduled: date(2026, 2, 1), completed: date(2026, 2, 1), duration: 15 },
-    { contact: 4, type: 'note', subject: 'Müşteri notu', description: 'Yaz sezonu için büyük sipariş planlıyor', status: 'completed', scheduled: date(2026, 2, 5), completed: date(2026, 2, 5), duration: null },
-    { contact: 5, type: 'call', subject: 'İlk temas', description: 'Referans üzerinden arandı, ilgileniyor', status: 'completed', scheduled: date(2026, 2, 8), completed: date(2026, 2, 8), duration: 20 },
-    { contact: 6, type: 'meeting', subject: 'Proje değerlendirme', description: 'Enerji projeleri için stok çözümü sunulacak', status: 'planned', scheduled: date(2026, 2, 25), completed: null, duration: null },
-    { contact: 7, type: 'task', subject: 'Numune gönderimi', description: 'Tekstil sektörüne özel ürün numunesi hazırlanacak', status: 'planned', scheduled: date(2026, 2, 28), completed: null, duration: null },
-    { contact: 8, type: 'call', subject: 'Demo sunumu', description: 'StokSayaç demo hesabı tanıtımı yapılacak', status: 'planned', scheduled: date(2026, 3, 5), completed: null, duration: null },
-    { contact: 9, type: 'email', subject: 'Bilgilendirme maili', description: 'Yeni özellikler hakkında bilgilendirme', status: 'planned', scheduled: date(2026, 3, 10), completed: null, duration: null },
-  ];
-
-  for (const a of activitiesData) {
-    await knex('crm_activities').insert({
-      tenant_id: tenantId, contact_id: contactIds[a.contact],
-      type: a.type, subject: a.subject, description: a.description,
-      status: a.status, scheduled_at: a.scheduled,
-      completed_at: a.completed, duration_minutes: a.duration,
-      created_by: userId,
-    });
-  }
-
-  console.log(`✅ demo206 seed completed: 50 expenses + 10 sales + 10 returns + 10 quotes + 10 transfers + 10 accounts + 10 contacts + 10 activities for ${TENANT_USER_EMAIL}`);
+  console.log(`✅ demo206 seed completed: 50 expenses + 10 sales + 10 returns + 10 quotes + 10 transfers for ${TENANT_EMAIL}`);
 }
