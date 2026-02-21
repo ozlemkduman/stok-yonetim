@@ -695,14 +695,31 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    width: 44px;
+    height: 44px;
   }
 
   .searchBox {
     display: none;
   }
-}
 
-@media (max-width: 1024px) {
+  .iconButton {
+    width: 44px;
+    height: 44px;
+  }
+
+  .topbar {
+    padding: 0 1rem;
+  }
+
+  .topbarRight {
+    gap: 0.5rem;
+  }
+
+  .dateTime {
+    display: none;
+  }
+
   .content {
     padding: 1rem 1.25rem;
   }
@@ -713,17 +730,81 @@
     padding: 1rem;
   }
 
-  .dateTime {
-    display: none;
+  .topbar {
+    padding: 0 0.75rem;
+    height: 56px;
   }
 
-  .topbar {
-    padding: 0 1rem;
+  .menuButton {
+    width: 44px;
+    height: 44px;
+  }
+
+  .iconButton {
+    width: 40px;
+    height: 40px;
+  }
+
+  .topbarRight {
+    gap: 0.25rem;
+  }
+
+  .badge {
+    top: 4px;
+    right: 4px;
+    min-width: 16px;
+    height: 16px;
+    font-size: 0.625rem;
+  }
+
+  .sidebar {
+    width: 280px;
+  }
+
+  .sidebarHeader {
+    padding: 1rem;
+  }
+
+  .nav {
+    padding: 0.75rem 0.5rem;
+  }
+
+  .menuItem {
+    padding: 0.625rem 0.75rem;
+    font-size: 0.875rem;
+  }
+
+  .menuItemNested {
+    padding-left: 2.25rem;
+    font-size: 0.8125rem;
+  }
+
+  .groupHeader {
+    padding: 0.625rem 0.75rem;
+    font-size: 0.75rem;
+  }
+
+  .sidebarFooter {
+    padding: 0.75rem 1rem;
+  }
+
+  .avatar {
+    width: 36px;
+    height: 36px;
+    font-size: 0.875rem;
+  }
+
+  .userName {
+    font-size: 0.875rem;
+  }
+
+  .userRole {
+    font-size: 0.6875rem;
   }
 
   .notificationDropdown {
     position: fixed;
-    top: var(--topbar-height);
+    top: 56px;
     right: 0;
     left: 0;
     width: 100%;

@@ -130,6 +130,26 @@
   align-items: center;
 }
 
+/* Tablet - touch-friendly sizing */
+@media (min-width: 768px) and (max-width: 1024px) {
+  .button {
+    min-height: 42px;
+  }
+
+  .sm {
+    height: 34px;
+    min-height: 34px;
+  }
+
+  .md {
+    height: 42px;
+  }
+
+  .lg {
+    height: 48px;
+  }
+}
+
 /* Responsive - Ensure minimum touch target on mobile */
 @media (max-width: 767px) {
   .button {

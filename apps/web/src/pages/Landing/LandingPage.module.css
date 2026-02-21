@@ -84,6 +84,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 1rem;
   padding: 1rem 2rem;
   max-width: 1200px;
   margin: 0 auto;
@@ -129,12 +130,12 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 0.6rem 1.5rem;
+  padding: 0.5rem 1.2rem;
   background: linear-gradient(135deg, #4361ee, #3a56d4);
   color: #fff;
   border: none;
   border-radius: 10px;
-  font-size: 0.95rem;
+  font-size: 0.875rem;
   font-weight: 600;
   cursor: pointer;
   text-decoration: none;
@@ -171,12 +172,12 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 0.6rem 1.5rem;
+  padding: 0.5rem 1.2rem;
   background: transparent;
   color: #4361ee;
   border: 2px solid #4361ee;
   border-radius: 10px;
-  font-size: 0.95rem;
+  font-size: 0.875rem;
   font-weight: 600;
   cursor: pointer;
   text-decoration: none;
@@ -1153,25 +1154,159 @@
   .heroVisual {
     max-width: 420px;
   }
+
+  .navLinks {
+    display: none;
+  }
+
+  .navbar {
+    padding: 1rem 1.5rem;
+  }
+
+  .btnPrimary,
+  .btnOutline {
+    padding: 0.55rem 1.2rem;
+    font-size: 0.9rem;
+  }
 }
 
 @media (max-width: 767px) {
-  .heroTitle {
-    font-size: 2.2rem;
-  }
-
-  .heroSubtitle {
-    font-size: 1rem;
+  /* Navbar */
+  .navbar {
+    padding: 0.75rem 1rem;
   }
 
   .navLinks {
     display: none;
   }
 
+  .navButtons {
+    gap: 0.4rem;
+  }
+
+  .btnPrimary,
+  .btnOutline {
+    padding: 0.35rem 0.7rem;
+    font-size: 0.75rem;
+    border-radius: 7px;
+  }
+
+  .btnLarge {
+    padding: 0.7rem 1.4rem;
+    font-size: 0.9rem;
+    border-radius: 10px;
+  }
+
+  /* Hero */
+  .hero {
+    padding: 2rem 1.25rem 2.5rem;
+    gap: 2rem;
+  }
+
+  .heroBadge {
+    font-size: 0.75rem;
+    padding: 0.35rem 0.75rem;
+    margin-bottom: 1rem;
+  }
+
+  .heroTitle {
+    font-size: 2rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .heroSubtitle {
+    font-size: 0.95rem;
+    margin-bottom: 1.5rem;
+    line-height: 1.6;
+  }
+
+  .heroButtons {
+    gap: 0.75rem;
+  }
+
+  .heroVisual {
+    max-width: 340px;
+  }
+
+  .heroNote {
+    font-size: 0.8rem;
+  }
+
+  /* Sections */
+  .sectionTitle {
+    font-size: 1.6rem;
+  }
+
+  .sectionSubtitle {
+    font-size: 0.9rem;
+    margin-bottom: 2rem;
+  }
+
+  .features,
+  .scenarios,
+  .testimonials {
+    padding: 3rem 1.25rem;
+  }
+
   .featuresGrid,
   .scenariosGrid,
   .testimonialsGrid {
     grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+
+  .featureCard {
+    padding: 1.25rem 1rem;
+  }
+
+  .featureIcon {
+    font-size: 2.2rem;
+  }
+
+  .featureTitle {
+    font-size: 1rem;
+  }
+
+  .featureDesc {
+    font-size: 0.82rem;
+  }
+
+  .scenarioCard {
+    padding: 1.25rem 1rem;
+  }
+
+  /* Stats */
+  .stats {
+    gap: 1.5rem;
+    padding: 2rem 1.25rem;
+  }
+
+  .statValue {
+    font-size: 1.5rem;
+  }
+
+  .statLabel {
+    font-size: 0.75rem;
+  }
+
+  /* Steps */
+  .steps {
+    padding: 3rem 1.25rem;
+  }
+
+  .stepsGrid {
+    flex-direction: column;
+    gap: 1.5rem;
+    align-items: center;
+  }
+
+  .stepArrow {
+    display: none;
+  }
+
+  /* Plans */
+  .plans {
+    padding: 3rem 1.25rem;
   }
 
   .plansGrid {
@@ -1181,9 +1316,22 @@
     margin-right: auto;
   }
 
+  .planCard {
+    padding: 2rem 1.5rem;
+  }
+
+  /* Demo */
+  .demoSection {
+    padding: 3rem 1.25rem;
+  }
+
   .demoInner {
     grid-template-columns: 1fr;
     text-align: center;
+  }
+
+  .demoTitle {
+    font-size: 1.6rem;
   }
 
   .demoBenefits {
@@ -1198,64 +1346,127 @@
     grid-template-columns: 1fr;
   }
 
-  .stats {
-    gap: 1.5rem;
-  }
-
-  .statValue {
-    font-size: 1.5rem;
-  }
-
-  .stepsGrid {
-    flex-direction: column;
-    gap: 1.5rem;
-    align-items: center;
-  }
-
-  .stepArrow {
-    display: none;
-  }
-
-  .footerInner {
-    grid-template-columns: 1fr;
-    text-align: center;
-  }
-
-  .footerAbout {
-    max-width: none;
+  /* CTA */
+  .cta {
+    padding: 3rem 1.25rem;
   }
 
   .ctaTitle {
     font-size: 1.6rem;
   }
 
-  .sectionTitle {
-    font-size: 1.6rem;
+  .ctaText {
+    font-size: 0.95rem;
+  }
+
+  /* Footer */
+  .footerInner {
+    grid-template-columns: 1fr;
+    text-align: center;
+    padding: 2rem 1.25rem 1.5rem;
+  }
+
+  .footerAbout {
+    max-width: none;
+  }
+
+  /* WhatsApp */
+  .whatsappBtn {
+    width: 52px;
+    height: 52px;
+    bottom: 1.25rem;
+    right: 1.25rem;
+  }
+
+  .whatsappIcon {
+    width: 28px;
+    height: 28px;
   }
 }
 
 @media (max-width: 480px) {
+  /* Navbar */
+  .navbar {
+    padding: 0.5rem 0.75rem;
+  }
+
+  .logo {
+    font-size: 1.2rem;
+  }
+
+  .btnPrimary,
+  .btnOutline {
+    padding: 0.3rem 0.6rem;
+    font-size: 0.7rem;
+  }
+
+  /* Hero */
+  .hero {
+    padding: 1.5rem 1rem 2rem;
+  }
+
+  .heroTitle {
+    font-size: 1.7rem;
+  }
+
+  .heroSubtitle {
+    font-size: 0.875rem;
+  }
+
+  .heroButtons {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .btnLarge {
+    width: 100%;
+    text-align: center;
+    padding: 0.65rem 1rem;
+    font-size: 0.875rem;
+  }
+
+  .heroVisual {
+    max-width: 100%;
+  }
+
+  /* Grids */
   .featuresGrid,
   .scenariosGrid,
   .testimonialsGrid {
     grid-template-columns: 1fr;
   }
 
-  .heroButtons {
-    flex-direction: column;
-    align-items: center;
-  }
-
+  /* CTA */
   .ctaButtons {
     flex-direction: column;
-    align-items: center;
+    align-items: stretch;
   }
 
-  .navbar {
-    padding: 0.75rem 1rem;
+  .ctaTitle {
+    font-size: 1.35rem;
   }
 
+  /* Mockup */
   .mockupStatRow {
     flex-direction: column;
+  }
+
+  /* Stats */
+  .stats {
+    gap: 1rem;
+    padding: 1.5rem 1rem;
+  }
+
+  .statValue {
+    font-size: 1.3rem;
+  }
+
+  /* Plans */
+  .planPrice {
+    font-size: 2.2rem;
+  }
+
+  .planName {
+    font-size: 1.2rem;
   }
 }
