@@ -8,7 +8,6 @@ on:
 env:
   REGISTRY: ghcr.io
   API_IMAGE: ghcr.io/${{ github.repository_owner }}/stok-api
-  WEB_IMAGE: ghcr.io/${{ github.repository_owner }}/stok-web
 
 jobs:
   build-and-push:
@@ -49,28 +48,10 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-      # Web Image
-      - name: Build and push Web image
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          file: ./apps/web/Dockerfile
-          push: true
-          platforms: linux/amd64
-          tags: |
-            ${{ env.WEB_IMAGE }}:latest
-            ${{ env.WEB_IMAGE }}:${{ steps.version.outputs.tag }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-
       - name: Summary
         run: |
           echo "## Deploy Basarili! :rocket:" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "**API Image:** \`${{ env.API_IMAGE }}:${{ steps.version.outputs.tag }}\`" >> $GITHUB_STEP_SUMMARY
-          echo "**Web Image:** \`${{ env.WEB_IMAGE }}:${{ steps.version.outputs.tag }}\`" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "### Kutbulut'ta Guncelleme" >> $GITHUB_STEP_SUMMARY
-          echo "1. Kutbulut'a git" >> $GITHUB_STEP_SUMMARY
-          echo "2. Her iki uygulamada da imaj tag'ini \`latest\` olarak degistir" >> $GITHUB_STEP_SUMMARY
-          echo "3. Kaydet" >> $GITHUB_STEP_SUMMARY
+          echo "Web uygulamasi Cloudflare Pages uzerinden otomatik deploy edilmektedir." >> $GITHUB_STEP_SUMMARY
