@@ -24,7 +24,7 @@ export function CustomerDetailPage() {
         const response = await customersApi.getDetail(id);
         setData(response.data);
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Veri yuklenemedi');
+        setError(err instanceof Error ? err.message : 'Veri yüklenemedi');
       } finally {
         setLoading(false);
       }
@@ -36,7 +36,7 @@ export function CustomerDetailPage() {
   if (loading) {
     return (
       <div className={styles.page}>
-        <div className={styles.loading}>Yukleniyor...</div>
+        <div className={styles.loading}>Yükleniyor...</div>
       </div>
     );
   }
@@ -44,7 +44,7 @@ export function CustomerDetailPage() {
   if (error || !data) {
     return (
       <div className={styles.page}>
-        <div className={styles.error}>{error || 'Musteri bulunamadi'}</div>
+        <div className={styles.error}>{error || 'Müşteri bulunamadı'}</div>
         <Button onClick={() => navigate('/customers')}>Geri Don</Button>
       </div>
     );

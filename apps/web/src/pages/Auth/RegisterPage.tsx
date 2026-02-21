@@ -24,7 +24,7 @@ export function RegisterPage() {
 
   useEffect(() => {
     if (!token) {
-      setValidationError('Gecersiz davet linki');
+      setValidationError('Geçersiz davet linki');
       setIsValidating(false);
       return;
     }
@@ -38,7 +38,7 @@ export function RegisterPage() {
       const response = await authApi.validateInvitation(token!);
       setInvitation(response.data);
     } catch (err) {
-      setValidationError(err instanceof Error ? err.message : 'Gecersiz davet linki');
+      setValidationError(err instanceof Error ? err.message : 'Geçersiz davet linki');
     } finally {
       setIsValidating(false);
     }
@@ -46,16 +46,16 @@ export function RegisterPage() {
 
   const validatePassword = (password: string): string | null => {
     if (password.length < 8) {
-      return 'Sifre en az 8 karakter olmalidir';
+      return 'Şifre en az 8 karakter olmalıdır';
     }
     if (!/[a-z]/.test(password)) {
-      return 'Sifre en az bir kucuk harf icermelidir';
+      return 'Şifre en az bir küçük harf içermelidir';
     }
     if (!/[A-Z]/.test(password)) {
-      return 'Sifre en az bir buyuk harf icermelidir';
+      return 'Şifre en az bir büyük harf içermelidir';
     }
     if (!/\d/.test(password)) {
-      return 'Sifre en az bir rakam icermelidir';
+      return 'Şifre en az bir rakam içermelidir';
     }
     return null;
   };
@@ -65,7 +65,7 @@ export function RegisterPage() {
     setError('');
 
     if (formData.password !== formData.confirmPassword) {
-      setError('Sifreler eslesmiyor');
+      setError('Şifreler eşleşmiyor');
       return;
     }
 
@@ -86,7 +86,7 @@ export function RegisterPage() {
       });
       navigate('/dashboard', { replace: true });
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Kayit basarisiz');
+      setError(err instanceof Error ? err.message : 'Kayıt başarısız');
     } finally {
       setIsLoading(false);
     }
@@ -96,7 +96,7 @@ export function RegisterPage() {
     return (
       <div className={styles.page}>
         <div className={styles.loading}>
-          <p>Davet dogrulaniyor...</p>
+          <p>Davet doğrulanıyor...</p>
         </div>
       </div>
     );
@@ -107,16 +107,16 @@ export function RegisterPage() {
       <div className={styles.page}>
         <h2 className={styles.title}>Davet Gerekli</h2>
         <p className={styles.subtitle}>
-          Kayit olmak icin bir davet linkiniz olmasi gerekiyor.
+          Kayıt olmak için bir davet linkiniz olması gerekiyor.
         </p>
         <div className={styles.infoBox}>
-          <p>Bu platform sadece davetli kullanicilar icindir.</p>
-          <p>Kayit olmak icin sistem yoneticinizden davet linki talep edin.</p>
+          <p>Bu platform sadece davetli kullanıcılar içindir.</p>
+          <p>Kayıt olmak için sistem yöneticinizden davet linki talep edin.</p>
         </div>
         <div className={styles.footer}>
           <p>
-            Zaten hesabiniz var mi?{' '}
-            <Link to="/login">Giris yapin</Link>
+            Zaten hesabınız var mı?{' '}
+            <Link to="/login">Giriş yapın</Link>
           </p>
         </div>
       </div>
@@ -126,15 +126,15 @@ export function RegisterPage() {
   if (validationError) {
     return (
       <div className={styles.page}>
-        <h2 className={styles.title}>Gecersiz Davet</h2>
+        <h2 className={styles.title}>Geçersiz Davet</h2>
         <div className={styles.error}>{validationError}</div>
         <p className={styles.subtitle}>
-          Davet linkinin suresi dolmus veya daha once kullanilmis olabilir.
+          Davet linkinin süresi dolmuş veya daha önce kullanılmış olabilir.
         </p>
         <div className={styles.footer}>
           <p>
-            Zaten hesabiniz var mi?{' '}
-            <Link to="/login">Giris yapin</Link>
+            Zaten hesabınız var mı?{' '}
+            <Link to="/login">Giriş yapın</Link>
           </p>
         </div>
       </div>
@@ -143,14 +143,14 @@ export function RegisterPage() {
 
   return (
     <div className={styles.page}>
-      <h2 className={styles.title}>Kayit Ol</h2>
+      <h2 className={styles.title}>Kayıt Ol</h2>
       {invitation?.isNewTenant ? (
         <p className={styles.subtitle}>
-          {invitation.tenantName} organizasyonunu olusturmak icin kayit olun
+          {invitation.tenantName} organizasyonunu oluşturmak için kayıt olun
         </p>
       ) : (
         <p className={styles.subtitle}>
-          {invitation?.tenantName} organizasyonuna katilmak icin kayit olun
+          {invitation?.tenantName} organizasyonuna katılmak için kayıt olun
         </p>
       )}
 
@@ -165,7 +165,7 @@ export function RegisterPage() {
             value={invitation?.email || ''}
             disabled
           />
-          <span className={styles.hint}>E-posta adresi degistirilemez</span>
+          <span className={styles.hint}>E-posta adresi değiştirilemez</span>
         </div>
 
         <div className={styles.field}>
@@ -175,7 +175,7 @@ export function RegisterPage() {
             type="text"
             value={formData.name}
             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-            placeholder="Ahmet Yilmaz"
+            placeholder="Ahmet Yılmaz"
             required
           />
         </div>
@@ -192,7 +192,7 @@ export function RegisterPage() {
         </div>
 
         <div className={styles.field}>
-          <label htmlFor="password">Sifre</label>
+          <label htmlFor="password">Şifre</label>
           <Input
             id="password"
             type="password"
@@ -202,31 +202,31 @@ export function RegisterPage() {
             required
           />
           <span className={styles.hint}>
-            En az 8 karakter, 1 buyuk harf, 1 kucuk harf ve 1 rakam
+            En az 8 karakter, 1 büyük harf, 1 küçük harf ve 1 rakam
           </span>
         </div>
 
         <div className={styles.field}>
-          <label htmlFor="confirmPassword">Sifre Tekrar</label>
+          <label htmlFor="confirmPassword">Şifre Tekrar</label>
           <Input
             id="confirmPassword"
             type="password"
             value={formData.confirmPassword}
             onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-            placeholder="Sifrenizi tekrar girin"
+            placeholder="Şifrenizi tekrar girin"
             required
           />
         </div>
 
         <Button type="submit" variant="primary" fullWidth disabled={isLoading}>
-          {isLoading ? 'Kayit yapiliyor...' : 'Kayit Ol'}
+          {isLoading ? 'Kayıt yapılıyor...' : 'Kayıt Ol'}
         </Button>
       </form>
 
       <div className={styles.footer}>
         <p>
-          Zaten hesabiniz var mi?{' '}
-          <Link to="/login">Giris yapin</Link>
+          Zaten hesabınız var mı?{' '}
+          <Link to="/login">Giriş yapın</Link>
         </p>
       </div>
     </div>

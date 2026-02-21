@@ -136,7 +136,7 @@ export function ReportsPage() {
       setCustomerSales(custSales.data);
       setEmployeePerformance(empPerf.data);
     } catch (err) {
-      showToast('error', 'Rapor yuklenemedi');
+      showToast('error', 'Rapor yüklenemedi');
     }
     setLoading(false);
   }, [startDate, endDate]);
@@ -149,13 +149,13 @@ export function ReportsPage() {
       <div className={styles.reportCard}>
         <div className={styles.reportCardHeader}>
           {icons.sales}
-          <h3 className={styles.reportCardTitle}>Satis Ozeti</h3>
+          <h3 className={styles.reportCardTitle}>Satış Özeti</h3>
         </div>
         <div className={styles.reportCardBody}>
           {salesSummary?.summary && (
             <div className={styles.reportGrid}>
               <div className={styles.reportItem}>
-                <span>Toplam Satis</span>
+                <span>Toplam Satış</span>
                 <strong>{salesSummary.summary.sale_count} adet</strong>
               </div>
               <div className={styles.reportItem}>
@@ -193,7 +193,7 @@ export function ReportsPage() {
                 <strong className={styles.success}>{formatCurrency(profitLoss.revenue)}</strong>
               </div>
               <div className={styles.reportItem}>
-                <span>Satis Maliyeti</span>
+                <span>Satış Maliyeti</span>
                 <strong>{formatCurrency(profitLoss.costOfGoods)}</strong>
               </div>
               <div className={styles.reportItem}>
