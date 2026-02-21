@@ -173,7 +173,7 @@
   padding-left: var(--space-1);
 }
 
-@media (max-width: 640px) {
+@media (max-width: 767px) {
   .form { grid-template-columns: 1fr; }
   .priceSectionHeader { flex-direction: column; align-items: flex-start; }
 }

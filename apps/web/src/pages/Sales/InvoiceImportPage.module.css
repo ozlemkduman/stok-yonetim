@@ -334,7 +334,7 @@
 }
 
 /* Responsive */
-@media (max-width: 768px) {
+@media (max-width: 767px) {
   .page {
     padding: var(--space-3);
   }

@@ -97,8 +97,13 @@
   --shadow-inner: inset 0 2px 4px rgba(0, 0, 0, 0.04);
 
   /* ── Layout ── */
+  /* Breakpoint Standards:
+     Desktop:      >1024px  (default styles)
+     Tablet:       768-1024px  @media (max-width: 1024px)
+     Mobile:       480-767px   @media (max-width: 767px)
+     Small Mobile: <480px      @media (max-width: 480px)
+  */
   --sidebar-width: 280px;
-  --sidebar-collapsed-width: 72px;
   --topbar-height: 64px;
   --content-max-width: 1400px;
   --content-padding: 1.5rem;

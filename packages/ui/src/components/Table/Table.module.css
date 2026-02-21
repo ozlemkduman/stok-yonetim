@@ -96,7 +96,7 @@
 }
 
 /* Responsive - Card view on mobile */
-@media (max-width: 768px) {
+@media (max-width: 767px) {
   .responsive .thead {
     display: none;
   }

@@ -127,7 +127,7 @@
 }
 
 /* Responsive */
-@media (max-width: 639px) {
+@media (max-width: 480px) {
   .overlay { padding: var(--space-2); }
   .modal { max-width: 100%; }
   .header { padding: var(--space-3) var(--space-4); }

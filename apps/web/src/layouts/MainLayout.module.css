@@ -702,7 +702,13 @@
   }
 }
 
-@media (max-width: 640px) {
+@media (max-width: 1024px) {
+  .content {
+    padding: 1rem 1.25rem;
+  }
+}
+
+@media (max-width: 767px) {
   .content {
     padding: 1rem;
   }
@@ -713,5 +719,14 @@
 
   .topbar {
     padding: 0 1rem;
+  }
+
+  .notificationDropdown {
+    position: fixed;
+    top: var(--topbar-height);
+    right: 0;
+    left: 0;
+    width: 100%;
+    border-radius: 0 0 var(--radius-lg) var(--radius-lg);
   }
 }

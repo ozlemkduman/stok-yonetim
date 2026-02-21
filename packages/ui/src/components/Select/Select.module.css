@@ -77,7 +77,7 @@
    RESPONSIVE DESIGN
    ══════════════════════════════════════════════════════════════════════════ */
 
-@media (max-width: 768px) {
+@media (max-width: 767px) {
   .select {
     height: 44px; /* Better touch target */
     font-size: 16px; /* Prevents zoom on iOS */

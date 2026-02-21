@@ -30,7 +30,7 @@
    RESPONSIVE DESIGN
    ══════════════════════════════════════════════════════════════════════════ */
 
-@media (max-width: 639px) {
+@media (max-width: 480px) {
   .form { gap: var(--space-3); }
   .section { margin-top: var(--space-3); padding-top: var(--space-3); }
   .section h3 { font-size: var(--font-size-xs); }

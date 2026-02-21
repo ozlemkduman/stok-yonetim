@@ -418,6 +418,10 @@
   .tablesGrid {
     gap: var(--space-4);
   }
+
+  .secondaryStats {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 /* ── Mobile Large ── */

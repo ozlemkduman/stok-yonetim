@@ -27,11 +27,12 @@ export function useMediaQuery(query: string): boolean {
 }
 
 // Predefined breakpoints
+// Desktop: >1024px (default), Tablet: 768-1024px, Mobile: 480-767px, Small Mobile: <480px
 export const breakpoints = {
-  mobile: '(max-width: 639px)',
-  tablet: '(min-width: 640px) and (max-width: 1023px)',
-  desktop: '(min-width: 1024px)',
-  notMobile: '(min-width: 640px)',
+  mobile: '(max-width: 767px)',
+  tablet: '(min-width: 768px) and (max-width: 1024px)',
+  desktop: '(min-width: 1025px)',
+  notMobile: '(min-width: 768px)',
 } as const;
 
 export function useIsMobile(): boolean {

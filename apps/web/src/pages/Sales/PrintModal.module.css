@@ -82,7 +82,7 @@
 }
 
 /* Responsive */
-@media (max-width: 640px) {
+@media (max-width: 767px) {
   .typeSelector {
     grid-template-columns: 1fr;
   }

@@ -113,7 +113,7 @@
 }
 
 /* Tablet adjustments */
-@media (max-width: 768px) {
+@media (max-width: 767px) {
   .lg {
     max-width: 95%;
   }
@@ -137,7 +137,7 @@
 }
 
 /* Mobile adjustments */
-@media (max-width: 639px) {
+@media (max-width: 480px) {
   .overlay {
     padding: 0;
     align-items: flex-end;

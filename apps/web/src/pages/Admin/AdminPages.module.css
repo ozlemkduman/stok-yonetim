@@ -347,7 +347,7 @@
   font-size: 0.875rem;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 767px) {
   .twoColumn {
     grid-template-columns: 1fr;
   }

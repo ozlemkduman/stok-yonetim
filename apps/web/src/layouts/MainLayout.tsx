@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Outlet, NavLink, useLocation, useNavigate } from 'react-router-dom';
-import { useIsMobile } from '@stok/ui';
+import { useIsMobile, useIsTablet } from '@stok/ui';
 import { reportsApi } from '../api/reports.api';
 import { useAuth } from '../context/AuthContext';
 import { useTenant } from '../context/TenantContext';
@@ -94,13 +94,15 @@ interface Notification {
 
 export function MainLayout() {
   const isMobile = useIsMobile();
+  const isTablet = useIsTablet();
+  const isCompact = isMobile || isTablet;
   const location = useLocation();
   const navigate = useNavigate();
   const { user, logout } = useAuth();
   const { isSuperAdmin } = usePermissions();
   const { impersonatedTenant, isImpersonating, stopImpersonating, hasFeature } = useTenant();
   const { openHelp, hasHelp } = useHelp();
-  const [sidebarOpen, setSidebarOpen] = useState(!isMobile);
+  const [sidebarOpen, setSidebarOpen] = useState(!isCompact);
   const [expandedGroups, setExpandedGroups] = useState<string[]>([]);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [showNotifications, setShowNotifications] = useState(false);
@@ -189,8 +191,13 @@ export function MainLayout() {
     setShowNotifications(false);
   };
 
+  // Sync sidebar state with viewport size
+  useEffect(() => {
+    setSidebarOpen(!isCompact);
+  }, [isCompact]);
+
   const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
-  const closeSidebar = () => isMobile && setSidebarOpen(false);
+  const closeSidebar = () => isCompact && setSidebarOpen(false);
 
   const toggleGroup = (groupId: string) => {
     setExpandedGroups((prev) =>
@@ -206,8 +213,8 @@ export function MainLayout() {
 
   return (
     <div className={styles.layout}>
-      {/* Overlay for mobile */}
-      {isMobile && sidebarOpen && (
+      {/* Overlay for mobile/tablet */}
+      {isCompact && sidebarOpen && (
         <div className={styles.overlay} onClick={closeSidebar} />
       )}
 
