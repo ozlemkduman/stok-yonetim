@@ -30,25 +30,21 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
       throw error;
     }
 
-    // Auto-run migrations
-    try {
-      // In production (compiled JS), use src/database/migrations with .ts files
-      // to keep migration names consistent with knex_migrations table
-      const srcMigrationsDir = path.resolve(process.cwd(), 'src', 'database', 'migrations');
-      const devMigrationsDir = path.resolve(__dirname, 'migrations');
-      const migrationsDir = require('fs').existsSync(srcMigrationsDir)
-        ? srcMigrationsDir
-        : devMigrationsDir;
-      const [batch, migrations] = await this._knex.migrate.latest({
-        directory: migrationsDir,
-      });
-      if (migrations.length > 0) {
-        this.logger.log(`Ran ${migrations.length} migrations (batch ${batch})`);
-      } else {
-        this.logger.log('Database schema is up to date');
+    // Auto-run migrations (skip in production - handled by start.sh)
+    if (process.env.NODE_ENV !== 'production') {
+      try {
+        const migrationsDir = path.resolve(__dirname, 'migrations');
+        const [batch, migrations] = await this._knex.migrate.latest({
+          directory: migrationsDir,
+        });
+        if (migrations.length > 0) {
+          this.logger.log(`Ran ${migrations.length} migrations (batch ${batch})`);
+        } else {
+          this.logger.log('Database schema is up to date');
+        }
+      } catch (error) {
+        this.logger.error('Migration failed', error);
       }
-    } catch (error) {
-      this.logger.error('Migration failed', error);
     }
 
     // Auto-seed plans and super admin
