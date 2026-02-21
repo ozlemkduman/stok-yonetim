@@ -32,7 +32,13 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
 
     // Auto-run migrations
     try {
-      const migrationsDir = path.resolve(__dirname, 'migrations');
+      // In production (compiled JS), use src/database/migrations with .ts files
+      // to keep migration names consistent with knex_migrations table
+      const srcMigrationsDir = path.resolve(process.cwd(), 'src', 'database', 'migrations');
+      const devMigrationsDir = path.resolve(__dirname, 'migrations');
+      const migrationsDir = require('fs').existsSync(srcMigrationsDir)
+        ? srcMigrationsDir
+        : devMigrationsDir;
       const [batch, migrations] = await this._knex.migrate.latest({
         directory: migrationsDir,
       });
