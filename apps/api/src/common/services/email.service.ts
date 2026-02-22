@@ -19,8 +19,11 @@ export class EmailService {
     const user = this.configService.get<string>('SMTP_USER');
     const pass = this.configService.get<string>('SMTP_PASS');
 
+    this.logger.log(`SMTP Config: host=${host}, port=${port}, user=${user ? '***' : 'NOT SET'}, pass=${pass ? '***' : 'NOT SET'}`);
+
     if (host && user && pass) {
       const smtpPort = Number(port) || 587;
+      this.logger.log(`SMTP transporter olusturuluyor: ${host}:${smtpPort}, secure=${smtpPort === 465}`);
       this.transporter = nodemailer.createTransport({
         host,
         port: smtpPort,
@@ -35,7 +38,10 @@ export class EmailService {
   }
 
   private get fromAddress(): string {
-    return this.configService.get<string>('SMTP_FROM') || 'StokSayaç <noreply@stoksayac.com>';
+    const from = this.configService.get<string>('SMTP_FROM');
+    const user = this.configService.get<string>('SMTP_USER');
+    // Fallback: if SMTP_FROM not set, use SMTP_USER directly
+    return from || user || 'noreply@stoksayac.com';
   }
 
   private get frontendUrl(): string {
@@ -65,7 +71,10 @@ export class EmailService {
       this.logger.log(`E-posta gonderildi: ${options.to}`);
       return true;
     } catch (error) {
-      this.logger.error(`E-posta gonderilemedi: ${options.to}`, (error as Error).stack || error);
+      const err = error as Error;
+      this.logger.error(`E-posta gonderilemedi: ${options.to}`);
+      this.logger.error(`Hata mesaji: ${err.message}`);
+      this.logger.error(`Hata detay: ${err.stack || JSON.stringify(error)}`);
       return false;
     }
   }
