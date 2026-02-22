@@ -1,10 +1,12 @@
 import { useState } from 'react';
 import { Link, useSearchParams, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Button, Input } from '@stok/ui';
 import { authApi } from '../../api/auth.api';
 import styles from './AuthPages.module.css';
 
 export function ResetPasswordPage() {
+  const { t } = useTranslation('auth');
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const token = searchParams.get('token');
@@ -19,12 +21,12 @@ export function ResetPasswordPage() {
   if (!token) {
     return (
       <div className={styles.page}>
-        <h2 className={styles.title}>Gecersiz Baglanti</h2>
+        <h2 className={styles.title}>{t('resetPassword.invalidLink.title')}</h2>
         <p className={styles.subtitle}>
-          Sifre sifirlama baglantisi gecersiz veya suresi dolmus.
+          {t('resetPassword.invalidLink.subtitle')}
         </p>
         <div className={styles.footer}>
-          <Link to="/forgot-password">Yeni baglanti isteyin</Link>
+          <Link to="/forgot-password">{t('resetPassword.invalidLink.requestNew')}</Link>
         </div>
       </div>
     );
@@ -35,12 +37,12 @@ export function ResetPasswordPage() {
     setError('');
 
     if (formData.password !== formData.confirmPassword) {
-      setError('Sifreler eslesmiyor');
+      setError(t('resetPassword.validation.passwordsDoNotMatch'));
       return;
     }
 
     if (formData.password.length < 8) {
-      setError('Sifre en az 8 karakter olmalidir');
+      setError(t('resetPassword.validation.passwordMinLength'));
       return;
     }
 
@@ -49,10 +51,10 @@ export function ResetPasswordPage() {
     try {
       await authApi.resetPassword(token, formData.password);
       navigate('/login', {
-        state: { message: 'Sifreniz basariyla degistirildi. Giris yapabilirsiniz.' },
+        state: { message: t('resetPassword.successMessage') },
       });
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Islem basarisiz');
+      setError(err instanceof Error ? err.message : t('resetPassword.defaultError'));
     } finally {
       setIsLoading(false);
     }
@@ -60,44 +62,44 @@ export function ResetPasswordPage() {
 
   return (
     <div className={styles.page}>
-      <h2 className={styles.title}>Yeni Sifre Belirle</h2>
-      <p className={styles.subtitle}>Yeni sifrenizi girin</p>
+      <h2 className={styles.title}>{t('resetPassword.title')}</h2>
+      <p className={styles.subtitle}>{t('resetPassword.subtitle')}</p>
 
       {error && <div className={styles.error}>{error}</div>}
 
       <form onSubmit={handleSubmit} className={styles.form}>
         <div className={styles.field}>
-          <label htmlFor="password">Yeni Sifre</label>
+          <label htmlFor="password">{t('resetPassword.passwordLabel')}</label>
           <Input
             id="password"
             type="password"
             value={formData.password}
             onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-            placeholder="En az 8 karakter"
+            placeholder={t('resetPassword.passwordPlaceholder')}
             required
           />
         </div>
 
         <div className={styles.field}>
-          <label htmlFor="confirmPassword">Sifre Tekrar</label>
+          <label htmlFor="confirmPassword">{t('resetPassword.confirmPasswordLabel')}</label>
           <Input
             id="confirmPassword"
             type="password"
             value={formData.confirmPassword}
             onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-            placeholder="Sifrenizi tekrar girin"
+            placeholder={t('resetPassword.confirmPasswordPlaceholder')}
             required
           />
         </div>
 
         <Button type="submit" variant="primary" fullWidth disabled={isLoading}>
-          {isLoading ? 'Kaydediliyor...' : 'Sifreyi Degistir'}
+          {isLoading ? t('resetPassword.submitting') : t('resetPassword.submitButton')}
         </Button>
       </form>
 
       <div className={styles.footer}>
         <p>
-          <Link to="/login">Giris sayfasina don</Link>
+          <Link to="/login">{t('resetPassword.backToLogin')}</Link>
         </p>
       </div>
     </div>

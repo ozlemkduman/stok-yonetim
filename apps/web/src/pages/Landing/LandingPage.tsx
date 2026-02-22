@@ -1,168 +1,95 @@
 import { Link } from 'react-router-dom';
 import { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Logo } from '../../components/Logo';
+import { LanguageSwitcher } from '../../components/LanguageSwitcher';
 import styles from './LandingPage.module.css';
 
 /* ── Data ── */
 
-const features = [
-  { icon: '📦', title: 'Stok Takibi', desc: 'Ürünlerinizi kategorilere ayırın, stok seviyelerini anlık takip edin. Kritik stok uyarıları ile hiçbir ürünü kaybetmeyin.' },
-  { icon: '💰', title: 'Satış Yönetimi', desc: 'Satışlarınızı kaydedin, faturalayın ve tek ekranda tüm satış geçmişinizi görüntüleyin.' },
-  { icon: '🧾', title: 'e-Belge', desc: 'e-Fatura ve e-Arşiv belgelerinizi saniyeler içinde oluşturun, müşterilerinize gönderin.' },
-  { icon: '📊', title: 'Raporlama', desc: 'Detaylı satış, stok ve kâr/zarar raporları ile işletmenizin nabzını tutun.' },
-  { icon: '👥', title: 'CRM', desc: 'Müşterilerinizi yönetin, iletişim geçmişini takip edin, satış fırsatlarını kaçırmayın.' },
-  { icon: '🏭', title: 'Depo Yönetimi', desc: 'Birden fazla depo ile stok transferlerini ve hareketlerini kolayca yönetin.' },
+const featureIcons = ['📦', '💰', '🧾', '📊', '👥', '🏭'];
+
+const scenarioMeta = [
+  { icon: '🔍', color: '#4361ee' },
+  { icon: '🧾', color: '#f72585' },
+  { icon: '📉', color: '#7209b7' },
+  { icon: '🤝', color: '#e63946' },
+  { icon: '🏪', color: '#2ec4b6' },
+  { icon: '📱', color: '#ff9f1c' },
 ];
 
-const scenarios = [
-  {
-    icon: '🔍',
-    title: 'Stokta Ne Kaldı?',
-    before: 'Depoya gidip tek tek sayıyorsunuz, Excel\'e yazıyorsunuz, yine de rakamlar tutmuyor.',
-    after: 'Telefonunuzdan anlık stok durumunu görün. Kritik seviyeye düşen ürünler için otomatik uyarı alın.',
-    color: '#4361ee',
-  },
-  {
-    icon: '🧾',
-    title: 'Fatura Takibi',
-    before: 'Faturalarınız başka portalde, satışlarınız başka yerde — eşleştirmek için saatler harcıyorsunuz.',
-    after: 'e-Fatura XML dosyanızı sisteme aktarın, satışlarla otomatik eşleşsin. Tüm belgeler tek ekranda.',
-    color: '#f72585',
-  },
-  {
-    icon: '📉',
-    title: 'Kâr mı Ediyorum?',
-    before: 'Ay sonunda hesap makinesi ile topluyorsunuz, gerçek kârı bulmak imkânsız.',
-    after: 'Anlık kâr/zarar raporları, ürün bazlı kârlılık analizi — kararlarınızı veriye dayalı verin.',
-    color: '#7209b7',
-  },
-  {
-    icon: '🤝',
-    title: 'Müşteri Kayboldu',
-    before: 'Müşteri bilgileri defterde, kim ne aldı hatırlamıyorsunuz, tekrar satış fırsatları kaçtı.',
-    after: 'Tüm müşteri geçmişi tek ekranda. Son alışveriş, ödeme durumu, notlar — her şey elinizin altında.',
-    color: '#e63946',
-  },
-  {
-    icon: '🏪',
-    title: 'Çoklu Depo Çilesi',
-    before: 'Hangi depoda ne var bilinmiyor, transferler kâğıt üzerinde, kayıplar artık normal.',
-    after: 'Depolar arası transfer tek tıkla. Her deponun stok durumunu anlık izleyin, fark varsa anında görün.',
-    color: '#2ec4b6',
-  },
-  {
-    icon: '📱',
-    title: 'Sahada Kopukluk',
-    before: 'Saha ekibi ofisi arasın mı, WhatsApp\'tan resim mi göndersin — bilgi akışı kopuk.',
-    after: 'Saha ekibi mobilde sipariş girsin, rota planlama ile zaman kazansın, anlık senkronizasyon.',
-    color: '#ff9f1c',
-  },
+const statMeta = [
+  { value: 1200, suffix: '+' },
+  { value: 50000, suffix: '+' },
+  { value: 99.9, suffix: '%' },
+  { value: 7, suffix: '/24' },
 ];
 
-const stats = [
-  { value: 1200, suffix: '+', label: 'Aktif İşletme' },
-  { value: 50000, suffix: '+', label: 'Aylık İşlem' },
-  { value: 99.9, suffix: '%', label: 'Uptime' },
-  { value: 7, suffix: '/24', label: 'Destek' },
-];
-
-const testimonials = [
-  {
-    name: 'Ahmet Y.',
-    role: 'Market Sahibi',
-    text: 'Eskiden stok sayımı için 2 gün harcıyordum. Şimdi telefonumdan anında görebiliyorum. Hayat kurtaran bir sistem.',
-    avatar: 'AY',
-  },
-  {
-    name: 'Fatma K.',
-    role: 'Toptan Gıda',
-    text: 'e-Fatura entegrasyonu muhteşem. Eskiden her fatura için 10 dakika harcıyordum, şimdi tek tıkla hazırlanıyor.',
-    avatar: 'FK',
-  },
-  {
-    name: 'Mehmet S.',
-    role: 'Yedek Parça',
-    text: '3 depomuz var ve transferler hep sorundu. StokSayaç ile hangi depoda ne var anında görüyoruz. Kayıplarımız sıfırlandı.',
-    avatar: 'MS',
-  },
-];
-
-const steps = [
-  { num: '1', title: 'Formu Doldurun', desc: 'Ad, telefon ve işletme bilgilerinizi girin. 30 saniye sürer.' },
-  { num: '2', title: 'Sizi Arayalım', desc: 'Ekibimiz sizinle iletişime geçip ihtiyaçlarınızı dinler.' },
-  { num: '3', title: '45 Gün Ücretsiz Deneyin', desc: 'Demo hesabınız açılsın, tüm özellikleri test edin.' },
-];
-
-interface PlanFeature {
-  text: string;
-  included: boolean;
-}
-
-interface Plan {
+interface PlanDef {
+  key: string;
   name: string;
   price: string;
-  users: string;
   popular?: boolean;
-  features: PlanFeature[];
+  featureKeys: { key: string; included: boolean }[];
 }
 
-const plans: Plan[] = [
+const planDefs: PlanDef[] = [
   {
+    key: 'basic',
     name: 'Basic',
     price: '199',
-    users: '1 Kullanıcı / 200 Ürün / 100 Müşteri',
-    features: [
-      { text: 'Stok Takibi', included: true },
-      { text: 'Satış & İade', included: true },
-      { text: '5 GB Depolama', included: true },
-      { text: 'Teklif Yönetimi', included: false },
-      { text: 'Fatura Import (XML)', included: false },
-      { text: 'e-Belge', included: false },
-      { text: 'Çoklu Depo', included: false },
-      { text: 'Entegrasyonlar', included: false },
-      { text: 'Gelişmiş Raporlama', included: false },
-      { text: 'CRM', included: false },
-      { text: 'Saha Ekibi', included: false },
-      { text: 'API Erişimi', included: false },
+    featureKeys: [
+      { key: 'stockTracking', included: true },
+      { key: 'salesReturn', included: true },
+      { key: 'storage5', included: true },
+      { key: 'quoteManagement', included: false },
+      { key: 'invoiceImport', included: false },
+      { key: 'eDocument', included: false },
+      { key: 'multiWarehouse', included: false },
+      { key: 'integrations', included: false },
+      { key: 'advancedReporting', included: false },
+      { key: 'crm', included: false },
+      { key: 'fieldTeam', included: false },
+      { key: 'apiAccess', included: false },
     ],
   },
   {
+    key: 'pro',
     name: 'Pro',
     price: '449',
-    users: '5 Kullanıcı / 5.000 Ürün / 2.000 Müşteri',
     popular: true,
-    features: [
-      { text: 'Stok Takibi', included: true },
-      { text: 'Satış & İade', included: true },
-      { text: '25 GB Depolama', included: true },
-      { text: 'Teklif Yönetimi', included: true },
-      { text: 'Fatura Import (XML)', included: true },
-      { text: 'e-Belge', included: true },
-      { text: 'Çoklu Depo (3 Depo)', included: true },
-      { text: 'Entegrasyonlar (3 Adet)', included: true },
-      { text: 'Gelişmiş Raporlama', included: true },
-      { text: 'CRM', included: false },
-      { text: 'Saha Ekibi', included: false },
-      { text: 'API Erişimi', included: false },
+    featureKeys: [
+      { key: 'stockTracking', included: true },
+      { key: 'salesReturn', included: true },
+      { key: 'storage25', included: true },
+      { key: 'quoteManagement', included: true },
+      { key: 'invoiceImport', included: true },
+      { key: 'eDocument', included: true },
+      { key: 'multiWarehouse', included: true },
+      { key: 'integrations', included: true },
+      { key: 'advancedReporting', included: true },
+      { key: 'crm', included: false },
+      { key: 'fieldTeam', included: false },
+      { key: 'apiAccess', included: false },
     ],
   },
   {
+    key: 'plus',
     name: 'Plus',
     price: '799',
-    users: 'Sınırsız Kullanıcı, Ürün & Müşteri',
-    features: [
-      { text: 'Stok Takibi', included: true },
-      { text: 'Satış & İade', included: true },
-      { text: '100 GB Depolama', included: true },
-      { text: 'Teklif Yönetimi', included: true },
-      { text: 'Fatura Import (XML)', included: true },
-      { text: 'e-Belge', included: true },
-      { text: 'Sınırsız Depo', included: true },
-      { text: 'Sınırsız Entegrasyon', included: true },
-      { text: 'Gelişmiş Raporlama', included: true },
-      { text: 'CRM', included: true },
-      { text: 'Saha Ekibi', included: true },
-      { text: 'API Erişimi', included: true },
+    featureKeys: [
+      { key: 'stockTracking', included: true },
+      { key: 'salesReturn', included: true },
+      { key: 'storage100', included: true },
+      { key: 'quoteManagement', included: true },
+      { key: 'invoiceImport', included: true },
+      { key: 'eDocument', included: true },
+      { key: 'unlimitedWarehouse', included: true },
+      { key: 'unlimitedIntegrations', included: true },
+      { key: 'advancedReporting', included: true },
+      { key: 'crm', included: true },
+      { key: 'fieldTeam', included: true },
+      { key: 'apiAccess', included: true },
     ],
   },
 ];
@@ -220,18 +147,19 @@ function AnimatedCounter({ target, suffix }: { target: number; suffix: string })
 /* ── Demo Form Component ── */
 
 function DemoForm() {
+  const { t } = useTranslation('landing');
   const [form, setForm] = useState({ name: '', phone: '', company: '', sector: '', note: '' });
   const [submitted, setSubmitted] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const message = [
-      `Merhaba, demo başvurusu yapmak istiyorum.`,
-      `Ad Soyad: ${form.name}`,
-      `Telefon: ${form.phone}`,
-      form.company ? `İşletme: ${form.company}` : '',
-      form.sector ? `Sektör: ${form.sector}` : '',
-      form.note ? `Not: ${form.note}` : '',
+      t('demo.form.whatsappMessage'),
+      `${t('demo.form.whatsappName')}: ${form.name}`,
+      `${t('demo.form.whatsappPhone')}: ${form.phone}`,
+      form.company ? `${t('demo.form.whatsappCompany')}: ${form.company}` : '',
+      form.sector ? `${t('demo.form.whatsappSector')}: ${form.sector}` : '',
+      form.note ? `${t('demo.form.whatsappNote')}: ${form.note}` : '',
     ].filter(Boolean).join('\n');
 
     window.open(`https://wa.me/905350739908?text=${encodeURIComponent(message)}`, '_blank');
@@ -242,16 +170,16 @@ function DemoForm() {
     return (
       <div className={styles.formSuccess}>
         <div className={styles.formSuccessIcon}>✓</div>
-        <h3 className={styles.formSuccessTitle}>Başvurunuz Alındı!</h3>
+        <h3 className={styles.formSuccessTitle}>{t('demo.success.title')}</h3>
         <p className={styles.formSuccessText}>
-          En kısa sürede sizinle iletişime geçeceğiz.<br />
-          45 gün ücretsiz demo hesabınızı hazırlayacağız.
+          {t('demo.success.text1')}<br />
+          {t('demo.success.text2')}
         </p>
         <button
           className={styles.btnOutline}
           onClick={() => { setSubmitted(false); setForm({ name: '', phone: '', company: '', sector: '', note: '' }); }}
         >
-          Yeni Başvuru
+          {t('demo.success.newApplication')}
         </button>
       </div>
     );
@@ -261,23 +189,23 @@ function DemoForm() {
     <form className={styles.demoForm} onSubmit={handleSubmit}>
       <div className={styles.formRow}>
         <div className={styles.formGroup}>
-          <label className={styles.formLabel}>Ad Soyad *</label>
+          <label className={styles.formLabel}>{t('demo.form.nameLabel')}</label>
           <input
             type="text"
             required
             className={styles.formInput}
-            placeholder="Adınız Soyadınız"
+            placeholder={t('demo.form.namePlaceholder')}
             value={form.name}
             onChange={(e) => setForm({ ...form, name: e.target.value })}
           />
         </div>
         <div className={styles.formGroup}>
-          <label className={styles.formLabel}>Telefon *</label>
+          <label className={styles.formLabel}>{t('demo.form.phoneLabel')}</label>
           <input
             type="tel"
             required
             className={styles.formInput}
-            placeholder="05XX XXX XX XX"
+            placeholder={t('demo.form.phonePlaceholder')}
             value={form.phone}
             onChange={(e) => setForm({ ...form, phone: e.target.value })}
           />
@@ -285,49 +213,49 @@ function DemoForm() {
       </div>
       <div className={styles.formRow}>
         <div className={styles.formGroup}>
-          <label className={styles.formLabel}>İşletme Adı</label>
+          <label className={styles.formLabel}>{t('demo.form.companyLabel')}</label>
           <input
             type="text"
             className={styles.formInput}
-            placeholder="İşletmenizin adı"
+            placeholder={t('demo.form.companyPlaceholder')}
             value={form.company}
             onChange={(e) => setForm({ ...form, company: e.target.value })}
           />
         </div>
         <div className={styles.formGroup}>
-          <label className={styles.formLabel}>Sektör</label>
+          <label className={styles.formLabel}>{t('demo.form.sectorLabel')}</label>
           <select
             className={styles.formInput}
             value={form.sector}
             onChange={(e) => setForm({ ...form, sector: e.target.value })}
           >
-            <option value="">Seçiniz</option>
-            <option value="Perakende">Perakende</option>
-            <option value="Toptan">Toptan</option>
-            <option value="Gıda">Gıda</option>
-            <option value="Tekstil">Tekstil</option>
-            <option value="Yedek Parça">Yedek Parça</option>
-            <option value="Elektronik">Elektronik</option>
-            <option value="İnşaat / Yapı Malzemesi">İnşaat / Yapı Malzemesi</option>
-            <option value="Kozmetik">Kozmetik</option>
-            <option value="Diğer">Diğer</option>
+            <option value="">{t('demo.form.sectorPlaceholder')}</option>
+            <option value="Perakende">{t('demo.form.sectors.retail')}</option>
+            <option value="Toptan">{t('demo.form.sectors.wholesale')}</option>
+            <option value="Gıda">{t('demo.form.sectors.food')}</option>
+            <option value="Tekstil">{t('demo.form.sectors.textile')}</option>
+            <option value="Yedek Parça">{t('demo.form.sectors.spareParts')}</option>
+            <option value="Elektronik">{t('demo.form.sectors.electronics')}</option>
+            <option value="İnşaat / Yapı Malzemesi">{t('demo.form.sectors.construction')}</option>
+            <option value="Kozmetik">{t('demo.form.sectors.cosmetics')}</option>
+            <option value="Diğer">{t('demo.form.sectors.other')}</option>
           </select>
         </div>
       </div>
       <div className={styles.formGroup}>
-        <label className={styles.formLabel}>Notunuz</label>
+        <label className={styles.formLabel}>{t('demo.form.noteLabel')}</label>
         <textarea
           className={`${styles.formInput} ${styles.formTextarea}`}
-          placeholder="Eklemek istediğiniz bir not varsa yazabilirsiniz..."
+          placeholder={t('demo.form.notePlaceholder')}
           rows={3}
           value={form.note}
           onChange={(e) => setForm({ ...form, note: e.target.value })}
         />
       </div>
       <button type="submit" className={`${styles.btnPrimary} ${styles.btnLarge} ${styles.btnGlow} ${styles.formSubmitBtn}`}>
-        Demo Başvurusu Gönder
+        {t('demo.form.submit')}
       </button>
-      <p className={styles.formNote}>45 gün ücretsiz &middot; Kredi kartı gerekmez &middot; Hemen başlayın</p>
+      <p className={styles.formNote}>{t('demo.form.formNote')}</p>
     </form>
   );
 }
@@ -335,6 +263,7 @@ function DemoForm() {
 /* ── Component ── */
 
 export function LandingPage() {
+  const { t } = useTranslation('landing');
   const scenariosView = useInView(0.1);
   const statsView = useInView(0.2);
   const featuresView = useInView(0.1);
@@ -350,14 +279,15 @@ export function LandingPage() {
       <nav className={styles.navbar}>
         <Logo size="md" />
         <div className={styles.navLinks}>
-          <a href="#ozellikler" className={styles.navLink}>Özellikler</a>
-          <a href="#planlar" className={styles.navLink}>Planlar</a>
-          <a href="#demo" className={styles.navLink}>Demo</a>
-          <a href="#demo" className={styles.navLink}>İletişim</a>
+          <a href="#ozellikler" className={styles.navLink}>{t('nav.features')}</a>
+          <a href="#planlar" className={styles.navLink}>{t('nav.plans')}</a>
+          <a href="#demo" className={styles.navLink}>{t('nav.demo')}</a>
+          <a href="#demo" className={styles.navLink}>{t('nav.contact')}</a>
         </div>
         <div className={styles.navButtons}>
-          <Link to="/login" className={styles.btnOutline}>Giriş Yap</Link>
-          <a href="#demo" className={styles.btnPrimary}>Ücretsiz Dene</a>
+          <LanguageSwitcher />
+          <Link to="/login" className={styles.btnOutline}>{t('nav.login')}</Link>
+          <a href="#demo" className={styles.btnPrimary}>{t('nav.freeTrial')}</a>
         </div>
       </nav>
 
@@ -365,24 +295,23 @@ export function LandingPage() {
       <section className={styles.hero}>
         <div className={styles.heroGlow} />
         <div className={styles.heroContent}>
-          <div className={styles.heroBadge}>Türkiye'nin Yeni Nesil Stok Yönetim Platformu</div>
+          <div className={styles.heroBadge}>{t('hero.badge')}</div>
           <h1 className={styles.heroTitle}>
-            İşletmenizi<br />
-            <span className={styles.heroHighlight}>Dijitale Taşıyoruz</span>
+            {t('hero.titleLine1')}<br />
+            <span className={styles.heroHighlight}>{t('hero.titleHighlight')}</span>
           </h1>
           <p className={styles.heroSubtitle}>
-            Stok takibi, satış yönetimi, e-Fatura, raporlama ve CRM — hepsi tek platformda.
-            Excel dosyalarına, dağılan bilgilere ve kayıp stoklara elveda deyin.
+            {t('hero.subtitle')}
           </p>
           <div className={styles.heroButtons}>
             <a href="#demo" className={`${styles.btnPrimary} ${styles.btnLarge} ${styles.btnGlow}`}>
-              45 Gün Ücretsiz Dene
+              {t('hero.ctaPrimary')}
             </a>
             <a href="#senaryolar" className={`${styles.btnOutline} ${styles.btnLarge}`}>
-              Nasıl Çalışır?
+              {t('hero.ctaSecondary')}
             </a>
           </div>
-          <p className={styles.heroNote}>Kredi kartı gerekmez &middot; Hemen başlayabilirsiniz</p>
+          <p className={styles.heroNote}>{t('hero.note')}</p>
         </div>
         <div className={styles.heroVisual}>
           <div className={styles.mockupWindow}>
@@ -401,15 +330,15 @@ export function LandingPage() {
                 <div className={styles.mockupStatRow}>
                   <div className={styles.mockupStat} style={{ background: 'linear-gradient(135deg, #4361ee20, #4361ee05)' }}>
                     <div className={styles.mockupStatValue}>2.847</div>
-                    <div className={styles.mockupStatLabel}>Toplam Ürün</div>
+                    <div className={styles.mockupStatLabel}>{t('mockup.totalProducts')}</div>
                   </div>
                   <div className={styles.mockupStat} style={{ background: 'linear-gradient(135deg, #22c55e20, #22c55e05)' }}>
                     <div className={styles.mockupStatValue}>₺48.2K</div>
-                    <div className={styles.mockupStatLabel}>Aylık Satış</div>
+                    <div className={styles.mockupStatLabel}>{t('mockup.monthlySales')}</div>
                   </div>
                   <div className={styles.mockupStat} style={{ background: 'linear-gradient(135deg, #f7258520, #f7258505)' }}>
                     <div className={styles.mockupStatValue}>142</div>
-                    <div className={styles.mockupStatLabel}>Müşteri</div>
+                    <div className={styles.mockupStatLabel}>{t('mockup.customers')}</div>
                   </div>
                 </div>
                 <div className={styles.mockupChart}>
@@ -432,12 +361,12 @@ export function LandingPage() {
         ref={statsView.ref}
         className={`${styles.stats} ${statsView.visible ? styles.fadeInUp : styles.hidden}`}
       >
-        {stats.map((s) => (
-          <div key={s.label} className={styles.statItem}>
+        {statMeta.map((s, i) => (
+          <div key={i} className={styles.statItem}>
             <div className={styles.statValue}>
               <AnimatedCounter target={s.value} suffix={s.suffix} />
             </div>
-            <div className={styles.statLabel}>{s.label}</div>
+            <div className={styles.statLabel}>{t(`stats.${i}.label`)}</div>
           </div>
         ))}
       </section>
@@ -448,24 +377,24 @@ export function LandingPage() {
         ref={scenariosView.ref}
         className={`${styles.scenarios} ${scenariosView.visible ? styles.fadeInUp : styles.hidden}`}
       >
-        <h2 className={styles.sectionTitle}>Size Tanıdık Geliyor mu?</h2>
-        <p className={styles.sectionSubtitle}>İşletmelerin her gün yaşadığı sorunlara profesyonel çözümler</p>
+        <h2 className={styles.sectionTitle}>{t('scenarios.title')}</h2>
+        <p className={styles.sectionSubtitle}>{t('scenarios.subtitle')}</p>
         <div className={styles.scenariosGrid}>
-          {scenarios.map((s, i) => (
+          {scenarioMeta.map((s, i) => (
             <div
-              key={s.title}
+              key={i}
               className={styles.scenarioCard}
               style={{ animationDelay: `${i * 0.1}s`, borderTopColor: s.color }}
             >
               <div className={styles.scenarioIcon}>{s.icon}</div>
-              <h3 className={styles.scenarioTitle}>{s.title}</h3>
+              <h3 className={styles.scenarioTitle}>{t(`scenarios.${i}.title`)}</h3>
               <div className={styles.scenarioBefore}>
-                <span className={styles.scenarioLabel} style={{ background: '#fee2e2', color: '#dc2626' }}>Öncesi</span>
-                <p>{s.before}</p>
+                <span className={styles.scenarioLabel} style={{ background: '#fee2e2', color: '#dc2626' }}>{t('scenarios.beforeLabel')}</span>
+                <p>{t(`scenarios.${i}.before`)}</p>
               </div>
               <div className={styles.scenarioAfter}>
-                <span className={styles.scenarioLabel} style={{ background: '#dcfce7', color: '#16a34a' }}>Sonrası</span>
-                <p>{s.after}</p>
+                <span className={styles.scenarioLabel} style={{ background: '#dcfce7', color: '#16a34a' }}>{t('scenarios.afterLabel')}</span>
+                <p>{t(`scenarios.${i}.after`)}</p>
               </div>
             </div>
           ))}
@@ -478,14 +407,14 @@ export function LandingPage() {
         ref={featuresView.ref}
         className={`${styles.features} ${featuresView.visible ? styles.fadeInUp : styles.hidden}`}
       >
-        <h2 className={styles.sectionTitle}>Güçlü Özellikler</h2>
-        <p className={styles.sectionSubtitle}>İşletmenizi büyütmek için ihtiyacınız olan tüm araçlar tek çatıda</p>
+        <h2 className={styles.sectionTitle}>{t('features.title')}</h2>
+        <p className={styles.sectionSubtitle}>{t('features.subtitle')}</p>
         <div className={styles.featuresGrid}>
-          {features.map((f, i) => (
-            <div key={f.title} className={styles.featureCard} style={{ animationDelay: `${i * 0.08}s` }}>
-              <div className={styles.featureIcon}>{f.icon}</div>
-              <h3 className={styles.featureTitle}>{f.title}</h3>
-              <p className={styles.featureDesc}>{f.desc}</p>
+          {featureIcons.map((icon, i) => (
+            <div key={i} className={styles.featureCard} style={{ animationDelay: `${i * 0.08}s` }}>
+              <div className={styles.featureIcon}>{icon}</div>
+              <h3 className={styles.featureTitle}>{t(`features.${i}.title`)}</h3>
+              <p className={styles.featureDesc}>{t(`features.${i}.desc`)}</p>
             </div>
           ))}
         </div>
@@ -496,15 +425,15 @@ export function LandingPage() {
         ref={stepsView.ref}
         className={`${styles.steps} ${stepsView.visible ? styles.fadeInUp : styles.hidden}`}
       >
-        <h2 className={styles.sectionTitle}>3 Adımda Başlayabilirsiniz</h2>
-        <p className={styles.sectionSubtitle}>Kurulum yok, yükleme yok — hemen başlayabilirsiniz</p>
+        <h2 className={styles.sectionTitle}>{t('steps.title')}</h2>
+        <p className={styles.sectionSubtitle}>{t('steps.subtitle')}</p>
         <div className={styles.stepsGrid}>
-          {steps.map((s, i) => (
-            <div key={s.num} className={styles.stepCard} style={{ animationDelay: `${i * 0.15}s` }}>
-              <div className={styles.stepNum}>{s.num}</div>
-              <h3 className={styles.stepTitle}>{s.title}</h3>
-              <p className={styles.stepDesc}>{s.desc}</p>
-              {i < steps.length - 1 && <div className={styles.stepArrow}>→</div>}
+          {[0, 1, 2].map((i) => (
+            <div key={i} className={styles.stepCard} style={{ animationDelay: `${i * 0.15}s` }}>
+              <div className={styles.stepNum}>{i + 1}</div>
+              <h3 className={styles.stepTitle}>{t(`steps.${i}.title`)}</h3>
+              <p className={styles.stepDesc}>{t(`steps.${i}.desc`)}</p>
+              {i < 2 && <div className={styles.stepArrow}>→</div>}
             </div>
           ))}
         </div>
@@ -515,18 +444,18 @@ export function LandingPage() {
         ref={testimonialsView.ref}
         className={`${styles.testimonials} ${testimonialsView.visible ? styles.fadeInUp : styles.hidden}`}
       >
-        <h2 className={styles.sectionTitle}>Müşterilerimiz Ne Diyor?</h2>
-        <p className={styles.sectionSubtitle}>Binlerce işletme StokSayaç ile büyüyor</p>
+        <h2 className={styles.sectionTitle}>{t('testimonials.title')}</h2>
+        <p className={styles.sectionSubtitle}>{t('testimonials.subtitle')}</p>
         <div className={styles.testimonialsGrid}>
-          {testimonials.map((t) => (
-            <div key={t.name} className={styles.testimonialCard}>
+          {[0, 1, 2].map((i) => (
+            <div key={i} className={styles.testimonialCard}>
               <div className={styles.testimonialStars}>★★★★★</div>
-              <p className={styles.testimonialText}>"{t.text}"</p>
+              <p className={styles.testimonialText}>"{t(`testimonials.${i}.text`)}"</p>
               <div className={styles.testimonialAuthor}>
-                <div className={styles.testimonialAvatar}>{t.avatar}</div>
+                <div className={styles.testimonialAvatar}>{t(`testimonials.${i}.avatar`)}</div>
                 <div>
-                  <div className={styles.testimonialName}>{t.name}</div>
-                  <div className={styles.testimonialRole}>{t.role}</div>
+                  <div className={styles.testimonialName}>{t(`testimonials.${i}.name`)}</div>
+                  <div className={styles.testimonialRole}>{t(`testimonials.${i}.role`)}</div>
                 </div>
               </div>
             </div>
@@ -540,32 +469,32 @@ export function LandingPage() {
         ref={plansView.ref}
         className={`${styles.plans} ${plansView.visible ? styles.fadeInUp : styles.hidden}`}
       >
-        <h2 className={styles.sectionTitle}>Size Uygun Plan</h2>
-        <p className={styles.sectionSubtitle}>Her büyüklükte işletme için esnek fiyatlandırma</p>
+        <h2 className={styles.sectionTitle}>{t('plans.title')}</h2>
+        <p className={styles.sectionSubtitle}>{t('plans.subtitle')}</p>
         <div className={styles.plansGrid}>
-          {plans.map((plan) => (
+          {planDefs.map((plan) => (
             <div
               key={plan.name}
               className={`${styles.planCard} ${plan.popular ? styles.planPopular : ''}`}
             >
-              {plan.popular && <span className={styles.planBadge}>En Popüler</span>}
+              {plan.popular && <span className={styles.planBadge}>{t('plans.popular')}</span>}
               <h3 className={styles.planName}>{plan.name}</h3>
               <div className={styles.planPrice}>
-                {plan.price}₺<span className={styles.planPeriod}>/ay</span>
+                {plan.price}₺<span className={styles.planPeriod}>{t('plans.perMonth')}</span>
               </div>
-              <p className={styles.planUsers}>{plan.users}</p>
+              <p className={styles.planUsers}>{t(`plans.${plan.key}.users`)}</p>
               <ul className={styles.planFeatures}>
-                {plan.features.map((f) => (
-                  <li key={f.text} className={f.included ? '' : styles.disabledFeature}>
+                {plan.featureKeys.map((f) => (
+                  <li key={f.key} className={f.included ? '' : styles.disabledFeature}>
                     <span className={f.included ? styles.checkIcon : styles.crossIcon}>
                       {f.included ? '✓' : '✗'}
                     </span>
-                    {f.text}
+                    {t(`plans.${plan.key}.features.${f.key}`)}
                   </li>
                 ))}
               </ul>
               <a href="#demo" className={`${styles.btnPrimary} ${plan.popular ? styles.btnGlow : ''}`}>
-                Hemen Başla
+                {t('plans.cta')}
               </a>
             </div>
           ))}
@@ -580,32 +509,17 @@ export function LandingPage() {
       >
         <div className={styles.demoInner}>
           <div className={styles.demoInfo}>
-            <h2 className={styles.demoTitle}>Ücretsiz Demo Başvurusu</h2>
+            <h2 className={styles.demoTitle}>{t('demo.title')}</h2>
             <p className={styles.demoSubtitle}>
-              Formu doldurun, 45 gün boyunca tüm özellikleri ücretsiz deneyin.
-              Ekibimiz en kısa sürede sizinle iletişime geçecektir.
+              {t('demo.subtitle')}
             </p>
             <div className={styles.demoBenefits}>
-              <div className={styles.demoBenefit}>
-                <span className={styles.demoBenefitIcon}>✓</span>
-                <span>45 gün ücretsiz deneme süresi</span>
-              </div>
-              <div className={styles.demoBenefit}>
-                <span className={styles.demoBenefitIcon}>✓</span>
-                <span>Kredi kartı gerekmez</span>
-              </div>
-              <div className={styles.demoBenefit}>
-                <span className={styles.demoBenefitIcon}>✓</span>
-                <span>Tüm özellikler açık</span>
-              </div>
-              <div className={styles.demoBenefit}>
-                <span className={styles.demoBenefitIcon}>✓</span>
-                <span>Ücretsiz kurulum desteği</span>
-              </div>
-              <div className={styles.demoBenefit}>
-                <span className={styles.demoBenefitIcon}>✓</span>
-                <span>İstediğiniz zaman iptal edin</span>
-              </div>
+              {[0, 1, 2, 3, 4].map((i) => (
+                <div key={i} className={styles.demoBenefit}>
+                  <span className={styles.demoBenefitIcon}>✓</span>
+                  <span>{t(`demo.benefits.${i}`)}</span>
+                </div>
+              ))}
             </div>
           </div>
           <div className={styles.demoFormWrapper}>
@@ -620,13 +534,13 @@ export function LandingPage() {
         className={`${styles.cta} ${ctaView.visible ? styles.fadeInUp : styles.hidden}`}
       >
         <div className={styles.ctaInner}>
-          <h2 className={styles.ctaTitle}>İşletmenizi Dijitale Taşımanın Zamanı Geldi</h2>
+          <h2 className={styles.ctaTitle}>{t('cta.title')}</h2>
           <p className={styles.ctaText}>
-            45 gün boyunca tüm özellikleri ücretsiz deneyin. Memnun kalmazsanız hiçbir ücret ödemezsiniz.
+            {t('cta.text')}
           </p>
           <div className={styles.ctaButtons}>
             <a href="#demo" className={`${styles.btnPrimary} ${styles.btnLarge} ${styles.btnGlow}`}>
-              Ücretsiz Demo Başvurusu
+              {t('cta.primary')}
             </a>
             <a
               href="https://wa.me/905350739908"
@@ -634,7 +548,7 @@ export function LandingPage() {
               rel="noopener noreferrer"
               className={`${styles.btnOutline} ${styles.btnLarge} ${styles.btnWhite}`}
             >
-              WhatsApp ile Bilgi Alın
+              {t('cta.whatsapp')}
             </a>
           </div>
         </div>
@@ -646,17 +560,17 @@ export function LandingPage() {
           <div className={styles.footerCol}>
             <Logo size="sm" dark />
             <p className={styles.footerAbout}>
-              İşletmeniz için geliştirilmiş profesyonel stok ve satış yönetim platformu.
+              {t('footer.about')}
             </p>
           </div>
           <div className={styles.footerCol}>
-            <h4 className={styles.footerColTitle}>Hızlı Erişim</h4>
-            <Link to="/login" className={styles.footerLink}>Giriş Yap</Link>
-            <a href="#demo" className={styles.footerLink}>Demo Başvurusu</a>
-            <a href="#planlar" className={styles.footerLink}>Planlar</a>
+            <h4 className={styles.footerColTitle}>{t('footer.quickAccess')}</h4>
+            <Link to="/login" className={styles.footerLink}>{t('footer.login')}</Link>
+            <a href="#demo" className={styles.footerLink}>{t('footer.demoApplication')}</a>
+            <a href="#planlar" className={styles.footerLink}>{t('footer.plans')}</a>
           </div>
           <div className={styles.footerCol}>
-            <h4 className={styles.footerColTitle}>İletişim</h4>
+            <h4 className={styles.footerColTitle}>{t('footer.contact')}</h4>
             <a href="https://wa.me/905350739908" target="_blank" rel="noopener noreferrer" className={styles.footerLink}>
               📱 0535 073 99 08
             </a>
@@ -666,7 +580,7 @@ export function LandingPage() {
           </div>
         </div>
         <div className={styles.footerBottom}>
-          <p>&copy; 2026 Pancar Bilgi Teknolojileri ve Yazılım Hizmetleri Ltd. Şti. Tüm hakları saklıdır.</p>
+          <p>{t('footer.copyright')}</p>
         </div>
       </footer>
 
@@ -676,7 +590,7 @@ export function LandingPage() {
         target="_blank"
         rel="noopener noreferrer"
         className={styles.whatsappBtn}
-        aria-label="WhatsApp ile iletişime geçin"
+        aria-label={t('whatsappAriaLabel')}
       >
         <svg className={styles.whatsappIcon} viewBox="0 0 32 32" fill="white">
           <path d="M16.004 0h-.008C7.174 0 0 7.176 0 16c0 3.5 1.128 6.744 3.046 9.378L1.054 31.29l6.118-1.958A15.924 15.924 0 0016.004 32C24.826 32 32 24.822 32 16S24.826 0 16.004 0zm9.335 22.594c-.39 1.1-1.932 2.014-3.168 2.28-.846.18-1.95.324-5.67-1.218-4.762-1.972-7.826-6.798-8.064-7.114-.23-.316-1.932-2.572-1.932-4.904s1.222-3.48 1.656-3.956c.434-.476.948-.594 1.264-.594.316 0 .632.002.908.016.292.016.684-.11 1.07.816.39.948 1.328 3.242 1.444 3.478.118.236.196.512.04.826-.158.316-.236.512-.472.788-.236.276-.496.616-.71.826-.236.236-.482.492-.206.964.276.472 1.226 2.022 2.632 3.276 1.812 1.614 3.34 2.114 3.814 2.35.472.236.75.198 1.026-.118.276-.316 1.184-1.382 1.5-1.856.316-.476.632-.394 1.066-.236.434.158 2.728 1.286 3.196 1.52.468.236.78.354.896.55.118.196.118 1.128-.272 2.226z" />

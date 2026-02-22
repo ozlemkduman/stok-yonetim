@@ -1,0 +1,122 @@
+{
+  "pageTitle": "CRM - Contacts",
+  "newContact": "New Contact",
+  "searchPlaceholder": "Search...",
+  "search": "Search",
+  "columns": {
+    "name": "Full Name",
+    "status": "Status",
+    "email": "Email",
+    "phone": "Phone",
+    "source": "Source",
+    "nextFollowUp": "Next Follow-up",
+    "actions": "Actions"
+  },
+  "buttons": {
+    "detail": "Detail",
+    "edit": "Edit",
+    "delete": "Delete",
+    "back": "Go Back",
+    "backToContacts": "← Contacts",
+    "cancel": "Cancel",
+    "save": "Save",
+    "saving": "Saving...",
+    "convertToCustomer": "Convert to Customer",
+    "converting": "Converting...",
+    "viewCustomer": "View Customer"
+  },
+  "status": {
+    "lead": "Lead",
+    "prospect": "Prospect",
+    "customer": "Customer",
+    "inactive": "Inactive"
+  },
+  "source": {
+    "website": "Website",
+    "referral": "Referral",
+    "social": "Social Media",
+    "cold_call": "Cold Call",
+    "event": "Event",
+    "other": "Other"
+  },
+  "filter": {
+    "allStatuses": "All Statuses"
+  },
+  "pagination": {
+    "previous": "Previous",
+    "next": "Next",
+    "pageOf": "Page {{page}} / {{totalPages}}"
+  },
+  "empty": "No contacts found",
+  "toast": {
+    "loadError": "Failed to load contacts",
+    "deleteError": "Failed to delete contact",
+    "saveError": "Failed to save contact",
+    "alreadyLinked": "This contact is already linked to a customer.",
+    "convertSuccess": "Contact successfully converted to customer!",
+    "convertError": "Conversion failed",
+    "dataLoadError": "Failed to load data"
+  },
+  "confirm": {
+    "delete": "Are you sure you want to delete this contact?",
+    "convert": "Are you sure you want to convert this contact to a customer?"
+  },
+  "detail": {
+    "loading": "Loading...",
+    "notFound": "Contact not found",
+    "customerLinked": "Customer Linked",
+    "contactInfo": "Contact Information",
+    "activitySummary": "Activity Summary",
+    "labels": {
+      "name": "Full Name",
+      "email": "Email",
+      "phone": "Phone",
+      "mobile": "Mobile",
+      "company": "Company",
+      "position": "Position",
+      "source": "Source",
+      "notes": "Notes",
+      "lastContact": "Last Contact",
+      "nextFollowUp": "Next Follow-up"
+    },
+    "stats": {
+      "total": "Total",
+      "completed": "Completed",
+      "planned": "Planned"
+    },
+    "tabs": {
+      "callsEmails": "Calls / Emails ({{count}})",
+      "meetings": "Meetings ({{count}})",
+      "notesAndTasks": "Notes / Tasks ({{count}})"
+    },
+    "emptyActivities": "No activities yet",
+    "completedAt": "Completed: {{date}}",
+    "durationMinutes": "{{minutes}} min"
+  },
+  "activityType": {
+    "call": "Call",
+    "email": "Email",
+    "meeting": "Meeting",
+    "note": "Note",
+    "task": "Task"
+  },
+  "activityStatus": {
+    "planned": "Planned",
+    "completed": "Completed",
+    "cancelled": "Cancelled"
+  },
+  "form": {
+    "editTitle": "Edit Contact",
+    "createTitle": "New Contact",
+    "nameLabel": "Full Name *",
+    "titleLabel": "Title",
+    "emailLabel": "Email",
+    "phoneLabel": "Phone",
+    "mobileLabel": "Mobile Phone",
+    "statusLabel": "Status",
+    "sourceLabel": "Source",
+    "nextFollowUpLabel": "Next Follow-up",
+    "notesLabel": "Notes",
+    "sourceSelect": "Select"
+  }
+}

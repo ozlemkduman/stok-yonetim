@@ -1,9 +1,9 @@
+import { useTranslation } from 'react-i18next';
 import { Button, Card } from '@stok/ui';
 import { Customer } from '../../../api/customers.api';
 import { Warehouse } from '../../../api/warehouses.api';
 import { WizardFormData } from '../wizard.types';
 import { formatCurrency } from '../../../utils/formatters';
-import { PAYMENT_METHODS, SALE_TYPES } from '../../../utils/constants';
 import styles from '../SaleFormPage.module.css';
 
 interface StepSummaryProps {
@@ -15,6 +15,7 @@ interface StepSummaryProps {
 }
 
 export function StepSummary({ data, customers, warehouses, totals, onGoToStep }: StepSummaryProps) {
+  const { t } = useTranslation(['sales', 'common']);
   const customer = customers.find(c => c.id === data.customerId);
   const warehouse = warehouses.find(w => w.id === data.warehouseId);
 
@@ -22,39 +23,39 @@ export function StepSummary({ data, customers, warehouses, totals, onGoToStep }:
     <div className={styles.stepContent}>
       <Card className={styles.summaryCard}>
         <div className={styles.summaryHeader}>
-          <h3>Satis Bilgileri</h3>
-          <Button type="button" size="sm" variant="ghost" onClick={() => onGoToStep(3)}>Duzenle</Button>
+          <h3>{t('sales:stepSummary.saleInfo')}</h3>
+          <Button type="button" size="sm" variant="ghost" onClick={() => onGoToStep(3)}>{t('sales:stepSummary.edit')}</Button>
         </div>
         <div className={styles.summaryGrid}>
           <div className={styles.summaryItem}>
-            <span className={styles.summaryLabel}>Satis Tipi</span>
-            <span>{SALE_TYPES[data.saleType as keyof typeof SALE_TYPES] || data.saleType}</span>
+            <span className={styles.summaryLabel}>{t('sales:stepSummary.saleType')}</span>
+            <span>{t(`common:saleTypes.${data.saleType === 'wholesale' ? 'wholesale' : 'retail'}`)}</span>
           </div>
           <div className={styles.summaryItem}>
-            <span className={styles.summaryLabel}>Musteri</span>
-            <span>{customer ? customer.name : 'Perakende Satis'}</span>
+            <span className={styles.summaryLabel}>{t('sales:stepSummary.customer')}</span>
+            <span>{customer ? customer.name : t('sales:stepSummary.retailSale')}</span>
           </div>
           <div className={styles.summaryItem}>
-            <span className={styles.summaryLabel}>Depo</span>
+            <span className={styles.summaryLabel}>{t('sales:stepSummary.warehouse')}</span>
             <span>{warehouse ? warehouse.name : '-'}</span>
           </div>
           <div className={styles.summaryItem}>
-            <span className={styles.summaryLabel}>Odeme Yontemi</span>
-            <span>{PAYMENT_METHODS[data.paymentMethod as keyof typeof PAYMENT_METHODS] || data.paymentMethod}</span>
+            <span className={styles.summaryLabel}>{t('sales:stepSummary.paymentMethod')}</span>
+            <span>{t(`common:paymentMethods.${data.paymentMethod}`, { defaultValue: data.paymentMethod })}</span>
           </div>
           {data.paymentMethod === 'veresiye' && data.dueDate && (
             <div className={styles.summaryItem}>
-              <span className={styles.summaryLabel}>Vade Tarihi</span>
+              <span className={styles.summaryLabel}>{t('sales:stepSummary.dueDate')}</span>
               <span>{data.dueDate}</span>
             </div>
           )}
           <div className={styles.summaryItem}>
-            <span className={styles.summaryLabel}>KDV</span>
-            <span>{data.includeVat ? 'Dahil' : 'Haric'}</span>
+            <span className={styles.summaryLabel}>{t('sales:stepSummary.vat')}</span>
+            <span>{data.includeVat ? t('sales:stepSummary.vatIncluded') : t('sales:stepSummary.vatExcluded')}</span>
           </div>
           {data.notes && (
             <div className={styles.summaryItem}>
-              <span className={styles.summaryLabel}>Notlar</span>
+              <span className={styles.summaryLabel}>{t('sales:stepSummary.notes')}</span>
               <span>{data.notes}</span>
             </div>
           )}
@@ -63,18 +64,18 @@ export function StepSummary({ data, customers, warehouses, totals, onGoToStep }:
 
       <Card className={styles.summaryCard}>
         <div className={styles.summaryHeader}>
-          <h3>Urunler ({data.items.length})</h3>
-          <Button type="button" size="sm" variant="ghost" onClick={() => onGoToStep(1)}>Duzenle</Button>
+          <h3>{t('sales:stepSummary.productsCount', { count: data.items.length })}</h3>
+          <Button type="button" size="sm" variant="ghost" onClick={() => onGoToStep(1)}>{t('sales:stepSummary.edit')}</Button>
         </div>
         <div className={styles.itemsTableContainer}>
           <table className={styles.itemsTable}>
             <thead>
               <tr>
-                <th>Urun</th>
-                <th className={styles.alignRight}>Miktar</th>
-                <th className={styles.alignRight}>Birim Fiyat</th>
-                <th className={styles.alignRight}>Iskonto</th>
-                <th className={styles.alignRight}>Toplam</th>
+                <th>{t('sales:stepSummary.columns.product')}</th>
+                <th className={styles.alignRight}>{t('sales:stepSummary.columns.quantity')}</th>
+                <th className={styles.alignRight}>{t('sales:stepSummary.columns.unitPrice')}</th>
+                <th className={styles.alignRight}>{t('sales:stepSummary.columns.discount')}</th>
+                <th className={styles.alignRight}>{t('sales:stepSummary.columns.total')}</th>
               </tr>
             </thead>
             <tbody>
@@ -94,21 +95,21 @@ export function StepSummary({ data, customers, warehouses, totals, onGoToStep }:
         <div className={styles.totalsSection}>
           <div className={styles.totalsGrid}>
             <div className={styles.totalRow}>
-              <span>Ara Toplam:</span>
+              <span>{t('sales:stepSummary.subtotal')}</span>
               <span>{formatCurrency(totals.subtotal)}</span>
             </div>
             {totals.discount > 0 && (
               <div className={styles.totalRow}>
-                <span>Iskonto:</span>
+                <span>{t('sales:stepSummary.discountLabel')}</span>
                 <span>-{formatCurrency(totals.discount)}</span>
               </div>
             )}
             <div className={styles.totalRow}>
-              <span>KDV Toplam:</span>
+              <span>{t('sales:stepSummary.vatTotal')}</span>
               <span>{formatCurrency(totals.vatTotal)}</span>
             </div>
             <div className={`${styles.totalRow} ${styles.grandTotal}`}>
-              <span>Genel Toplam:</span>
+              <span>{t('sales:stepSummary.grandTotal')}</span>
               <span>{formatCurrency(totals.grandTotal)}</span>
             </div>
           </div>

@@ -1,0 +1,187 @@
+{
+  "title": "Warehouse Management",
+  "subtitle": {
+    "warehouses": "{{count}} warehouses",
+    "transfers": "{{count}} transfers",
+    "movements": "{{count}} movements"
+  },
+  "newWarehouse": "+ New Warehouse",
+  "tabs": {
+    "warehouses": "Warehouses",
+    "transfers": "Transfers",
+    "stockMovements": "Stock Movements"
+  },
+  "columns": {
+    "warehouse": "Warehouse",
+    "address": "Address",
+    "manager": "Manager",
+    "status": "Status",
+    "transferNo": "Transfer No",
+    "source": "Source",
+    "target": "Target",
+    "date": "Date",
+    "product": "Product",
+    "operation": "Operation",
+    "quantity": "Quantity",
+    "stockAfter": "Stock After",
+    "direction": "Direction",
+    "otherWarehouse": "Other Warehouse",
+    "notes": "Notes",
+    "barcode": "Barcode",
+    "minStock": "Min. Stock",
+    "movementType": "Movement Type",
+    "sourceWarehouse": "Source Warehouse",
+    "targetWarehouse": "Target Warehouse"
+  },
+  "badges": {
+    "default": "Default",
+    "active": "Active",
+    "inactive": "Inactive",
+    "lowStock": "Low Stock",
+    "normal": "Normal"
+  },
+  "transferStatus": {
+    "pending": "Pending",
+    "in_transit": "In Transit",
+    "completed": "Completed",
+    "cancelled": "Cancelled"
+  },
+  "transferStatusAlt": {
+    "pending": "Pending",
+    "in_transit": "In Transit",
+    "completed": "Completed",
+    "cancelled": "Cancelled"
+  },
+  "movementTypes": {
+    "sale": "Sale",
+    "return": "Return",
+    "transfer_in": "Transfer In",
+    "transfer_out": "Transfer Out",
+    "adjustment": "Adjustment",
+    "purchase": "Purchase",
+    "initial": "Initial",
+    "purchaseFull": "Purchase"
+  },
+  "buttons": {
+    "detail": "Detail",
+    "edit": "Edit",
+    "delete": "Delete",
+    "complete": "Complete",
+    "cancel": "Cancel",
+    "filter": "Filter",
+    "reset": "Reset",
+    "previous": "Previous",
+    "next": "Next",
+    "closeForm": "Close Form",
+    "newTransfer": "+ New Transfer",
+    "addProduct": "+ Add Product",
+    "createTransfer": "Create Transfer",
+    "saving": "Saving..."
+  },
+  "empty": {
+    "warehouses": "No warehouses found",
+    "transfers": "No transfers found",
+    "movements": "No movements found",
+    "stockMovements": "No stock movements found",
+    "stocks": "No stock in this warehouse",
+    "detailMovements": "No stock movements yet",
+    "detailTransfers": "No transfers yet",
+    "noProducts": "No products added yet"
+  },
+  "toast": {
+    "loadError": "Error loading warehouses",
+    "transfersLoadError": "Error loading transfers",
+    "movementsLoadError": "Error loading movements",
+    "dataLoadError": "Error loading data",
+    "deleteSuccess": "Warehouse deleted successfully",
+    "deleteFailed": "Delete operation failed",
+    "updateSuccess": "Warehouse updated successfully",
+    "createSuccess": "Warehouse created successfully",
+    "saveFailed": "Failed to save warehouse",
+    "completeSuccess": "Transfer completed",
+    "cancelSuccess": "Transfer cancelled",
+    "operationFailed": "Operation failed",
+    "transferCreateSuccess": "Transfer created",
+    "transferCreateFailed": "Failed to create transfer",
+    "selectWarehousesError": "Select source and target warehouses",
+    "sameWarehouseError": "Source and target warehouses cannot be the same",
+    "invalidItemsError": "Enter valid products and quantities"
+  },
+  "confirm": {
+    "deleteWarehouse": "Are you sure you want to delete the warehouse \"{{name}}\"?",
+    "completeTransfer": "Are you sure you want to complete this transfer?",
+    "cancelTransfer": "Are you sure you want to cancel this transfer?",
+    "completeTransferAlt": "Are you sure you want to complete this transfer?",
+    "cancelTransferAlt": "Are you sure you want to cancel this transfer?"
+  },
+  "upgradePrompt": "You have reached your warehouse limit. Upgrade your plan to add more warehouses.",
+  "filters": {
+    "allStatuses": "All Statuses",
+    "warehouse": "Warehouse",
+    "allWarehouses": "All Warehouses",
+    "product": "Product",
+    "allProducts": "All Products",
+    "movementType": "Movement Type",
+    "allTypes": "All Types",
+    "startDate": "Start Date",
+    "endDate": "End Date"
+  },
+  "detail": {
+    "back": "← Warehouses",
+    "loading": "Loading...",
+    "notFound": "Warehouse not found",
+    "backButton": "Go Back",
+    "loadError": "Failed to load data",
+    "warehouseInfo": "Warehouse Information",
+    "address": "Address",
+    "phone": "Phone",
+    "manager": "Manager",
+    "createdAt": "Created Date",
+    "summary": "Summary",
+    "totalMovements": "Total Movements",
+    "totalTransfers": "Total Transfers",
+    "pendingTransfers": "Pending Transfers",
+    "productCount": "Products",
+    "totalStock": "Total Stock",
+    "lowStock": "Low Stock",
+    "stocksTab": "Stocks ({{count}})",
+    "movementsTab": "Movements ({{count}})",
+    "transfersTab": "Transfers ({{count}})"
+  },
+  "transferDirection": {
+    "outgoing": "Outgoing",
+    "incoming": "Incoming"
+  },
+  "form": {
+    "editTitle": "Edit Warehouse",
+    "createTitle": "New Warehouse",
+    "warehouseName": "Warehouse Name *",
+    "warehouseCode": "Warehouse Code *",
+    "codePlaceholder": "Example: WH01",
+    "address": "Address",
+    "phone": "Phone",
+    "manager": "Manager",
+    "setDefault": "Set as default warehouse",
+    "cancel": "Cancel",
+    "update": "Update",
+    "create": "Create"
+  },
+  "stockMovementsPage": {
+    "title": "Stock Movements",
+    "subtitle": "Stock inflows and outflows across all warehouses",
+    "page": "Page {{current}} / {{total}}"
+  },
+  "stockTransferPage": {
+    "title": "Stock Transfers",
+    "subtitle": "Inter-warehouse stock transfer operations",
+    "newTransferTitle": "New Transfer",
+    "sourceWarehouse": "Source Warehouse *",
+    "targetWarehouse": "Target Warehouse *",
+    "selectWarehouse": "Select Warehouse",
+    "transferDate": "Transfer Date",
+    "products": "Products",
+    "selectProduct": "Select Product",
+    "notes": "Notes",
+    "page": "Page {{current}} / {{total}}"
+  }
+}

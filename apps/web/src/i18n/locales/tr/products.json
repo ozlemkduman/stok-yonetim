@@ -1,0 +1,159 @@
+{
+  "pageTitle": "Urunler",
+  "subtitle": "Toplam {{count}} urun kaydi",
+  "newProduct": "+ Yeni Urun",
+  "searchPlaceholder": "Urun ara...",
+  "upgradeMessage": "Urun limitinize ulastiniz. Daha fazla urun eklemek icin planinizi yukseltin.",
+  "emptyMessage": "Urun bulunamadi",
+  "columns": {
+    "productName": "Urun Adi",
+    "category": "Kategori",
+    "totalSold": "Satilan",
+    "stock": "Stok",
+    "purchasePrice": "Alis Fiyati",
+    "salePrice": "Satis Fiyati",
+    "createdBy": "Kaydeden"
+  },
+  "actions": {
+    "detail": "Detay",
+    "edit": "Duzenle",
+    "delete": "Sil"
+  },
+  "filters": {
+    "allCategories": "Tum Kategoriler",
+    "bestSelling": "En Cok Satan",
+    "leastSelling": "En Az Satan",
+    "nameAZ": "Ada Gore (A-Z)",
+    "nameZA": "Ada Gore (Z-A)",
+    "stockLowHigh": "Stok (Az-Cok)",
+    "stockHighLow": "Stok (Cok-Az)",
+    "priceHighLow": "Fiyat (Yuksek-Dusuk)",
+    "priceLowHigh": "Fiyat (Dusuk-Yuksek)",
+    "newest": "En Yeni"
+  },
+  "modal": {
+    "editTitle": "Urun Duzenle",
+    "createTitle": "Yeni Urun",
+    "cancel": "Iptal",
+    "update": "Guncelle",
+    "save": "Kaydet"
+  },
+  "form": {
+    "productName": "Urun Adi *",
+    "barcode": "Barkod",
+    "category": "Kategori",
+    "unit": "Birim",
+    "vatRate": "KDV Orani (%)",
+    "purchasePriceSection": "Alis Fiyati",
+    "salePriceSection": "Satis Fiyatlari",
+    "vatExcluded": "KDV Haric",
+    "vatIncluded": "KDV Dahil",
+    "purchasePriceLabel": "Alis Fiyati * ({{vatStatus}})",
+    "salePriceLabel": "Satis Fiyati * ({{vatStatus}})",
+    "wholesalePriceLabel": "Toptan Satis Fiyati ({{vatStatus}})",
+    "stockQuantity": "Stok Miktari",
+    "minStockLevel": "Kritik Stok Seviyesi"
+  },
+  "priceInfo": {
+    "vatExcluded": "KDV Haric: {{price}} \u20ba",
+    "vatIncluded": "KDV Dahil: {{price}} \u20ba"
+  },
+  "toast": {
+    "loadError": "Urunler yuklenemedi",
+    "updateSuccess": "Urun guncellendi",
+    "createSuccess": "Urun eklendi",
+    "deleteSuccess": "Urun silindi",
+    "genericError": "Hata olustu",
+    "deleteFailed": "Silme basarisiz",
+    "deleteConfirm": "\"{{name}}\" urunununu silmek istediginizden emin misiniz?"
+  },
+  "detail": {
+    "backToProducts": "\u2190 Urunler",
+    "active": "Aktif",
+    "inactive": "Pasif",
+    "lowStock": "Dusuk Stok",
+    "currentStock": "Mevcut Stok",
+    "minStock": "Min: {{value}} {{unit}}",
+    "productInfo": "Urun Bilgileri",
+    "salePrice": "Satis Fiyati",
+    "wholesalePrice": "Toptan Satis Fiyati",
+    "purchasePrice": "Alis Fiyati",
+    "vatRate": "KDV Orani",
+    "unit": "Birim",
+    "createdAt": "Olusturulma",
+    "createdBy": "Kaydeden",
+    "statistics": "Istatistikler",
+    "totalSold": "Satilan",
+    "salesCount": "{{count}} satis",
+    "totalReturned": "Iade Edilen",
+    "returnsCount": "{{count}} iade",
+    "totalRevenue": "Toplam Gelir",
+    "netQuantity": "Net: {{count}} adet",
+    "loading": "Yukleniyor...",
+    "loadError": "Veri yuklenemedi",
+    "notFound": "Urun bulunamadi",
+    "goBack": "Geri Don",
+    "warehouseStocks": "Depo Stoklari",
+    "warehouseStocksColumns": {
+      "warehouse": "Depo",
+      "stockQuantity": "Stok Miktari"
+    }
+  },
+  "tabs": {
+    "sales": "Satislar ({{count}})",
+    "returns": "Iadeler ({{count}})",
+    "movements": "Stok Hareketleri ({{count}})"
+  },
+  "salesTab": {
+    "empty": "Bu urun henuz satilmamis",
+    "invoiceNo": "Fatura No",
+    "date": "Tarih",
+    "customer": "Musteri",
+    "quantity": "Miktar",
+    "unitPrice": "Birim Fiyat",
+    "vat": "KDV",
+    "total": "Toplam",
+    "payment": "Odeme",
+    "status": "Durum"
+  },
+  "returnsTab": {
+    "empty": "Bu urun icin iade yapilmamis",
+    "returnNo": "Iade No",
+    "date": "Tarih",
+    "customer": "Musteri",
+    "quantity": "Miktar",
+    "unitPrice": "Birim Fiyat",
+    "vat": "KDV",
+    "total": "Toplam",
+    "reason": "Sebep",
+    "status": "Durum"
+  },
+  "movementsTab": {
+    "empty": "Stok hareketi bulunmuyor",
+    "date": "Tarih",
+    "movementType": "Hareket Tipi",
+    "quantity": "Miktar",
+    "stockAfter": "Sonraki Stok",
+    "warehouse": "Depo",
+    "notes": "Notlar"
+  },
+  "paymentMethods": {
+    "cash": "Nakit",
+    "credit_card": "Kredi Karti",
+    "bank_transfer": "Havale/EFT",
+    "credit": "Veresiye"
+  },
+  "statuses": {
+    "completed": "Tamamlandi",
+    "cancelled": "Iptal Edildi",
+    "pending": "Beklemede"
+  },
+  "movementTypes": {
+    "sale": "Satis",
+    "return": "Iade",
+    "transfer_in": "Transfer Giris",
+    "transfer_out": "Transfer Cikis",
+    "adjustment": "Duzeltme",
+    "purchase": "Alis"
+  }
+}

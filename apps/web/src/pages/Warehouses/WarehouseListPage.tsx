@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Table, Button, Badge, Input, Select, Pagination, type Column } from '@stok/ui';
 import { Warehouse, StockTransfer, StockMovement, CreateWarehouseData, warehousesApi } from '../../api/warehouses.api';
 import { WarehouseFormModal } from './WarehouseFormModal';
@@ -22,23 +23,8 @@ const icons = {
 
 type TabType = 'warehouses' | 'transfers' | 'movements';
 
-const TRANSFER_STATUS_LABELS: Record<string, string> = {
-  pending: 'Bekliyor',
-  in_transit: 'Yolda',
-  completed: 'Tamamlandi',
-  cancelled: 'Iptal',
-};
-
-const MOVEMENT_TYPE_LABELS: Record<string, string> = {
-  sale: 'Satis',
-  return: 'Iade',
-  transfer_in: 'Transfer Giris',
-  transfer_out: 'Transfer Cikis',
-  adjustment: 'Duzeltme',
-  purchase: 'Alis',
-};
-
 export function WarehouseListPage() {
+  const { t } = useTranslation(['warehouses', 'common']);
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<TabType>('warehouses');
   const [warehouses, setWarehouses] = useState<Warehouse[]>([]);
@@ -71,11 +57,11 @@ export function WarehouseListPage() {
       setTotal(response.meta?.total || 0);
       setTotalPages(response.meta?.totalPages || 1);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Depolar yuklenirken hata olustu');
+      setError(err instanceof Error ? err.message : t('warehouses:toast.loadError'));
     } finally {
       setLoading(false);
     }
-  }, [page]);
+  }, [page, t]);
 
   const fetchTransfers = useCallback(async () => {
     setLoading(true);
@@ -89,11 +75,11 @@ export function WarehouseListPage() {
       setTotal(response.meta?.total || 0);
       setTotalPages(response.meta?.totalPages || 1);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Transferler yuklenirken hata olustu');
+      setError(err instanceof Error ? err.message : t('warehouses:toast.transfersLoadError'));
     } finally {
       setLoading(false);
     }
-  }, [page, transferStatusFilter]);
+  }, [page, transferStatusFilter, t]);
 
   const fetchMovements = useCallback(async () => {
     setLoading(true);
@@ -108,11 +94,11 @@ export function WarehouseListPage() {
       setTotal(response.meta?.total || 0);
       setTotalPages(response.meta?.totalPages || 1);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Hareketler yuklenirken hata olustu');
+      setError(err instanceof Error ? err.message : t('warehouses:toast.movementsLoadError'));
     } finally {
       setLoading(false);
     }
-  }, [page, movementStartDate, movementEndDate]);
+  }, [page, movementStartDate, movementEndDate, t]);
 
   useEffect(() => {
     if (activeTab === 'warehouses') {
@@ -165,56 +151,56 @@ export function WarehouseListPage() {
     if (e) {
       e.stopPropagation();
     }
-    const confirmed = await confirm({ message: `"${warehouse.name}" deposunu silmek istediginizden emin misiniz?`, variant: 'danger' });
+    const confirmed = await confirm({ message: t('warehouses:confirm.deleteWarehouse', { name: warehouse.name }), variant: 'danger' });
     if (!confirmed) return;
     try {
       await warehousesApi.delete(warehouse.id);
-      showToast('success', 'Depo basariyla silindi');
+      showToast('success', t('warehouses:toast.deleteSuccess'));
       fetchWarehouses();
     } catch (err) {
-      showToast('error', err instanceof Error ? err.message : 'Silme islemi basarisiz');
+      showToast('error', err instanceof Error ? err.message : t('warehouses:toast.deleteFailed'));
     }
   };
 
   const handleFormSubmit = async (data: CreateWarehouseData) => {
     if (editingWarehouse) {
       await warehousesApi.update(editingWarehouse.id, data);
-      showToast('success', 'Depo basariyla guncellendi');
+      showToast('success', t('warehouses:toast.updateSuccess'));
     } else {
       await warehousesApi.create(data);
-      showToast('success', 'Depo basariyla eklendi');
+      showToast('success', t('warehouses:toast.createSuccess'));
     }
     fetchWarehouses();
   };
 
   const handleCompleteTransfer = async (transfer: StockTransfer) => {
-    const confirmed = await confirm({ message: 'Transferi tamamlamak istediginizden emin misiniz?', variant: 'warning' });
+    const confirmed = await confirm({ message: t('warehouses:confirm.completeTransfer'), variant: 'warning' });
     if (!confirmed) return;
     try {
       await warehousesApi.completeTransfer(transfer.id);
-      showToast('success', 'Transfer tamamlandi');
+      showToast('success', t('warehouses:toast.completeSuccess'));
       fetchTransfers();
     } catch (err) {
-      showToast('error', err instanceof Error ? err.message : 'Islem basarisiz');
+      showToast('error', err instanceof Error ? err.message : t('warehouses:toast.operationFailed'));
     }
   };
 
   const handleCancelTransfer = async (transfer: StockTransfer) => {
-    const confirmed = await confirm({ message: 'Transferi iptal etmek istediginizden emin misiniz?', variant: 'danger' });
+    const confirmed = await confirm({ message: t('warehouses:confirm.cancelTransfer'), variant: 'danger' });
     if (!confirmed) return;
     try {
       await warehousesApi.cancelTransfer(transfer.id);
-      showToast('success', 'Transfer iptal edildi');
+      showToast('success', t('warehouses:toast.cancelSuccess'));
       fetchTransfers();
     } catch (err) {
-      showToast('error', err instanceof Error ? err.message : 'Islem basarisiz');
+      showToast('error', err instanceof Error ? err.message : t('warehouses:toast.operationFailed'));
     }
   };
 
   const warehouseColumns: Column<Warehouse>[] = [
     {
       key: 'name',
-      header: 'Depo',
+      header: t('warehouses:columns.warehouse'),
       render: (wh) => (
         <div className={styles.warehouseInfo}>
           <span className={styles.warehouseName}>{wh.name}</span>
@@ -224,19 +210,19 @@ export function WarehouseListPage() {
     },
     {
       key: 'address',
-      header: 'Adres',
+      header: t('warehouses:columns.address'),
       render: (wh) => wh.address || '-',
     },
     {
       key: 'manager_name',
-      header: 'Sorumlu',
+      header: t('warehouses:columns.manager'),
       render: (wh) => wh.manager_name || '-',
     },
     {
       key: 'is_default',
-      header: 'Durum',
+      header: t('warehouses:columns.status'),
       render: (wh) => (
-        wh.is_default ? <Badge variant="success">Varsayilan</Badge> : null
+        wh.is_default ? <Badge variant="success">{t('warehouses:badges.default')}</Badge> : null
       ),
     },
     {
@@ -245,9 +231,9 @@ export function WarehouseListPage() {
       width: '150px',
       render: (wh) => (
         <div className={styles.actions}>
-          <Button size="sm" variant="secondary" onClick={() => handleView(wh)}>Detay</Button>
-          <Button size="sm" variant="primary" onClick={(e) => handleEdit(wh, e)}>Duzenle</Button>
-          <Button size="sm" variant="danger" onClick={(e) => handleDelete(wh, e)}>Sil</Button>
+          <Button size="sm" variant="secondary" onClick={() => handleView(wh)}>{t('warehouses:buttons.detail')}</Button>
+          <Button size="sm" variant="primary" onClick={(e) => handleEdit(wh, e)}>{t('warehouses:buttons.edit')}</Button>
+          <Button size="sm" variant="danger" onClick={(e) => handleDelete(wh, e)}>{t('warehouses:buttons.delete')}</Button>
         </div>
       ),
     },
@@ -256,34 +242,34 @@ export function WarehouseListPage() {
   const transferColumns: Column<StockTransfer>[] = [
     {
       key: 'transfer_number',
-      header: 'Transfer No',
-      render: (t) => t.transfer_number,
+      header: t('warehouses:columns.transferNo'),
+      render: (tr) => tr.transfer_number,
     },
     {
       key: 'from_warehouse',
-      header: 'Kaynak',
-      render: (t) => t.from_warehouse_name || '-',
+      header: t('warehouses:columns.source'),
+      render: (tr) => tr.from_warehouse_name || '-',
     },
     {
       key: 'to_warehouse',
-      header: 'Hedef',
-      render: (t) => t.to_warehouse_name || '-',
+      header: t('warehouses:columns.target'),
+      render: (tr) => tr.to_warehouse_name || '-',
     },
     {
       key: 'transfer_date',
-      header: 'Tarih',
-      render: (t) => formatDate(t.transfer_date),
+      header: t('warehouses:columns.date'),
+      render: (tr) => formatDate(tr.transfer_date),
     },
     {
       key: 'status',
-      header: 'Durum',
-      render: (t) => (
+      header: t('warehouses:columns.status'),
+      render: (tr) => (
         <Badge variant={
-          t.status === 'completed' ? 'success' :
-          t.status === 'cancelled' ? 'danger' :
-          t.status === 'in_transit' ? 'warning' : 'default'
+          tr.status === 'completed' ? 'success' :
+          tr.status === 'cancelled' ? 'danger' :
+          tr.status === 'in_transit' ? 'warning' : 'default'
         }>
-          {TRANSFER_STATUS_LABELS[t.status] || t.status}
+          {t(`warehouses:transferStatus.${tr.status}`)}
         </Badge>
       ),
     },
@@ -291,12 +277,12 @@ export function WarehouseListPage() {
       key: 'actions',
       header: '',
       width: '150px',
-      render: (t) => (
+      render: (tr) => (
         <div className={styles.actions}>
-          {t.status === 'pending' && (
+          {tr.status === 'pending' && (
             <>
-              <Button size="sm" variant="ghost" onClick={() => handleCompleteTransfer(t)}>Tamamla</Button>
-              <Button size="sm" variant="ghost" onClick={() => handleCancelTransfer(t)}>Iptal</Button>
+              <Button size="sm" variant="ghost" onClick={() => handleCompleteTransfer(tr)}>{t('warehouses:buttons.complete')}</Button>
+              <Button size="sm" variant="ghost" onClick={() => handleCancelTransfer(tr)}>{t('warehouses:buttons.cancel')}</Button>
             </>
           )}
         </div>
@@ -307,27 +293,27 @@ export function WarehouseListPage() {
   const movementColumns: Column<StockMovement>[] = [
     {
       key: 'movement_date',
-      header: 'Tarih',
+      header: t('warehouses:columns.date'),
       render: (m) => formatDateTime(m.movement_date),
     },
     {
       key: 'warehouse_name',
-      header: 'Depo',
+      header: t('warehouses:columns.warehouse'),
       render: (m) => m.warehouse_name || '-',
     },
     {
       key: 'product_name',
-      header: 'Urun',
+      header: t('warehouses:columns.product'),
       render: (m) => m.product_name || '-',
     },
     {
       key: 'movement_type',
-      header: 'Islem',
-      render: (m) => MOVEMENT_TYPE_LABELS[m.movement_type] || m.movement_type,
+      header: t('warehouses:columns.operation'),
+      render: (m) => t(`warehouses:movementTypes.${m.movement_type}`),
     },
     {
       key: 'quantity',
-      header: 'Miktar',
+      header: t('warehouses:columns.quantity'),
       align: 'right',
       render: (m) => (
         <span className={`${styles.movementQuantity} ${m.quantity > 0 ? styles.positive : styles.negative}`}>
@@ -337,7 +323,7 @@ export function WarehouseListPage() {
     },
     {
       key: 'stock_after',
-      header: 'Sonraki Stok',
+      header: t('warehouses:columns.stockAfter'),
       align: 'right',
       render: (m) => m.stock_after,
     },
@@ -349,21 +335,21 @@ export function WarehouseListPage() {
         <div className={styles.headerLeft}>
           <h1 className={styles.title}>
             <span className={styles.titleIcon}>{icons.warehouse}</span>
-            Depo Yonetimi
+            {t('warehouses:title')}
           </h1>
           <p className={styles.subtitle}>
-            {activeTab === 'warehouses' && `${total} depo`}
-            {activeTab === 'transfers' && `${total} transfer`}
-            {activeTab === 'movements' && `${total} hareket`}
+            {activeTab === 'warehouses' && t('warehouses:subtitle.warehouses', { count: total })}
+            {activeTab === 'transfers' && t('warehouses:subtitle.transfers', { count: total })}
+            {activeTab === 'movements' && t('warehouses:subtitle.movements', { count: total })}
           </p>
         </div>
         {activeTab === 'warehouses' && canAddWarehouse && (
-          <Button onClick={handleCreate}>+ Yeni Depo</Button>
+          <Button onClick={handleCreate}>{t('warehouses:newWarehouse')}</Button>
         )}
       </div>
 
       {activeTab === 'warehouses' && !canAddWarehouse && (
-        <UpgradePrompt variant="inline" message="Depo limitinize ulastiniz. Daha fazla depo eklemek icin planinizi yukseltin." />
+        <UpgradePrompt variant="inline" message={t('warehouses:upgradePrompt')} />
       )}
 
       <div className={styles.card}>
@@ -372,19 +358,19 @@ export function WarehouseListPage() {
             className={`${styles.tab} ${activeTab === 'warehouses' ? styles.active : ''}`}
             onClick={() => handleTabChange('warehouses')}
           >
-            Depolar
+            {t('warehouses:tabs.warehouses')}
           </button>
           <button
             className={`${styles.tab} ${activeTab === 'transfers' ? styles.active : ''}`}
             onClick={() => handleTabChange('transfers')}
           >
-            Transferler
+            {t('warehouses:tabs.transfers')}
           </button>
           <button
             className={`${styles.tab} ${activeTab === 'movements' ? styles.active : ''}`}
             onClick={() => handleTabChange('movements')}
           >
-            Stok Hareketleri
+            {t('warehouses:tabs.stockMovements')}
           </button>
         </div>
 
@@ -392,11 +378,11 @@ export function WarehouseListPage() {
           <div className={styles.tabFilters}>
             <Select
               options={[
-                { value: '', label: 'Tüm Durumlar' },
-                { value: 'pending', label: 'Bekliyor' },
-                { value: 'in_transit', label: 'Yolda' },
-                { value: 'completed', label: 'Tamamlandi' },
-                { value: 'cancelled', label: 'Iptal' },
+                { value: '', label: t('warehouses:filters.allStatuses') },
+                { value: 'pending', label: t('warehouses:transferStatus.pending') },
+                { value: 'in_transit', label: t('warehouses:transferStatus.in_transit') },
+                { value: 'completed', label: t('warehouses:transferStatus.completed') },
+                { value: 'cancelled', label: t('warehouses:transferStatus.cancelled') },
               ]}
               value={transferStatusFilter}
               onChange={handleTransferStatusChange}
@@ -419,7 +405,7 @@ export function WarehouseListPage() {
             data={warehouses}
             keyExtractor={(wh) => wh.id}
             loading={loading}
-            emptyMessage="Depo bulunamadi"
+            emptyMessage={t('warehouses:empty.warehouses')}
             onRowClick={handleView}
           />
         )}
@@ -428,9 +414,9 @@ export function WarehouseListPage() {
           <Table
             columns={transferColumns}
             data={transfers}
-            keyExtractor={(t) => t.id}
+            keyExtractor={(tr) => tr.id}
             loading={loading}
-            emptyMessage="Transfer bulunamadi"
+            emptyMessage={t('warehouses:empty.transfers')}
           />
         )}
 
@@ -440,7 +426,7 @@ export function WarehouseListPage() {
             data={movements}
             keyExtractor={(m) => m.id}
             loading={loading}
-            emptyMessage="Hareket bulunamadi"
+            emptyMessage={t('warehouses:empty.movements')}
           />
         )}
 

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Modal, Input, Select, Button } from '@stok/ui';
 import { Account, CreateAccountData } from '../../api/accounts.api';
 import { useToast } from '../../context/ToastContext';
@@ -11,6 +12,7 @@ interface AccountFormModalProps {
 }
 
 export function AccountFormModal({ isOpen, onClose, onSubmit, account }: AccountFormModalProps) {
+  const { t } = useTranslation(['accounts', 'common']);
   const { showToast } = useToast();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState<CreateAccountData>({
@@ -61,28 +63,28 @@ export function AccountFormModal({ isOpen, onClose, onSubmit, account }: Account
       await onSubmit(formData);
       onClose();
     } catch (error) {
-      showToast('error', 'Hesap kaydedilemedi');
+      showToast('error', t('accounts:toast.saveFailed'));
     } finally {
       setLoading(false);
     }
   };
 
   const accountTypeOptions = [
-    { value: 'kasa', label: 'Kasa' },
-    { value: 'banka', label: 'Banka' },
+    { value: 'kasa', label: t('accounts:accountTypes.kasa') },
+    { value: 'banka', label: t('accounts:accountTypes.banka') },
   ];
 
   return (
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={account ? 'Hesap Duzenle' : 'Yeni Hesap'}
+      title={account ? t('accounts:form.editTitle') : t('accounts:form.createTitle')}
       size="md"
     >
       <form onSubmit={handleSubmit}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
           <Input
-            label="Hesap Adi *"
+            label={t('accounts:form.accountName')}
             value={formData.name}
             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
             required
@@ -90,7 +92,7 @@ export function AccountFormModal({ isOpen, onClose, onSubmit, account }: Account
           />
 
           <Select
-            label="Hesap Turu *"
+            label={t('accounts:form.accountType')}
             options={accountTypeOptions}
             value={formData.account_type}
             onChange={(e) => setFormData({ ...formData, account_type: e.target.value as 'kasa' | 'banka' })}
@@ -101,29 +103,29 @@ export function AccountFormModal({ isOpen, onClose, onSubmit, account }: Account
           {formData.account_type === 'banka' && (
             <>
               <Input
-                label="Banka Adi"
+                label={t('accounts:form.bankName')}
                 value={formData.bank_name}
                 onChange={(e) => setFormData({ ...formData, bank_name: e.target.value })}
                 fullWidth
               />
 
               <Input
-                label="IBAN"
+                label={t('accounts:form.iban')}
                 value={formData.iban}
                 onChange={(e) => setFormData({ ...formData, iban: e.target.value })}
-                placeholder="TR00 0000 0000 0000 0000 0000 00"
+                placeholder={t('accounts:form.ibanPlaceholder')}
                 fullWidth
               />
 
               <Input
-                label="Hesap Numarasi"
+                label={t('accounts:form.accountNumber')}
                 value={formData.account_number}
                 onChange={(e) => setFormData({ ...formData, account_number: e.target.value })}
                 fullWidth
               />
 
               <Input
-                label="Sube Adi"
+                label={t('accounts:form.branchName')}
                 value={formData.branch_name}
                 onChange={(e) => setFormData({ ...formData, branch_name: e.target.value })}
                 fullWidth
@@ -133,7 +135,7 @@ export function AccountFormModal({ isOpen, onClose, onSubmit, account }: Account
 
           {!account && (
             <Input
-              label="Acilis Bakiyesi"
+              label={t('accounts:form.openingBalance')}
               type="number"
               step="0.01"
               min="0"
@@ -149,16 +151,16 @@ export function AccountFormModal({ isOpen, onClose, onSubmit, account }: Account
               checked={formData.is_default}
               onChange={(e) => setFormData({ ...formData, is_default: e.target.checked })}
             />
-            <span>Varsayilan hesap olarak ayarla</span>
+            <span>{t('accounts:form.setDefault')}</span>
           </label>
         </div>
 
         <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 'var(--space-2)', marginTop: 'var(--space-6)' }}>
           <Button type="button" variant="ghost" onClick={onClose}>
-            Iptal
+            {t('accounts:form.cancel')}
           </Button>
           <Button type="submit" loading={loading}>
-            {account ? 'Guncelle' : 'Olustur'}
+            {account ? t('accounts:form.update') : t('accounts:form.create')}
           </Button>
         </div>
       </form>

@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Table, Button, Badge, Pagination, type Column } from '@stok/ui';
 import { Account, AccountSummary, CreateAccountData, CreateMovementData, CreateTransferData, accountsApi } from '../../api/accounts.api';
 import { AccountFormModal } from './AccountFormModal';
@@ -40,6 +41,7 @@ const icons = {
 type TabType = 'all' | 'kasa' | 'banka';
 
 export function AccountListPage() {
+  const { t } = useTranslation(['accounts', 'common']);
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [summary, setSummary] = useState<AccountSummary | null>(null);
   const [loading, setLoading] = useState(true);
@@ -78,20 +80,20 @@ export function AccountListPage() {
       setTotal(response.meta?.total || 0);
       setTotalPages(response.meta?.totalPages || 1);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Hesaplar yuklenirken hata olustu');
+      setError(err instanceof Error ? err.message : t('accounts:toast.loadError'));
     } finally {
       setLoading(false);
     }
-  }, [page, activeTab]);
+  }, [page, activeTab, t]);
 
   const fetchSummary = useCallback(async () => {
     try {
       const response = await accountsApi.getSummary();
       setSummary(response.data);
     } catch (err) {
-      showToast('error', 'Hesap ozeti yuklenemedi');
+      showToast('error', t('accounts:toast.summaryError'));
     }
-  }, []);
+  }, [t]);
 
   useEffect(() => {
     fetchAccounts();
@@ -122,26 +124,26 @@ export function AccountListPage() {
   };
 
   const handleDeleteAccount = async (account: Account) => {
-    const confirmed = await confirm({ message: `"${account.name}" hesabini silmek istediginizden emin misiniz?`, variant: 'danger' });
+    const confirmed = await confirm({ message: t('accounts:confirm.deleteAccount', { name: account.name }), variant: 'danger' });
     if (!confirmed) return;
 
     try {
       await accountsApi.delete(account.id);
-      showToast('success', 'Hesap basariyla silindi');
+      showToast('success', t('accounts:toast.deleteSuccess'));
       fetchAccounts();
       fetchSummary();
     } catch (err) {
-      showToast('error', err instanceof Error ? err.message : 'Silme islemi basarisiz');
+      showToast('error', err instanceof Error ? err.message : t('accounts:toast.deleteFailed'));
     }
   };
 
   const handleAccountSubmit = async (data: CreateAccountData) => {
     if (editingAccount) {
       await accountsApi.update(editingAccount.id, data);
-      showToast('success', 'Hesap basariyla guncellendi');
+      showToast('success', t('accounts:toast.updateSuccess'));
     } else {
       await accountsApi.create(data);
-      showToast('success', 'Hesap basariyla eklendi');
+      showToast('success', t('accounts:toast.createSuccess'));
     }
     fetchAccounts();
     fetchSummary();
@@ -150,14 +152,14 @@ export function AccountListPage() {
   const handleMovementSubmit = async (data: CreateMovementData) => {
     if (!selectedAccount) return;
     await accountsApi.addMovement(selectedAccount.id, data);
-    showToast('success', 'Hareket basariyla eklendi');
+    showToast('success', t('accounts:toast.movementSuccess'));
     fetchAccounts();
     fetchSummary();
   };
 
   const handleTransferSubmit = async (data: CreateTransferData) => {
     await accountsApi.createTransfer(data);
-    showToast('success', 'Transfer basariyla yapildi');
+    showToast('success', t('accounts:toast.transferSuccess'));
     fetchAccounts();
     fetchSummary();
   };
@@ -165,7 +167,7 @@ export function AccountListPage() {
   const columns: Column<Account>[] = [
     {
       key: 'name',
-      header: 'Hesap',
+      header: t('accounts:columns.account'),
       render: (account) => (
         <div className={styles.accountInfo}>
           <span className={styles.accountName}>{account.name}</span>
@@ -179,16 +181,16 @@ export function AccountListPage() {
     },
     {
       key: 'account_type',
-      header: 'Tur',
+      header: t('accounts:columns.type'),
       render: (account) => (
         <Badge variant={account.account_type === 'kasa' ? 'primary' : 'info'}>
-          {account.account_type === 'kasa' ? 'Kasa' : 'Banka'}
+          {t(`accounts:accountTypes.${account.account_type}`)}
         </Badge>
       ),
     },
     {
       key: 'current_balance',
-      header: 'Guncel Bakiye',
+      header: t('accounts:columns.currentBalance'),
       align: 'right',
       render: (account) => (
         <span className={`${styles.balance} ${Number(account.current_balance) >= 0 ? styles.positive : styles.negative}`}>
@@ -198,9 +200,9 @@ export function AccountListPage() {
     },
     {
       key: 'is_default',
-      header: 'Varsayilan',
+      header: t('accounts:columns.default'),
       render: (account) => (
-        account.is_default ? <Badge variant="success">Varsayilan</Badge> : null
+        account.is_default ? <Badge variant="success">{t('accounts:badges.default')}</Badge> : null
       ),
     },
     {
@@ -210,13 +212,13 @@ export function AccountListPage() {
       render: (account) => (
         <div className={styles.actions}>
           <Button size="sm" variant="secondary" onClick={() => handleAddMovement(account)}>
-            Hareket
+            {t('accounts:buttons.movement')}
           </Button>
           <Button size="sm" variant="primary" onClick={() => handleEditAccount(account)}>
-            Duzenle
+            {t('accounts:buttons.edit')}
           </Button>
           <Button size="sm" variant="danger" onClick={() => handleDeleteAccount(account)}>
-            Sil
+            {t('accounts:buttons.delete')}
           </Button>
         </div>
       ),
@@ -229,15 +231,15 @@ export function AccountListPage() {
         <div className={styles.headerLeft}>
           <h1 className={styles.title}>
             <span className={styles.titleIcon}>{icons.accounts}</span>
-            Kasa / Banka Hesaplari
+            {t('accounts:title')}
           </h1>
-          <p className={styles.subtitle}>Toplam {total} hesap</p>
+          <p className={styles.subtitle}>{t('accounts:subtitle', { count: total })}</p>
         </div>
         <div className={styles.headerActions}>
           <Button variant="secondary" onClick={() => setIsTransferModalOpen(true)}>
-            Transfer
+            {t('accounts:transfer')}
           </Button>
-          <Button onClick={handleCreateAccount}>+ Yeni Hesap</Button>
+          <Button onClick={handleCreateAccount}>{t('accounts:newAccount')}</Button>
         </div>
       </div>
 
@@ -246,7 +248,7 @@ export function AccountListPage() {
           <div className={styles.summaryCard}>
             <div className={`${styles.summaryIcon} ${styles.kasa}`}>{icons.kasa}</div>
             <div className={styles.summaryContent}>
-              <p className={styles.summaryLabel}>Toplam Kasa</p>
+              <p className={styles.summaryLabel}>{t('accounts:summary.totalKasa')}</p>
               <p className={`${styles.summaryValue} ${styles.kasa}`}>
                 {formatCurrency(summary.totalKasa)}
               </p>
@@ -255,7 +257,7 @@ export function AccountListPage() {
           <div className={styles.summaryCard}>
             <div className={`${styles.summaryIcon} ${styles.banka}`}>{icons.banka}</div>
             <div className={styles.summaryContent}>
-              <p className={styles.summaryLabel}>Toplam Banka</p>
+              <p className={styles.summaryLabel}>{t('accounts:summary.totalBanka')}</p>
               <p className={`${styles.summaryValue} ${styles.banka}`}>
                 {formatCurrency(summary.totalBanka)}
               </p>
@@ -264,7 +266,7 @@ export function AccountListPage() {
           <div className={styles.summaryCard}>
             <div className={`${styles.summaryIcon} ${styles.total}`}>{icons.total}</div>
             <div className={styles.summaryContent}>
-              <p className={styles.summaryLabel}>Genel Toplam</p>
+              <p className={styles.summaryLabel}>{t('accounts:summary.totalBalance')}</p>
               <p className={`${styles.summaryValue} ${styles.total}`}>
                 {formatCurrency(summary.totalBalance)}
               </p>
@@ -279,19 +281,19 @@ export function AccountListPage() {
             className={`${styles.tab} ${activeTab === 'all' ? styles.active : ''}`}
             onClick={() => handleTabChange('all')}
           >
-            Tumu
+            {t('accounts:tabs.all')}
           </button>
           <button
             className={`${styles.tab} ${activeTab === 'kasa' ? styles.active : ''}`}
             onClick={() => handleTabChange('kasa')}
           >
-            Kasalar
+            {t('accounts:tabs.kasa')}
           </button>
           <button
             className={`${styles.tab} ${activeTab === 'banka' ? styles.active : ''}`}
             onClick={() => handleTabChange('banka')}
           >
-            Banka Hesaplari
+            {t('accounts:tabs.banka')}
           </button>
         </div>
 
@@ -302,7 +304,7 @@ export function AccountListPage() {
           data={accounts}
           keyExtractor={(account) => account.id}
           loading={loading}
-          emptyMessage="Hesap bulunamadi"
+          emptyMessage={t('accounts:empty.accounts')}
           onRowClick={handleEditAccount}
         />
 

@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@stok/ui';
 import { Quote, quotesApi } from '../../api/quotes.api';
 import { formatCurrency, formatDate } from '../../utils/formatters';
@@ -7,6 +8,7 @@ import { useTenant } from '../../context/TenantContext';
 import styles from './QuotePrintView.module.css';
 
 export function QuotePrintView() {
+  const { t } = useTranslation(['quotes', 'common']);
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const printRef = useRef<HTMLDivElement>(null);
@@ -24,14 +26,14 @@ export function QuotePrintView() {
         const response = await quotesApi.getById(id);
         setQuote(response.data);
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Teklif yüklenemedi');
+        setError(err instanceof Error ? err.message : t('quotes:print.loadError'));
       } finally {
         setLoading(false);
       }
     };
 
     fetchQuote();
-  }, [id]);
+  }, [id, t]);
 
   const handlePrint = () => {
     window.print();
@@ -40,7 +42,7 @@ export function QuotePrintView() {
   if (loading) {
     return (
       <div className={styles.page}>
-        <div className={styles.loading}>Yükleniyor...</div>
+        <div className={styles.loading}>{t('quotes:print.loading')}</div>
       </div>
     );
   }
@@ -48,8 +50,8 @@ export function QuotePrintView() {
   if (error || !quote) {
     return (
       <div className={styles.page}>
-        <div className={styles.error}>{error || 'Teklif bulunamadı'}</div>
-        <Button onClick={() => navigate('/quotes')}>Geri Dön</Button>
+        <div className={styles.error}>{error || t('quotes:print.notFound')}</div>
+        <Button onClick={() => navigate('/quotes')}>{t('quotes:print.goBackButton')}</Button>
       </div>
     );
   }
@@ -58,9 +60,9 @@ export function QuotePrintView() {
     <div className={styles.page}>
       <div className={styles.toolbar}>
         <Button variant="ghost" onClick={() => navigate(`/quotes/${id}`)}>
-          ← Geri Dön
+          {t('quotes:print.goBack')}
         </Button>
-        <Button onClick={handlePrint}>Yazdır</Button>
+        <Button onClick={handlePrint}>{t('quotes:print.print')}</Button>
       </div>
 
       <div className={styles.printArea} ref={printRef}>
@@ -68,7 +70,7 @@ export function QuotePrintView() {
           {/* Header */}
           <div className={styles.printHeader}>
             <div className={styles.companyInfo}>
-              <h1 className={styles.companyName}>{tenantSettings?.name || 'Şirket Adı'}</h1>
+              <h1 className={styles.companyName}>{tenantSettings?.name || t('quotes:print.companyName')}</h1>
               {tenantSettings?.settings?.address && <p>{tenantSettings.settings.address}</p>}
               {tenantSettings?.settings?.phone && <p>Tel: {tenantSettings.settings.phone}</p>}
               {tenantSettings?.settings?.taxOffice && tenantSettings?.settings?.taxNumber && (
@@ -76,19 +78,19 @@ export function QuotePrintView() {
               )}
             </div>
             <div className={styles.documentInfo}>
-              <h2 className={styles.documentTitle}>TEKLİF</h2>
+              <h2 className={styles.documentTitle}>{t('quotes:print.documentTitle')}</h2>
               <table className={styles.infoTable}>
                 <tbody>
                   <tr>
-                    <td>Teklif No:</td>
+                    <td>{t('quotes:print.quoteNo')}</td>
                     <td><strong>{quote.quote_number}</strong></td>
                   </tr>
                   <tr>
-                    <td>Tarih:</td>
+                    <td>{t('quotes:print.date')}</td>
                     <td>{formatDate(quote.quote_date)}</td>
                   </tr>
                   <tr>
-                    <td>Geçerlilik:</td>
+                    <td>{t('quotes:print.validity')}</td>
                     <td>{formatDate(quote.valid_until)}</td>
                   </tr>
                 </tbody>
@@ -99,7 +101,7 @@ export function QuotePrintView() {
           {/* Customer Info */}
           {quote.customer_name && (
             <div className={styles.customerSection}>
-              <h3>Müşteri Bilgileri</h3>
+              <h3>{t('quotes:print.customerInfo')}</h3>
               <p><strong>{quote.customer_name}</strong></p>
             </div>
           )}
@@ -109,12 +111,12 @@ export function QuotePrintView() {
             <thead>
               <tr>
                 <th>#</th>
-                <th>Ürün / Hizmet</th>
-                <th className={styles.alignRight}>Miktar</th>
-                <th className={styles.alignRight}>Birim Fiyat</th>
-                <th className={styles.alignRight}>İskonto</th>
-                <th className={styles.alignRight}>KDV</th>
-                <th className={styles.alignRight}>Toplam</th>
+                <th>{t('quotes:print.productService')}</th>
+                <th className={styles.alignRight}>{t('quotes:print.quantity')}</th>
+                <th className={styles.alignRight}>{t('quotes:print.unitPrice')}</th>
+                <th className={styles.alignRight}>{t('quotes:print.discount')}</th>
+                <th className={styles.alignRight}>{t('quotes:print.vat')}</th>
+                <th className={styles.alignRight}>{t('quotes:print.total')}</th>
               </tr>
             </thead>
             <tbody>
@@ -139,21 +141,21 @@ export function QuotePrintView() {
             <table className={styles.totalsTable}>
               <tbody>
                 <tr>
-                  <td>Ara Toplam:</td>
+                  <td>{t('quotes:print.subtotal')}</td>
                   <td>{formatCurrency(quote.subtotal)}</td>
                 </tr>
                 {(quote.discount_amount > 0 || quote.discount_rate > 0) && (
                   <tr>
-                    <td>İskonto {quote.discount_rate > 0 && `(%${quote.discount_rate})`}:</td>
+                    <td>{t('quotes:print.discountLabel')} {quote.discount_rate > 0 && `(%${quote.discount_rate})`}:</td>
                     <td>-{formatCurrency(quote.discount_amount)}</td>
                   </tr>
                 )}
                 <tr>
-                  <td>KDV Toplam:</td>
+                  <td>{t('quotes:print.vatTotal')}</td>
                   <td>{formatCurrency(quote.vat_total)}</td>
                 </tr>
                 <tr className={styles.grandTotalRow}>
-                  <td><strong>GENEL TOPLAM:</strong></td>
+                  <td><strong>{t('quotes:print.grandTotal')}</strong></td>
                   <td><strong>{formatCurrency(quote.grand_total)}</strong></td>
                 </tr>
               </tbody>
@@ -163,21 +165,21 @@ export function QuotePrintView() {
           {/* Notes */}
           {quote.notes && (
             <div className={styles.notesSection}>
-              <h4>Notlar</h4>
+              <h4>{t('quotes:print.notes')}</h4>
               <p>{quote.notes}</p>
             </div>
           )}
 
           {/* Footer */}
           <div className={styles.printFooter}>
-            <p>Bu teklif {formatDate(quote.valid_until)} tarihine kadar geçerlidir.</p>
+            <p>{t('quotes:print.validUntilFooter', { date: formatDate(quote.valid_until) })}</p>
             <div className={styles.signatureArea}>
               <div className={styles.signatureBox}>
-                <p>Hazırlayan</p>
+                <p>{t('quotes:print.preparedBy')}</p>
                 <div className={styles.signatureLine}></div>
               </div>
               <div className={styles.signatureBox}>
-                <p>Onaylayan</p>
+                <p>{t('quotes:print.approvedBy')}</p>
                 <div className={styles.signatureLine}></div>
               </div>
             </div>

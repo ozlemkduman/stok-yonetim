@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Input, Card } from '@stok/ui';
 import { Customer } from '../../../api/customers.api';
 import styles from '../SaleFormPage.module.css';
@@ -16,6 +17,7 @@ export function StepCustomer({
   onCustomerChange,
   onOpenCustomerModal,
 }: StepCustomerProps) {
+  const { t } = useTranslation(['sales', 'common']);
   const [search, setSearch] = useState('');
 
   const selectedCustomer = customers.find(c => c.id === customerId);
@@ -39,7 +41,7 @@ export function StepCustomer({
               <circle cx="9" cy="7" r="4" />
             </svg>
           </div>
-          <span>Musterisiz (Perakende)</span>
+          <span>{t('sales:stepCustomer.noCustomer')}</span>
         </button>
 
         <button
@@ -53,7 +55,7 @@ export function StepCustomer({
               <circle cx="12" cy="7" r="4" />
             </svg>
           </div>
-          <span>Musteri Sec</span>
+          <span>{t('sales:stepCustomer.selectCustomer')}</span>
         </button>
 
         <button
@@ -67,7 +69,7 @@ export function StepCustomer({
               <line x1="5" y1="12" x2="19" y2="12" />
             </svg>
           </div>
-          <span>Yeni Musteri Ekle</span>
+          <span>{t('sales:stepCustomer.addNewCustomer')}</span>
         </button>
       </div>
 
@@ -75,7 +77,7 @@ export function StepCustomer({
         <>
           <div className={styles.customerSearch}>
             <Input
-              placeholder="Musteri ara (ad, telefon, e-posta)..."
+              placeholder={t('sales:stepCustomer.searchPlaceholder')}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               fullWidth
@@ -97,7 +99,7 @@ export function StepCustomer({
               </div>
             ))}
             {filteredCustomers.length === 0 && (
-              <div className={styles.emptyItems}>Musteri bulunamadi</div>
+              <div className={styles.emptyItems}>{t('sales:stepCustomer.notFound')}</div>
             )}
           </div>
         </>
@@ -105,14 +107,14 @@ export function StepCustomer({
 
       {selectedCustomer && (
         <Card className={styles.selectedCustomerCard}>
-          <h4>Secilen Musteri</h4>
+          <h4>{t('sales:stepCustomer.selectedCustomer')}</h4>
           <div className={styles.customerInfo}>
             <div><strong>{selectedCustomer.name}</strong></div>
-            {selectedCustomer.phone && <div>Tel: {selectedCustomer.phone}</div>}
-            {selectedCustomer.email && <div>E-posta: {selectedCustomer.email}</div>}
-            {selectedCustomer.tax_number && <div>Vergi No: {selectedCustomer.tax_number}</div>}
-            {selectedCustomer.tax_office && <div>Vergi Dairesi: {selectedCustomer.tax_office}</div>}
-            {selectedCustomer.address && <div>Adres: {selectedCustomer.address}</div>}
+            {selectedCustomer.phone && <div>{t('sales:stepCustomer.labels.phone')}: {selectedCustomer.phone}</div>}
+            {selectedCustomer.email && <div>{t('sales:stepCustomer.labels.email')}: {selectedCustomer.email}</div>}
+            {selectedCustomer.tax_number && <div>{t('sales:stepCustomer.labels.taxNumber')}: {selectedCustomer.tax_number}</div>}
+            {selectedCustomer.tax_office && <div>{t('sales:stepCustomer.labels.taxOffice')}: {selectedCustomer.tax_office}</div>}
+            {selectedCustomer.address && <div>{t('sales:stepCustomer.labels.address')}: {selectedCustomer.address}</div>}
           </div>
         </Card>
       )}

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Button, Badge, Card } from '@stok/ui';
 import { warehousesApi, WarehouseDetail, WarehouseStock, StockMovement, StockTransfer } from '../../api/warehouses.api';
 import { formatDate, formatDateTime } from '../../utils/formatters';
@@ -7,23 +8,8 @@ import styles from './WarehouseDetailPage.module.css';
 
 type TabType = 'stocks' | 'movements' | 'transfers';
 
-const MOVEMENT_TYPE_LABELS: Record<string, string> = {
-  sale: 'Satis',
-  return: 'Iade',
-  transfer_in: 'Transfer Giris',
-  transfer_out: 'Transfer Cikis',
-  adjustment: 'Duzeltme',
-  purchase: 'Alis',
-};
-
-const TRANSFER_STATUS_LABELS: Record<string, string> = {
-  pending: 'Bekliyor',
-  in_transit: 'Yolda',
-  completed: 'Tamamlandi',
-  cancelled: 'Iptal',
-};
-
 export function WarehouseDetailPage() {
+  const { t } = useTranslation(['warehouses', 'common']);
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [data, setData] = useState<WarehouseDetail | null>(null);
@@ -40,19 +26,19 @@ export function WarehouseDetailPage() {
         const response = await warehousesApi.getDetail(id);
         setData(response.data);
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Veri yuklenemedi');
+        setError(err instanceof Error ? err.message : t('warehouses:detail.loadError'));
       } finally {
         setLoading(false);
       }
     };
 
     fetchData();
-  }, [id]);
+  }, [id, t]);
 
   if (loading) {
     return (
       <div className={styles.page}>
-        <div className={styles.loading}>Yukleniyor...</div>
+        <div className={styles.loading}>{t('warehouses:detail.loading')}</div>
       </div>
     );
   }
@@ -60,8 +46,8 @@ export function WarehouseDetailPage() {
   if (error || !data) {
     return (
       <div className={styles.page}>
-        <div className={styles.error}>{error || 'Depo bulunamadi'}</div>
-        <Button onClick={() => navigate('/warehouses')}>Geri Don</Button>
+        <div className={styles.error}>{error || t('warehouses:detail.notFound')}</div>
+        <Button onClick={() => navigate('/warehouses')}>{t('warehouses:detail.backButton')}</Button>
       </div>
     );
   }
@@ -73,14 +59,14 @@ export function WarehouseDetailPage() {
       <div className={styles.header}>
         <div className={styles.headerLeft}>
           <Button variant="ghost" onClick={() => navigate('/warehouses')}>
-            ← Depolar
+            {t('warehouses:detail.back')}
           </Button>
           <h1 className={styles.title}>{warehouse.name}</h1>
           <div className={styles.warehouseMeta}>
             <span className={styles.warehouseCode}>{warehouse.code}</span>
-            {warehouse.is_default && <Badge variant="success">Varsayilan</Badge>}
+            {warehouse.is_default && <Badge variant="success">{t('warehouses:badges.default')}</Badge>}
             <Badge variant={warehouse.is_active ? 'success' : 'default'}>
-              {warehouse.is_active ? 'Aktif' : 'Pasif'}
+              {warehouse.is_active ? t('warehouses:badges.active') : t('warehouses:badges.inactive')}
             </Badge>
           </div>
         </div>
@@ -88,16 +74,16 @@ export function WarehouseDetailPage() {
           <div className={styles.statsCard}>
             <div className={styles.statItem}>
               <span className={styles.statValue}>{stats.totalProducts}</span>
-              <span className={styles.statLabel}>Urun</span>
+              <span className={styles.statLabel}>{t('warehouses:detail.productCount')}</span>
             </div>
             <div className={styles.statItem}>
               <span className={styles.statValue}>{stats.totalQuantity}</span>
-              <span className={styles.statLabel}>Toplam Stok</span>
+              <span className={styles.statLabel}>{t('warehouses:detail.totalStock')}</span>
             </div>
             {stats.lowStockCount > 0 && (
               <div className={`${styles.statItem} ${styles.warning}`}>
                 <span className={styles.statValue}>{stats.lowStockCount}</span>
-                <span className={styles.statLabel}>Dusuk Stok</span>
+                <span className={styles.statLabel}>{t('warehouses:detail.lowStock')}</span>
               </div>
             )}
           </div>
@@ -107,47 +93,47 @@ export function WarehouseDetailPage() {
       {/* Warehouse Info */}
       <div className={styles.infoGrid}>
         <Card className={styles.infoCard}>
-          <h3>Depo Bilgileri</h3>
+          <h3>{t('warehouses:detail.warehouseInfo')}</h3>
           <div className={styles.infoList}>
             {warehouse.address && (
               <div className={styles.infoItem}>
-                <span className={styles.infoLabel}>Adres</span>
+                <span className={styles.infoLabel}>{t('warehouses:detail.address')}</span>
                 <span className={styles.infoValue}>{warehouse.address}</span>
               </div>
             )}
             {warehouse.phone && (
               <div className={styles.infoItem}>
-                <span className={styles.infoLabel}>Telefon</span>
+                <span className={styles.infoLabel}>{t('warehouses:detail.phone')}</span>
                 <span className={styles.infoValue}>{warehouse.phone}</span>
               </div>
             )}
             {warehouse.manager_name && (
               <div className={styles.infoItem}>
-                <span className={styles.infoLabel}>Sorumlu</span>
+                <span className={styles.infoLabel}>{t('warehouses:detail.manager')}</span>
                 <span className={styles.infoValue}>{warehouse.manager_name}</span>
               </div>
             )}
             <div className={styles.infoItem}>
-              <span className={styles.infoLabel}>Olusturma Tarihi</span>
+              <span className={styles.infoLabel}>{t('warehouses:detail.createdAt')}</span>
               <span className={styles.infoValue}>{formatDate(warehouse.created_at)}</span>
             </div>
           </div>
         </Card>
 
         <Card className={styles.summaryCard}>
-          <h3>Ozet</h3>
+          <h3>{t('warehouses:detail.summary')}</h3>
           <div className={styles.summaryGrid}>
             <div className={styles.summaryItem}>
               <span className={styles.summaryValue}>{stats.movementsCount}</span>
-              <span className={styles.summaryLabel}>Toplam Hareket</span>
+              <span className={styles.summaryLabel}>{t('warehouses:detail.totalMovements')}</span>
             </div>
             <div className={styles.summaryItem}>
               <span className={styles.summaryValue}>{stats.transfersCount}</span>
-              <span className={styles.summaryLabel}>Toplam Transfer</span>
+              <span className={styles.summaryLabel}>{t('warehouses:detail.totalTransfers')}</span>
             </div>
             <div className={styles.summaryItem}>
               <span className={styles.summaryValue}>{stats.pendingTransfers}</span>
-              <span className={styles.summaryLabel}>Bekleyen Transfer</span>
+              <span className={styles.summaryLabel}>{t('warehouses:detail.pendingTransfers')}</span>
             </div>
           </div>
         </Card>
@@ -160,35 +146,35 @@ export function WarehouseDetailPage() {
             className={`${styles.tab} ${activeTab === 'stocks' ? styles.tabActive : ''}`}
             onClick={() => setActiveTab('stocks')}
           >
-            Stoklar ({stocks.length})
+            {t('warehouses:detail.stocksTab', { count: stocks.length })}
           </button>
           <button
             className={`${styles.tab} ${activeTab === 'movements' ? styles.tabActive : ''}`}
             onClick={() => setActiveTab('movements')}
           >
-            Hareketler ({movements.length})
+            {t('warehouses:detail.movementsTab', { count: movements.length })}
           </button>
           <button
             className={`${styles.tab} ${activeTab === 'transfers' ? styles.tabActive : ''}`}
             onClick={() => setActiveTab('transfers')}
           >
-            Transferler ({transfers.length})
+            {t('warehouses:detail.transfersTab', { count: transfers.length })}
           </button>
         </div>
 
         <div className={styles.tabContent}>
-          {activeTab === 'stocks' && <StocksTab stocks={stocks} />}
-          {activeTab === 'movements' && <MovementsTab movements={movements} />}
-          {activeTab === 'transfers' && <TransfersTab transfers={transfers} warehouseId={warehouse.id} />}
+          {activeTab === 'stocks' && <StocksTab stocks={stocks} t={t} />}
+          {activeTab === 'movements' && <MovementsTab movements={movements} t={t} />}
+          {activeTab === 'transfers' && <TransfersTab transfers={transfers} warehouseId={warehouse.id} t={t} />}
         </div>
       </div>
     </div>
   );
 }
 
-function StocksTab({ stocks }: { stocks: WarehouseStock[] }) {
+function StocksTab({ stocks, t }: { stocks: WarehouseStock[]; t: (key: string) => string }) {
   if (stocks.length === 0) {
-    return <div className={styles.emptyState}>Bu depoda stok bulunmuyor</div>;
+    return <div className={styles.emptyState}>{t('warehouses:empty.stocks')}</div>;
   }
 
   return (
@@ -196,11 +182,11 @@ function StocksTab({ stocks }: { stocks: WarehouseStock[] }) {
       <table className={styles.stocksTable}>
         <thead>
           <tr>
-            <th>Urun</th>
-            <th>Barkod</th>
-            <th>Miktar</th>
-            <th>Min. Stok</th>
-            <th>Durum</th>
+            <th>{t('warehouses:columns.product')}</th>
+            <th>{t('warehouses:columns.barcode')}</th>
+            <th>{t('warehouses:columns.quantity')}</th>
+            <th>{t('warehouses:columns.minStock')}</th>
+            <th>{t('warehouses:columns.status')}</th>
           </tr>
         </thead>
         <tbody>
@@ -214,9 +200,9 @@ function StocksTab({ stocks }: { stocks: WarehouseStock[] }) {
                 <td className={styles.minStock}>{stock.min_stock_level}</td>
                 <td>
                   {isLowStock ? (
-                    <Badge variant="warning">Dusuk Stok</Badge>
+                    <Badge variant="warning">{t('warehouses:badges.lowStock')}</Badge>
                   ) : (
-                    <Badge variant="success">Normal</Badge>
+                    <Badge variant="success">{t('warehouses:badges.normal')}</Badge>
                   )}
                 </td>
               </tr>
@@ -228,9 +214,9 @@ function StocksTab({ stocks }: { stocks: WarehouseStock[] }) {
   );
 }
 
-function MovementsTab({ movements }: { movements: StockMovement[] }) {
+function MovementsTab({ movements, t }: { movements: StockMovement[]; t: (key: string) => string }) {
   if (movements.length === 0) {
-    return <div className={styles.emptyState}>Henuz stok hareketi bulunmuyor</div>;
+    return <div className={styles.emptyState}>{t('warehouses:empty.detailMovements')}</div>;
   }
 
   return (
@@ -238,12 +224,12 @@ function MovementsTab({ movements }: { movements: StockMovement[] }) {
       <table className={styles.movementsTable}>
         <thead>
           <tr>
-            <th>Tarih</th>
-            <th>Urun</th>
-            <th>Islem</th>
-            <th>Miktar</th>
-            <th>Sonraki Stok</th>
-            <th>Not</th>
+            <th>{t('warehouses:columns.date')}</th>
+            <th>{t('warehouses:columns.product')}</th>
+            <th>{t('warehouses:columns.operation')}</th>
+            <th>{t('warehouses:columns.quantity')}</th>
+            <th>{t('warehouses:columns.stockAfter')}</th>
+            <th>{t('warehouses:columns.notes')}</th>
           </tr>
         </thead>
         <tbody>
@@ -253,7 +239,7 @@ function MovementsTab({ movements }: { movements: StockMovement[] }) {
               <td className={styles.productName}>{movement.product_name || '-'}</td>
               <td>
                 <span className={styles.movementType}>
-                  {MOVEMENT_TYPE_LABELS[movement.movement_type] || movement.movement_type}
+                  {t(`warehouses:movementTypes.${movement.movement_type}`)}
                 </span>
               </td>
               <td>
@@ -271,9 +257,9 @@ function MovementsTab({ movements }: { movements: StockMovement[] }) {
   );
 }
 
-function TransfersTab({ transfers, warehouseId }: { transfers: StockTransfer[]; warehouseId: string }) {
+function TransfersTab({ transfers, warehouseId, t }: { transfers: StockTransfer[]; warehouseId: string; t: (key: string) => string }) {
   if (transfers.length === 0) {
-    return <div className={styles.emptyState}>Henuz transfer bulunmuyor</div>;
+    return <div className={styles.emptyState}>{t('warehouses:empty.detailTransfers')}</div>;
   }
 
   return (
@@ -281,12 +267,12 @@ function TransfersTab({ transfers, warehouseId }: { transfers: StockTransfer[]; 
       <table className={styles.transfersTable}>
         <thead>
           <tr>
-            <th>Transfer No</th>
-            <th>Tarih</th>
-            <th>Yon</th>
-            <th>Diger Depo</th>
-            <th>Durum</th>
-            <th>Not</th>
+            <th>{t('warehouses:columns.transferNo')}</th>
+            <th>{t('warehouses:columns.date')}</th>
+            <th>{t('warehouses:columns.direction')}</th>
+            <th>{t('warehouses:columns.otherWarehouse')}</th>
+            <th>{t('warehouses:columns.status')}</th>
+            <th>{t('warehouses:columns.notes')}</th>
           </tr>
         </thead>
         <tbody>
@@ -300,7 +286,7 @@ function TransfersTab({ transfers, warehouseId }: { transfers: StockTransfer[]; 
                 <td className={styles.transferDate}>{formatDate(transfer.transfer_date)}</td>
                 <td>
                   <span className={`${styles.transferDirection} ${isOutgoing ? styles.outgoing : styles.incoming}`}>
-                    {isOutgoing ? 'Cikis' : 'Giris'}
+                    {isOutgoing ? t('warehouses:transferDirection.outgoing') : t('warehouses:transferDirection.incoming')}
                   </span>
                 </td>
                 <td className={styles.otherWarehouse}>{otherWarehouse || '-'}</td>
@@ -312,7 +298,7 @@ function TransfersTab({ transfers, warehouseId }: { transfers: StockTransfer[]; 
                       transfer.status === 'in_transit' ? 'warning' : 'default'
                     }
                   >
-                    {TRANSFER_STATUS_LABELS[transfer.status] || transfer.status}
+                    {t(`warehouses:transferStatus.${transfer.status}`)}
                   </Badge>
                 </td>
                 <td className={styles.transferNotes}>{transfer.notes || '-'}</td>

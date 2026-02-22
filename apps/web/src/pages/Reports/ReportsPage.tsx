@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Button, Spinner } from '@stok/ui';
 import { useToast } from '../../context/ToastContext';
 import { reportsApi, TopProduct, TopCustomer, UpcomingPayment, OverduePayment, StockReportProduct, ExpenseByCategory, CustomerProductPurchase, CustomerSale, EmployeePerformanceReport } from '../../api/reports.api';
@@ -77,6 +78,7 @@ const icons = {
 type TabType = 'genel' | 'satis' | 'musteri' | 'musteriSatis' | 'stok' | 'gider' | 'personel';
 
 export function ReportsPage() {
+  const { t } = useTranslation(['reports', 'common']);
   const { showToast } = useToast();
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState<TabType>('genel');
@@ -136,7 +138,7 @@ export function ReportsPage() {
       setCustomerSales(custSales.data);
       setEmployeePerformance(empPerf.data);
     } catch (err) {
-      showToast('error', 'Rapor yüklenemedi');
+      showToast('error', t('reports:loadFailed'));
     }
     setLoading(false);
   }, [startDate, endDate]);
@@ -149,29 +151,29 @@ export function ReportsPage() {
       <div className={styles.reportCard}>
         <div className={styles.reportCardHeader}>
           {icons.sales}
-          <h3 className={styles.reportCardTitle}>Satış Özeti</h3>
+          <h3 className={styles.reportCardTitle}>{t('reports:general.salesSummary')}</h3>
         </div>
         <div className={styles.reportCardBody}>
           {salesSummary?.summary && (
             <div className={styles.reportGrid}>
               <div className={styles.reportItem}>
-                <span>Toplam Satış</span>
-                <strong>{salesSummary.summary.sale_count} adet</strong>
+                <span>{t('reports:general.totalSales')}</span>
+                <strong>{salesSummary.summary.sale_count} {t('reports:general.pieces')}</strong>
               </div>
               <div className={styles.reportItem}>
-                <span>Ara Toplam</span>
+                <span>{t('reports:general.subtotal')}</span>
                 <strong>{formatCurrency(parseFloat(salesSummary.summary.subtotal))}</strong>
               </div>
               <div className={styles.reportItem}>
-                <span>Toplam Iskonto</span>
+                <span>{t('reports:general.totalDiscount')}</span>
                 <strong>{formatCurrency(parseFloat(salesSummary.summary.discount_total))}</strong>
               </div>
               <div className={styles.reportItem}>
-                <span>Toplam KDV</span>
+                <span>{t('reports:general.totalVat')}</span>
                 <strong>{formatCurrency(parseFloat(salesSummary.summary.vat_total))}</strong>
               </div>
               <div className={styles.reportItem}>
-                <span>Genel Toplam</span>
+                <span>{t('reports:general.grandTotal')}</span>
                 <strong className={styles.success}>{formatCurrency(parseFloat(salesSummary.summary.grand_total))}</strong>
               </div>
             </div>
@@ -183,33 +185,33 @@ export function ReportsPage() {
       <div className={styles.reportCard}>
         <div className={styles.reportCardHeader}>
           {icons.profit}
-          <h3 className={styles.reportCardTitle}>Kar / Zarar</h3>
+          <h3 className={styles.reportCardTitle}>{t('reports:general.profitLoss')}</h3>
         </div>
         <div className={styles.reportCardBody}>
           {profitLoss && (
             <div className={styles.reportGrid}>
               <div className={styles.reportItem}>
-                <span>Toplam Gelir</span>
+                <span>{t('reports:general.totalRevenue')}</span>
                 <strong className={styles.success}>{formatCurrency(profitLoss.revenue)}</strong>
               </div>
               <div className={styles.reportItem}>
-                <span>Satış Maliyeti</span>
+                <span>{t('reports:general.costOfGoods')}</span>
                 <strong>{formatCurrency(profitLoss.costOfGoods)}</strong>
               </div>
               <div className={styles.reportItem}>
-                <span>Iade Tutari</span>
+                <span>{t('reports:general.returnAmount')}</span>
                 <strong>{formatCurrency(profitLoss.returns)}</strong>
               </div>
               <div className={styles.reportItem}>
-                <span>Brut Kar</span>
+                <span>{t('reports:general.grossProfit')}</span>
                 <strong>{formatCurrency(profitLoss.grossProfit)}</strong>
               </div>
               <div className={styles.reportItem}>
-                <span>Toplam Giderler</span>
+                <span>{t('reports:general.totalExpenses')}</span>
                 <strong className={styles.danger}>{formatCurrency(profitLoss.expenses)}</strong>
               </div>
               <div className={styles.reportItem}>
-                <span>Net Kar</span>
+                <span>{t('reports:general.netProfit')}</span>
                 <strong className={profitLoss.netProfit >= 0 ? styles.success : styles.danger}>
                   {formatCurrency(profitLoss.netProfit)}
                 </strong>
@@ -223,21 +225,21 @@ export function ReportsPage() {
       <div className={styles.reportCard}>
         <div className={styles.reportCardHeader}>
           {icons.debt}
-          <h3 className={styles.reportCardTitle}>Borc / Alacak Ozeti</h3>
+          <h3 className={styles.reportCardTitle}>{t('reports:general.debtOverview')}</h3>
         </div>
         <div className={styles.reportCardBody}>
           {debtOverview && (
             <div className={styles.reportGrid}>
               <div className={styles.reportItem}>
-                <span>Toplam Borc</span>
+                <span>{t('reports:general.totalDebt')}</span>
                 <strong className={styles.danger}>{formatCurrency(debtOverview.totalDebt)}</strong>
               </div>
               <div className={styles.reportItem}>
-                <span>Toplam Alacak</span>
+                <span>{t('reports:general.totalCredit')}</span>
                 <strong className={styles.success}>{formatCurrency(debtOverview.totalCredit)}</strong>
               </div>
               <div className={styles.reportItem}>
-                <span>Net Durum</span>
+                <span>{t('reports:general.netStatus')}</span>
                 <strong className={debtOverview.totalCredit - debtOverview.totalDebt >= 0 ? styles.success : styles.danger}>
                   {formatCurrency(debtOverview.totalCredit - debtOverview.totalDebt)}
                 </strong>
@@ -251,7 +253,7 @@ export function ReportsPage() {
       <div className={`${styles.reportCard} ${styles.fullWidthCard}`}>
         <div className={styles.reportCardHeader}>
           {icons.alert}
-          <h3 className={styles.reportCardTitle}>Geciken Odemeler</h3>
+          <h3 className={styles.reportCardTitle}>{t('reports:general.overduePayments')}</h3>
         </div>
         <div className={styles.reportCardBody}>
           {overduePayments && overduePayments.totalCount > 0 ? (
@@ -259,21 +261,21 @@ export function ReportsPage() {
               <div className={styles.summaryGrid}>
                 <div className={styles.summaryCard}>
                   <div className={`${styles.summaryValue} ${styles.danger}`}>{overduePayments.totalCount}</div>
-                  <div className={styles.summaryLabel}>Geciken Fatura</div>
+                  <div className={styles.summaryLabel}>{t('reports:general.overdueInvoice')}</div>
                 </div>
                 <div className={styles.summaryCard}>
                   <div className={`${styles.summaryValue} ${styles.danger}`}>{formatCurrency(overduePayments.totalAmount)}</div>
-                  <div className={styles.summaryLabel}>Toplam Tutar</div>
+                  <div className={styles.summaryLabel}>{t('reports:general.totalAmount')}</div>
                 </div>
               </div>
               <table className={styles.reportTable}>
                 <thead>
                   <tr>
-                    <th>Fatura</th>
-                    <th>Musteri</th>
-                    <th>Vade Tarihi</th>
-                    <th>Gecikme</th>
-                    <th className={styles.alignRight}>Tutar</th>
+                    <th>{t('reports:general.invoice')}</th>
+                    <th>{t('reports:general.customer')}</th>
+                    <th>{t('reports:general.dueDate')}</th>
+                    <th>{t('reports:general.delay')}</th>
+                    <th className={styles.alignRight}>{t('reports:general.amount')}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -282,7 +284,7 @@ export function ReportsPage() {
                       <td>{p.invoice_number}</td>
                       <td>{p.customer_name || '-'}</td>
                       <td>{formatDate(p.due_date)}</td>
-                      <td><span className={`${styles.badge} ${styles.badgeDanger}`}>{p.days_overdue} gun</span></td>
+                      <td><span className={`${styles.badge} ${styles.badgeDanger}`}>{p.days_overdue} {t('reports:general.days')}</span></td>
                       <td className={styles.alignRight}><strong>{formatCurrency(p.grand_total)}</strong></td>
                     </tr>
                   ))}
@@ -290,7 +292,7 @@ export function ReportsPage() {
               </table>
             </>
           ) : (
-            <div className={styles.emptyState}>Geciken odeme bulunmuyor</div>
+            <div className={styles.emptyState}>{t('reports:general.noOverduePayments')}</div>
           )}
         </div>
       </div>
@@ -299,17 +301,17 @@ export function ReportsPage() {
       <div className={`${styles.reportCard} ${styles.fullWidthCard}`}>
         <div className={styles.reportCardHeader}>
           {icons.calendar}
-          <h3 className={styles.reportCardTitle}>Yaklasan Odemeler (30 Gun)</h3>
+          <h3 className={styles.reportCardTitle}>{t('reports:general.upcomingPayments')}</h3>
         </div>
         <div className={styles.reportCardBody}>
           {upcomingPayments.length > 0 ? (
             <table className={styles.reportTable}>
               <thead>
                 <tr>
-                  <th>Fatura</th>
-                  <th>Musteri</th>
-                  <th>Vade Tarihi</th>
-                  <th className={styles.alignRight}>Tutar</th>
+                  <th>{t('reports:general.invoice')}</th>
+                  <th>{t('reports:general.customer')}</th>
+                  <th>{t('reports:general.dueDate')}</th>
+                  <th className={styles.alignRight}>{t('reports:general.amount')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -324,7 +326,7 @@ export function ReportsPage() {
               </tbody>
             </table>
           ) : (
-            <div className={styles.emptyState}>Yaklasan odeme bulunmuyor</div>
+            <div className={styles.emptyState}>{t('reports:general.noUpcomingPayments')}</div>
           )}
         </div>
       </div>
@@ -337,7 +339,7 @@ export function ReportsPage() {
       <div className={styles.reportCard}>
         <div className={styles.reportCardHeader}>
           {icons.product}
-          <h3 className={styles.reportCardTitle}>En Cok Satan Urunler</h3>
+          <h3 className={styles.reportCardTitle}>{t('reports:sales.topProducts')}</h3>
         </div>
         <div className={styles.reportCardBody}>
           {topProducts.length > 0 ? (
@@ -345,9 +347,9 @@ export function ReportsPage() {
               <thead>
                 <tr>
                   <th>#</th>
-                  <th>Urun</th>
-                  <th className={styles.alignRight}>Adet</th>
-                  <th className={styles.alignRight}>Ciro</th>
+                  <th>{t('reports:sales.product')}</th>
+                  <th className={styles.alignRight}>{t('reports:sales.quantity')}</th>
+                  <th className={styles.alignRight}>{t('reports:sales.revenue')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -362,7 +364,7 @@ export function ReportsPage() {
               </tbody>
             </table>
           ) : (
-            <div className={styles.emptyState}>Veri bulunamadi</div>
+            <div className={styles.emptyState}>{t('reports:noData')}</div>
           )}
         </div>
       </div>
@@ -371,7 +373,7 @@ export function ReportsPage() {
       <div className={styles.reportCard}>
         <div className={styles.reportCardHeader}>
           {icons.returns}
-          <h3 className={styles.reportCardTitle}>Iade Raporu</h3>
+          <h3 className={styles.reportCardTitle}>{t('reports:sales.returnsReport')}</h3>
         </div>
         <div className={styles.reportCardBody}>
           {returnsReport ? (
@@ -379,22 +381,22 @@ export function ReportsPage() {
               <div className={styles.summaryGrid}>
                 <div className={styles.summaryCard}>
                   <div className={styles.summaryValue}>{returnsReport.summary.count}</div>
-                  <div className={styles.summaryLabel}>Toplam Iade</div>
+                  <div className={styles.summaryLabel}>{t('reports:sales.totalReturns')}</div>
                 </div>
                 <div className={styles.summaryCard}>
                   <div className={`${styles.summaryValue} ${styles.danger}`}>{formatCurrency(returnsReport.summary.total)}</div>
-                  <div className={styles.summaryLabel}>Iade Tutari</div>
+                  <div className={styles.summaryLabel}>{t('reports:sales.returnAmount')}</div>
                 </div>
               </div>
               {returnsReport.topReturnedProducts?.length > 0 && (
                 <>
-                  <h4 style={{ margin: 'var(--space-3) 0', fontSize: 'var(--font-size-sm)', color: 'var(--color-text-muted)' }}>En Cok Iade Edilen Urunler</h4>
+                  <h4 style={{ margin: 'var(--space-3) 0', fontSize: 'var(--font-size-sm)', color: 'var(--color-text-muted)' }}>{t('reports:sales.topReturnedProducts')}</h4>
                   <table className={styles.reportTable}>
                     <thead>
                       <tr>
-                        <th>Urun</th>
-                        <th className={styles.alignRight}>Adet</th>
-                        <th className={styles.alignRight}>Tutar</th>
+                        <th>{t('reports:sales.product')}</th>
+                        <th className={styles.alignRight}>{t('reports:sales.returnQuantity')}</th>
+                        <th className={styles.alignRight}>{t('reports:sales.returnTotal')}</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -411,7 +413,7 @@ export function ReportsPage() {
               )}
             </>
           ) : (
-            <div className={styles.emptyState}>Veri bulunamadi</div>
+            <div className={styles.emptyState}>{t('reports:noData')}</div>
           )}
         </div>
       </div>
@@ -439,7 +441,7 @@ export function ReportsPage() {
         <div className={styles.reportCard}>
           <div className={styles.reportCardHeader}>
             {icons.customer}
-            <h3 className={styles.reportCardTitle}>En Cok Alisveris Yapan Musteriler</h3>
+            <h3 className={styles.reportCardTitle}>{t('reports:customers.topCustomers')}</h3>
           </div>
           <div className={styles.reportCardBody}>
             {topCustomers.length > 0 ? (
@@ -447,9 +449,9 @@ export function ReportsPage() {
                 <thead>
                   <tr>
                     <th>#</th>
-                    <th>Musteri</th>
-                    <th className={styles.alignRight}>Satis</th>
-                    <th className={styles.alignRight}>Toplam</th>
+                    <th>{t('reports:customers.customer')}</th>
+                    <th className={styles.alignRight}>{t('reports:customers.salesCount')}</th>
+                    <th className={styles.alignRight}>{t('reports:customers.total')}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -467,7 +469,7 @@ export function ReportsPage() {
                 </tbody>
               </table>
             ) : (
-              <div className={styles.emptyState}>Veri bulunamadi</div>
+              <div className={styles.emptyState}>{t('reports:noData')}</div>
             )}
           </div>
         </div>
@@ -476,16 +478,16 @@ export function ReportsPage() {
         <div className={styles.reportCard}>
           <div className={styles.reportCardHeader}>
             {icons.debt}
-            <h3 className={styles.reportCardTitle}>Borclu Musteriler</h3>
+            <h3 className={styles.reportCardTitle}>{t('reports:customers.debtCustomers')}</h3>
           </div>
           <div className={styles.reportCardBody}>
             {debtCustomers.length > 0 ? (
               <table className={styles.reportTable}>
                 <thead>
                   <tr>
-                    <th>Musteri</th>
-                    <th>Telefon</th>
-                    <th className={styles.alignRight}>Bakiye</th>
+                    <th>{t('reports:customers.customer')}</th>
+                    <th>{t('reports:customers.phone')}</th>
+                    <th className={styles.alignRight}>{t('reports:customers.balance')}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -501,7 +503,7 @@ export function ReportsPage() {
                 </tbody>
               </table>
             ) : (
-              <div className={styles.emptyState}>Borclu musteri bulunmuyor</div>
+              <div className={styles.emptyState}>{t('reports:customers.noDebtCustomers')}</div>
             )}
           </div>
         </div>
@@ -510,7 +512,7 @@ export function ReportsPage() {
         <div className={`${styles.reportCard} ${styles.fullWidthCard}`}>
           <div className={styles.reportCardHeader}>
             {icons.product}
-            <h3 className={styles.reportCardTitle}>Musteri Bazli Urun Alim Detayi</h3>
+            <h3 className={styles.reportCardTitle}>{t('reports:customers.productPurchases')}</h3>
           </div>
           <div className={styles.reportCardBody}>
             {Object.keys(groupedByCustomer).length > 0 ? (
@@ -519,15 +521,15 @@ export function ReportsPage() {
                   <h4 className={styles.customerProductGroupHeader}>
                     {customer.name}
                     <span className={styles.customerProductGroupCount}>
-                      ({customer.products.reduce((s, p) => s + p.total_quantity, 0)} adet toplam)
+                      ({customer.products.reduce((s, p) => s + p.total_quantity, 0)} {t('reports:customers.totalPieces')})
                     </span>
                   </h4>
                   <table className={styles.reportTable}>
                     <thead>
                       <tr>
-                        <th>Urun</th>
-                        <th className={styles.alignRight}>Adet</th>
-                        <th className={styles.alignRight}>Tutar</th>
+                        <th>{t('reports:sales.product')}</th>
+                        <th className={styles.alignRight}>{t('reports:sales.quantity')}</th>
+                        <th className={styles.alignRight}>{t('reports:general.amount')}</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -543,7 +545,7 @@ export function ReportsPage() {
                 </div>
               ))
             ) : (
-              <div className={styles.emptyState}>Musteri urun verisi bulunamadi</div>
+              <div className={styles.emptyState}>{t('reports:customers.noProductData')}</div>
             )}
           </div>
         </div>
@@ -557,34 +559,34 @@ export function ReportsPage() {
       <div className={`${styles.reportCard} ${styles.fullWidthCard}`}>
         <div className={styles.reportCardHeader}>
           {icons.product}
-          <h3 className={styles.reportCardTitle}>Stok Durumu Ozeti</h3>
+          <h3 className={styles.reportCardTitle}>{t('reports:stock.summary')}</h3>
         </div>
         <div className={styles.reportCardBody}>
           {stockReport?.summary && (
             <div className={styles.summaryGrid}>
               <div className={styles.summaryCard}>
                 <div className={styles.summaryValue}>{stockReport.summary.totalProducts}</div>
-                <div className={styles.summaryLabel}>Toplam Urun</div>
+                <div className={styles.summaryLabel}>{t('reports:stock.totalProducts')}</div>
               </div>
               <div className={styles.summaryCard}>
                 <div className={`${styles.summaryValue} ${styles.warning}`}>{stockReport.summary.lowStockCount}</div>
-                <div className={styles.summaryLabel}>Dusuk Stok</div>
+                <div className={styles.summaryLabel}>{t('reports:stock.lowStock')}</div>
               </div>
               <div className={styles.summaryCard}>
                 <div className={`${styles.summaryValue} ${styles.danger}`}>{stockReport.summary.outOfStockCount}</div>
-                <div className={styles.summaryLabel}>Stok Bitti</div>
+                <div className={styles.summaryLabel}>{t('reports:stock.outOfStock')}</div>
               </div>
               <div className={styles.summaryCard}>
                 <div className={styles.summaryValue}>{formatCurrency(stockReport.summary.totalStockValue)}</div>
-                <div className={styles.summaryLabel}>Stok Degeri (Maliyet)</div>
+                <div className={styles.summaryLabel}>{t('reports:stock.stockValueCost')}</div>
               </div>
               <div className={styles.summaryCard}>
                 <div className={styles.summaryValue}>{formatCurrency(stockReport.summary.totalSaleValue)}</div>
-                <div className={styles.summaryLabel}>Stok Degeri (Satis)</div>
+                <div className={styles.summaryLabel}>{t('reports:stock.stockValueSale')}</div>
               </div>
               <div className={styles.summaryCard}>
                 <div className={`${styles.summaryValue} ${styles.success}`}>{formatCurrency(stockReport.summary.potentialProfit)}</div>
-                <div className={styles.summaryLabel}>Potansiyel Kar</div>
+                <div className={styles.summaryLabel}>{t('reports:stock.potentialProfit')}</div>
               </div>
             </div>
           )}
@@ -595,18 +597,18 @@ export function ReportsPage() {
       <div className={`${styles.reportCard} ${styles.fullWidthCard}`}>
         <div className={styles.reportCardHeader}>
           {icons.alert}
-          <h3 className={styles.reportCardTitle}>Dusuk Stoklu Urunler</h3>
+          <h3 className={styles.reportCardTitle}>{t('reports:stock.lowStockProducts')}</h3>
         </div>
         <div className={styles.reportCardBody}>
           {stockReport?.products && stockReport.products.filter(p => p.stock_quantity <= p.min_stock_level).length > 0 ? (
             <table className={styles.reportTable}>
               <thead>
                 <tr>
-                  <th>Urun</th>
-                  <th>Barkod</th>
-                  <th className={styles.alignRight}>Mevcut</th>
-                  <th className={styles.alignRight}>Minimum</th>
-                  <th className={styles.alignRight}>Durum</th>
+                  <th>{t('reports:stock.product')}</th>
+                  <th>{t('reports:stock.barcode')}</th>
+                  <th className={styles.alignRight}>{t('reports:stock.current')}</th>
+                  <th className={styles.alignRight}>{t('reports:stock.minimum')}</th>
+                  <th className={styles.alignRight}>{t('reports:stock.status')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -621,7 +623,7 @@ export function ReportsPage() {
                       <td className={styles.alignRight}>{p.min_stock_level}</td>
                       <td className={styles.alignRight}>
                         <span className={`${styles.badge} ${p.stock_quantity === 0 ? styles.badgeDanger : styles.badgeWarning}`}>
-                          {p.stock_quantity === 0 ? 'Tukendi' : 'Dusuk'}
+                          {p.stock_quantity === 0 ? t('reports:stock.depleted') : t('reports:stock.low')}
                         </span>
                       </td>
                     </tr>
@@ -629,7 +631,7 @@ export function ReportsPage() {
               </tbody>
             </table>
           ) : (
-            <div className={styles.emptyState}>Dusuk stoklu urun bulunmuyor</div>
+            <div className={styles.emptyState}>{t('reports:stock.noLowStock')}</div>
           )}
         </div>
       </div>
@@ -660,21 +662,21 @@ export function ReportsPage() {
         <div className={`${styles.reportCard} ${styles.fullWidthCard}`}>
           <div className={styles.reportCardHeader}>
             {icons.customer}
-            <h3 className={styles.reportCardTitle}>Musteri Satislari Ozeti</h3>
+            <h3 className={styles.reportCardTitle}>{t('reports:customerSales.summary')}</h3>
           </div>
           <div className={styles.reportCardBody}>
             <div className={styles.summaryGrid}>
               <div className={styles.summaryCard}>
                 <div className={styles.summaryValue}>{totalCustomerCount}</div>
-                <div className={styles.summaryLabel}>Musteri</div>
+                <div className={styles.summaryLabel}>{t('reports:customerSales.customer')}</div>
               </div>
               <div className={styles.summaryCard}>
                 <div className={styles.summaryValue}>{totalSaleCount}</div>
-                <div className={styles.summaryLabel}>Toplam Satis</div>
+                <div className={styles.summaryLabel}>{t('reports:customerSales.totalSales')}</div>
               </div>
               <div className={styles.summaryCard}>
                 <div className={`${styles.summaryValue} ${styles.success}`}>{formatCurrency(totalAmount)}</div>
-                <div className={styles.summaryLabel}>Toplam Ciro</div>
+                <div className={styles.summaryLabel}>{t('reports:customerSales.totalRevenue')}</div>
               </div>
             </div>
           </div>
@@ -684,7 +686,7 @@ export function ReportsPage() {
         <div className={`${styles.reportCard} ${styles.fullWidthCard}`}>
           <div className={styles.reportCardHeader}>
             {icons.sales}
-            <h3 className={styles.reportCardTitle}>Musteri Bazli Satislar</h3>
+            <h3 className={styles.reportCardTitle}>{t('reports:customerSales.byCustomer')}</h3>
           </div>
           <div className={styles.reportCardBody}>
             {entries.length > 0 ? (
@@ -704,7 +706,7 @@ export function ReportsPage() {
                           {customer.phone && <span className={styles.accordionPhone}>{customer.phone}</span>}
                         </div>
                         <div className={styles.accordionMeta}>
-                          <span className={styles.accordionCount}>{customer.sales.length} satis</span>
+                          <span className={styles.accordionCount}>{customer.sales.length} {t('reports:customerSales.saleCount')}</span>
                           <strong className={styles.success}>{formatCurrency(custTotal)}</strong>
                           <span className={`${styles.accordionArrow} ${isExpanded ? styles.accordionArrowOpen : ''}`}>&#9660;</span>
                         </div>
@@ -728,10 +730,10 @@ export function ReportsPage() {
                                 <table className={styles.reportTable}>
                                   <thead>
                                     <tr>
-                                      <th>Urun</th>
-                                      <th className={styles.alignRight}>Adet</th>
-                                      <th className={styles.alignRight}>Birim Fiyat</th>
-                                      <th className={styles.alignRight}>Toplam</th>
+                                      <th>{t('reports:customerSales.product')}</th>
+                                      <th className={styles.alignRight}>{t('reports:customerSales.quantity')}</th>
+                                      <th className={styles.alignRight}>{t('reports:customerSales.unitPrice')}</th>
+                                      <th className={styles.alignRight}>{t('reports:customerSales.total')}</th>
                                     </tr>
                                   </thead>
                                   <tbody>
@@ -755,7 +757,7 @@ export function ReportsPage() {
                 })}
               </div>
             ) : (
-              <div className={styles.emptyState}>Musteri satisi bulunamadi</div>
+              <div className={styles.emptyState}>{t('reports:customerSales.noCustomerSales')}</div>
             )}
           </div>
         </div>
@@ -769,7 +771,7 @@ export function ReportsPage() {
       <div className={styles.reportCard}>
         <div className={styles.reportCardHeader}>
           {icons.expense}
-          <h3 className={styles.reportCardTitle}>Kategori Bazli Giderler</h3>
+          <h3 className={styles.reportCardTitle}>{t('reports:expenses.byCategory')}</h3>
         </div>
         <div className={styles.reportCardBody}>
           {expensesReport?.byCategory && expensesReport.byCategory.length > 0 ? (
@@ -777,19 +779,19 @@ export function ReportsPage() {
               <div className={styles.summaryGrid}>
                 <div className={styles.summaryCard}>
                   <div className={styles.summaryValue}>{expensesReport.summary.count}</div>
-                  <div className={styles.summaryLabel}>Toplam Kayit</div>
+                  <div className={styles.summaryLabel}>{t('reports:expenses.totalRecords')}</div>
                 </div>
                 <div className={styles.summaryCard}>
                   <div className={`${styles.summaryValue} ${styles.danger}`}>{formatCurrency(expensesReport.summary.total)}</div>
-                  <div className={styles.summaryLabel}>Toplam Gider</div>
+                  <div className={styles.summaryLabel}>{t('reports:expenses.totalExpenses')}</div>
                 </div>
               </div>
               <table className={styles.reportTable}>
                 <thead>
                   <tr>
-                    <th>Kategori</th>
-                    <th className={styles.alignRight}>Kayit</th>
-                    <th className={styles.alignRight}>Tutar</th>
+                    <th>{t('reports:expenses.category')}</th>
+                    <th className={styles.alignRight}>{t('reports:expenses.records')}</th>
+                    <th className={styles.alignRight}>{t('reports:expenses.amount')}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -804,7 +806,7 @@ export function ReportsPage() {
               </table>
             </>
           ) : (
-            <div className={styles.emptyState}>Gider verisi bulunamadi</div>
+            <div className={styles.emptyState}>{t('reports:expenses.noExpenseData')}</div>
           )}
         </div>
       </div>
@@ -813,15 +815,15 @@ export function ReportsPage() {
       <div className={styles.reportCard}>
         <div className={styles.reportCardHeader}>
           {icons.calendar}
-          <h3 className={styles.reportCardTitle}>Aylik Gider Trendi</h3>
+          <h3 className={styles.reportCardTitle}>{t('reports:expenses.monthlyTrend')}</h3>
         </div>
         <div className={styles.reportCardBody}>
           {expensesReport?.monthlyTrend && expensesReport.monthlyTrend.length > 0 ? (
             <table className={styles.reportTable}>
               <thead>
                 <tr>
-                  <th>Ay</th>
-                  <th className={styles.alignRight}>Tutar</th>
+                  <th>{t('reports:expenses.month')}</th>
+                  <th className={styles.alignRight}>{t('reports:expenses.amount')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -834,7 +836,7 @@ export function ReportsPage() {
               </tbody>
             </table>
           ) : (
-            <div className={styles.emptyState}>Veri bulunamadi</div>
+            <div className={styles.emptyState}>{t('reports:noData')}</div>
           )}
         </div>
       </div>
@@ -844,7 +846,7 @@ export function ReportsPage() {
   const isAdmin = user?.role === 'super_admin' || user?.role === 'tenant_admin';
 
   const renderPersonelTab = () => {
-    if (!employeePerformance) return <div className={styles.emptyState}>Veri bulunamadi</div>;
+    if (!employeePerformance) return <div className={styles.emptyState}>{t('reports:noData')}</div>;
 
     const { employees, summary } = employeePerformance;
     const topEmployee = employees.length > 0 ? employees[0] : null;
@@ -855,22 +857,22 @@ export function ReportsPage() {
         <div className={`${styles.reportCard} ${styles.fullWidthCard}`}>
           <div className={styles.reportCardHeader}>
             {icons.customer}
-            <h3 className={styles.reportCardTitle}>Personel Performans Ozeti</h3>
+            <h3 className={styles.reportCardTitle}>{t('reports:staff.performanceSummary')}</h3>
           </div>
           <div className={styles.reportCardBody}>
             <div className={styles.summaryGrid}>
               <div className={styles.summaryCard}>
                 <div className={styles.summaryValue}>{summary.totalSales}</div>
-                <div className={styles.summaryLabel}>Toplam Satis</div>
+                <div className={styles.summaryLabel}>{t('reports:staff.totalSales')}</div>
               </div>
               <div className={styles.summaryCard}>
                 <div className={`${styles.summaryValue} ${styles.success}`}>{formatCurrency(summary.totalRevenue)}</div>
-                <div className={styles.summaryLabel}>Toplam Ciro</div>
+                <div className={styles.summaryLabel}>{t('reports:staff.totalRevenue')}</div>
               </div>
               {isAdmin && topEmployee && (
                 <div className={styles.summaryCard}>
                   <div className={styles.summaryValue} style={{ fontSize: 'var(--font-size-base)' }}>{topEmployee.name}</div>
-                  <div className={styles.summaryLabel}>En Cok Satan Calisan</div>
+                  <div className={styles.summaryLabel}>{t('reports:staff.topEmployee')}</div>
                 </div>
               )}
             </div>
@@ -882,19 +884,19 @@ export function ReportsPage() {
           <div className={`${styles.reportCard} ${styles.fullWidthCard}`}>
             <div className={styles.reportCardHeader}>
               {icons.reports}
-              <h3 className={styles.reportCardTitle}>Calisan Siralamasi</h3>
+              <h3 className={styles.reportCardTitle}>{t('reports:staff.leaderboard')}</h3>
             </div>
             <div className={styles.reportCardBody}>
               <table className={styles.reportTable}>
                 <thead>
                   <tr>
-                    <th>Sira</th>
-                    <th>Calisan</th>
-                    <th className={styles.alignRight}>Satis</th>
-                    <th className={styles.alignRight}>Ciro</th>
-                    <th className={styles.alignRight}>Faturali</th>
-                    <th className={styles.alignRight}>Iptal</th>
-                    <th className={styles.alignRight}>Ort. Satis</th>
+                    <th>{t('reports:staff.rank')}</th>
+                    <th>{t('reports:staff.employee')}</th>
+                    <th className={styles.alignRight}>{t('reports:staff.sales')}</th>
+                    <th className={styles.alignRight}>{t('reports:staff.revenue')}</th>
+                    <th className={styles.alignRight}>{t('reports:staff.invoiced')}</th>
+                    <th className={styles.alignRight}>{t('reports:staff.cancelled')}</th>
+                    <th className={styles.alignRight}>{t('reports:staff.avgSale')}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -937,9 +939,9 @@ export function ReportsPage() {
         <div className={styles.headerLeft}>
           <h1 className={styles.title}>
             <span className={styles.titleIcon}>{icons.reports}</span>
-            Raporlar
+            {t('reports:title')}
           </h1>
-          <p className={styles.subtitle}>Finansal raporlar ve analizler</p>
+          <p className={styles.subtitle}>{t('reports:subtitle')}</p>
         </div>
         <div className={styles.filters}>
           <input
@@ -954,31 +956,31 @@ export function ReportsPage() {
             value={endDate}
             onChange={(e) => setEndDate(e.target.value)}
           />
-          <Button onClick={fetchReports}>Filtrele</Button>
+          <Button onClick={fetchReports}>{t('reports:filter')}</Button>
         </div>
       </div>
 
       <div className={styles.tabs}>
         <button className={`${styles.tab} ${activeTab === 'genel' ? styles.tabActive : ''}`} onClick={() => setActiveTab('genel')}>
-          Genel Ozet
+          {t('reports:tabs.general')}
         </button>
         <button className={`${styles.tab} ${activeTab === 'satis' ? styles.tabActive : ''}`} onClick={() => setActiveTab('satis')}>
-          Satis & Iade
+          {t('reports:tabs.sales')}
         </button>
         <button className={`${styles.tab} ${activeTab === 'musteri' ? styles.tabActive : ''}`} onClick={() => setActiveTab('musteri')}>
-          Musteriler
+          {t('reports:tabs.customers')}
         </button>
         <button className={`${styles.tab} ${activeTab === 'musteriSatis' ? styles.tabActive : ''}`} onClick={() => setActiveTab('musteriSatis')}>
-          Musteri Satislari
+          {t('reports:tabs.customerSales')}
         </button>
         <button className={`${styles.tab} ${activeTab === 'stok' ? styles.tabActive : ''}`} onClick={() => setActiveTab('stok')}>
-          Stok Durumu
+          {t('reports:tabs.stock')}
         </button>
         <button className={`${styles.tab} ${activeTab === 'gider' ? styles.tabActive : ''}`} onClick={() => setActiveTab('gider')}>
-          Giderler
+          {t('reports:tabs.expenses')}
         </button>
         <button className={`${styles.tab} ${activeTab === 'personel' ? styles.tabActive : ''}`} onClick={() => setActiveTab('personel')}>
-          Personel
+          {t('reports:tabs.staff')}
         </button>
       </div>
 

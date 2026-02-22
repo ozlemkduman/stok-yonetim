@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Button, Badge, Card } from '@stok/ui';
 import { integrationsApi, IntegrationDetail, IntegrationLog } from '../../api/integrations.api';
 import { formatDateTime } from '../../utils/formatters';
@@ -8,56 +9,8 @@ import styles from './IntegrationDetailPage.module.css';
 
 type TabType = 'logs' | 'config';
 
-const typeLabels: Record<string, string> = {
-  e_commerce: 'E-Ticaret',
-  bank: 'Banka',
-  payment: 'Odeme',
-  crm: 'CRM',
-  other: 'Diger',
-};
-
-const statusLabels: Record<string, string> = {
-  active: 'Aktif',
-  inactive: 'Pasif',
-  error: 'Hata',
-};
-
-const providerLabels: Record<string, string> = {
-  trendyol: 'Trendyol',
-  hepsiburada: 'Hepsiburada',
-  n11: 'N11',
-  amazon: 'Amazon',
-  gittigidiyor: 'GittiGidiyor',
-  akbank: 'Akbank',
-  isbank: 'Is Bankasi',
-  garanti: 'Garanti',
-  yapikredi: 'Yapi Kredi',
-  ziraat: 'Ziraat',
-  iyzico: 'iyzico',
-  paytr: 'PayTR',
-  payu: 'PayU',
-  stripe: 'Stripe',
-  salesforce: 'Salesforce',
-  hubspot: 'HubSpot',
-  zoho: 'Zoho',
-  custom: 'Ozel',
-};
-
-const logStatusLabels: Record<string, string> = {
-  started: 'Basladi',
-  success: 'Basarili',
-  failed: 'Basarisiz',
-};
-
-const logActionLabels: Record<string, string> = {
-  sync: 'Senkronizasyon',
-  push: 'Gonderim',
-  pull: 'Cekme',
-  webhook: 'Webhook',
-  error: 'Hata',
-};
-
 export function IntegrationDetailPage() {
+  const { t } = useTranslation(['integrations', 'common']);
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { showToast } = useToast();
@@ -77,7 +30,7 @@ export function IntegrationDetailPage() {
       const response = await integrationsApi.getIntegrationDetail(id);
       setData(response.data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Veri yuklenemedi');
+      setError(err instanceof Error ? err.message : t('integrations:toast.dataLoadError'));
     } finally {
       setLoading(false);
     }
@@ -93,10 +46,10 @@ export function IntegrationDetailPage() {
     setSyncing(true);
     try {
       const response = await integrationsApi.syncOrders(id);
-      showToast('success', `${response.data.syncedCount} siparis senkronize edildi`);
+      showToast('success', t('integrations:toast.ordersSynced', { count: response.data.syncedCount }));
       fetchData();
     } catch (err) {
-      showToast('error', 'Senkronizasyon basarisiz');
+      showToast('error', t('integrations:toast.syncFailed'));
     } finally {
       setSyncing(false);
     }
@@ -108,10 +61,10 @@ export function IntegrationDetailPage() {
     setTesting(true);
     try {
       const response = await integrationsApi.testConnection(id);
-      showToast('success', response.data?.message || (response.success ? 'Baglanti basarili' : 'Baglanti basarisiz'));
+      showToast('success', response.data?.message || (response.success ? t('integrations:toast.connectionSuccess') : t('integrations:toast.connectionFailed')));
       fetchData();
     } catch (err) {
-      showToast('error', 'Baglanti testi basarisiz');
+      showToast('error', t('integrations:toast.connectionTestFailed'));
     } finally {
       setTesting(false);
     }
@@ -126,7 +79,7 @@ export function IntegrationDetailPage() {
       await integrationsApi.updateIntegration(id, { status: newStatus });
       fetchData();
     } catch (err) {
-      showToast('error', 'Durum degistirilemedi');
+      showToast('error', t('integrations:toast.statusChangeFailed'));
     } finally {
       setToggling(false);
     }
@@ -135,7 +88,7 @@ export function IntegrationDetailPage() {
   if (loading) {
     return (
       <div className={styles.page}>
-        <div className={styles.loading}>Yukleniyor...</div>
+        <div className={styles.loading}>{t('integrations:detail.loading')}</div>
       </div>
     );
   }
@@ -143,8 +96,8 @@ export function IntegrationDetailPage() {
   if (error || !data) {
     return (
       <div className={styles.page}>
-        <div className={styles.error}>{error || 'Entegrasyon bulunamadi'}</div>
-        <Button onClick={() => navigate('/integrations')}>Geri Don</Button>
+        <div className={styles.error}>{error || t('integrations:detail.notFound')}</div>
+        <Button onClick={() => navigate('/integrations')}>{t('integrations:detail.goBack')}</Button>
       </div>
     );
   }
@@ -156,15 +109,15 @@ export function IntegrationDetailPage() {
       <div className={styles.header}>
         <div className={styles.headerLeft}>
           <Button variant="ghost" onClick={() => navigate('/integrations')}>
-            &larr; Entegrasyonlar
+            &larr; {t('integrations:detail.backToList')}
           </Button>
           <h1 className={styles.title}>{integration.name}</h1>
           <div className={styles.integrationMeta}>
             <span className={styles.metaItem}>
-              {typeLabels[integration.type] || integration.type}
+              {t(`integrations:types.${integration.type}`, { defaultValue: integration.type })}
             </span>
             <span className={styles.metaItem}>
-              {providerLabels[integration.provider] || integration.provider}
+              {t(`integrations:providers.${integration.provider}`, { defaultValue: integration.provider })}
             </span>
             <Badge
               variant={
@@ -175,7 +128,7 @@ export function IntegrationDetailPage() {
                   : 'default'
               }
             >
-              {statusLabels[integration.status]}
+              {t(`integrations:statuses.${integration.status}`)}
             </Badge>
           </div>
         </div>
@@ -186,7 +139,7 @@ export function IntegrationDetailPage() {
               onClick={handleTestConnection}
               disabled={testing}
             >
-              {testing ? 'Test Ediliyor...' : 'Baglanti Testi'}
+              {testing ? t('integrations:detail.testingConnection') : t('integrations:detail.testConnection')}
             </Button>
             {integration.type === 'e_commerce' && integration.status === 'active' && (
               <Button
@@ -194,7 +147,7 @@ export function IntegrationDetailPage() {
                 onClick={handleSyncNow}
                 disabled={syncing}
               >
-                {syncing ? 'Senkronize Ediliyor...' : 'Simdi Senkronize Et'}
+                {syncing ? t('integrations:detail.syncing') : t('integrations:detail.syncNow')}
               </Button>
             )}
             <Button
@@ -203,10 +156,10 @@ export function IntegrationDetailPage() {
               disabled={toggling}
             >
               {toggling
-                ? 'Degistiriliyor...'
+                ? t('integrations:detail.toggling')
                 : integration.status === 'active'
-                ? 'Devre Disi Birak'
-                : 'Etkinlestir'}
+                ? t('integrations:detail.deactivate')
+                : t('integrations:detail.activate')}
             </Button>
           </div>
         </div>
@@ -214,46 +167,46 @@ export function IntegrationDetailPage() {
 
       {integration.last_error && (
         <div className={styles.errorBanner}>
-          <strong>Son Hata:</strong> {integration.last_error}
+          <strong>{t('integrations:detail.lastError')}</strong> {integration.last_error}
         </div>
       )}
 
       {/* Info Grid */}
       <div className={styles.infoGrid}>
         <Card className={styles.infoCard}>
-          <h3>Entegrasyon Bilgileri</h3>
+          <h3>{t('integrations:detail.integrationInfo')}</h3>
           <div className={styles.infoList}>
             <div className={styles.infoItem}>
-              <span className={styles.infoLabel}>Ad</span>
+              <span className={styles.infoLabel}>{t('integrations:detail.name')}</span>
               <span className={styles.infoValue}>{integration.name}</span>
             </div>
             <div className={styles.infoItem}>
-              <span className={styles.infoLabel}>Tip</span>
+              <span className={styles.infoLabel}>{t('integrations:detail.type')}</span>
               <span className={styles.infoValue}>
-                {typeLabels[integration.type] || integration.type}
+                {t(`integrations:types.${integration.type}`, { defaultValue: integration.type })}
               </span>
             </div>
             <div className={styles.infoItem}>
-              <span className={styles.infoLabel}>Saglayici</span>
+              <span className={styles.infoLabel}>{t('integrations:detail.provider')}</span>
               <span className={styles.infoValue}>
-                {providerLabels[integration.provider] || integration.provider}
+                {t(`integrations:providers.${integration.provider}`, { defaultValue: integration.provider })}
               </span>
             </div>
             <div className={styles.infoItem}>
-              <span className={styles.infoLabel}>Durum</span>
+              <span className={styles.infoLabel}>{t('integrations:detail.status')}</span>
               <span className={styles.infoValue}>
-                {statusLabels[integration.status]}
+                {t(`integrations:statuses.${integration.status}`)}
               </span>
             </div>
             <div className={styles.infoItem}>
-              <span className={styles.infoLabel}>Olusturulma</span>
+              <span className={styles.infoLabel}>{t('integrations:detail.createdAt')}</span>
               <span className={styles.infoValue}>
                 {formatDateTime(integration.created_at)}
               </span>
             </div>
             {integration.last_sync_at && (
               <div className={styles.infoItem}>
-                <span className={styles.infoLabel}>Son Senkronizasyon</span>
+                <span className={styles.infoLabel}>{t('integrations:detail.lastSync')}</span>
                 <span className={styles.infoValue}>
                   {formatDateTime(integration.last_sync_at)}
                 </span>
@@ -263,42 +216,42 @@ export function IntegrationDetailPage() {
         </Card>
 
         <Card className={styles.statsCard}>
-          <h3>Istatistikler</h3>
+          <h3>{t('integrations:detail.statistics')}</h3>
           <div className={styles.statsGrid}>
             <div className={styles.statItem}>
               <span className={styles.statValue}>{stats.totalSynced}</span>
-              <span className={styles.statLabel}>Basarili Senk.</span>
+              <span className={styles.statLabel}>{t('integrations:detail.successfulSyncs')}</span>
             </div>
             <div className={styles.statItem}>
               <span className={`${styles.statValue} ${stats.totalErrors > 0 ? styles.errorValue : ''}`}>
                 {stats.totalErrors}
               </span>
-              <span className={styles.statLabel}>Hata</span>
+              <span className={styles.statLabel}>{t('integrations:detail.errors')}</span>
             </div>
             {integration.type === 'e_commerce' && (
               <>
                 <div className={styles.statItem}>
                   <span className={styles.statValue}>{stats.syncedOrders}</span>
-                  <span className={styles.statLabel}>Senk. Siparis</span>
+                  <span className={styles.statLabel}>{t('integrations:detail.syncedOrders')}</span>
                 </div>
                 <div className={styles.statItem}>
                   <span className={`${styles.statValue} ${stats.pendingOrders > 0 ? styles.warningValue : ''}`}>
                     {stats.pendingOrders}
                   </span>
-                  <span className={styles.statLabel}>Bekleyen</span>
+                  <span className={styles.statLabel}>{t('integrations:detail.pending')}</span>
                 </div>
                 <div className={styles.statItem}>
                   <span className={`${styles.statValue} ${stats.errorOrders > 0 ? styles.errorValue : ''}`}>
                     {stats.errorOrders}
                   </span>
-                  <span className={styles.statLabel}>Hatali</span>
+                  <span className={styles.statLabel}>{t('integrations:detail.withErrors')}</span>
                 </div>
               </>
             )}
           </div>
           {stats.lastSyncAt && (
             <div className={styles.lastSync}>
-              Son basarili senk: {formatDateTime(stats.lastSyncAt)}
+              {t('integrations:detail.lastSuccessfulSync', { date: formatDateTime(stats.lastSyncAt) })}
             </div>
           )}
         </Card>
@@ -311,28 +264,28 @@ export function IntegrationDetailPage() {
             className={`${styles.tab} ${activeTab === 'logs' ? styles.tabActive : ''}`}
             onClick={() => setActiveTab('logs')}
           >
-            Senkronizasyon Gecmisi ({logs.length})
+            {t('integrations:detail.syncHistory')} ({logs.length})
           </button>
           <button
             className={`${styles.tab} ${activeTab === 'config' ? styles.tabActive : ''}`}
             onClick={() => setActiveTab('config')}
           >
-            Yapilandirma
+            {t('integrations:detail.configuration')}
           </button>
         </div>
 
         <div className={styles.tabContent}>
-          {activeTab === 'logs' && <LogsTab logs={logs} />}
-          {activeTab === 'config' && <ConfigTab config={integration.config} />}
+          {activeTab === 'logs' && <LogsTab logs={logs} t={t} />}
+          {activeTab === 'config' && <ConfigTab config={integration.config} t={t} />}
         </div>
       </div>
     </div>
   );
 }
 
-function LogsTab({ logs }: { logs: IntegrationLog[] }) {
+function LogsTab({ logs, t }: { logs: IntegrationLog[]; t: (key: string, options?: Record<string, unknown>) => string }) {
   if (logs.length === 0) {
-    return <div className={styles.emptyState}>Henuz log kaydi yok</div>;
+    return <div className={styles.emptyState}>{t('integrations:detail.noLogs')}</div>;
   }
 
   return (
@@ -340,17 +293,17 @@ function LogsTab({ logs }: { logs: IntegrationLog[] }) {
       <table className={styles.logsTable}>
         <thead>
           <tr>
-            <th>Tarih</th>
-            <th>Islem</th>
-            <th>Durum</th>
-            <th>Mesaj</th>
+            <th>{t('integrations:logColumns.date')}</th>
+            <th>{t('integrations:logColumns.action')}</th>
+            <th>{t('integrations:logColumns.status')}</th>
+            <th>{t('integrations:logColumns.message')}</th>
           </tr>
         </thead>
         <tbody>
           {logs.map((log) => (
             <tr key={log.id}>
               <td>{formatDateTime(log.created_at)}</td>
-              <td>{logActionLabels[log.action] || log.action}</td>
+              <td>{t(`integrations:logActions.${log.action}`, { defaultValue: log.action })}</td>
               <td>
                 <span
                   className={`${styles.logStatus} ${
@@ -361,7 +314,7 @@ function LogsTab({ logs }: { logs: IntegrationLog[] }) {
                       : styles.logStatusStarted
                   }`}
                 >
-                  {logStatusLabels[log.status] || log.status}
+                  {t(`integrations:logStatuses.${log.status}`, { defaultValue: log.status })}
                 </span>
               </td>
               <td>{log.message || '-'}</td>
@@ -373,11 +326,11 @@ function LogsTab({ logs }: { logs: IntegrationLog[] }) {
   );
 }
 
-function ConfigTab({ config }: { config: Record<string, unknown> }) {
+function ConfigTab({ config, t }: { config: Record<string, unknown>; t: (key: string, options?: Record<string, unknown>) => string }) {
   const configEntries = Object.entries(config);
 
   if (configEntries.length === 0) {
-    return <div className={styles.emptyState}>Yapilandirma bilgisi yok</div>;
+    return <div className={styles.emptyState}>{t('integrations:detail.noConfig')}</div>;
   }
 
   return (

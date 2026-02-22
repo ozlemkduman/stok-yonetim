@@ -1,6 +1,9 @@
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 export function NotFoundPage() {
+  const { t } = useTranslation(['admin', 'common']);
+
   return (
     <div style={{
       display: 'flex',
@@ -10,9 +13,9 @@ export function NotFoundPage() {
       minHeight: '50vh',
       textAlign: 'center',
     }}>
-      <h1 style={{ fontSize: '4rem', marginBottom: 'var(--space-4)' }}>404</h1>
+      <h1 style={{ fontSize: '4rem', marginBottom: 'var(--space-4)' }}>{t('admin:notFound.title')}</h1>
       <p style={{ fontSize: 'var(--font-size-lg)', color: 'var(--color-text-secondary)', marginBottom: 'var(--space-6)' }}>
-        Sayfa bulunamadi
+        {t('admin:notFound.message')}
       </p>
       <Link
         to="/dashboard"
@@ -24,7 +27,7 @@ export function NotFoundPage() {
           textDecoration: 'none',
         }}
       >
-        Ana Sayfaya Don
+        {t('admin:notFound.goHome')}
       </Link>
     </div>
   );

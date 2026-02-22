@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Button, Badge, Select, Input } from '@stok/ui';
 import { invoiceImportApi, ParsePreviewResponse, ConfirmImportData } from '../../api/invoice-import.api';
 import { Warehouse, warehousesApi } from '../../api/warehouses.api';
@@ -7,22 +8,11 @@ import { useToast } from '../../context/ToastContext';
 import { formatCurrency, formatDate } from '../../utils/formatters';
 import styles from './InvoiceImportPage.module.css';
 
-const PAYMENT_OPTIONS = [
-  { value: 'nakit', label: 'Nakit' },
-  { value: 'kredi_karti', label: 'Kredi Kartı' },
-  { value: 'havale', label: 'Havale' },
-  { value: 'veresiye', label: 'Veresiye' },
-];
-
-const SALE_TYPE_OPTIONS = [
-  { value: 'retail', label: 'Perakende' },
-  { value: 'wholesale', label: 'Toptan' },
-];
-
 type Step = 'upload' | 'preview' | 'importing';
 
 export function InvoiceImportPage() {
   const navigate = useNavigate();
+  const { t } = useTranslation(['sales', 'common']);
   const { showToast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -38,6 +28,18 @@ export function InvoiceImportPage() {
   const [saleType, setSaleType] = useState('retail');
   const [dueDate, setDueDate] = useState('');
   const [notes, setNotes] = useState('');
+
+  const PAYMENT_OPTIONS = [
+    { value: 'nakit', label: t('sales:import.paymentOptions.nakit') },
+    { value: 'kredi_karti', label: t('sales:import.paymentOptions.kredi_karti') },
+    { value: 'havale', label: t('sales:import.paymentOptions.havale') },
+    { value: 'veresiye', label: t('sales:import.paymentOptions.veresiye') },
+  ];
+
+  const SALE_TYPE_OPTIONS = [
+    { value: 'retail', label: t('sales:import.saleTypeOptions.retail') },
+    { value: 'wholesale', label: t('sales:import.saleTypeOptions.wholesale') },
+  ];
 
   useEffect(() => {
     warehousesApi.getAll({ isActive: true }).then((res) => {
@@ -66,7 +68,7 @@ export function InvoiceImportPage() {
       setPurchasePrices(prices);
       setStep('preview');
     } catch (err) {
-      showToast('error', err instanceof Error ? err.message : 'XML parse hatası');
+      showToast('error', err instanceof Error ? err.message : t('sales:toast.xmlParseError'));
     }
     setParsing(false);
   };
@@ -78,15 +80,15 @@ export function InvoiceImportPage() {
   const handleConfirm = async () => {
     if (!preview) return;
     if (!warehouseId) {
-      showToast('error', 'Lütfen bir depo seçin');
+      showToast('error', t('sales:toast.selectWarehouse'));
       return;
     }
     if (paymentMethod === 'veresiye' && preview.customer.isNew && !preview.customer.parsed.name) {
-      showToast('error', 'Veresiye satış için müşteri bilgisi gerekli');
+      showToast('error', t('sales:toast.creditCustomerRequired'));
       return;
     }
     if (stockWarnings.length > 0) {
-      showToast('error', 'Stok yetersiz olan ürünler var. Lütfen kontrol edin.');
+      showToast('error', t('sales:toast.stockInsufficient'));
       return;
     }
     setImporting(true);
@@ -109,10 +111,10 @@ export function InvoiceImportPage() {
         notes: notes || undefined,
       };
       const response = await invoiceImportApi.confirm(data);
-      showToast('success', 'Fatura başarıyla içeri aktarıldı');
+      showToast('success', t('sales:toast.importSuccess'));
       navigate(`/sales/${response.data.saleId}`);
     } catch (err) {
-      showToast('error', err instanceof Error ? err.message : 'İçeri aktarma hatası');
+      showToast('error', err instanceof Error ? err.message : t('sales:toast.importError'));
       setStep('preview');
     }
     setImporting(false);
@@ -128,8 +130,8 @@ export function InvoiceImportPage() {
             </svg>
           </button>
           <div>
-            <h1 className={styles.title}>E-Fatura Yükle</h1>
-            <p className={styles.subtitle}>UBL-TR XML dosyasından satış kaydı oluşturun</p>
+            <h1 className={styles.title}>{t('sales:import.title')}</h1>
+            <p className={styles.subtitle}>{t('sales:import.subtitle')}</p>
           </div>
         </div>
       </div>
@@ -145,9 +147,9 @@ export function InvoiceImportPage() {
                 <polyline points="9 15 12 12 15 15" />
               </svg>
             </div>
-            <h2 className={styles.uploadTitle}>XML Dosyası Seçin</h2>
+            <h2 className={styles.uploadTitle}>{t('sales:import.selectFile')}</h2>
             <p className={styles.uploadDesc}>
-              BiFatura veya diğer e-fatura portallarından indirdiğiniz UBL-TR formatındaki XML dosyasını yükleyin.
+              {t('sales:import.fileDesc')}
             </p>
             <input
               ref={fileInputRef}
@@ -161,13 +163,13 @@ export function InvoiceImportPage() {
                 variant="secondary"
                 onClick={() => fileInputRef.current?.click()}
               >
-                Dosya Seç
+                {t('sales:import.chooseFile')}
               </Button>
               {file && <span className={styles.fileName}>{file.name}</span>}
             </div>
             {file && (
               <Button onClick={handleParse} disabled={parsing}>
-                {parsing ? 'Analiz ediliyor...' : 'Analiz Et'}
+                {parsing ? t('sales:import.analyzing') : t('sales:import.analyze')}
               </Button>
             )}
           </div>
@@ -178,24 +180,24 @@ export function InvoiceImportPage() {
         <div className={styles.previewSection}>
           {/* Invoice Info */}
           <div className={styles.card}>
-            <h3 className={styles.cardTitle}>Fatura Bilgileri</h3>
+            <h3 className={styles.cardTitle}>{t('sales:import.invoiceInfo')}</h3>
             <div className={styles.infoGrid}>
               <div className={styles.infoItem}>
-                <span className={styles.infoLabel}>Fatura No</span>
+                <span className={styles.infoLabel}>{t('sales:import.invoiceNo')}</span>
                 <span className={styles.infoValue}>{preview.invoice.id}</span>
               </div>
               <div className={styles.infoItem}>
-                <span className={styles.infoLabel}>Tarih</span>
+                <span className={styles.infoLabel}>{t('sales:import.date')}</span>
                 <span className={styles.infoValue}>
                   {preview.invoice.issueDate ? formatDate(preview.invoice.issueDate) : '-'}
                 </span>
               </div>
               <div className={styles.infoItem}>
-                <span className={styles.infoLabel}>Tip</span>
+                <span className={styles.infoLabel}>{t('sales:import.type')}</span>
                 <span className={styles.infoValue}>{preview.invoice.invoiceTypeCode}</span>
               </div>
               <div className={styles.infoItem}>
-                <span className={styles.infoLabel}>Para Birimi</span>
+                <span className={styles.infoLabel}>{t('sales:import.currency')}</span>
                 <span className={styles.infoValue}>{preview.invoice.currencyCode}</span>
               </div>
             </div>
@@ -204,14 +206,14 @@ export function InvoiceImportPage() {
           {/* Customer Info */}
           <div className={styles.card}>
             <div className={styles.cardHeader}>
-              <h3 className={styles.cardTitle}>Müşteri</h3>
+              <h3 className={styles.cardTitle}>{t('sales:import.customer')}</h3>
               <Badge variant={preview.customer.isNew ? 'warning' : 'success'}>
-                {preview.customer.isNew ? 'Yeni Oluşturulacak' : 'Mevcut'}
+                {preview.customer.isNew ? t('sales:import.customerNew') : t('sales:import.customerExisting')}
               </Badge>
             </div>
             <div className={styles.infoGrid}>
               <div className={styles.infoItem}>
-                <span className={styles.infoLabel}>Ad</span>
+                <span className={styles.infoLabel}>{t('sales:import.name')}</span>
                 <span className={styles.infoValue}>
                   {preview.customer.isNew
                     ? preview.customer.parsed.name
@@ -220,19 +222,19 @@ export function InvoiceImportPage() {
               </div>
               {preview.customer.parsed.taxNumber && (
                 <div className={styles.infoItem}>
-                  <span className={styles.infoLabel}>VKN/TCKN</span>
+                  <span className={styles.infoLabel}>{t('sales:import.taxId')}</span>
                   <span className={styles.infoValue}>{preview.customer.parsed.taxNumber}</span>
                 </div>
               )}
               {preview.customer.parsed.taxOffice && (
                 <div className={styles.infoItem}>
-                  <span className={styles.infoLabel}>Vergi Dairesi</span>
+                  <span className={styles.infoLabel}>{t('sales:import.taxOffice')}</span>
                   <span className={styles.infoValue}>{preview.customer.parsed.taxOffice}</span>
                 </div>
               )}
               {preview.customer.parsed.address && (
                 <div className={styles.infoItem}>
-                  <span className={styles.infoLabel}>Adres</span>
+                  <span className={styles.infoLabel}>{t('sales:import.address')}</span>
                   <span className={styles.infoValue}>{preview.customer.parsed.address}</span>
                 </div>
               )}
@@ -242,30 +244,30 @@ export function InvoiceImportPage() {
           {/* Items */}
           <div className={styles.card}>
             <div className={styles.cardHeader}>
-              <h3 className={styles.cardTitle}>Ürünler ({preview.items.length})</h3>
+              <h3 className={styles.cardTitle}>{t('sales:import.productsCount', { count: preview.items.length })}</h3>
               {stockWarnings.length > 0 && (
-                <Badge variant="danger">{stockWarnings.length} üründe stok yetersiz</Badge>
+                <Badge variant="danger">{t('sales:import.stockInsufficient', { count: stockWarnings.length })}</Badge>
               )}
             </div>
             {stockWarnings.length > 0 && (
               <div className={styles.stockWarning}>
-                Stok yetersiz olan ürünler kırmızı ile işaretlenmiştir. Bu ürünlerin stoğu yeterli olmadan satış oluşturulamaz.
+                {t('sales:import.stockWarningMessage')}
               </div>
             )}
             <div className={styles.tableWrapper}>
               <table className={styles.table}>
                 <thead>
                   <tr>
-                    <th>Durum</th>
-                    <th>Ürün Adı</th>
-                    <th className={styles.alignRight}>Stok</th>
-                    <th className={styles.alignRight}>Miktar</th>
-                    <th className={styles.alignRight}>Birim Fiyat</th>
-                    <th className={styles.alignRight}>KDV %</th>
-                    <th className={styles.alignRight}>KDV Tutarı</th>
-                    <th className={styles.alignRight}>Toplam</th>
+                    <th>{t('sales:import.itemColumns.status')}</th>
+                    <th>{t('sales:import.itemColumns.productName')}</th>
+                    <th className={styles.alignRight}>{t('sales:import.itemColumns.stock')}</th>
+                    <th className={styles.alignRight}>{t('sales:import.itemColumns.quantity')}</th>
+                    <th className={styles.alignRight}>{t('sales:import.itemColumns.unitPrice')}</th>
+                    <th className={styles.alignRight}>{t('sales:import.itemColumns.vatRate')}</th>
+                    <th className={styles.alignRight}>{t('sales:import.itemColumns.vatAmount')}</th>
+                    <th className={styles.alignRight}>{t('sales:import.itemColumns.total')}</th>
                     {preview.items.some(i => i.isNew) && (
-                      <th className={styles.alignRight}>Alış Fiyatı</th>
+                      <th className={styles.alignRight}>{t('sales:import.itemColumns.purchasePrice')}</th>
                     )}
                   </tr>
                 </thead>
@@ -276,13 +278,13 @@ export function InvoiceImportPage() {
                       <tr key={idx} className={isLowStock ? styles.lowStockRow : ''}>
                         <td>
                           <Badge variant={item.isNew ? 'warning' : 'success'}>
-                            {item.isNew ? 'Yeni' : 'Mevcut'}
+                            {item.isNew ? t('sales:import.itemNew') : t('sales:import.itemExisting')}
                           </Badge>
                         </td>
                         <td>
                           {item.parsed.name}
                           {!item.isNew && item.matchedName && item.matchedName !== item.parsed.name && (
-                            <span className={styles.matchedName}> → {item.matchedName}</span>
+                            <span className={styles.matchedName}> &rarr; {item.matchedName}</span>
                           )}
                         </td>
                         <td className={styles.alignRight}>
@@ -330,18 +332,18 @@ export function InvoiceImportPage() {
 
           {/* Totals */}
           <div className={styles.card}>
-            <h3 className={styles.cardTitle}>Toplam</h3>
+            <h3 className={styles.cardTitle}>{t('sales:import.totals')}</h3>
             <div className={styles.totalsGrid}>
               <div className={styles.totalRow}>
-                <span>Ara Toplam</span>
+                <span>{t('sales:import.subtotal')}</span>
                 <span>{formatCurrency(preview.totals.lineExtensionAmount)}</span>
               </div>
               <div className={styles.totalRow}>
-                <span>KDV Toplam</span>
+                <span>{t('sales:import.vatTotal')}</span>
                 <span>{formatCurrency(preview.totals.taxTotal)}</span>
               </div>
               <div className={`${styles.totalRow} ${styles.grandTotal}`}>
-                <span>Genel Toplam</span>
+                <span>{t('sales:import.grandTotal')}</span>
                 <span>{formatCurrency(preview.totals.payableAmount)}</span>
               </div>
             </div>
@@ -349,13 +351,13 @@ export function InvoiceImportPage() {
 
           {/* Settings */}
           <div className={styles.card}>
-            <h3 className={styles.cardTitle}>Satış Ayarları</h3>
+            <h3 className={styles.cardTitle}>{t('sales:import.saleSettings')}</h3>
             <div className={styles.settingsGrid}>
               <div className={styles.settingsField}>
-                <label className={styles.infoLabel}>Depo *</label>
+                <label className={styles.infoLabel}>{t('sales:import.warehouseLabel')}</label>
                 <Select
                   options={[
-                    { value: '', label: 'Depo seçin...' },
+                    { value: '', label: t('sales:import.selectWarehouse') },
                     ...warehouses.map(w => ({ value: w.id, label: w.name })),
                   ]}
                   value={warehouseId}
@@ -363,7 +365,7 @@ export function InvoiceImportPage() {
                 />
               </div>
               <div className={styles.settingsField}>
-                <label className={styles.infoLabel}>Ödeme Yöntemi</label>
+                <label className={styles.infoLabel}>{t('sales:import.paymentMethodLabel')}</label>
                 <Select
                   options={PAYMENT_OPTIONS}
                   value={paymentMethod}
@@ -371,7 +373,7 @@ export function InvoiceImportPage() {
                 />
               </div>
               <div className={styles.settingsField}>
-                <label className={styles.infoLabel}>Satış Tipi</label>
+                <label className={styles.infoLabel}>{t('sales:import.saleTypeLabel')}</label>
                 <Select
                   options={SALE_TYPE_OPTIONS}
                   value={saleType}
@@ -380,7 +382,7 @@ export function InvoiceImportPage() {
               </div>
               {paymentMethod === 'veresiye' && (
                 <div className={styles.settingsField}>
-                  <label className={styles.infoLabel}>Vade Tarihi</label>
+                  <label className={styles.infoLabel}>{t('sales:import.dueDateLabel')}</label>
                   <Input
                     type="date"
                     value={dueDate}
@@ -390,13 +392,13 @@ export function InvoiceImportPage() {
               )}
             </div>
             <div className={styles.settingsField} style={{ marginTop: 'var(--space-3)' }}>
-              <label className={styles.infoLabel}>Not</label>
+              <label className={styles.infoLabel}>{t('sales:import.noteLabel')}</label>
               <textarea
                 className={styles.notesInput}
                 rows={2}
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
-                placeholder="Satış ile ilgili not ekleyin..."
+                placeholder={t('sales:import.notePlaceholder')}
               />
             </div>
           </div>
@@ -404,10 +406,10 @@ export function InvoiceImportPage() {
           {/* Actions */}
           <div className={styles.actions}>
             <Button variant="secondary" onClick={() => { setStep('upload'); setPreview(null); setFile(null); }}>
-              Geri
+              {t('sales:import.back')}
             </Button>
             <Button onClick={handleConfirm} disabled={importing || !warehouseId || stockWarnings.length > 0}>
-              {importing ? 'İçeri aktarılıyor...' : 'İçeri Aktar'}
+              {importing ? t('sales:import.importing') : t('sales:import.importButton')}
             </Button>
           </div>
         </div>
@@ -417,9 +419,9 @@ export function InvoiceImportPage() {
         <div className={styles.uploadSection}>
           <div className={styles.uploadCard}>
             <div className={styles.spinner} />
-            <h2 className={styles.uploadTitle}>İçeri aktarılıyor...</h2>
+            <h2 className={styles.uploadTitle}>{t('sales:import.importingTitle')}</h2>
             <p className={styles.uploadDesc}>
-              Müşteri, ürünler ve satış kaydı oluşturuluyor.
+              {t('sales:import.importingDesc')}
             </p>
           </div>
         </div>

@@ -1,0 +1,176 @@
+{
+  "pageTitle": "Saha Ekip - Rotalar",
+  "newRoute": "Yeni Rota",
+  "columns": {
+    "routeName": "Rota Adi",
+    "date": "Tarih",
+    "status": "Durum",
+    "visits": "Ziyaret",
+    "estimatedDuration": "Tahmini Sure",
+    "actions": "Islemler"
+  },
+  "buttons": {
+    "detail": "Detay",
+    "start": "Baslat",
+    "complete": "Tamamla",
+    "edit": "Duzenle",
+    "delete": "Sil",
+    "back": "Geri Don",
+    "backToRoutes": "← Rotalar",
+    "startRoute": "Rotayi Baslat",
+    "completeRoute": "Rotayi Tamamla",
+    "cancel": "Iptal",
+    "save": "Kaydet",
+    "saving": "Kaydediliyor...",
+    "createRoute": "Rota Olustur",
+    "addVisit": "+ Ziyaret Ekle",
+    "checkIn": "Giris Yap",
+    "checkOut": "Cikis Yap",
+    "skip": "Atla",
+    "checkInAction": "Check-in Yap",
+    "checkOutAction": "Check-out Yap",
+    "close": "Kapat"
+  },
+  "status": {
+    "planned": "Planli",
+    "in_progress": "Devam Ediyor",
+    "completed": "Tamamlandi",
+    "cancelled": "Iptal"
+  },
+  "visitStatus": {
+    "pending": "Beklemede",
+    "in_progress": "Devam Ediyor",
+    "completed": "Tamamlandi",
+    "skipped": "Atlandi",
+    "rescheduled": "Ertelendi"
+  },
+  "visitStatusForm": {
+    "pending": "Bekliyor",
+    "in_progress": "Devam Ediyor",
+    "completed": "Tamamlandi",
+    "skipped": "Atlandi",
+    "rescheduled": "Ertelendi"
+  },
+  "visitType": {
+    "sales": "Satis",
+    "support": "Destek",
+    "collection": "Tahsilat",
+    "delivery": "Teslimat",
+    "meeting": "Toplanti",
+    "other": "Diger"
+  },
+  "filter": {
+    "allStatuses": "Tum Durumlar"
+  },
+  "pagination": {
+    "previous": "Onceki",
+    "next": "Sonraki",
+    "pageOf": "Sayfa {{page}} / {{totalPages}}"
+  },
+  "empty": "Rota bulunamadi",
+  "durationFormat": "{{hours}}s {{minutes}}dk",
+  "durationMinutes": "{{minutes}} dk",
+  "toast": {
+    "loadError": "Rotalar yuklenemedi",
+    "deleteError": "Rota silinemedi",
+    "startError": "Rota baslatilamadi",
+    "completeError": "Rota tamamlanamadi",
+    "saveError": "Rota kaydedilemedi",
+    "createSuccess": "Rota olusturuldu",
+    "createError": "Rota olusturulamadi",
+    "dataLoadError": "Veriler yuklenirken hata olustu",
+    "routeNameRequired": "Rota adi gerekli",
+    "addVisitRequired": "En az bir ziyaret ekleyin",
+    "checkInError": "Giris yapilirken hata olustu",
+    "checkOutError": "Cikis yapilirken hata olustu",
+    "skipError": "Ziyaret atlanamadi",
+    "visitUpdateSuccess": "Ziyaret guncellendi",
+    "visitUpdateError": "Guncelleme basarisiz",
+    "checkInSuccess": "Check-in yapildi",
+    "checkInNoLocation": "Check-in yapildi (konum alinamadi)",
+    "checkInFailed": "Check-in basarisiz",
+    "checkOutSuccess": "Check-out yapildi",
+    "checkOutFailed": "Check-out basarisiz",
+    "visitSkipped": "Ziyaret atlandi",
+    "operationFailed": "Islem basarisiz"
+  },
+  "confirm": {
+    "delete": "Bu rotayi silmek istediginize emin misiniz?",
+    "skipVisit": "Bu ziyareti atlamak istediginize emin misiniz?"
+  },
+  "detail": {
+    "loading": "Yukleniyor...",
+    "notFound": "Rota bulunamadi",
+    "routeInfo": "Rota Bilgileri",
+    "statistics": "Istatistikler",
+    "assignedTo": "Atanan: {{name}}",
+    "labels": {
+      "date": "Tarih",
+      "assignedUser": "Atanan Kullanici",
+      "estimatedDuration": "Tahmini Sure",
+      "actualDuration": "Gercek Sure",
+      "notes": "Notlar",
+      "address": "Adres",
+      "checkInTime": "Giris Saati",
+      "checkOutTime": "Cikis Saati",
+      "duration": "Sure",
+      "outcome": "Sonuc",
+      "scheduled": "Planlanan: {{time}}"
+    },
+    "stats": {
+      "totalVisits": "Toplam Ziyaret",
+      "completed": "Tamamlanan",
+      "pending": "Bekleyen",
+      "completionPercent": "{{percent}}% Tamamlandi"
+    },
+    "visitsSection": "Ziyaretler ({{count}})",
+    "noVisits": "Bu rotaya henuz ziyaret eklenmemis",
+    "unnamedVisit": "Isimsiz Ziyaret"
+  },
+  "planner": {
+    "title": "Yeni Rota Planla",
+    "routeInfo": "Rota Bilgileri",
+    "routeNameLabel": "Rota Adi *",
+    "routeNamePlaceholder": "Orn: Kadikoy Bolge Ziyareti",
+    "dateLabel": "Tarih *",
+    "estimatedDurationLabel": "Tahmini Sure (dakika)",
+    "estimatedDurationPlaceholder": "Orn: 180",
+    "notesLabel": "Notlar",
+    "notesPlaceholder": "Rota ile ilgili notlar...",
+    "visitsTitle": "Ziyaretler ({{count}})",
+    "emptyVisits": "Henuz ziyaret eklenmedi. \"Ziyaret Ekle\" butonuna tiklayin.",
+    "customerLabel": "Musteri",
+    "customerSelect": "Musteri Secin",
+    "contactLabel": "Kontak (CRM)",
+    "contactSelect": "Kontak Secin",
+    "visitTypeLabel": "Ziyaret Tipi",
+    "scheduledTimeLabel": "Planlanan Saat",
+    "addressLabel": "Adres",
+    "addressPlaceholder": "Ziyaret adresi",
+    "visitNotesLabel": "Notlar",
+    "visitNotesPlaceholder": "Ziyaret notlari"
+  },
+  "form": {
+    "editTitle": "Rota Duzenle",
+    "createTitle": "Yeni Rota",
+    "routeNameLabel": "Rota Adi *",
+    "dateLabel": "Tarih *",
+    "estimatedDurationLabel": "Tahmini Sure (dakika)",
+    "notesLabel": "Notlar"
+  },
+  "visitForm": {
+    "title": "Ziyaret Detayi",
+    "visitTypeLabel": "Ziyaret Tipi",
+    "customerLabel": "Musteri",
+    "contactLabel": "Kontak",
+    "addressLabel": "Adres",
+    "scheduledTimeLabel": "Planlanan Saat",
+    "checkInLabel": "Check-in",
+    "checkOutLabel": "Check-out",
+    "statusLabel": "Durum",
+    "notesLabel": "Notlar",
+    "notesPlaceholder": "Ziyaret notlari...",
+    "outcomeLabel": "Sonuc",
+    "outcomePlaceholder": "Ziyaret sonucu..."
+  }
+}

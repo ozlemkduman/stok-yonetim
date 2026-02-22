@@ -1,4 +1,5 @@
-import { WIZARD_STEPS } from '../wizard.types';
+import { useTranslation } from 'react-i18next';
+import { WIZARD_STEP_KEYS } from '../wizard.types';
 import styles from '../SaleFormPage.module.css';
 
 interface WizardStepIndicatorProps {
@@ -8,9 +9,11 @@ interface WizardStepIndicatorProps {
 }
 
 export function WizardStepIndicator({ currentStep, completedSteps, onStepClick }: WizardStepIndicatorProps) {
+  const { t } = useTranslation(['sales']);
+
   return (
     <div className={styles.stepIndicator}>
-      {WIZARD_STEPS.map((step, index) => {
+      {WIZARD_STEP_KEYS.map((step, index) => {
         const isActive = currentStep === step.number;
         const isCompleted = completedSteps.has(step.number);
         const isClickable = isCompleted && !isActive;
@@ -35,7 +38,7 @@ export function WizardStepIndicator({ currentStep, completedSteps, onStepClick }
                   step.number
                 )}
               </span>
-              <span className={styles.stepLabel}>{step.label}</span>
+              <span className={styles.stepLabel}>{t(step.labelKey)}</span>
             </button>
           </div>
         );

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Modal, Input, Button } from '@stok/ui';
 import { Warehouse, CreateWarehouseData } from '../../api/warehouses.api';
 import { useToast } from '../../context/ToastContext';
@@ -11,6 +12,7 @@ interface WarehouseFormModalProps {
 }
 
 export function WarehouseFormModal({ isOpen, onClose, onSubmit, warehouse }: WarehouseFormModalProps) {
+  const { t } = useTranslation(['warehouses', 'common']);
   const { showToast } = useToast();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState<CreateWarehouseData>({
@@ -52,7 +54,7 @@ export function WarehouseFormModal({ isOpen, onClose, onSubmit, warehouse }: War
       await onSubmit(formData);
       onClose();
     } catch (error) {
-      showToast('error', 'Depo kaydedilemedi');
+      showToast('error', t('warehouses:toast.saveFailed'));
     } finally {
       setLoading(false);
     }
@@ -62,13 +64,13 @@ export function WarehouseFormModal({ isOpen, onClose, onSubmit, warehouse }: War
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={warehouse ? 'Depo Duzenle' : 'Yeni Depo'}
+      title={warehouse ? t('warehouses:form.editTitle') : t('warehouses:form.createTitle')}
       size="md"
     >
       <form onSubmit={handleSubmit}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
           <Input
-            label="Depo Adi *"
+            label={t('warehouses:form.warehouseName')}
             value={formData.name}
             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
             required
@@ -76,31 +78,31 @@ export function WarehouseFormModal({ isOpen, onClose, onSubmit, warehouse }: War
           />
 
           <Input
-            label="Depo Kodu *"
+            label={t('warehouses:form.warehouseCode')}
             value={formData.code}
             onChange={(e) => setFormData({ ...formData, code: e.target.value.toUpperCase() })}
-            placeholder="Ornek: DEPO01"
+            placeholder={t('warehouses:form.codePlaceholder')}
             required
             disabled={!!warehouse}
             fullWidth
           />
 
           <Input
-            label="Adres"
+            label={t('warehouses:form.address')}
             value={formData.address}
             onChange={(e) => setFormData({ ...formData, address: e.target.value })}
             fullWidth
           />
 
           <Input
-            label="Telefon"
+            label={t('warehouses:form.phone')}
             value={formData.phone}
             onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
             fullWidth
           />
 
           <Input
-            label="Sorumlu Kisi"
+            label={t('warehouses:form.manager')}
             value={formData.manager_name}
             onChange={(e) => setFormData({ ...formData, manager_name: e.target.value })}
             fullWidth
@@ -112,16 +114,16 @@ export function WarehouseFormModal({ isOpen, onClose, onSubmit, warehouse }: War
               checked={formData.is_default}
               onChange={(e) => setFormData({ ...formData, is_default: e.target.checked })}
             />
-            <span>Varsayilan depo olarak ayarla</span>
+            <span>{t('warehouses:form.setDefault')}</span>
           </label>
         </div>
 
         <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 'var(--space-2)', marginTop: 'var(--space-6)' }}>
           <Button type="button" variant="ghost" onClick={onClose}>
-            Iptal
+            {t('warehouses:form.cancel')}
           </Button>
           <Button type="submit" loading={loading}>
-            {warehouse ? 'Guncelle' : 'Olustur'}
+            {warehouse ? t('warehouses:form.update') : t('warehouses:form.create')}
           </Button>
         </div>
       </form>

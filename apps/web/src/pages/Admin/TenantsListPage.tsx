@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Card, Table, Button, Input, Badge, Pagination, type Column } from '@stok/ui';
 import { adminTenantsApi, Tenant } from '../../api/admin/tenants.api';
 import { useConfirmDialog } from '../../context/ConfirmDialogContext';
@@ -13,14 +14,8 @@ const statusColors: Record<string, 'success' | 'warning' | 'danger' | 'default'>
   cancelled: 'default',
 };
 
-const statusLabels: Record<string, string> = {
-  active: 'Aktif',
-  trial: 'Deneme',
-  suspended: 'Askida',
-  cancelled: 'Iptal',
-};
-
 export function TenantsListPage() {
+  const { t } = useTranslation(['admin', 'common']);
   const navigate = useNavigate();
   const { confirm } = useConfirmDialog();
   const { showToast } = useToast();
@@ -30,6 +25,13 @@ export function TenantsListPage() {
   const [statusFilter, setStatusFilter] = useState('');
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+
+  const statusLabels: Record<string, string> = {
+    active: t('admin:tenants.statusActive'),
+    trial: t('admin:tenants.statusTrial'),
+    suspended: t('admin:tenants.statusSuspended'),
+    cancelled: t('admin:tenants.statusCancelled'),
+  };
 
   useEffect(() => {
     loadTenants();
@@ -48,21 +50,21 @@ export function TenantsListPage() {
       setTenants(response.data);
       setTotalPages(response.meta?.totalPages || 1);
     } catch (error) {
-      showToast('error', 'Organizasyonlar yuklenemedi');
+      showToast('error', t('admin:tenants.loadFailed'));
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleSuspend = async (id: string) => {
-    const confirmed = await confirm({ message: 'Bu organizasyonu askiya almak istediginize emin misiniz?', variant: 'danger' });
+    const confirmed = await confirm({ message: t('admin:tenants.suspendConfirm'), variant: 'danger' });
     if (!confirmed) return;
 
     try {
       await adminTenantsApi.suspend(id);
       loadTenants();
     } catch (error) {
-      showToast('error', 'Organizasyon askiya alinamadi');
+      showToast('error', t('admin:tenants.suspendFailed'));
     }
   };
 
@@ -71,14 +73,14 @@ export function TenantsListPage() {
       await adminTenantsApi.activate(id);
       loadTenants();
     } catch (error) {
-      showToast('error', 'Organizasyon aktif edilemedi');
+      showToast('error', t('admin:tenants.activateFailed'));
     }
   };
 
   const columns: Column<Tenant>[] = [
     {
       key: 'name',
-      header: 'Organizasyon',
+      header: t('admin:tenants.columnName'),
       render: (tenant) => (
         <div>
           <Link to={`/admin/tenants/${tenant.id}`} className={styles.link}>
@@ -90,17 +92,17 @@ export function TenantsListPage() {
     },
     {
       key: 'plan',
-      header: 'Plan',
+      header: t('admin:tenants.columnPlan'),
       render: (tenant) => tenant.plan_name || '-',
     },
     {
       key: 'user_count',
-      header: 'Kullanicilar',
+      header: t('admin:tenants.columnUsers'),
       render: (tenant) => tenant.user_count || 0,
     },
     {
       key: 'status',
-      header: 'Durum',
+      header: t('admin:tenants.columnStatus'),
       render: (tenant) => (
         <Badge variant={statusColors[tenant.status] || 'default'}>
           {statusLabels[tenant.status] || tenant.status}
@@ -109,7 +111,7 @@ export function TenantsListPage() {
     },
     {
       key: 'created_at',
-      header: 'Kayit Tarihi',
+      header: t('admin:tenants.columnCreatedAt'),
       render: (tenant) => new Date(tenant.created_at).toLocaleDateString('tr-TR'),
     },
     {
@@ -122,7 +124,7 @@ export function TenantsListPage() {
             size="sm"
             onClick={() => navigate(`/admin/tenants/${tenant.id}`)}
           >
-            Detay
+            {t('admin:tenants.detail')}
           </Button>
           {tenant.status === 'active' || tenant.status === 'trial' ? (
             <Button
@@ -130,7 +132,7 @@ export function TenantsListPage() {
               size="sm"
               onClick={() => handleSuspend(tenant.id)}
             >
-              Askiya Al
+              {t('admin:tenants.suspend')}
             </Button>
           ) : (
             <Button
@@ -138,7 +140,7 @@ export function TenantsListPage() {
               size="sm"
               onClick={() => handleActivate(tenant.id)}
             >
-              Aktif Et
+              {t('admin:tenants.activate')}
             </Button>
           )}
         </div>
@@ -149,16 +151,16 @@ export function TenantsListPage() {
   return (
     <div className={styles.page}>
       <div className={styles.pageHeader}>
-        <h1 className={styles.pageTitle}>Organizasyonlar</h1>
+        <h1 className={styles.pageTitle}>{t('admin:tenants.title')}</h1>
         <Button variant="primary" onClick={() => navigate('/admin/tenants/new')}>
-          Yeni Organizasyon
+          {t('admin:tenants.newTenant')}
         </Button>
       </div>
 
       <Card className={styles.filters}>
         <div className={styles.filterRow}>
           <Input
-            placeholder="Ara..."
+            placeholder={t('admin:tenants.searchPlaceholder')}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
@@ -167,11 +169,11 @@ export function TenantsListPage() {
             onChange={(e) => setStatusFilter(e.target.value)}
             className={styles.select}
           >
-            <option value="">Tum Durumlar</option>
-            <option value="active">Aktif</option>
-            <option value="trial">Deneme</option>
-            <option value="suspended">Askida</option>
-            <option value="cancelled">Iptal</option>
+            <option value="">{t('admin:tenants.allStatuses')}</option>
+            <option value="active">{t('admin:tenants.statusActive')}</option>
+            <option value="trial">{t('admin:tenants.statusTrial')}</option>
+            <option value="suspended">{t('admin:tenants.statusSuspended')}</option>
+            <option value="cancelled">{t('admin:tenants.statusCancelled')}</option>
           </select>
         </div>
       </Card>
@@ -182,7 +184,7 @@ export function TenantsListPage() {
           data={tenants}
           keyExtractor={(tenant) => tenant.id}
           loading={isLoading}
-          emptyMessage="Organizasyon bulunamadi"
+          emptyMessage={t('admin:tenants.emptyMessage')}
         />
 
         {totalPages > 1 && (

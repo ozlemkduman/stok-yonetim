@@ -1,0 +1,159 @@
+{
+  "pageTitle": "Products",
+  "subtitle": "Total {{count}} product records",
+  "newProduct": "+ New Product",
+  "searchPlaceholder": "Search products...",
+  "upgradeMessage": "You have reached your product limit. Upgrade your plan to add more products.",
+  "emptyMessage": "No products found",
+  "columns": {
+    "productName": "Product Name",
+    "category": "Category",
+    "totalSold": "Sold",
+    "stock": "Stock",
+    "purchasePrice": "Purchase Price",
+    "salePrice": "Sale Price",
+    "createdBy": "Created By"
+  },
+  "actions": {
+    "detail": "Detail",
+    "edit": "Edit",
+    "delete": "Delete"
+  },
+  "filters": {
+    "allCategories": "All Categories",
+    "bestSelling": "Best Selling",
+    "leastSelling": "Least Selling",
+    "nameAZ": "Name (A-Z)",
+    "nameZA": "Name (Z-A)",
+    "stockLowHigh": "Stock (Low-High)",
+    "stockHighLow": "Stock (High-Low)",
+    "priceHighLow": "Price (High-Low)",
+    "priceLowHigh": "Price (Low-High)",
+    "newest": "Newest"
+  },
+  "modal": {
+    "editTitle": "Edit Product",
+    "createTitle": "New Product",
+    "cancel": "Cancel",
+    "update": "Update",
+    "save": "Save"
+  },
+  "form": {
+    "productName": "Product Name *",
+    "barcode": "Barcode",
+    "category": "Category",
+    "unit": "Unit",
+    "vatRate": "VAT Rate (%)",
+    "purchasePriceSection": "Purchase Price",
+    "salePriceSection": "Sale Prices",
+    "vatExcluded": "Excl. VAT",
+    "vatIncluded": "Incl. VAT",
+    "purchasePriceLabel": "Purchase Price * ({{vatStatus}})",
+    "salePriceLabel": "Sale Price * ({{vatStatus}})",
+    "wholesalePriceLabel": "Wholesale Price ({{vatStatus}})",
+    "stockQuantity": "Stock Quantity",
+    "minStockLevel": "Minimum Stock Level"
+  },
+  "priceInfo": {
+    "vatExcluded": "Excl. VAT: {{price}} \u20ba",
+    "vatIncluded": "Incl. VAT: {{price}} \u20ba"
+  },
+  "toast": {
+    "loadError": "Failed to load products",
+    "updateSuccess": "Product updated",
+    "createSuccess": "Product added",
+    "deleteSuccess": "Product deleted",
+    "genericError": "An error occurred",
+    "deleteFailed": "Delete failed",
+    "deleteConfirm": "Are you sure you want to delete \"{{name}}\"?"
+  },
+  "detail": {
+    "backToProducts": "\u2190 Products",
+    "active": "Active",
+    "inactive": "Inactive",
+    "lowStock": "Low Stock",
+    "currentStock": "Current Stock",
+    "minStock": "Min: {{value}} {{unit}}",
+    "productInfo": "Product Information",
+    "salePrice": "Sale Price",
+    "wholesalePrice": "Wholesale Price",
+    "purchasePrice": "Purchase Price",
+    "vatRate": "VAT Rate",
+    "unit": "Unit",
+    "createdAt": "Created At",
+    "createdBy": "Created By",
+    "statistics": "Statistics",
+    "totalSold": "Sold",
+    "salesCount": "{{count}} sales",
+    "totalReturned": "Returned",
+    "returnsCount": "{{count}} returns",
+    "totalRevenue": "Total Revenue",
+    "netQuantity": "Net: {{count}} units",
+    "loading": "Loading...",
+    "loadError": "Failed to load data",
+    "notFound": "Product not found",
+    "goBack": "Go Back",
+    "warehouseStocks": "Warehouse Stocks",
+    "warehouseStocksColumns": {
+      "warehouse": "Warehouse",
+      "stockQuantity": "Stock Quantity"
+    }
+  },
+  "tabs": {
+    "sales": "Sales ({{count}})",
+    "returns": "Returns ({{count}})",
+    "movements": "Stock Movements ({{count}})"
+  },
+  "salesTab": {
+    "empty": "This product has not been sold yet",
+    "invoiceNo": "Invoice No",
+    "date": "Date",
+    "customer": "Customer",
+    "quantity": "Quantity",
+    "unitPrice": "Unit Price",
+    "vat": "VAT",
+    "total": "Total",
+    "payment": "Payment",
+    "status": "Status"
+  },
+  "returnsTab": {
+    "empty": "No returns for this product",
+    "returnNo": "Return No",
+    "date": "Date",
+    "customer": "Customer",
+    "quantity": "Quantity",
+    "unitPrice": "Unit Price",
+    "vat": "VAT",
+    "total": "Total",
+    "reason": "Reason",
+    "status": "Status"
+  },
+  "movementsTab": {
+    "empty": "No stock movements found",
+    "date": "Date",
+    "movementType": "Movement Type",
+    "quantity": "Quantity",
+    "stockAfter": "Stock After",
+    "warehouse": "Warehouse",
+    "notes": "Notes"
+  },
+  "paymentMethods": {
+    "cash": "Cash",
+    "credit_card": "Credit Card",
+    "bank_transfer": "Bank Transfer",
+    "credit": "Credit"
+  },
+  "statuses": {
+    "completed": "Completed",
+    "cancelled": "Cancelled",
+    "pending": "Pending"
+  },
+  "movementTypes": {
+    "sale": "Sale",
+    "return": "Return",
+    "transfer_in": "Transfer In",
+    "transfer_out": "Transfer Out",
+    "adjustment": "Adjustment",
+    "purchase": "Purchase"
+  }
+}

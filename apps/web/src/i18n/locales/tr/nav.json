@@ -1,0 +1,55 @@
+{
+  "groups": {
+    "main": "Ana Sayfa",
+    "sales": "Satış Yönetimi",
+    "inventory": "Stok Yönetimi",
+    "finance": "Finans",
+    "crm": "CRM & Saha",
+    "reports": "Raporlar",
+    "settings": "Ayarlar"
+  },
+  "items": {
+    "dashboard": "Özet",
+    "customers": "Müşteriler",
+    "quotes": "Teklifler",
+    "sales": "Satışlar",
+    "returns": "İadeler",
+    "products": "Ürünler",
+    "warehouses": "Depolar",
+    "accounts": "Kasa/Banka",
+    "expenses": "Giderler",
+    "edocuments": "e-Belgeler",
+    "crm": "CRM",
+    "fieldTeam": "Saha Ekip",
+    "integrations": "Entegrasyonlar",
+    "reports": "Raporlar",
+    "companySettings": "Şirket Ayarları",
+    "users": "Kullanıcılar",
+    "profile": "Profil"
+  },
+  "topbar": {
+    "search": "Ara...",
+    "toggleMenu": "Menüyü aç/kapat",
+    "help": "Sayfa Yardımı"
+  },
+  "notifications": {
+    "title": "Bildirimler",
+    "empty": "Bildirim yok",
+    "overdueTitle": "Geciken Ödemeler",
+    "overdueMessage": "{{count}} adet geciken ödeme var",
+    "lowStockTitle": "Düşük Stok",
+    "lowStockMessage": "{{count}} ürün stok seviyesi düşük",
+    "outOfStockTitle": "Stok Bitti",
+    "outOfStockMessage": "{{count}} ürün stokta yok"
+  },
+  "userMenu": {
+    "profile": "Profil",
+    "settings": "Ayarlar",
+    "logout": "Çıkış Yap",
+    "adminPanel": "Admin Panel"
+  },
+  "impersonation": {
+    "viewingAs": "{{name}} olarak görüntülüyorsunuz",
+    "backToAdmin": "Admin Paneline Dön"
+  }
+}

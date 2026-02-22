@@ -33,9 +33,9 @@ export interface WizardStepProps {
   products: Product[];
 }
 
-export const WIZARD_STEPS = [
-  { number: 1, label: 'Urunler' },
-  { number: 2, label: 'Musteri' },
-  { number: 3, label: 'Ayarlar' },
-  { number: 4, label: 'Ozet' },
+export const WIZARD_STEP_KEYS = [
+  { number: 1, labelKey: 'sales:form.wizardSteps.products' },
+  { number: 2, labelKey: 'sales:form.wizardSteps.customer' },
+  { number: 3, labelKey: 'sales:form.wizardSteps.settings' },
+  { number: 4, labelKey: 'sales:form.wizardSteps.summary' },
 ] as const;

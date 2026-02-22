@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Table, Button, Card, Select, type Column } from '@stok/ui';
 import { fieldTeamApi, FieldRoute } from '../../api/field-team.api';
 import { useConfirmDialog } from '../../context/ConfirmDialogContext';
@@ -7,14 +8,8 @@ import { useToast } from '../../context/ToastContext';
 import { RouteFormModal } from './RouteFormModal';
 import styles from './RouteListPage.module.css';
 
-const statusLabels: Record<string, string> = {
-  planned: 'Planli',
-  in_progress: 'Devam Ediyor',
-  completed: 'Tamamlandi',
-  cancelled: 'Iptal',
-};
-
 export function RouteListPage() {
+  const { t } = useTranslation(['fieldteam', 'common']);
   const navigate = useNavigate();
   const { confirm } = useConfirmDialog();
   const { showToast } = useToast();
@@ -39,7 +34,7 @@ export function RouteListPage() {
         setTotalPages(response.meta.totalPages);
       }
     } catch (error) {
-      showToast('error', 'Rotalar yuklenemedi');
+      showToast('error', t('fieldteam:toast.loadError'));
     } finally {
       setLoading(false);
     }
@@ -60,13 +55,13 @@ export function RouteListPage() {
   };
 
   const handleDelete = async (id: string) => {
-    const confirmed = await confirm({ message: 'Bu rotayi silmek istediginize emin misiniz?', variant: 'danger' });
+    const confirmed = await confirm({ message: t('fieldteam:confirm.delete'), variant: 'danger' });
     if (!confirmed) return;
     try {
       await fieldTeamApi.deleteRoute(id);
       fetchRoutes();
     } catch (error) {
-      showToast('error', 'Rota silinemedi');
+      showToast('error', t('fieldteam:toast.deleteError'));
     }
   };
 
@@ -75,7 +70,7 @@ export function RouteListPage() {
       await fieldTeamApi.startRoute(id);
       fetchRoutes();
     } catch (error) {
-      showToast('error', 'Rota baslatilamadi');
+      showToast('error', t('fieldteam:toast.startError'));
     }
   };
 
@@ -84,7 +79,7 @@ export function RouteListPage() {
       await fieldTeamApi.completeRoute(id);
       fetchRoutes();
     } catch (error) {
-      showToast('error', 'Rota tamamlanamadi');
+      showToast('error', t('fieldteam:toast.completeError'));
     }
   };
 
@@ -105,7 +100,7 @@ export function RouteListPage() {
   const columns: Column<FieldRoute>[] = [
     {
       key: 'name',
-      header: 'Rota Adi',
+      header: t('fieldteam:columns.routeName'),
       width: '20%',
       render: (item) => (
         <span
@@ -118,59 +113,62 @@ export function RouteListPage() {
     },
     {
       key: 'route_date',
-      header: 'Tarih',
+      header: t('fieldteam:columns.date'),
       width: '12%',
       render: (item) => new Date(item.route_date).toLocaleDateString('tr-TR'),
     },
     {
       key: 'status',
-      header: 'Durum',
+      header: t('fieldteam:columns.status'),
       width: '12%',
       render: (item) => (
         <span className={`${styles.badge} ${styles[`badge_${item.status}`]}`}>
-          {statusLabels[item.status]}
+          {t(`fieldteam:status.${item.status}`)}
         </span>
       ),
     },
     {
       key: 'visit_count',
-      header: 'Ziyaret',
+      header: t('fieldteam:columns.visits'),
       width: '10%',
       render: (item) => `${item.completed_count || 0}/${item.visit_count || 0}`,
     },
     {
       key: 'estimated_duration_minutes',
-      header: 'Tahmini Sure',
+      header: t('fieldteam:columns.estimatedDuration'),
       width: '12%',
       render: (item) =>
         item.estimated_duration_minutes
-          ? `${Math.floor(item.estimated_duration_minutes / 60)}s ${item.estimated_duration_minutes % 60}dk`
+          ? t('fieldteam:durationFormat', {
+              hours: Math.floor(item.estimated_duration_minutes / 60),
+              minutes: item.estimated_duration_minutes % 60,
+            })
           : '-',
     },
     {
       key: 'actions',
-      header: 'Islemler',
+      header: t('fieldteam:columns.actions'),
       width: '34%',
       render: (item) => (
         <div className={styles.actions}>
           <Button size="sm" variant="ghost" onClick={() => handleViewDetail(item.id)}>
-            Detay
+            {t('fieldteam:buttons.detail')}
           </Button>
           {item.status === 'planned' && (
             <Button size="sm" variant="primary" onClick={() => handleStartRoute(item.id)}>
-              Baslat
+              {t('fieldteam:buttons.start')}
             </Button>
           )}
           {item.status === 'in_progress' && (
             <Button size="sm" variant="primary" onClick={() => handleCompleteRoute(item.id)}>
-              Tamamla
+              {t('fieldteam:buttons.complete')}
             </Button>
           )}
           <Button size="sm" variant="secondary" onClick={() => handleEdit(item)}>
-            Duzenle
+            {t('fieldteam:buttons.edit')}
           </Button>
           <Button size="sm" variant="danger" onClick={() => handleDelete(item.id)}>
-            Sil
+            {t('fieldteam:buttons.delete')}
           </Button>
         </div>
       ),
@@ -180,8 +178,8 @@ export function RouteListPage() {
   return (
     <div className={styles.container}>
       <div className={styles.header}>
-        <h1>Saha Ekip - Rotalar</h1>
-        <Button onClick={handleAdd}>Yeni Rota</Button>
+        <h1>{t('fieldteam:pageTitle')}</h1>
+        <Button onClick={handleAdd}>{t('fieldteam:newRoute')}</Button>
       </div>
 
       <Card className={styles.filters}>
@@ -190,11 +188,11 @@ export function RouteListPage() {
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
             options={[
-              { value: '', label: 'Tum Durumlar' },
-              { value: 'planned', label: 'Planli' },
-              { value: 'in_progress', label: 'Devam Ediyor' },
-              { value: 'completed', label: 'Tamamlandi' },
-              { value: 'cancelled', label: 'Iptal' },
+              { value: '', label: t('fieldteam:filter.allStatuses') },
+              { value: 'planned', label: t('fieldteam:status.planned') },
+              { value: 'in_progress', label: t('fieldteam:status.in_progress') },
+              { value: 'completed', label: t('fieldteam:status.completed') },
+              { value: 'cancelled', label: t('fieldteam:status.cancelled') },
             ]}
           />
         </div>
@@ -206,7 +204,7 @@ export function RouteListPage() {
           data={routes}
           keyExtractor={(item) => item.id}
           loading={loading}
-          emptyMessage="Rota bulunamadi"
+          emptyMessage={t('fieldteam:empty')}
         />
 
         {totalPages > 1 && (
@@ -217,10 +215,10 @@ export function RouteListPage() {
               disabled={page === 1}
               onClick={() => setPage(page - 1)}
             >
-              Onceki
+              {t('fieldteam:pagination.previous')}
             </Button>
             <span>
-              Sayfa {page} / {totalPages}
+              {t('fieldteam:pagination.pageOf', { page, totalPages })}
             </span>
             <Button
               size="sm"
@@ -228,7 +226,7 @@ export function RouteListPage() {
               disabled={page === totalPages}
               onClick={() => setPage(page + 1)}
             >
-              Sonraki
+              {t('fieldteam:pagination.next')}
             </Button>
           </div>
         )}

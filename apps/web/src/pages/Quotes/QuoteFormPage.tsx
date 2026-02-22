@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Button, Card, Input, Select } from '@stok/ui';
 import { QuoteItemInput, quotesApi } from '../../api/quotes.api';
 import { Customer, customersApi } from '../../api/customers.api';
@@ -15,6 +16,7 @@ interface QuoteFormItem extends QuoteItemInput {
 }
 
 export function QuoteFormPage() {
+  const { t } = useTranslation(['quotes', 'common']);
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { showToast } = useToast();
@@ -74,7 +76,7 @@ export function QuoteFormPage() {
           setValidUntil(defaultDate.toISOString().split('T')[0]);
         }
       } catch (err) {
-        showToast('error', 'Veriler yuklenirken hata olustu');
+        showToast('error', t('quotes:toast.dataLoadError'));
       } finally {
         setLoading(false);
       }
@@ -148,12 +150,12 @@ export function QuoteFormPage() {
     e.preventDefault();
 
     if (items.length === 0) {
-      showToast('error', 'En az bir urun ekleyin');
+      showToast('error', t('quotes:form.addItemError'));
       return;
     }
 
     if (!validUntil) {
-      showToast('error', 'Gecerlilik tarihi gerekli');
+      showToast('error', t('quotes:form.validityRequired'));
       return;
     }
 
@@ -178,14 +180,14 @@ export function QuoteFormPage() {
 
       if (isEdit) {
         await quotesApi.update(id!, data);
-        showToast('success', 'Teklif guncellendi');
+        showToast('success', t('quotes:toast.updated'));
       } else {
         await quotesApi.create(data);
-        showToast('success', 'Teklif olusturuldu');
+        showToast('success', t('quotes:toast.created'));
       }
       navigate('/quotes');
     } catch (err) {
-      showToast('error', err instanceof Error ? err.message : 'Islem basarisiz');
+      showToast('error', err instanceof Error ? err.message : t('quotes:form.saveFailed'));
     } finally {
       setSaving(false);
     }
@@ -196,7 +198,7 @@ export function QuoteFormPage() {
   if (loading) {
     return (
       <div className={styles.page}>
-        <div className={styles.loading}>Yukleniyor...</div>
+        <div className={styles.loading}>{t('quotes:form.loading')}</div>
       </div>
     );
   }
@@ -205,31 +207,31 @@ export function QuoteFormPage() {
     <div className={styles.page}>
       <div className={styles.header}>
         <Button variant="ghost" onClick={() => navigate('/quotes')}>
-          ← Teklifler
+          {t('quotes:form.backToQuotes')}
         </Button>
         <h1 className={styles.title}>
-          {isEdit ? 'Teklif Duzenle' : 'Yeni Teklif'}
+          {isEdit ? t('quotes:form.editTitle') : t('quotes:form.newTitle')}
         </h1>
       </div>
 
       <form onSubmit={handleSubmit}>
         <div className={styles.formGrid}>
           <Card className={styles.formCard}>
-            <h3>Genel Bilgiler</h3>
+            <h3>{t('quotes:form.generalInfo')}</h3>
             <div className={styles.formRow}>
               <div className={styles.formGroup}>
-                <label className={styles.label}>Musteri</label>
+                <label className={styles.label}>{t('quotes:form.customer')}</label>
                 <Select
                   value={customerId}
                   onChange={(e) => setCustomerId(e.target.value)}
                   options={[
-                    { value: '', label: 'Musteri Secin (Opsiyonel)' },
+                    { value: '', label: t('quotes:form.customerPlaceholder') },
                     ...customers.map(c => ({ value: c.id, label: c.name })),
                   ]}
                 />
               </div>
               <div className={styles.formGroup}>
-                <label className={styles.label}>Gecerlilik Tarihi *</label>
+                <label className={styles.label}>{t('quotes:form.validityDate')}</label>
                 <Input
                   type="date"
                   value={validUntil}
@@ -246,12 +248,12 @@ export function QuoteFormPage() {
                     checked={includeVat}
                     onChange={(e) => setIncludeVat(e.target.checked)}
                   />
-                  KDV Dahil
+                  {t('quotes:form.vatIncluded')}
                 </label>
               </div>
             </div>
             <div className={styles.formGroup}>
-              <label className={styles.label}>Notlar</label>
+              <label className={styles.label}>{t('quotes:form.notes')}</label>
               <textarea
                 className={styles.textarea}
                 value={notes}
@@ -262,10 +264,10 @@ export function QuoteFormPage() {
           </Card>
 
           <Card className={styles.formCard}>
-            <h3>Iskonto</h3>
+            <h3>{t('quotes:form.discount')}</h3>
             <div className={styles.formRow}>
               <div className={styles.formGroup}>
-                <label className={styles.label}>Iskonto Orani (%)</label>
+                <label className={styles.label}>{t('quotes:form.discountRate')}</label>
                 <Input
                   type="number"
                   min="0"
@@ -278,7 +280,7 @@ export function QuoteFormPage() {
                 />
               </div>
               <div className={styles.formGroup}>
-                <label className={styles.label}>veya Iskonto Tutari</label>
+                <label className={styles.label}>{t('quotes:form.orDiscountAmount')}</label>
                 <Input
                   type="number"
                   min="0"
@@ -295,27 +297,27 @@ export function QuoteFormPage() {
 
         <Card className={styles.itemsCard}>
           <div className={styles.itemsHeader}>
-            <h3>Urunler</h3>
+            <h3>{t('quotes:form.products')}</h3>
             <Button type="button" size="sm" onClick={addItem}>
-              + Urun Ekle
+              {t('quotes:form.addProduct')}
             </Button>
           </div>
 
           {items.length === 0 ? (
             <div className={styles.emptyItems}>
-              Henuz urun eklenmedi. "Urun Ekle" butonuna tiklayin.
+              {t('quotes:form.noProducts')}
             </div>
           ) : (
             <div className={styles.itemsTableContainer}>
               <table className={styles.itemsTable}>
                 <thead>
                   <tr>
-                    <th>Urun</th>
-                    <th className={styles.alignRight}>Miktar</th>
-                    <th className={styles.alignRight}>Birim Fiyat</th>
-                    <th className={styles.alignRight}>Iskonto %</th>
-                    <th className={styles.alignRight}>KDV %</th>
-                    <th className={styles.alignRight}>Toplam</th>
+                    <th>{t('quotes:form.productColumn')}</th>
+                    <th className={styles.alignRight}>{t('quotes:form.quantityColumn')}</th>
+                    <th className={styles.alignRight}>{t('quotes:form.unitPriceColumn')}</th>
+                    <th className={styles.alignRight}>{t('quotes:form.discountColumn')}</th>
+                    <th className={styles.alignRight}>{t('quotes:form.vatColumn')}</th>
+                    <th className={styles.alignRight}>{t('quotes:form.totalColumn')}</th>
                     <th></th>
                   </tr>
                 </thead>
@@ -327,7 +329,7 @@ export function QuoteFormPage() {
                           value={item.product_id}
                           onChange={(e) => updateItem(index, 'product_id', e.target.value)}
                           options={[
-                            { value: '', label: 'Urun Secin' },
+                            { value: '', label: t('quotes:form.selectProduct') },
                             ...products.map(p => ({ value: p.id, label: `${p.name} (${formatCurrency(p.sale_price)})` })),
                           ]}
                         />
@@ -385,7 +387,7 @@ export function QuoteFormPage() {
                           onClick={() => removeItem(index)}
                           className={styles.deleteButton}
                         >
-                          Sil
+                          {t('common:buttons.delete')}
                         </Button>
                       </td>
                     </tr>
@@ -398,21 +400,21 @@ export function QuoteFormPage() {
           <div className={styles.totalsSection}>
             <div className={styles.totalsGrid}>
               <div className={styles.totalRow}>
-                <span>Ara Toplam:</span>
+                <span>{t('quotes:form.subtotal')}</span>
                 <span>{formatCurrency(totals.subtotal)}</span>
               </div>
               {totals.discount > 0 && (
                 <div className={styles.totalRow}>
-                  <span>Iskonto:</span>
+                  <span>{t('quotes:form.discountLabel')}</span>
                   <span>-{formatCurrency(totals.discount)}</span>
                 </div>
               )}
               <div className={styles.totalRow}>
-                <span>KDV Toplam:</span>
+                <span>{t('quotes:form.vatTotal')}</span>
                 <span>{formatCurrency(totals.vatTotal)}</span>
               </div>
               <div className={`${styles.totalRow} ${styles.grandTotal}`}>
-                <span>Genel Toplam:</span>
+                <span>{t('quotes:form.grandTotal')}</span>
                 <span>{formatCurrency(totals.grandTotal)}</span>
               </div>
             </div>
@@ -421,10 +423,10 @@ export function QuoteFormPage() {
 
         <div className={styles.formActions}>
           <Button type="button" variant="ghost" onClick={() => navigate('/quotes')}>
-            Iptal
+            {t('quotes:form.cancel')}
           </Button>
           <Button type="submit" disabled={saving}>
-            {saving ? 'Kaydediliyor...' : (isEdit ? 'Guncelle' : 'Olustur')}
+            {saving ? t('quotes:form.saving') : (isEdit ? t('quotes:form.update') : t('quotes:form.create'))}
           </Button>
         </div>
       </form>

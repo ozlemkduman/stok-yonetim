@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Button, Select, Card } from '@stok/ui';
 import { CreateEDocumentData, eDocumentsApi } from '../../api/e-documents.api';
 import { salesApi } from '../../api/sales.api';
@@ -19,20 +20,8 @@ interface Reference {
   customer_name?: string | null;
 }
 
-const DOCUMENT_TYPES = [
-  { value: 'e_fatura', label: 'e-Fatura' },
-  { value: 'e_arsiv', label: 'e-Arsiv Fatura' },
-  { value: 'e_ihracat', label: 'e-Ihracat Faturasi' },
-  { value: 'e_irsaliye', label: 'e-Irsaliye' },
-  { value: 'e_smm', label: 'e-SMM' },
-];
-
-const REFERENCE_TYPES = [
-  { value: 'sale', label: 'Satis' },
-  { value: 'return', label: 'Iade' },
-];
-
 export function CreateEDocumentModal({ onClose, onSuccess }: Props) {
+  const { t } = useTranslation(['edocuments', 'common']);
   const { showToast } = useToast();
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -43,6 +32,19 @@ export function CreateEDocumentModal({ onClose, onSuccess }: Props) {
   const [notes, setNotes] = useState('');
 
   const [references, setReferences] = useState<Reference[]>([]);
+
+  const DOCUMENT_TYPES = [
+    { value: 'e_fatura', label: t('edocuments:createModal.documentTypeOptions.e_fatura') },
+    { value: 'e_arsiv', label: t('edocuments:createModal.documentTypeOptions.e_arsiv') },
+    { value: 'e_ihracat', label: t('edocuments:createModal.documentTypeOptions.e_ihracat') },
+    { value: 'e_irsaliye', label: t('edocuments:createModal.documentTypeOptions.e_irsaliye') },
+    { value: 'e_smm', label: t('edocuments:createModal.documentTypeOptions.e_smm') },
+  ];
+
+  const REFERENCE_TYPES = [
+    { value: 'sale', label: t('edocuments:createModal.referenceTypeOptions.sale') },
+    { value: 'return', label: t('edocuments:createModal.referenceTypeOptions.return') },
+  ];
 
   useEffect(() => {
     const loadReferences = async () => {
@@ -69,7 +71,7 @@ export function CreateEDocumentModal({ onClose, onSuccess }: Props) {
         }
         setReferenceId('');
       } catch (err) {
-        showToast('error', 'Referanslar yuklenemedi');
+        showToast('error', t('edocuments:toast.referencesLoadError'));
       } finally {
         setLoading(false);
       }
@@ -82,7 +84,7 @@ export function CreateEDocumentModal({ onClose, onSuccess }: Props) {
     e.preventDefault();
 
     if (!referenceId) {
-      showToast('error', 'Lutfen bir referans secin');
+      showToast('error', t('edocuments:toast.selectReference'));
       return;
     }
 
@@ -94,10 +96,10 @@ export function CreateEDocumentModal({ onClose, onSuccess }: Props) {
         reference_id: referenceId,
         notes: notes || undefined,
       });
-      showToast('success', 'e-Belge olusturuldu');
+      showToast('success', t('edocuments:toast.created'));
       onSuccess();
     } catch (err) {
-      showToast('error', err instanceof Error ? err.message : 'e-Belge olusturulamadi');
+      showToast('error', err instanceof Error ? err.message : t('edocuments:toast.createFailed'));
     } finally {
       setSaving(false);
     }
@@ -107,14 +109,14 @@ export function CreateEDocumentModal({ onClose, onSuccess }: Props) {
     <div className={styles.overlay} onClick={onClose}>
       <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
         <div className={styles.header}>
-          <h2 className={styles.title}>Yeni e-Belge Olustur</h2>
+          <h2 className={styles.title}>{t('edocuments:createModal.title')}</h2>
           <button className={styles.closeButton} onClick={onClose}>×</button>
         </div>
 
         <form onSubmit={handleSubmit}>
           <div className={styles.body}>
             <div className={styles.formGroup}>
-              <label className={styles.label}>Belge Turu *</label>
+              <label className={styles.label}>{t('edocuments:createModal.documentType')}</label>
               <Select
                 value={documentType}
                 onChange={(e) => setDocumentType(e.target.value as CreateEDocumentData['document_type'])}
@@ -123,7 +125,7 @@ export function CreateEDocumentModal({ onClose, onSuccess }: Props) {
             </div>
 
             <div className={styles.formGroup}>
-              <label className={styles.label}>Referans Turu *</label>
+              <label className={styles.label}>{t('edocuments:createModal.referenceType')}</label>
               <Select
                 value={referenceType}
                 onChange={(e) => setReferenceType(e.target.value as CreateEDocumentData['reference_type'])}
@@ -132,18 +134,18 @@ export function CreateEDocumentModal({ onClose, onSuccess }: Props) {
             </div>
 
             <div className={styles.formGroup}>
-              <label className={styles.label}>Referans *</label>
+              <label className={styles.label}>{t('edocuments:createModal.reference')}</label>
               {loading ? (
-                <p className={styles.loading}>Yukleniyor...</p>
+                <p className={styles.loading}>{t('edocuments:createModal.loading')}</p>
               ) : (
                 <Select
                   value={referenceId}
                   onChange={(e) => setReferenceId(e.target.value)}
                   options={[
-                    { value: '', label: 'Referans Secin' },
+                    { value: '', label: t('edocuments:createModal.selectReference') },
                     ...references.map(r => ({
                       value: r.id,
-                      label: `${r.number} - ${r.customer_name || 'Isimsiz'} - ${new Date(r.date).toLocaleDateString('tr-TR')}`,
+                      label: `${r.number} - ${r.customer_name || t('edocuments:createModal.unnamed')} - ${new Date(r.date).toLocaleDateString('tr-TR')}`,
                     })),
                   ]}
                 />
@@ -157,10 +159,10 @@ export function CreateEDocumentModal({ onClose, onSuccess }: Props) {
                   if (!ref) return null;
                   return (
                     <>
-                      <p><strong>Belge No:</strong> {ref.number}</p>
-                      <p><strong>Tarih:</strong> {new Date(ref.date).toLocaleDateString('tr-TR')}</p>
-                      <p><strong>Musteri:</strong> {ref.customer_name || 'Belirtilmemis'}</p>
-                      <p><strong>Tutar:</strong> {ref.total.toLocaleString('tr-TR', { style: 'currency', currency: 'TRY' })}</p>
+                      <p><strong>{t('edocuments:createModal.documentNo')}</strong> {ref.number}</p>
+                      <p><strong>{t('edocuments:createModal.date')}</strong> {new Date(ref.date).toLocaleDateString('tr-TR')}</p>
+                      <p><strong>{t('edocuments:createModal.customer')}</strong> {ref.customer_name || t('edocuments:createModal.customerNotSpecified')}</p>
+                      <p><strong>{t('edocuments:createModal.amount')}</strong> {ref.total.toLocaleString('tr-TR', { style: 'currency', currency: 'TRY' })}</p>
                     </>
                   );
                 })()}
@@ -168,23 +170,23 @@ export function CreateEDocumentModal({ onClose, onSuccess }: Props) {
             )}
 
             <div className={styles.formGroup}>
-              <label className={styles.label}>Notlar</label>
+              <label className={styles.label}>{t('edocuments:createModal.notes')}</label>
               <textarea
                 className={styles.textarea}
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
                 rows={3}
-                placeholder="Opsiyonel notlar..."
+                placeholder={t('edocuments:createModal.notesPlaceholder')}
               />
             </div>
           </div>
 
           <div className={styles.footer}>
             <Button type="button" variant="ghost" onClick={onClose}>
-              Iptal
+              {t('edocuments:createModal.cancel')}
             </Button>
             <Button type="submit" disabled={saving || !referenceId}>
-              {saving ? 'Olusturuluyor...' : 'e-Belge Olustur'}
+              {saving ? t('edocuments:createModal.creating') : t('edocuments:createModal.create')}
             </Button>
           </div>
         </form>

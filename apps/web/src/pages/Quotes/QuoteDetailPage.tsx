@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Button, Badge, Card, Select } from '@stok/ui';
 import { Quote, QuoteItem, quotesApi, ConvertToSaleData } from '../../api/quotes.api';
 import { useToast } from '../../context/ToastContext';
@@ -7,23 +8,8 @@ import { useConfirmDialog } from '../../context/ConfirmDialogContext';
 import { formatCurrency, formatDate } from '../../utils/formatters';
 import styles from './QuoteDetailPage.module.css';
 
-const STATUS_LABELS: Record<string, string> = {
-  draft: 'Taslak',
-  sent: 'Gönderildi',
-  accepted: 'Kabul Edildi',
-  rejected: 'Reddedildi',
-  expired: 'Süresi Doldu',
-  converted: 'Satışa Dönüştürüldü',
-};
-
-const PAYMENT_METHOD_OPTIONS = [
-  { value: 'nakit', label: 'Nakit' },
-  { value: 'kredi_karti', label: 'Kredi Kartı' },
-  { value: 'havale', label: 'Havale/EFT' },
-  { value: 'veresiye', label: 'Veresiye' },
-];
-
 export function QuoteDetailPage() {
+  const { t } = useTranslation(['quotes', 'common']);
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { showToast } = useToast();
@@ -35,6 +21,13 @@ export function QuoteDetailPage() {
   const [showConvertModal, setShowConvertModal] = useState(false);
   const [convertPaymentMethod, setConvertPaymentMethod] = useState<ConvertToSaleData['payment_method']>('nakit');
 
+  const PAYMENT_METHOD_OPTIONS = [
+    { value: 'nakit', label: t('common:paymentMethods.nakit') },
+    { value: 'kredi_karti', label: t('common:paymentMethods.kredi_karti') },
+    { value: 'havale', label: t('common:paymentMethods.havale') },
+    { value: 'veresiye', label: t('common:paymentMethods.veresiye') },
+  ];
+
   useEffect(() => {
     if (!id) return;
 
@@ -44,14 +37,14 @@ export function QuoteDetailPage() {
         const response = await quotesApi.getById(id);
         setQuote(response.data);
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Teklif yüklenemedi');
+        setError(err instanceof Error ? err.message : t('quotes:toast.loadSingleError'));
       } finally {
         setLoading(false);
       }
     };
 
     fetchQuote();
-  }, [id]);
+  }, [id, t]);
 
   const handleSend = async () => {
     if (!quote) return;
@@ -59,9 +52,9 @@ export function QuoteDetailPage() {
     try {
       const response = await quotesApi.send(quote.id);
       setQuote({ ...quote, ...response.data });
-      showToast('success', 'Teklif gönderildi');
+      showToast('success', t('quotes:toast.sent'));
     } catch (err) {
-      showToast('error', err instanceof Error ? err.message : 'İşlem başarısız');
+      showToast('error', err instanceof Error ? err.message : t('quotes:toast.operationFailed'));
     } finally {
       setActionLoading(false);
     }
@@ -73,9 +66,9 @@ export function QuoteDetailPage() {
     try {
       const response = await quotesApi.accept(quote.id);
       setQuote({ ...quote, ...response.data });
-      showToast('success', 'Teklif kabul edildi');
+      showToast('success', t('quotes:toast.accepted'));
     } catch (err) {
-      showToast('error', err instanceof Error ? err.message : 'İşlem başarısız');
+      showToast('error', err instanceof Error ? err.message : t('quotes:toast.operationFailed'));
     } finally {
       setActionLoading(false);
     }
@@ -83,15 +76,15 @@ export function QuoteDetailPage() {
 
   const handleReject = async () => {
     if (!quote) return;
-    const confirmed = await confirm({ message: 'Teklifi reddetmek istediğinizden emin misiniz?', variant: 'warning' });
+    const confirmed = await confirm({ message: t('quotes:confirm.rejectMessage'), variant: 'warning' });
     if (!confirmed) return;
     setActionLoading(true);
     try {
       const response = await quotesApi.reject(quote.id);
       setQuote({ ...quote, ...response.data });
-      showToast('success', 'Teklif reddedildi');
+      showToast('success', t('quotes:toast.rejected'));
     } catch (err) {
-      showToast('error', err instanceof Error ? err.message : 'İşlem başarısız');
+      showToast('error', err instanceof Error ? err.message : t('quotes:toast.operationFailed'));
     } finally {
       setActionLoading(false);
     }
@@ -102,13 +95,13 @@ export function QuoteDetailPage() {
     setActionLoading(true);
     try {
       await quotesApi.convertToSale(quote.id, { payment_method: convertPaymentMethod });
-      showToast('success', 'Teklif satışa dönüştürüldü');
+      showToast('success', t('quotes:toast.converted'));
       setShowConvertModal(false);
       // Refresh quote data
       const response = await quotesApi.getById(quote.id);
       setQuote(response.data);
     } catch (err) {
-      showToast('error', err instanceof Error ? err.message : 'İşlem başarısız');
+      showToast('error', err instanceof Error ? err.message : t('quotes:toast.operationFailed'));
     } finally {
       setActionLoading(false);
     }
@@ -116,15 +109,15 @@ export function QuoteDetailPage() {
 
   const handleDelete = async () => {
     if (!quote) return;
-    const confirmed = await confirm({ message: `"${quote.quote_number}" teklifini silmek istediğinizden emin misiniz?`, variant: 'danger' });
+    const confirmed = await confirm({ message: t('quotes:confirm.deleteMessage', { number: quote.quote_number }), variant: 'danger' });
     if (!confirmed) return;
     setActionLoading(true);
     try {
       await quotesApi.delete(quote.id);
-      showToast('success', 'Teklif silindi');
+      showToast('success', t('quotes:toast.deleted'));
       navigate('/quotes');
     } catch (err) {
-      showToast('error', err instanceof Error ? err.message : 'Silme işlemi başarısız');
+      showToast('error', err instanceof Error ? err.message : t('quotes:toast.deleteFailed'));
     } finally {
       setActionLoading(false);
     }
@@ -154,16 +147,16 @@ export function QuoteDetailPage() {
     const today = new Date();
     const diffDays = Math.ceil((validUntil.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
 
-    if (diffDays < 0) return { text: 'Süresi doldu', variant: 'danger' as const };
-    if (diffDays === 0) return { text: 'Bugün son gün', variant: 'warning' as const };
-    if (diffDays <= 3) return { text: `${diffDays} gün kaldı`, variant: 'warning' as const };
-    return { text: `${diffDays} gün kaldı`, variant: 'default' as const };
+    if (diffDays < 0) return { text: t('quotes:detail.expired'), variant: 'danger' as const };
+    if (diffDays === 0) return { text: t('quotes:detail.lastDay'), variant: 'warning' as const };
+    if (diffDays <= 3) return { text: t('quotes:detail.daysLeft', { count: diffDays }), variant: 'warning' as const };
+    return { text: t('quotes:detail.daysLeft', { count: diffDays }), variant: 'default' as const };
   };
 
   if (loading) {
     return (
       <div className={styles.page}>
-        <div className={styles.loading}>Yükleniyor...</div>
+        <div className={styles.loading}>{t('quotes:detail.loading')}</div>
       </div>
     );
   }
@@ -171,8 +164,8 @@ export function QuoteDetailPage() {
   if (error || !quote) {
     return (
       <div className={styles.page}>
-        <div className={styles.error}>{error || 'Teklif bulunamadı'}</div>
-        <Button onClick={() => navigate('/quotes')}>Geri Dön</Button>
+        <div className={styles.error}>{error || t('quotes:detail.notFound')}</div>
+        <Button onClick={() => navigate('/quotes')}>{t('quotes:detail.goBack')}</Button>
       </div>
     );
   }
@@ -189,19 +182,19 @@ export function QuoteDetailPage() {
       <div className={styles.header}>
         <div className={styles.headerLeft}>
           <Button variant="ghost" onClick={() => navigate('/quotes')}>
-            ← Teklifler
+            {t('quotes:form.backToQuotes')}
           </Button>
           <h1 className={styles.title}>{quote.quote_number}</h1>
           <div className={styles.quoteMeta}>
             <Badge variant={getStatusBadgeVariant(quote.status)}>
-              {STATUS_LABELS[quote.status] || quote.status}
+              {t(`quotes:statuses.${quote.status}`, { defaultValue: quote.status })}
             </Badge>
             {quote.customer_name && <span className={styles.customerName}>{quote.customer_name}</span>}
           </div>
         </div>
         <div className={styles.headerRight}>
           <div className={styles.totalCard}>
-            <span className={styles.totalLabel}>Toplam Tutar</span>
+            <span className={styles.totalLabel}>{t('quotes:detail.totalAmount')}</span>
             <span className={styles.totalValue}>{formatCurrency(quote.grand_total)}</span>
             {validityStatus && (
               <span className={styles.validityBadge}>
@@ -217,39 +210,39 @@ export function QuoteDetailPage() {
       {/* Quote Info */}
       <div className={styles.infoGrid}>
         <Card className={styles.infoCard}>
-          <h3>Teklif Bilgileri</h3>
+          <h3>{t('quotes:detail.quoteInfo')}</h3>
           <div className={styles.infoList}>
             <div className={styles.infoItem}>
-              <span className={styles.infoLabel}>Teklif No</span>
+              <span className={styles.infoLabel}>{t('quotes:detail.quoteNo')}</span>
               <span className={styles.infoValue}>{quote.quote_number}</span>
             </div>
             <div className={styles.infoItem}>
-              <span className={styles.infoLabel}>Tarih</span>
+              <span className={styles.infoLabel}>{t('quotes:detail.date')}</span>
               <span className={styles.infoValue}>{formatDate(quote.quote_date)}</span>
             </div>
             <div className={styles.infoItem}>
-              <span className={styles.infoLabel}>Geçerlilik Tarihi</span>
+              <span className={styles.infoLabel}>{t('quotes:detail.validityDate')}</span>
               <span className={`${styles.infoValue} ${validityStatus?.variant === 'danger' ? styles.expired : validityStatus?.variant === 'warning' ? styles.warning : ''}`}>
                 {formatDate(quote.valid_until)}
               </span>
             </div>
             <div className={styles.infoItem}>
-              <span className={styles.infoLabel}>Müşteri</span>
-              <span className={styles.infoValue}>{quote.customer_name || 'Belirtilmemiş'}</span>
+              <span className={styles.infoLabel}>{t('quotes:detail.customer')}</span>
+              <span className={styles.infoValue}>{quote.customer_name || t('quotes:detail.customerNotSpecified')}</span>
             </div>
             <div className={styles.infoItem}>
-              <span className={styles.infoLabel}>KDV Dahil</span>
-              <span className={styles.infoValue}>{quote.include_vat ? 'Evet' : 'Hayır'}</span>
+              <span className={styles.infoLabel}>{t('quotes:detail.vatIncluded')}</span>
+              <span className={styles.infoValue}>{quote.include_vat ? t('quotes:detail.yes') : t('quotes:detail.no')}</span>
             </div>
             {quote.notes && (
               <div className={styles.infoItem}>
-                <span className={styles.infoLabel}>Notlar</span>
+                <span className={styles.infoLabel}>{t('quotes:detail.notes')}</span>
                 <span className={styles.infoValue}>{quote.notes}</span>
               </div>
             )}
             {quote.created_by_name && (
               <div className={styles.infoItem}>
-                <span className={styles.infoLabel}>Kaydeden</span>
+                <span className={styles.infoLabel}>{t('quotes:detail.createdBy')}</span>
                 <span className={styles.infoValue}>{quote.created_by_name}</span>
               </div>
             )}
@@ -257,39 +250,39 @@ export function QuoteDetailPage() {
         </Card>
 
         <Card className={styles.actionsCard}>
-          <h3>İşlemler</h3>
+          <h3>{t('quotes:detail.operations')}</h3>
           <div className={styles.actionButtons}>
             {canSend && (
               <Button onClick={handleSend} disabled={actionLoading}>
-                Gönder
+                {t('quotes:actions.send')}
               </Button>
             )}
             {canAcceptReject && (
               <>
                 <Button variant="secondary" onClick={handleAccept} disabled={actionLoading}>
-                  Kabul Et
+                  {t('quotes:actions.acceptFull')}
                 </Button>
                 <Button variant="ghost" onClick={handleReject} disabled={actionLoading}>
-                  Reddet
+                  {t('quotes:actions.rejectFull')}
                 </Button>
               </>
             )}
             {canConvert && (
               <Button variant="primary" onClick={() => setShowConvertModal(true)} disabled={actionLoading}>
-                Satışa Dönüştür
+                {t('quotes:actions.convertToSale')}
               </Button>
             )}
             {canDelete && (
               <Button variant="ghost" onClick={handleDelete} disabled={actionLoading} className={styles.deleteButton}>
-                Sil
+                {t('quotes:actions.delete')}
               </Button>
             )}
           </div>
           {quote.converted_sale_id && (
             <div className={styles.convertedInfo}>
-              <span className={styles.convertedLabel}>Satışa Dönüştürüldü</span>
+              <span className={styles.convertedLabel}>{t('quotes:detail.convertedToSale')}</span>
               <Button variant="ghost" size="sm" onClick={() => navigate(`/sales/${quote.converted_sale_id}`)}>
-                Satışı Gör
+                {t('quotes:actions.viewSale')}
               </Button>
             </div>
           )}
@@ -298,17 +291,17 @@ export function QuoteDetailPage() {
 
       {/* Quote Items */}
       <Card className={styles.itemsCard}>
-        <h3>Teklif Kalemleri</h3>
+        <h3>{t('quotes:detail.quoteItems')}</h3>
         <div className={styles.itemsTableContainer}>
           <table className={styles.itemsTable}>
             <thead>
               <tr>
-                <th>Ürün</th>
-                <th className={styles.alignRight}>Miktar</th>
-                <th className={styles.alignRight}>Birim Fiyat</th>
-                <th className={styles.alignRight}>İskonto</th>
-                <th className={styles.alignRight}>KDV</th>
-                <th className={styles.alignRight}>Toplam</th>
+                <th>{t('quotes:detail.productColumn')}</th>
+                <th className={styles.alignRight}>{t('quotes:detail.quantityColumn')}</th>
+                <th className={styles.alignRight}>{t('quotes:detail.unitPriceColumn')}</th>
+                <th className={styles.alignRight}>{t('quotes:detail.discountColumn')}</th>
+                <th className={styles.alignRight}>{t('quotes:detail.vatColumn')}</th>
+                <th className={styles.alignRight}>{t('quotes:detail.totalColumn')}</th>
               </tr>
             </thead>
             <tbody>
@@ -330,7 +323,7 @@ export function QuoteDetailPage() {
               ) : (
                 <tr>
                   <td colSpan={6} className={styles.emptyItems}>
-                    Teklif kalemi bulunamadı
+                    {t('quotes:detail.noItems')}
                   </td>
                 </tr>
               )}
@@ -342,23 +335,23 @@ export function QuoteDetailPage() {
         <div className={styles.totalsSection}>
           <div className={styles.totalsGrid}>
             <div className={styles.totalRow}>
-              <span className={styles.totalRowLabel}>Ara Toplam</span>
+              <span className={styles.totalRowLabel}>{t('quotes:detail.subtotal')}</span>
               <span className={styles.totalRowValue}>{formatCurrency(quote.subtotal)}</span>
             </div>
             {(quote.discount_amount > 0 || quote.discount_rate > 0) && (
               <div className={styles.totalRow}>
                 <span className={styles.totalRowLabel}>
-                  İskonto {quote.discount_rate > 0 && `(%${quote.discount_rate})`}
+                  {t('quotes:detail.discountLabel')} {quote.discount_rate > 0 && `(%${quote.discount_rate})`}
                 </span>
                 <span className={styles.totalRowValue}>-{formatCurrency(quote.discount_amount)}</span>
               </div>
             )}
             <div className={styles.totalRow}>
-              <span className={styles.totalRowLabel}>KDV Toplam</span>
+              <span className={styles.totalRowLabel}>{t('quotes:detail.vatTotal')}</span>
               <span className={styles.totalRowValue}>{formatCurrency(quote.vat_total)}</span>
             </div>
             <div className={`${styles.totalRow} ${styles.grandTotalRow}`}>
-              <span className={styles.totalRowLabel}>Genel Toplam</span>
+              <span className={styles.totalRowLabel}>{t('quotes:detail.grandTotal')}</span>
               <span className={styles.totalRowValue}>{formatCurrency(quote.grand_total)}</span>
             </div>
           </div>
@@ -369,12 +362,12 @@ export function QuoteDetailPage() {
       {showConvertModal && (
         <div className={styles.modalOverlay} onClick={() => setShowConvertModal(false)}>
           <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
-            <h3 className={styles.modalTitle}>Satışa Dönüştür</h3>
+            <h3 className={styles.modalTitle}>{t('quotes:convertModal.title')}</h3>
             <p className={styles.modalDescription}>
-              Bu teklifi satışa dönüştürmek için ödeme yöntemini seçin.
+              {t('quotes:convertModal.description')}
             </p>
             <div className={styles.modalField}>
-              <label className={styles.modalLabel}>Ödeme Yöntemi</label>
+              <label className={styles.modalLabel}>{t('quotes:convertModal.paymentMethod')}</label>
               <Select
                 options={PAYMENT_METHOD_OPTIONS}
                 value={convertPaymentMethod}
@@ -383,10 +376,10 @@ export function QuoteDetailPage() {
             </div>
             <div className={styles.modalActions}>
               <Button variant="ghost" onClick={() => setShowConvertModal(false)} disabled={actionLoading}>
-                İptal
+                {t('quotes:convertModal.cancel')}
               </Button>
               <Button variant="primary" onClick={handleConvertToSale} disabled={actionLoading}>
-                {actionLoading ? 'Dönüştürülüyor...' : 'Dönüştür'}
+                {actionLoading ? t('quotes:detail.converting') : t('quotes:detail.convert')}
               </Button>
             </div>
           </div>

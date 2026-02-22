@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Table, Button, Card, Input, Select, type Column } from '@stok/ui';
 import { crmApi, CrmContact } from '../../api/crm.api';
 import { useConfirmDialog } from '../../context/ConfirmDialogContext';
@@ -7,23 +8,8 @@ import { useToast } from '../../context/ToastContext';
 import { ContactFormModal } from './ContactFormModal';
 import styles from './ContactListPage.module.css';
 
-const statusLabels: Record<string, string> = {
-  lead: 'Potansiyel',
-  prospect: 'Aday',
-  customer: 'Musteri',
-  inactive: 'Pasif',
-};
-
-const sourceLabels: Record<string, string> = {
-  website: 'Web Sitesi',
-  referral: 'Referans',
-  social: 'Sosyal Medya',
-  cold_call: 'Soguk Arama',
-  event: 'Etkinlik',
-  other: 'Diger',
-};
-
 export function ContactListPage() {
+  const { t } = useTranslation(['crm', 'common']);
   const navigate = useNavigate();
   const { confirm } = useConfirmDialog();
   const { showToast } = useToast();
@@ -50,7 +36,7 @@ export function ContactListPage() {
         setTotalPages(response.meta.totalPages);
       }
     } catch (error) {
-      showToast('error', 'Kisiler yuklenemedi');
+      showToast('error', t('crm:toast.loadError'));
     } finally {
       setLoading(false);
     }
@@ -76,13 +62,13 @@ export function ContactListPage() {
   };
 
   const handleDelete = async (id: string) => {
-    const confirmed = await confirm({ message: 'Bu kisiyi silmek istediginize emin misiniz?', variant: 'danger' });
+    const confirmed = await confirm({ message: t('crm:confirm.delete'), variant: 'danger' });
     if (!confirmed) return;
     try {
       await crmApi.deleteContact(id);
       fetchContacts();
     } catch (error) {
-      showToast('error', 'Kisi silinemedi');
+      showToast('error', t('crm:toast.deleteError'));
     }
   };
 
@@ -99,7 +85,7 @@ export function ContactListPage() {
   const columns: Column<CrmContact>[] = [
     {
       key: 'name',
-      header: 'Ad Soyad',
+      header: t('crm:columns.name'),
       width: '20%',
       render: (item) => (
         <span
@@ -112,25 +98,25 @@ export function ContactListPage() {
     },
     {
       key: 'status',
-      header: 'Durum',
+      header: t('crm:columns.status'),
       width: '12%',
       render: (item) => (
         <span className={`${styles.badge} ${styles[`badge_${item.status}`]}`}>
-          {statusLabels[item.status]}
+          {t(`crm:status.${item.status}`)}
         </span>
       ),
     },
-    { key: 'email', header: 'E-posta', width: '18%' },
-    { key: 'phone', header: 'Telefon', width: '12%' },
+    { key: 'email', header: t('crm:columns.email'), width: '18%' },
+    { key: 'phone', header: t('crm:columns.phone'), width: '12%' },
     {
       key: 'source',
-      header: 'Kaynak',
+      header: t('crm:columns.source'),
       width: '12%',
-      render: (item) => (item.source ? sourceLabels[item.source] : '-'),
+      render: (item) => (item.source ? t(`crm:source.${item.source}`) : '-'),
     },
     {
       key: 'next_follow_up',
-      header: 'Sonraki Takip',
+      header: t('crm:columns.nextFollowUp'),
       width: '12%',
       render: (item) =>
         item.next_follow_up
@@ -139,18 +125,18 @@ export function ContactListPage() {
     },
     {
       key: 'actions',
-      header: 'Islemler',
+      header: t('crm:columns.actions'),
       width: '14%',
       render: (item) => (
         <div className={styles.actions}>
           <Button size="sm" variant="secondary" onClick={() => navigate(`/crm/${item.id}`)}>
-            Detay
+            {t('crm:buttons.detail')}
           </Button>
           <Button size="sm" variant="secondary" onClick={() => handleEdit(item)}>
-            Duzenle
+            {t('crm:buttons.edit')}
           </Button>
           <Button size="sm" variant="danger" onClick={() => handleDelete(item.id)}>
-            Sil
+            {t('crm:buttons.delete')}
           </Button>
         </div>
       ),
@@ -160,14 +146,14 @@ export function ContactListPage() {
   return (
     <div className={styles.container}>
       <div className={styles.header}>
-        <h1>CRM - Kisiler</h1>
-        <Button onClick={handleAdd}>Yeni Kisi</Button>
+        <h1>{t('crm:pageTitle')}</h1>
+        <Button onClick={handleAdd}>{t('crm:newContact')}</Button>
       </div>
 
       <Card className={styles.filters}>
         <div className={styles.filterRow}>
           <Input
-            placeholder="Ara..."
+            placeholder={t('crm:searchPlaceholder')}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
@@ -176,14 +162,14 @@ export function ContactListPage() {
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
             options={[
-              { value: '', label: 'Tum Durumlar' },
-              { value: 'lead', label: 'Potansiyel' },
-              { value: 'prospect', label: 'Aday' },
-              { value: 'customer', label: 'Musteri' },
-              { value: 'inactive', label: 'Pasif' },
+              { value: '', label: t('crm:filter.allStatuses') },
+              { value: 'lead', label: t('crm:status.lead') },
+              { value: 'prospect', label: t('crm:status.prospect') },
+              { value: 'customer', label: t('crm:status.customer') },
+              { value: 'inactive', label: t('crm:status.inactive') },
             ]}
           />
-          <Button onClick={handleSearch}>Ara</Button>
+          <Button onClick={handleSearch}>{t('crm:search')}</Button>
         </div>
       </Card>
 
@@ -193,7 +179,7 @@ export function ContactListPage() {
           data={contacts}
           keyExtractor={(item) => item.id}
           loading={loading}
-          emptyMessage="Kisi bulunamadi"
+          emptyMessage={t('crm:empty')}
         />
 
         {totalPages > 1 && (
@@ -204,10 +190,10 @@ export function ContactListPage() {
               disabled={page === 1}
               onClick={() => setPage(page - 1)}
             >
-              Onceki
+              {t('crm:pagination.previous')}
             </Button>
             <span>
-              Sayfa {page} / {totalPages}
+              {t('crm:pagination.pageOf', { page, totalPages })}
             </span>
             <Button
               size="sm"
@@ -215,7 +201,7 @@ export function ContactListPage() {
               disabled={page === totalPages}
               onClick={() => setPage(page + 1)}
             >
-              Sonraki
+              {t('crm:pagination.next')}
             </Button>
           </div>
         )}

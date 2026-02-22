@@ -1,0 +1,158 @@
+{
+  "pageTitle": "e-Belgeler",
+  "totalDocuments": "Toplam {{count}} belge",
+  "newDocument": "+ Yeni e-Belge",
+  "emptyMessage": "e-Belge bulunamad\u0131",
+  "documentTypes": {
+    "e_fatura": "e-Fatura",
+    "e_arsiv": "e-Ar\u015fiv",
+    "e_ihracat": "e-\u0130hracat",
+    "e_irsaliye": "e-\u0130rsaliye",
+    "e_smm": "e-SMM"
+  },
+  "statuses": {
+    "draft": "Taslak",
+    "pending": "Bekliyor",
+    "sent": "G\u00f6nderildi",
+    "approved": "Onayland\u0131",
+    "rejected": "Reddedildi",
+    "cancelled": "\u0130ptal"
+  },
+  "typeFilter": {
+    "all": "T\u00fcm Belgeler"
+  },
+  "statusFilter": {
+    "all": "T\u00fcm Durumlar"
+  },
+  "columns": {
+    "document": "Belge",
+    "customer": "M\u00fc\u015fteri",
+    "date": "Tarih",
+    "amount": "Tutar",
+    "status": "Durum"
+  },
+  "actions": {
+    "send": "G\u00f6nder",
+    "query": "Sorgula",
+    "cancel": "\u0130ptal"
+  },
+  "summary": {
+    "eFatura": "e-Fatura",
+    "eArsiv": "e-Ar\u015fiv",
+    "eIrsaliye": "e-\u0130rsaliye",
+    "approved": "Onaylanan",
+    "pending": "Bekleyen"
+  },
+  "toast": {
+    "sentToGib": "Belge G\u0130B'e g\u00f6nderildi",
+    "sendFailed": "G\u00f6nderim ba\u015far\u0131s\u0131z",
+    "statusResult": "Durum: {{status}}",
+    "statusQueryFailed": "Durum sorgulanamad\u0131",
+    "cancelled": "Belge iptal edildi",
+    "cancelFailed": "\u0130ptal ba\u015far\u0131s\u0131z",
+    "loadError": "Belgeler y\u00fcklenirken hata olu\u015ftu",
+    "summaryLoadError": "\u00d6zet bilgileri y\u00fcklenemedi",
+    "loadSingleError": "Belge y\u00fcklenemedi",
+    "created": "e-Belge olu\u015fturuldu",
+    "createFailed": "e-Belge olu\u015fturulamad\u0131",
+    "referencesLoadError": "Referanslar y\u00fcklenemedi",
+    "popupBlocked": "Popup engelleyici aktif. L\u00fctfen izin verin.",
+    "selectReference": "L\u00fctfen bir referans se\u00e7in"
+  },
+  "confirm": {
+    "cancelMessage": "Belgeyi iptal etmek istedi\u011finizden emin misiniz?"
+  },
+  "detail": {
+    "backToList": "\u2190 e-Belgeler",
+    "totalAmount": "Toplam Tutar",
+    "sending": "G\u00f6nderiliyor...",
+    "sendToGib": "G\u0130B'e G\u00f6nder",
+    "querying": "Sorgulan\u0131yor...",
+    "queryStatus": "Durumu Sorgula",
+    "downloadPdf": "PDF \u0130ndir",
+    "cancelling": "\u0130ptal Ediliyor...",
+    "cancelAction": "\u0130ptal Et",
+    "documentInfo": "Belge Bilgileri",
+    "documentType": "Belge Tipi",
+    "documentNo": "Belge No",
+    "issueDate": "D\u00fczenleme Tarihi",
+    "reference": "Referans",
+    "status": "Durum",
+    "customerInfo": "M\u00fc\u015fteri Bilgileri",
+    "customer": "M\u00fc\u015fteri",
+    "defaultCustomer": "Genel M\u00fc\u015fteri",
+    "amountInfo": "Tutar Bilgileri",
+    "subtotal": "Ara Toplam",
+    "vatTotal": "KDV Toplam",
+    "grandTotal": "Genel Toplam",
+    "gibInfo": "G\u0130B Bilgileri",
+    "gibUuid": "G\u0130B UUID",
+    "envelopeUuid": "Zarf UUID",
+    "responseCode": "Yan\u0131t Kodu",
+    "responseMessage": "Yan\u0131t Mesaj\u0131",
+    "transactionHistory": "\u0130\u015flem Ge\u00e7mi\u015fi",
+    "notFound": "Belge bulunamad\u0131",
+    "goBack": "Geri D\u00f6n",
+    "loading": "Y\u00fckleniyor..."
+  },
+  "actionLabels": {
+    "created": "Olu\u015fturuldu",
+    "sent": "G\u00f6nderildi",
+    "send_failed": "G\u00f6nderim Ba\u015far\u0131s\u0131z",
+    "status_checked": "Durum Sorguland\u0131",
+    "cancelled": "\u0130ptal Edildi"
+  },
+  "referenceTypes": {
+    "sale": "Sat\u0131\u015f",
+    "return": "\u0130ade",
+    "waybill": "\u0130rsaliye"
+  },
+  "createModal": {
+    "title": "Yeni e-Belge Olu\u015ftur",
+    "documentType": "Belge T\u00fcr\u00fc *",
+    "referenceType": "Referans T\u00fcr\u00fc *",
+    "reference": "Referans *",
+    "selectReference": "Referans Se\u00e7in",
+    "unnamed": "\u0130simsiz",
+    "documentNo": "Belge No:",
+    "date": "Tarih:",
+    "customer": "M\u00fc\u015fteri:",
+    "customerNotSpecified": "Belirtilmemi\u015f",
+    "amount": "Tutar:",
+    "notes": "Notlar",
+    "notesPlaceholder": "Opsiyonel notlar...",
+    "cancel": "\u0130ptal",
+    "creating": "Olu\u015fturuluyor...",
+    "create": "e-Belge Olu\u015ftur",
+    "loading": "Y\u00fckleniyor...",
+    "documentTypeOptions": {
+      "e_fatura": "e-Fatura",
+      "e_arsiv": "e-Ar\u015fiv Fatura",
+      "e_ihracat": "e-\u0130hracat Faturas\u0131",
+      "e_irsaliye": "e-\u0130rsaliye",
+      "e_smm": "e-SMM"
+    },
+    "referenceTypeOptions": {
+      "sale": "Sat\u0131\u015f",
+      "return": "\u0130ade"
+    }
+  },
+  "pdf": {
+    "customerInfo": "M\u00fc\u015fteri Bilgileri",
+    "defaultCustomer": "Genel M\u00fc\u015fteri",
+    "documentDetails": "Belge Detaylar\u0131",
+    "documentType": "Belge Tipi:",
+    "reference": "Referans:",
+    "issueDate": "D\u00fczenleme Tarihi:",
+    "createdAt": "Olu\u015fturulma:",
+    "documentNo": "Belge No:",
+    "date": "Tarih:",
+    "status": "Durum:",
+    "subtotal": "Ara Toplam:",
+    "vatTotal": "KDV Toplam:",
+    "grandTotal": "GENEL TOPLAM:",
+    "envelopeUuid": "Zarf UUID:",
+    "responseCode": "Yan\u0131t Kodu:",
+    "electronicDocument": "Bu belge elektronik ortamda olu\u015fturulmu\u015ftur."
+  }
+}

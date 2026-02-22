@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Card, Button, Input, Spinner } from '@stok/ui';
 import { adminTenantsApi, CreateTenantData, UpdateTenantData } from '../../api/admin/tenants.api';
 import { adminPlansApi, Plan } from '../../api/admin/plans.api';
@@ -7,6 +8,7 @@ import { useToast } from '../../context/ToastContext';
 import styles from './AdminPages.module.css';
 
 export function TenantFormPage() {
+  const { t } = useTranslation(['admin', 'common']);
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const isEditing = Boolean(id);
@@ -38,7 +40,7 @@ export function TenantFormPage() {
       const response = await adminPlansApi.getAll(true);
       setPlans(response.data);
     } catch (err) {
-      showToast('error', 'Planlar yuklenemedi');
+      showToast('error', t('admin:tenantForm.plansLoadFailed'));
     }
   };
 
@@ -56,8 +58,8 @@ export function TenantFormPage() {
         status: tenant.status,
       });
     } catch (err) {
-      showToast('error', 'Organizasyon yuklenemedi');
-      setError('Organizasyon yuklenemedi');
+      showToast('error', t('admin:tenantForm.loadFailed'));
+      setError(t('admin:tenantForm.loadFailed'));
     } finally {
       setIsLoading(false);
     }
@@ -68,7 +70,7 @@ export function TenantFormPage() {
     setError(null);
 
     if (!formData.name.trim()) {
-      setError('Organizasyon adi zorunludur');
+      setError(t('admin:tenantForm.nameRequired'));
       return;
     }
 
@@ -92,8 +94,8 @@ export function TenantFormPage() {
 
       navigate('/admin/tenants');
     } catch (err: any) {
-      showToast('error', 'Organizasyon kaydedilemedi');
-      setError(err instanceof Error ? err.message : 'Organizasyon kaydedilemedi');
+      showToast('error', t('admin:tenantForm.saveFailed'));
+      setError(err instanceof Error ? err.message : t('admin:tenantForm.saveFailed'));
     } finally {
       setIsSaving(false);
     }
@@ -134,10 +136,10 @@ export function TenantFormPage() {
       <div className={styles.pageHeader}>
         <div>
           <Button variant="ghost" onClick={() => navigate('/admin/tenants')}>
-            ← Geri
+            &larr; {t('admin:tenantForm.back')}
           </Button>
           <h1 className={styles.pageTitle}>
-            {isEditing ? 'Organizasyonu Duzenle' : 'Yeni Organizasyon'}
+            {isEditing ? t('admin:tenantForm.editTitle') : t('admin:tenantForm.newTitle')}
           </h1>
         </div>
       </div>
@@ -152,39 +154,39 @@ export function TenantFormPage() {
 
           <div className={styles.formGrid}>
             <div className={styles.field}>
-              <label>Organizasyon Adi *</label>
+              <label>{t('admin:tenantForm.labelName')}</label>
               <Input
                 value={formData.name}
                 onChange={handleNameChange}
-                placeholder="Ornek: ABC Ticaret Ltd. Sti."
+                placeholder={t('admin:tenantForm.namePlaceholder')}
                 required
               />
             </div>
 
             <div className={styles.field}>
-              <label>Slug (URL)</label>
+              <label>{t('admin:tenantForm.labelSlug')}</label>
               <Input
                 value={formData.slug}
                 onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
-                placeholder="abc-ticaret"
+                placeholder={t('admin:tenantForm.slugPlaceholder')}
                 disabled={isEditing}
               />
               <small className={styles.fieldHint}>
-                URL'de kullanilacak benzersiz tanimlayici
+                {t('admin:tenantForm.slugHint')}
               </small>
             </div>
 
             <div className={styles.field}>
-              <label>Domain</label>
+              <label>{t('admin:tenantForm.labelDomain')}</label>
               <Input
                 value={formData.domain}
                 onChange={(e) => setFormData({ ...formData, domain: e.target.value })}
-                placeholder="abc-ticaret.stokpro.com"
+                placeholder={t('admin:tenantForm.domainPlaceholder')}
               />
             </div>
 
             <div className={styles.field}>
-              <label>Fatura E-posta</label>
+              <label>{t('admin:tenantForm.labelBillingEmail')}</label>
               <Input
                 type="email"
                 value={formData.billingEmail}
@@ -194,42 +196,42 @@ export function TenantFormPage() {
             </div>
 
             <div className={styles.field}>
-              <label>Plan</label>
+              <label>{t('admin:tenantForm.labelPlan')}</label>
               <select
                 value={formData.planId}
                 onChange={(e) => setFormData({ ...formData, planId: e.target.value })}
                 className={styles.select}
               >
-                <option value="">Plan Secin</option>
+                <option value="">{t('admin:tenantForm.selectPlan')}</option>
                 {plans.map((plan) => (
                   <option key={plan.id} value={plan.id}>
-                    {plan.name} - {new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY' }).format(plan.price)}/{plan.billing_period === 'monthly' ? 'ay' : 'yil'}
+                    {plan.name} - {new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY' }).format(plan.price)}/{plan.billing_period === 'monthly' ? t('admin:tenantForm.billingMonthly') : t('admin:tenantForm.billingYearly')}
                   </option>
                 ))}
               </select>
             </div>
 
             <div className={styles.field}>
-              <label>Durum</label>
+              <label>{t('admin:tenantForm.labelStatus')}</label>
               <select
                 value={formData.status}
                 onChange={(e) => setFormData({ ...formData, status: e.target.value })}
                 className={styles.select}
               >
-                <option value="active">Aktif</option>
-                <option value="trial">Deneme</option>
-                <option value="suspended">Askida</option>
-                <option value="cancelled">Iptal</option>
+                <option value="active">{t('admin:tenantForm.statusActive')}</option>
+                <option value="trial">{t('admin:tenantForm.statusTrial')}</option>
+                <option value="suspended">{t('admin:tenantForm.statusSuspended')}</option>
+                <option value="cancelled">{t('admin:tenantForm.statusCancelled')}</option>
               </select>
             </div>
           </div>
 
           <div className={styles.formActions}>
             <Button type="button" variant="ghost" onClick={() => navigate('/admin/tenants')}>
-              Iptal
+              {t('admin:tenantForm.cancel')}
             </Button>
             <Button type="submit" variant="primary" disabled={isSaving}>
-              {isSaving ? 'Kaydediliyor...' : (isEditing ? 'Guncelle' : 'Olustur')}
+              {isSaving ? t('admin:tenantForm.saving') : (isEditing ? t('admin:tenantForm.update') : t('admin:tenantForm.create'))}
             </Button>
           </div>
         </form>

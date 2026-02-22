@@ -1,0 +1,127 @@
+{
+  "buttons": {
+    "save": "Kaydet",
+    "cancel": "Vazgeç",
+    "delete": "Sil",
+    "edit": "Düzenle",
+    "create": "Oluştur",
+    "add": "Ekle",
+    "confirm": "Onayla",
+    "back": "Geri",
+    "close": "Kapat",
+    "search": "Ara",
+    "filter": "Filtrele",
+    "export": "Dışa Aktar",
+    "print": "Yazdır",
+    "refresh": "Yenile",
+    "submit": "Gönder",
+    "update": "Güncelle",
+    "apply": "Uygula",
+    "clear": "Temizle",
+    "selectAll": "Tümünü Seç",
+    "yes": "Evet",
+    "no": "Hayır"
+  },
+  "labels": {
+    "name": "Ad",
+    "email": "E-posta",
+    "phone": "Telefon",
+    "address": "Adres",
+    "date": "Tarih",
+    "status": "Durum",
+    "actions": "İşlemler",
+    "total": "Toplam",
+    "description": "Açıklama",
+    "note": "Not",
+    "notes": "Notlar",
+    "amount": "Tutar",
+    "loading": "Yükleniyor...",
+    "quantity": "Miktar",
+    "price": "Fiyat",
+    "unit": "Birim",
+    "type": "Tip",
+    "category": "Kategori",
+    "active": "Aktif",
+    "inactive": "Pasif",
+    "all": "Tümü",
+    "none": "Yok",
+    "details": "Detaylar",
+    "general": "Genel",
+    "required": "Zorunlu",
+    "optional": "Opsiyonel"
+  },
+  "pagination": {
+    "showing": "{{from}}-{{to}} / {{total}} kayıt gösteriliyor",
+    "previous": "Önceki",
+    "next": "Sonraki",
+    "first": "İlk",
+    "last": "Son",
+    "page": "Sayfa",
+    "of": "/"
+  },
+  "errors": {
+    "generic": "Bir hata oluştu",
+    "loadFailed": "Veriler yüklenemedi",
+    "saveFailed": "Kayıt başarısız",
+    "deleteFailed": "Silme başarısız",
+    "required": "Bu alan zorunludur",
+    "notFound": "Bulunamadı",
+    "unauthorized": "Yetkisiz erişim",
+    "networkError": "Bağlantı hatası"
+  },
+  "confirm": {
+    "title": "Onay",
+    "defaultConfirm": "Onayla",
+    "defaultCancel": "Vazgeç",
+    "deleteTitle": "Silme Onayı",
+    "deleteMessage": "Bu kaydı silmek istediğinizden emin misiniz?"
+  },
+  "success": {
+    "saved": "Başarıyla kaydedildi",
+    "deleted": "Başarıyla silindi",
+    "updated": "Başarıyla güncellendi",
+    "created": "Başarıyla oluşturuldu"
+  },
+  "paymentMethods": {
+    "nakit": "Nakit",
+    "kredi_karti": "Kredi Kartı",
+    "havale": "Havale",
+    "veresiye": "Veresiye"
+  },
+  "saleStatuses": {
+    "completed": "Tamamlandı",
+    "cancelled": "İptal",
+    "refunded": "İade Edildi"
+  },
+  "saleTypes": {
+    "retail": "Perakende",
+    "wholesale": "Toptan"
+  },
+  "units": {
+    "adet": "Adet",
+    "kg": "Kg",
+    "litre": "Litre",
+    "metre": "Metre",
+    "paket": "Paket",
+    "kutu": "Kutu"
+  },
+  "expenseCategories": {
+    "kira": "Kira",
+    "vergi": "Vergi",
+    "maas": "Maaş",
+    "fatura": "Fatura",
+    "diger": "Diğer"
+  },
+  "vatRates": {
+    "all": "Tümü",
+    "withVat": "KDV Dahil",
+    "withoutVat": "KDV Hariç"
+  },
+  "time": {
+    "today": "Bugün",
+    "yesterday": "Dün",
+    "thisWeek": "Bu Hafta",
+    "thisMonth": "Bu Ay",
+    "thisYear": "Bu Yıl"
+  }
+}

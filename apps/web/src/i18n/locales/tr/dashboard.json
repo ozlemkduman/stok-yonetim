@@ -1,0 +1,41 @@
+{
+  "title": "Özet",
+  "refresh": "Yenile",
+  "errors": {
+    "loadFailed": "Özet verileri yüklenemedi"
+  },
+  "stats": {
+    "dailySales": "Günlük Satış",
+    "dailySalesTransactions": "{{count}} işlem",
+    "totalProducts": "Toplam Ürün",
+    "totalProductsSub": "Aktif ürünler",
+    "totalCustomers": "Toplam Müşteri",
+    "totalCustomersSub": "Kayıtlı müşteriler",
+    "lowStock": "Düşük Stok",
+    "lowStockSub": "Kritik seviye",
+    "totalDebt": "Toplam Borç",
+    "totalCredit": "Toplam Alacak",
+    "monthlyExpenses": "Aylık Gider"
+  },
+  "quickActions": {
+    "newSale": "Yeni Satış",
+    "addProduct": "Ürün Ekle",
+    "addCustomer": "Müşteri Ekle",
+    "reports": "Raporlar"
+  },
+  "lowStockTable": {
+    "title": "Düşük Stok Ürünleri",
+    "productCount": "{{count}} ürün",
+    "columnProductName": "Ürün Adı",
+    "columnCurrentStock": "Mevcut Stok",
+    "columnMinLevel": "Min. Seviye",
+    "empty": "Düşük stok ürünü yok"
+  },
+  "debtorsTable": {
+    "title": "En Borçlu Müşteriler",
+    "customerCount": "{{count}} müşteri",
+    "columnCustomer": "Müşteri",
+    "columnDebtAmount": "Borç Tutarı",
+    "empty": "Borçlu müşteri yok"
+  }
+}

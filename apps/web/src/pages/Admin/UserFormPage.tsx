@@ -1,17 +1,14 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Card, Button, Input, Spinner } from '@stok/ui';
 import { adminUsersApi, CreateUserData, UpdateUserData } from '../../api/admin/users.api';
 import { adminTenantsApi, Tenant } from '../../api/admin/tenants.api';
 import { useToast } from '../../context/ToastContext';
 import styles from './AdminPages.module.css';
 
-const roleOptions = [
-  { value: 'tenant_admin', label: 'Organizasyon Yoneticisi' },
-  { value: 'user', label: 'Kullanici' },
-];
-
 export function UserFormPage() {
+  const { t } = useTranslation(['admin', 'common']);
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const isEditing = Boolean(id);
@@ -44,7 +41,7 @@ export function UserFormPage() {
       const response = await adminTenantsApi.getAll({ limit: 100 });
       setTenants(response.data);
     } catch (err) {
-      showToast('error', 'Organizasyonlar yuklenemedi');
+      showToast('error', t('admin:userForm.orgsLoadFailed'));
     }
   };
 
@@ -63,8 +60,8 @@ export function UserFormPage() {
         status: user.status,
       });
     } catch (err) {
-      showToast('error', 'Kullanici yuklenemedi');
-      setError('Kullanici yuklenemedi');
+      showToast('error', t('admin:userForm.loadFailed'));
+      setError(t('admin:userForm.loadFailed'));
     } finally {
       setIsLoading(false);
     }
@@ -75,22 +72,22 @@ export function UserFormPage() {
     setError(null);
 
     if (!formData.name.trim()) {
-      setError('Kullanici adi zorunludur');
+      setError(t('admin:userForm.nameRequired'));
       return;
     }
 
     if (!isEditing && !formData.email.trim()) {
-      setError('E-posta adresi zorunludur');
+      setError(t('admin:userForm.emailRequired'));
       return;
     }
 
     if (!isEditing && !formData.password) {
-      setError('Sifre zorunludur');
+      setError(t('admin:userForm.passwordRequired'));
       return;
     }
 
     if (!isEditing && formData.password.length < 6) {
-      setError('Sifre en az 6 karakter olmalidir');
+      setError(t('admin:userForm.passwordTooShort'));
       return;
     }
 
@@ -120,8 +117,8 @@ export function UserFormPage() {
 
       navigate('/admin/users');
     } catch (err: any) {
-      showToast('error', 'Kullanici kaydedilemedi');
-      setError(err instanceof Error ? err.message : 'Kullanici kaydedilemedi');
+      showToast('error', t('admin:userForm.saveFailed'));
+      setError(err instanceof Error ? err.message : t('admin:userForm.saveFailed'));
     } finally {
       setIsSaving(false);
     }
@@ -140,10 +137,10 @@ export function UserFormPage() {
       <div className={styles.pageHeader}>
         <div>
           <Button variant="ghost" onClick={() => navigate('/admin/users')}>
-            ← Geri
+            &larr; {t('admin:userForm.back')}
           </Button>
           <h1 className={styles.pageTitle}>
-            {isEditing ? 'Kullaniciyi Duzenle' : 'Yeni Kullanici'}
+            {isEditing ? t('admin:userForm.editTitle') : t('admin:userForm.newTitle')}
           </h1>
         </div>
       </div>
@@ -158,47 +155,47 @@ export function UserFormPage() {
 
           <div className={styles.formGrid}>
             <div className={styles.field}>
-              <label>Ad Soyad *</label>
+              <label>{t('admin:userForm.labelName')}</label>
               <Input
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                placeholder="Ornek: Ahmet Yilmaz"
+                placeholder={t('admin:userForm.namePlaceholder')}
                 required
               />
             </div>
 
             <div className={styles.field}>
-              <label>E-posta *</label>
+              <label>{t('admin:userForm.labelEmail')}</label>
               <Input
                 type="email"
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                placeholder="ornek@sirket.com"
+                placeholder={t('admin:userForm.emailPlaceholder')}
                 disabled={isEditing}
                 required={!isEditing}
               />
               {isEditing && (
                 <small className={styles.fieldHint}>
-                  E-posta adresi degistirilemez
+                  {t('admin:userForm.emailReadonly')}
                 </small>
               )}
             </div>
 
             {!isEditing && (
               <div className={styles.field}>
-                <label>Sifre *</label>
+                <label>{t('admin:userForm.labelPassword')}</label>
                 <Input
                   type="password"
                   value={formData.password}
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  placeholder="En az 6 karakter"
+                  placeholder={t('admin:userForm.passwordPlaceholder')}
                   required
                 />
               </div>
             )}
 
             <div className={styles.field}>
-              <label>Telefon</label>
+              <label>{t('admin:userForm.labelPhone')}</label>
               <Input
                 type="tel"
                 value={formData.phone}
@@ -208,28 +205,25 @@ export function UserFormPage() {
             </div>
 
             <div className={styles.field}>
-              <label>Rol</label>
+              <label>{t('admin:userForm.labelRole')}</label>
               <select
                 value={formData.role}
                 onChange={(e) => setFormData({ ...formData, role: e.target.value })}
                 className={styles.select}
               >
-                {roleOptions.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
+                <option value="tenant_admin">{t('admin:userForm.roleOrgAdmin')}</option>
+                <option value="user">{t('admin:userForm.roleUser')}</option>
               </select>
             </div>
 
             <div className={styles.field}>
-              <label>Organizasyon</label>
+              <label>{t('admin:userForm.labelOrganization')}</label>
               <select
                 value={formData.tenantId}
                 onChange={(e) => setFormData({ ...formData, tenantId: e.target.value })}
                 className={styles.select}
               >
-                <option value="">Organizasyon Secin</option>
+                <option value="">{t('admin:userForm.selectOrg')}</option>
                 {tenants.map((tenant) => (
                   <option key={tenant.id} value={tenant.id}>
                     {tenant.name}
@@ -237,20 +231,20 @@ export function UserFormPage() {
                 ))}
               </select>
               <small className={styles.fieldHint}>
-                Bos birakilirsa kullanici hicbir organizasyona bagli olmaz
+                {t('admin:userForm.orgHint')}
               </small>
             </div>
 
             {isEditing && (
               <div className={styles.field}>
-                <label>Durum</label>
+                <label>{t('admin:userForm.labelStatus')}</label>
                 <select
                   value={formData.status}
                   onChange={(e) => setFormData({ ...formData, status: e.target.value })}
                   className={styles.select}
                 >
-                  <option value="active">Aktif</option>
-                  <option value="suspended">Askida</option>
+                  <option value="active">{t('admin:userForm.statusActive')}</option>
+                  <option value="suspended">{t('admin:userForm.statusSuspended')}</option>
                 </select>
               </div>
             )}
@@ -258,10 +252,10 @@ export function UserFormPage() {
 
           <div className={styles.formActions}>
             <Button type="button" variant="ghost" onClick={() => navigate('/admin/users')}>
-              Iptal
+              {t('admin:userForm.cancel')}
             </Button>
             <Button type="submit" variant="primary" disabled={isSaving}>
-              {isSaving ? 'Kaydediliyor...' : (isEditing ? 'Guncelle' : 'Olustur')}
+              {isSaving ? t('admin:userForm.saving') : (isEditing ? t('admin:userForm.update') : t('admin:userForm.create'))}
             </Button>
           </div>
         </form>

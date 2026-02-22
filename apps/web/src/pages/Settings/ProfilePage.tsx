@@ -1,10 +1,12 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Card, Button, Input } from '@stok/ui';
 import { useAuth } from '../../context/AuthContext';
 import { authApi } from '../../api/auth.api';
 import styles from './SettingsPages.module.css';
 
 export function ProfilePage() {
+  const { t } = useTranslation(['settings', 'common']);
   const { user } = useAuth();
   const [passwordData, setPasswordData] = useState({
     currentPassword: '',
@@ -21,12 +23,12 @@ export function ProfilePage() {
     setError('');
 
     if (passwordData.newPassword !== passwordData.confirmPassword) {
-      setError('Yeni sifreler eslesmiyor');
+      setError(t('settings:profile.passwordMismatch'));
       return;
     }
 
     if (passwordData.newPassword.length < 8) {
-      setError('Yeni sifre en az 8 karakter olmalidir');
+      setError(t('settings:profile.passwordTooShort'));
       return;
     }
 
@@ -34,14 +36,14 @@ export function ProfilePage() {
 
     try {
       await authApi.changePassword(passwordData.currentPassword, passwordData.newPassword);
-      setMessage('Sifreniz basariyla degistirildi');
+      setMessage(t('settings:profile.passwordChanged'));
       setPasswordData({
         currentPassword: '',
         newPassword: '',
         confirmPassword: '',
       });
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Sifre degistirilemedi');
+      setError(err instanceof Error ? err.message : t('settings:profile.passwordChangeFailed'));
     } finally {
       setIsChangingPassword(false);
     }
@@ -49,32 +51,32 @@ export function ProfilePage() {
 
   return (
     <div className={styles.page}>
-      <h1 className={styles.pageTitle}>Profil</h1>
+      <h1 className={styles.pageTitle}>{t('settings:profile.title')}</h1>
 
       <div className={styles.grid}>
         <Card className={styles.section}>
-          <h2 className={styles.sectionTitle}>Hesap Bilgileri</h2>
+          <h2 className={styles.sectionTitle}>{t('settings:profile.accountInfo')}</h2>
           <dl className={styles.detailList}>
-            <dt>Ad Soyad</dt>
+            <dt>{t('settings:profile.fullName')}</dt>
             <dd>{user?.name}</dd>
 
-            <dt>E-posta</dt>
+            <dt>{t('settings:profile.email')}</dt>
             <dd>{user?.email}</dd>
 
-            <dt>Rol</dt>
+            <dt>{t('settings:profile.role')}</dt>
             <dd>{user?.role}</dd>
 
-            <dt>Sirket</dt>
+            <dt>{t('settings:profile.company')}</dt>
             <dd>{user?.tenant?.name || '-'}</dd>
           </dl>
         </Card>
 
         <Card className={styles.section}>
-          <h2 className={styles.sectionTitle}>Sifre Degistir</h2>
+          <h2 className={styles.sectionTitle}>{t('settings:profile.changePassword')}</h2>
 
           <form onSubmit={handlePasswordChange} className={styles.form}>
             <div className={styles.field}>
-              <label>Mevcut Sifre</label>
+              <label>{t('settings:profile.currentPassword')}</label>
               <Input
                 type="password"
                 value={passwordData.currentPassword}
@@ -86,7 +88,7 @@ export function ProfilePage() {
             </div>
 
             <div className={styles.field}>
-              <label>Yeni Sifre</label>
+              <label>{t('settings:profile.newPassword')}</label>
               <Input
                 type="password"
                 value={passwordData.newPassword}
@@ -99,7 +101,7 @@ export function ProfilePage() {
             </div>
 
             <div className={styles.field}>
-              <label>Yeni Sifre Tekrar</label>
+              <label>{t('settings:profile.confirmPassword')}</label>
               <Input
                 type="password"
                 value={passwordData.confirmPassword}
@@ -114,7 +116,7 @@ export function ProfilePage() {
             {message && <p className={styles.success}>{message}</p>}
 
             <Button type="submit" variant="primary" disabled={isChangingPassword}>
-              {isChangingPassword ? 'Degistiriliyor...' : 'Sifreyi Degistir'}
+              {isChangingPassword ? t('settings:profile.changingPassword') : t('settings:profile.changePasswordButton')}
             </Button>
           </form>
         </Card>

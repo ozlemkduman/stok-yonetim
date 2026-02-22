@@ -1,16 +1,11 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Card, Table, Button, Input, Badge, Pagination, type Column } from '@stok/ui';
 import { adminUsersApi, AdminUser } from '../../api/admin/users.api';
 import { useConfirmDialog } from '../../context/ConfirmDialogContext';
 import { useToast } from '../../context/ToastContext';
 import styles from './AdminPages.module.css';
-
-const roleLabels: Record<string, string> = {
-  super_admin: 'Super Admin',
-  tenant_admin: 'Tenant Admin',
-  user: 'Kullanici',
-};
 
 const statusColors: Record<string, 'success' | 'warning' | 'danger' | 'default'> = {
   active: 'success',
@@ -18,13 +13,8 @@ const statusColors: Record<string, 'success' | 'warning' | 'danger' | 'default'>
   inactive: 'default',
 };
 
-const statusLabels: Record<string, string> = {
-  active: 'Aktif',
-  suspended: 'Askida',
-  inactive: 'Pasif',
-};
-
 export function AdminUsersPage() {
+  const { t } = useTranslation(['admin', 'common']);
   const navigate = useNavigate();
   const { confirm } = useConfirmDialog();
   const { showToast } = useToast();
@@ -35,6 +25,18 @@ export function AdminUsersPage() {
   const [statusFilter, setStatusFilter] = useState('');
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+
+  const roleLabels: Record<string, string> = {
+    super_admin: t('admin:users.roleSuperAdmin'),
+    tenant_admin: t('admin:users.roleTenantAdmin'),
+    user: t('admin:users.roleUser'),
+  };
+
+  const statusLabels: Record<string, string> = {
+    active: t('admin:users.statusActive'),
+    suspended: t('admin:users.statusSuspended'),
+    inactive: t('admin:users.statusInactive'),
+  };
 
   useEffect(() => {
     loadUsers();
@@ -54,21 +56,21 @@ export function AdminUsersPage() {
       setUsers(response.data);
       setTotalPages(response.meta?.totalPages || 1);
     } catch (error) {
-      showToast('error', 'Kullanicilar yuklenemedi');
+      showToast('error', t('admin:users.loadFailed'));
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleSuspend = async (id: string) => {
-    const confirmed = await confirm({ message: 'Bu kullaniciyi askiya almak istediginize emin misiniz?', variant: 'danger' });
+    const confirmed = await confirm({ message: t('admin:users.suspendConfirm'), variant: 'danger' });
     if (!confirmed) return;
 
     try {
       await adminUsersApi.suspend(id);
       loadUsers();
     } catch (error) {
-      showToast('error', 'Kullanici askiya alinamadi');
+      showToast('error', t('admin:users.suspendFailed'));
     }
   };
 
@@ -77,14 +79,14 @@ export function AdminUsersPage() {
       await adminUsersApi.activate(id);
       loadUsers();
     } catch (error) {
-      showToast('error', 'Kullanici aktif edilemedi');
+      showToast('error', t('admin:users.activateFailed'));
     }
   };
 
   const columns: Column<AdminUser>[] = [
     {
       key: 'name',
-      header: 'Kullanici',
+      header: t('admin:users.columnUser'),
       render: (user) => (
         <div>
           <div className={styles.link}>{user.name}</div>
@@ -94,7 +96,7 @@ export function AdminUsersPage() {
     },
     {
       key: 'tenant',
-      header: 'Organizasyon',
+      header: t('admin:users.columnOrganization'),
       render: (user) =>
         user.tenant_name ? (
           <Link to={`/admin/tenants/${user.tenant_id}`} className={styles.link}>
@@ -106,12 +108,12 @@ export function AdminUsersPage() {
     },
     {
       key: 'role',
-      header: 'Rol',
+      header: t('admin:users.columnRole'),
       render: (user) => roleLabels[user.role] || user.role,
     },
     {
       key: 'status',
-      header: 'Durum',
+      header: t('admin:users.columnStatus'),
       render: (user) => (
         <Badge variant={statusColors[user.status] || 'default'}>
           {statusLabels[user.status] || user.status}
@@ -120,11 +122,11 @@ export function AdminUsersPage() {
     },
     {
       key: 'last_login',
-      header: 'Son Giris',
+      header: t('admin:users.columnLastLogin'),
       render: (user) =>
         user.last_login_at
           ? new Date(user.last_login_at).toLocaleDateString('tr-TR')
-          : 'Hic giris yapmadi',
+          : t('admin:users.neverLoggedIn'),
     },
     {
       key: 'actions',
@@ -138,7 +140,7 @@ export function AdminUsersPage() {
                 size="sm"
                 onClick={() => navigate(`/admin/users/${user.id}/edit`)}
               >
-                Duzenle
+                {t('admin:users.edit')}
               </Button>
               {user.status === 'active' ? (
                 <Button
@@ -146,7 +148,7 @@ export function AdminUsersPage() {
                   size="sm"
                   onClick={() => handleSuspend(user.id)}
                 >
-                  Askiya Al
+                  {t('admin:users.suspend')}
                 </Button>
               ) : (
                 <Button
@@ -154,7 +156,7 @@ export function AdminUsersPage() {
                   size="sm"
                   onClick={() => handleActivate(user.id)}
                 >
-                  Aktif Et
+                  {t('admin:users.activate')}
                 </Button>
               )}
             </>
@@ -167,16 +169,16 @@ export function AdminUsersPage() {
   return (
     <div className={styles.page}>
       <div className={styles.pageHeader}>
-        <h1 className={styles.pageTitle}>Kullanicilar</h1>
+        <h1 className={styles.pageTitle}>{t('admin:users.title')}</h1>
         <Button variant="primary" onClick={() => navigate('/admin/users/new')}>
-          Yeni Kullanici
+          {t('admin:users.newUser')}
         </Button>
       </div>
 
       <Card className={styles.filters}>
         <div className={styles.filterRow}>
           <Input
-            placeholder="Ara..."
+            placeholder={t('admin:users.searchPlaceholder')}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
@@ -185,19 +187,19 @@ export function AdminUsersPage() {
             onChange={(e) => setRoleFilter(e.target.value)}
             className={styles.select}
           >
-            <option value="">Tum Roller</option>
-            <option value="super_admin">Super Admin</option>
-            <option value="tenant_admin">Tenant Admin</option>
-            <option value="user">Kullanici</option>
+            <option value="">{t('admin:users.allRoles')}</option>
+            <option value="super_admin">{t('admin:users.roleSuperAdmin')}</option>
+            <option value="tenant_admin">{t('admin:users.roleTenantAdmin')}</option>
+            <option value="user">{t('admin:users.roleUser')}</option>
           </select>
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
             className={styles.select}
           >
-            <option value="">Tum Durumlar</option>
-            <option value="active">Aktif</option>
-            <option value="suspended">Askida</option>
+            <option value="">{t('admin:users.allStatuses')}</option>
+            <option value="active">{t('admin:users.statusActive')}</option>
+            <option value="suspended">{t('admin:users.statusSuspended')}</option>
           </select>
         </div>
       </Card>
@@ -208,7 +210,7 @@ export function AdminUsersPage() {
           data={users}
           keyExtractor={(user) => user.id}
           loading={isLoading}
-          emptyMessage="Kullanici bulunamadi"
+          emptyMessage={t('admin:users.emptyMessage')}
         />
 
         {totalPages > 1 && (

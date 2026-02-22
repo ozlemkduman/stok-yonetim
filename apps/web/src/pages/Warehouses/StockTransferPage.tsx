@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Button, Card, Input, Select, Table, Badge, type Column } from '@stok/ui';
 import {
   Warehouse,
@@ -12,14 +13,8 @@ import { useConfirmDialog } from '../../context/ConfirmDialogContext';
 import { formatDate } from '../../utils/formatters';
 import styles from './StockTransferPage.module.css';
 
-const STATUS_LABELS: Record<string, string> = {
-  pending: 'Beklemede',
-  in_transit: 'Transfer Ediliyor',
-  completed: 'Tamamlandi',
-  cancelled: 'Iptal',
-};
-
 export function StockTransferPage() {
+  const { t } = useTranslation(['warehouses', 'common']);
   const { showToast } = useToast();
   const { confirm } = useConfirmDialog();
 
@@ -55,7 +50,7 @@ export function StockTransferPage() {
         setTotalPages(transfersRes.meta.totalPages);
       }
     } catch (err) {
-      showToast('error', 'Veriler yuklenirken hata olustu');
+      showToast('error', t('warehouses:toast.dataLoadError'));
     } finally {
       setLoading(false);
     }
@@ -92,17 +87,17 @@ export function StockTransferPage() {
     e.preventDefault();
 
     if (!fromWarehouseId || !toWarehouseId) {
-      showToast('error', 'Kaynak ve hedef depo secin');
+      showToast('error', t('warehouses:toast.selectWarehousesError'));
       return;
     }
 
     if (fromWarehouseId === toWarehouseId) {
-      showToast('error', 'Kaynak ve hedef depo ayni olamaz');
+      showToast('error', t('warehouses:toast.sameWarehouseError'));
       return;
     }
 
     if (items.length === 0 || items.some(item => !item.product_id || item.quantity < 1)) {
-      showToast('error', 'Gecerli urun ve miktar girin');
+      showToast('error', t('warehouses:toast.invalidItemsError'));
       return;
     }
 
@@ -115,12 +110,12 @@ export function StockTransferPage() {
         items: items.map(i => ({ product_id: i.product_id, quantity: i.quantity })),
         notes: notes || undefined,
       });
-      showToast('success', 'Transfer olusturuldu');
+      showToast('success', t('warehouses:toast.transferCreateSuccess'));
       setShowForm(false);
       resetForm();
       loadData();
     } catch (err) {
-      showToast('error', err instanceof Error ? err.message : 'Transfer olusturulamadi');
+      showToast('error', err instanceof Error ? err.message : t('warehouses:toast.transferCreateFailed'));
     } finally {
       setSaving(false);
     }
@@ -135,81 +130,81 @@ export function StockTransferPage() {
   };
 
   const handleComplete = async (transfer: StockTransfer) => {
-    const confirmed = await confirm({ message: 'Transferi tamamlamak istediginize emin misiniz?', variant: 'warning' });
+    const confirmed = await confirm({ message: t('warehouses:confirm.completeTransferAlt'), variant: 'warning' });
     if (!confirmed) return;
     try {
       await warehousesApi.completeTransfer(transfer.id);
-      showToast('success', 'Transfer tamamlandi');
+      showToast('success', t('warehouses:toast.completeSuccess'));
       loadData();
     } catch (err) {
-      showToast('error', err instanceof Error ? err.message : 'Islem basarisiz');
+      showToast('error', err instanceof Error ? err.message : t('warehouses:toast.operationFailed'));
     }
   };
 
   const handleCancel = async (transfer: StockTransfer) => {
-    const confirmed = await confirm({ message: 'Transferi iptal etmek istediginize emin misiniz?', variant: 'danger' });
+    const confirmed = await confirm({ message: t('warehouses:confirm.cancelTransferAlt'), variant: 'danger' });
     if (!confirmed) return;
     try {
       await warehousesApi.cancelTransfer(transfer.id);
-      showToast('success', 'Transfer iptal edildi');
+      showToast('success', t('warehouses:toast.cancelSuccess'));
       loadData();
     } catch (err) {
-      showToast('error', err instanceof Error ? err.message : 'Islem basarisiz');
+      showToast('error', err instanceof Error ? err.message : t('warehouses:toast.operationFailed'));
     }
   };
 
   const columns: Column<StockTransfer>[] = [
     {
       key: 'transfer_number',
-      header: 'Transfer No',
-      render: (t) => <strong>{t.transfer_number}</strong>,
+      header: t('warehouses:columns.transferNo'),
+      render: (tr) => <strong>{tr.transfer_number}</strong>,
     },
     {
       key: 'from_warehouse',
-      header: 'Kaynak Depo',
-      render: (t) => t.from_warehouse_name || '-',
+      header: t('warehouses:columns.sourceWarehouse'),
+      render: (tr) => tr.from_warehouse_name || '-',
     },
     {
       key: 'to_warehouse',
-      header: 'Hedef Depo',
-      render: (t) => t.to_warehouse_name || '-',
+      header: t('warehouses:columns.targetWarehouse'),
+      render: (tr) => tr.to_warehouse_name || '-',
     },
     {
       key: 'transfer_date',
-      header: 'Tarih',
-      render: (t) => formatDate(t.transfer_date),
+      header: t('warehouses:columns.date'),
+      render: (tr) => formatDate(tr.transfer_date),
     },
     {
       key: 'status',
-      header: 'Durum',
-      render: (t) => (
+      header: t('warehouses:columns.status'),
+      render: (tr) => (
         <Badge variant={
-          t.status === 'completed' ? 'success' :
-          t.status === 'cancelled' ? 'danger' :
-          t.status === 'in_transit' ? 'info' : 'warning'
+          tr.status === 'completed' ? 'success' :
+          tr.status === 'cancelled' ? 'danger' :
+          tr.status === 'in_transit' ? 'info' : 'warning'
         }>
-          {STATUS_LABELS[t.status]}
+          {t(`warehouses:transferStatusAlt.${tr.status}`)}
         </Badge>
       ),
     },
     {
       key: 'actions',
       header: '',
-      render: (t) => (
+      render: (tr) => (
         <div className={styles.actions}>
-          {t.status === 'pending' && (
+          {tr.status === 'pending' && (
             <>
-              <Button size="sm" variant="primary" onClick={() => handleComplete(t)}>
-                Tamamla
+              <Button size="sm" variant="primary" onClick={() => handleComplete(tr)}>
+                {t('warehouses:buttons.complete')}
               </Button>
-              <Button size="sm" variant="ghost" onClick={() => handleCancel(t)}>
-                Iptal
+              <Button size="sm" variant="ghost" onClick={() => handleCancel(tr)}>
+                {t('warehouses:buttons.cancel')}
               </Button>
             </>
           )}
-          {t.status === 'in_transit' && (
-            <Button size="sm" variant="primary" onClick={() => handleComplete(t)}>
-              Tamamla
+          {tr.status === 'in_transit' && (
+            <Button size="sm" variant="primary" onClick={() => handleComplete(tr)}>
+              {t('warehouses:buttons.complete')}
             </Button>
           )}
         </div>
@@ -221,43 +216,43 @@ export function StockTransferPage() {
     <div className={styles.page}>
       <div className={styles.header}>
         <div>
-          <h1 className={styles.title}>Stok Transferleri</h1>
-          <p className={styles.subtitle}>Depolar arasi stok transfer islemleri</p>
+          <h1 className={styles.title}>{t('warehouses:stockTransferPage.title')}</h1>
+          <p className={styles.subtitle}>{t('warehouses:stockTransferPage.subtitle')}</p>
         </div>
         <Button onClick={() => setShowForm(!showForm)}>
-          {showForm ? 'Formu Kapat' : '+ Yeni Transfer'}
+          {showForm ? t('warehouses:buttons.closeForm') : t('warehouses:buttons.newTransfer')}
         </Button>
       </div>
 
       {showForm && (
         <Card className={styles.formCard}>
-          <h3>Yeni Transfer</h3>
+          <h3>{t('warehouses:stockTransferPage.newTransferTitle')}</h3>
           <form onSubmit={handleSubmit}>
             <div className={styles.formGrid}>
               <div className={styles.formGroup}>
-                <label className={styles.label}>Kaynak Depo *</label>
+                <label className={styles.label}>{t('warehouses:stockTransferPage.sourceWarehouse')}</label>
                 <Select
                   value={fromWarehouseId}
                   onChange={(e) => setFromWarehouseId(e.target.value)}
                   options={[
-                    { value: '', label: 'Depo Secin' },
+                    { value: '', label: t('warehouses:stockTransferPage.selectWarehouse') },
                     ...warehouses.map(w => ({ value: w.id, label: w.name })),
                   ]}
                 />
               </div>
               <div className={styles.formGroup}>
-                <label className={styles.label}>Hedef Depo *</label>
+                <label className={styles.label}>{t('warehouses:stockTransferPage.targetWarehouse')}</label>
                 <Select
                   value={toWarehouseId}
                   onChange={(e) => setToWarehouseId(e.target.value)}
                   options={[
-                    { value: '', label: 'Depo Secin' },
+                    { value: '', label: t('warehouses:stockTransferPage.selectWarehouse') },
                     ...warehouses.filter(w => w.id !== fromWarehouseId).map(w => ({ value: w.id, label: w.name })),
                   ]}
                 />
               </div>
               <div className={styles.formGroup}>
-                <label className={styles.label}>Transfer Tarihi</label>
+                <label className={styles.label}>{t('warehouses:stockTransferPage.transferDate')}</label>
                 <Input
                   type="date"
                   value={transferDate}
@@ -268,18 +263,18 @@ export function StockTransferPage() {
 
             <div className={styles.itemsSection}>
               <div className={styles.itemsHeader}>
-                <h4>Urunler</h4>
-                <Button type="button" size="sm" onClick={addItem}>+ Urun Ekle</Button>
+                <h4>{t('warehouses:stockTransferPage.products')}</h4>
+                <Button type="button" size="sm" onClick={addItem}>{t('warehouses:buttons.addProduct')}</Button>
               </div>
 
               {items.length === 0 ? (
-                <p className={styles.emptyItems}>Henuz urun eklenmedi</p>
+                <p className={styles.emptyItems}>{t('warehouses:empty.noProducts')}</p>
               ) : (
                 <table className={styles.itemsTable}>
                   <thead>
                     <tr>
-                      <th>Urun</th>
-                      <th>Miktar</th>
+                      <th>{t('warehouses:columns.product')}</th>
+                      <th>{t('warehouses:columns.quantity')}</th>
                       <th></th>
                     </tr>
                   </thead>
@@ -291,7 +286,7 @@ export function StockTransferPage() {
                             value={item.product_id}
                             onChange={(e) => updateItem(index, 'product_id', e.target.value)}
                             options={[
-                              { value: '', label: 'Urun Secin' },
+                              { value: '', label: t('warehouses:stockTransferPage.selectProduct') },
                               ...products.map(p => ({ value: p.id, label: p.name })),
                             ]}
                           />
@@ -306,7 +301,7 @@ export function StockTransferPage() {
                         </td>
                         <td>
                           <Button type="button" size="sm" variant="ghost" onClick={() => removeItem(index)}>
-                            Sil
+                            {t('warehouses:buttons.delete')}
                           </Button>
                         </td>
                       </tr>
@@ -317,7 +312,7 @@ export function StockTransferPage() {
             </div>
 
             <div className={styles.formGroup}>
-              <label className={styles.label}>Notlar</label>
+              <label className={styles.label}>{t('warehouses:stockTransferPage.notes')}</label>
               <textarea
                 className={styles.textarea}
                 value={notes}
@@ -328,10 +323,10 @@ export function StockTransferPage() {
 
             <div className={styles.formActions}>
               <Button type="button" variant="ghost" onClick={() => { setShowForm(false); resetForm(); }}>
-                Iptal
+                {t('warehouses:buttons.cancel')}
               </Button>
               <Button type="submit" disabled={saving}>
-                {saving ? 'Kaydediliyor...' : 'Transfer Olustur'}
+                {saving ? t('warehouses:buttons.saving') : t('warehouses:buttons.createTransfer')}
               </Button>
             </div>
           </form>
@@ -344,11 +339,11 @@ export function StockTransferPage() {
             value={statusFilter}
             onChange={(e) => { setStatusFilter(e.target.value); setPage(1); }}
             options={[
-              { value: '', label: 'Tum Durumlar' },
-              { value: 'pending', label: 'Beklemede' },
-              { value: 'in_transit', label: 'Transfer Ediliyor' },
-              { value: 'completed', label: 'Tamamlandi' },
-              { value: 'cancelled', label: 'Iptal' },
+              { value: '', label: t('warehouses:filters.allStatuses') },
+              { value: 'pending', label: t('warehouses:transferStatusAlt.pending') },
+              { value: 'in_transit', label: t('warehouses:transferStatusAlt.in_transit') },
+              { value: 'completed', label: t('warehouses:transferStatusAlt.completed') },
+              { value: 'cancelled', label: t('warehouses:transferStatusAlt.cancelled') },
             ]}
           />
         </div>
@@ -356,19 +351,19 @@ export function StockTransferPage() {
         <Table
           columns={columns}
           data={transfers}
-          keyExtractor={(t) => t.id}
+          keyExtractor={(tr) => tr.id}
           loading={loading}
-          emptyMessage="Transfer bulunamadi"
+          emptyMessage={t('warehouses:empty.transfers')}
         />
 
         {totalPages > 1 && (
           <div className={styles.pagination}>
             <Button size="sm" variant="secondary" disabled={page === 1} onClick={() => setPage(page - 1)}>
-              Onceki
+              {t('warehouses:buttons.previous')}
             </Button>
-            <span>Sayfa {page} / {totalPages}</span>
+            <span>{t('warehouses:stockTransferPage.page', { current: page, total: totalPages })}</span>
             <Button size="sm" variant="secondary" disabled={page === totalPages} onClick={() => setPage(page + 1)}>
-              Sonraki
+              {t('warehouses:buttons.next')}
             </Button>
           </div>
         )}

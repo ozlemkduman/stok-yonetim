@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Button, Input } from '@stok/ui';
 import { authApi, InvitationInfo } from '../../api/auth.api';
 import styles from './AuthPages.module.css';
 
 export function RegisterPage() {
+  const { t } = useTranslation('auth');
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const token = searchParams.get('token');
@@ -24,7 +26,7 @@ export function RegisterPage() {
 
   useEffect(() => {
     if (!token) {
-      setValidationError('Geçersiz davet linki');
+      setValidationError(t('register.invalidInviteLink'));
       setIsValidating(false);
       return;
     }
@@ -38,7 +40,7 @@ export function RegisterPage() {
       const response = await authApi.validateInvitation(token!);
       setInvitation(response.data);
     } catch (err) {
-      setValidationError(err instanceof Error ? err.message : 'Geçersiz davet linki');
+      setValidationError(err instanceof Error ? err.message : t('register.invalidInviteLink'));
     } finally {
       setIsValidating(false);
     }
@@ -46,16 +48,16 @@ export function RegisterPage() {
 
   const validatePassword = (password: string): string | null => {
     if (password.length < 8) {
-      return 'Şifre en az 8 karakter olmalıdır';
+      return t('register.validation.passwordMinLength');
     }
     if (!/[a-z]/.test(password)) {
-      return 'Şifre en az bir küçük harf içermelidir';
+      return t('register.validation.passwordLowercase');
     }
     if (!/[A-Z]/.test(password)) {
-      return 'Şifre en az bir büyük harf içermelidir';
+      return t('register.validation.passwordUppercase');
     }
     if (!/\d/.test(password)) {
-      return 'Şifre en az bir rakam içermelidir';
+      return t('register.validation.passwordDigit');
     }
     return null;
   };
@@ -65,7 +67,7 @@ export function RegisterPage() {
     setError('');
 
     if (formData.password !== formData.confirmPassword) {
-      setError('Şifreler eşleşmiyor');
+      setError(t('register.validation.passwordsDoNotMatch'));
       return;
     }
 
@@ -86,7 +88,7 @@ export function RegisterPage() {
       });
       navigate('/dashboard', { replace: true });
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Kayıt başarısız');
+      setError(err instanceof Error ? err.message : t('register.defaultError'));
     } finally {
       setIsLoading(false);
     }
@@ -96,7 +98,7 @@ export function RegisterPage() {
     return (
       <div className={styles.page}>
         <div className={styles.loading}>
-          <p>Davet doğrulanıyor...</p>
+          <p>{t('register.validatingInvitation')}</p>
         </div>
       </div>
     );
@@ -105,18 +107,18 @@ export function RegisterPage() {
   if (!token) {
     return (
       <div className={styles.page}>
-        <h2 className={styles.title}>Davet Gerekli</h2>
+        <h2 className={styles.title}>{t('register.inviteRequired.title')}</h2>
         <p className={styles.subtitle}>
-          Kayıt olmak için bir davet linkiniz olması gerekiyor.
+          {t('register.inviteRequired.subtitle')}
         </p>
         <div className={styles.infoBox}>
-          <p>Bu platform sadece davetli kullanıcılar içindir.</p>
-          <p>Kayıt olmak için sistem yöneticinizden davet linki talep edin.</p>
+          <p>{t('register.inviteRequired.info1')}</p>
+          <p>{t('register.inviteRequired.info2')}</p>
         </div>
         <div className={styles.footer}>
           <p>
-            Zaten hesabınız var mı?{' '}
-            <Link to="/login">Giriş yapın</Link>
+            {t('register.hasAccount')}{' '}
+            <Link to="/login">{t('register.loginLink')}</Link>
           </p>
         </div>
       </div>
@@ -126,15 +128,15 @@ export function RegisterPage() {
   if (validationError) {
     return (
       <div className={styles.page}>
-        <h2 className={styles.title}>Geçersiz Davet</h2>
+        <h2 className={styles.title}>{t('register.invalidInvite.title')}</h2>
         <div className={styles.error}>{validationError}</div>
         <p className={styles.subtitle}>
-          Davet linkinin süresi dolmuş veya daha önce kullanılmış olabilir.
+          {t('register.invalidInvite.subtitle')}
         </p>
         <div className={styles.footer}>
           <p>
-            Zaten hesabınız var mı?{' '}
-            <Link to="/login">Giriş yapın</Link>
+            {t('register.hasAccount')}{' '}
+            <Link to="/login">{t('register.loginLink')}</Link>
           </p>
         </div>
       </div>
@@ -143,14 +145,14 @@ export function RegisterPage() {
 
   return (
     <div className={styles.page}>
-      <h2 className={styles.title}>Kayıt Ol</h2>
+      <h2 className={styles.title}>{t('register.title')}</h2>
       {invitation?.isNewTenant ? (
         <p className={styles.subtitle}>
-          {invitation.tenantName} organizasyonunu oluşturmak için kayıt olun
+          {t('register.subtitleCreate', { tenantName: invitation.tenantName })}
         </p>
       ) : (
         <p className={styles.subtitle}>
-          {invitation?.tenantName} organizasyonuna katılmak için kayıt olun
+          {t('register.subtitleJoin', { tenantName: invitation?.tenantName })}
         </p>
       )}
 
@@ -158,41 +160,41 @@ export function RegisterPage() {
 
       <form onSubmit={handleSubmit} className={styles.form}>
         <div className={styles.field}>
-          <label htmlFor="email">E-posta</label>
+          <label htmlFor="email">{t('register.emailLabel')}</label>
           <Input
             id="email"
             type="email"
             value={invitation?.email || ''}
             disabled
           />
-          <span className={styles.hint}>E-posta adresi değiştirilemez</span>
+          <span className={styles.hint}>{t('register.emailHint')}</span>
         </div>
 
         <div className={styles.field}>
-          <label htmlFor="name">Ad Soyad</label>
+          <label htmlFor="name">{t('register.nameLabel')}</label>
           <Input
             id="name"
             type="text"
             value={formData.name}
             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-            placeholder="Ahmet Yılmaz"
+            placeholder={t('register.namePlaceholder')}
             required
           />
         </div>
 
         <div className={styles.field}>
-          <label htmlFor="phone">Telefon (Opsiyonel)</label>
+          <label htmlFor="phone">{t('register.phoneLabel')}</label>
           <Input
             id="phone"
             type="tel"
             value={formData.phone}
             onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-            placeholder="0532 111 22 33"
+            placeholder={t('register.phonePlaceholder')}
           />
         </div>
 
         <div className={styles.field}>
-          <label htmlFor="password">Şifre</label>
+          <label htmlFor="password">{t('register.passwordLabel')}</label>
           <Input
             id="password"
             type="password"
@@ -202,31 +204,31 @@ export function RegisterPage() {
             required
           />
           <span className={styles.hint}>
-            En az 8 karakter, 1 büyük harf, 1 küçük harf ve 1 rakam
+            {t('register.passwordHint')}
           </span>
         </div>
 
         <div className={styles.field}>
-          <label htmlFor="confirmPassword">Şifre Tekrar</label>
+          <label htmlFor="confirmPassword">{t('register.confirmPasswordLabel')}</label>
           <Input
             id="confirmPassword"
             type="password"
             value={formData.confirmPassword}
             onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-            placeholder="Şifrenizi tekrar girin"
+            placeholder={t('register.confirmPasswordPlaceholder')}
             required
           />
         </div>
 
         <Button type="submit" variant="primary" fullWidth disabled={isLoading}>
-          {isLoading ? 'Kayıt yapılıyor...' : 'Kayıt Ol'}
+          {isLoading ? t('register.submitting') : t('register.submitButton')}
         </Button>
       </form>
 
       <div className={styles.footer}>
         <p>
-          Zaten hesabınız var mı?{' '}
-          <Link to="/login">Giriş yapın</Link>
+          {t('register.hasAccount')}{' '}
+          <Link to="/login">{t('register.loginLink')}</Link>
         </p>
       </div>
     </div>

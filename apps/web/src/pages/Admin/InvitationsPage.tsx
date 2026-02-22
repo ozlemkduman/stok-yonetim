@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Card, Table, Button, Badge, type Column } from '@stok/ui';
 import { adminInvitationsApi, Invitation } from '../../api/admin/invitations.api';
 import { adminTenantsApi, Tenant } from '../../api/admin/tenants.api';
@@ -6,13 +7,8 @@ import { useConfirmDialog } from '../../context/ConfirmDialogContext';
 import { useToast } from '../../context/ToastContext';
 import styles from './AdminPages.module.css';
 
-const roleLabels: Record<string, string> = {
-  super_admin: 'Super Admin',
-  tenant_admin: 'Organizasyon Admini',
-  user: 'Kullanici',
-};
-
 export function InvitationsPage() {
+  const { t } = useTranslation(['admin', 'common']);
   const { confirm } = useConfirmDialog();
   const { showToast } = useToast();
   const [invitations, setInvitations] = useState<Invitation[]>([]);
@@ -31,6 +27,12 @@ export function InvitationsPage() {
   const [copiedLink, setCopiedLink] = useState<string | null>(null);
   const [createdInviteLink, setCreatedInviteLink] = useState<string | null>(null);
 
+  const roleLabels: Record<string, string> = {
+    super_admin: t('admin:invitations.roleSuperAdmin'),
+    tenant_admin: t('admin:invitations.roleOrgAdmin'),
+    user: t('admin:invitations.roleUser'),
+  };
+
   useEffect(() => {
     loadData();
   }, [statusFilter]);
@@ -47,7 +49,7 @@ export function InvitationsPage() {
       setInvitations(invitationsRes.data);
       setTenants(tenantsRes.data);
     } catch (error) {
-      showToast('error', 'Veriler yuklenemedi');
+      showToast('error', t('admin:invitations.loadFailed'));
     } finally {
       setIsLoading(false);
     }
@@ -57,28 +59,25 @@ export function InvitationsPage() {
     e.preventDefault();
     setInviteError('');
 
-    // Email validasyonu
     const emailTrimmed = newInvitation.email.trim();
     if (!emailTrimmed) {
-      setInviteError('E-posta adresi gerekli');
+      setInviteError(t('admin:invitations.emailRequired'));
       return;
     }
 
-    // Email format kontrolu
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(emailTrimmed)) {
-      setInviteError('Gecerli bir e-posta adresi girin');
+      setInviteError(t('admin:invitations.emailInvalid'));
       return;
     }
 
-    // Organizasyon validasyonu
     if (newInvitation.role === 'tenant_admin' && !newInvitation.tenantId && !newInvitation.tenantName.trim()) {
-      setInviteError('Yeni organizasyon adi girin veya mevcut organizasyon secin');
+      setInviteError(t('admin:invitations.orgRequired'));
       return;
     }
 
     if (newInvitation.role === 'user' && !newInvitation.tenantId) {
-      setInviteError('Organizasyon secimi gerekli');
+      setInviteError(t('admin:invitations.orgSelectRequired'));
       return;
     }
 
@@ -92,7 +91,6 @@ export function InvitationsPage() {
         tenantName: newInvitation.tenantName.trim() || undefined,
       });
 
-      // Davet linkini goster
       const link = response.data?.invitationLink;
       if (link) {
         setShowModal(false);
@@ -100,13 +98,13 @@ export function InvitationsPage() {
         setCreatedInviteLink(link);
         loadData();
       } else {
-        setInviteError('Davet olusturuldu ancak link alinamadi');
+        setInviteError(t('admin:invitations.inviteLinkFailed'));
         setShowModal(false);
         loadData();
       }
     } catch (error) {
-      showToast('error', 'Davet gonderilemedi');
-      setInviteError(error instanceof Error ? error.message : 'Davet gonderilemedi');
+      showToast('error', t('admin:invitations.inviteFailed'));
+      setInviteError(error instanceof Error ? error.message : t('admin:invitations.inviteFailed'));
     } finally {
       setIsSubmitting(false);
     }
@@ -117,19 +115,19 @@ export function InvitationsPage() {
       await adminInvitationsApi.resend(id);
       loadData();
     } catch (error) {
-      showToast('error', 'Davet yeniden gonderilemedi');
+      showToast('error', t('admin:invitations.resendFailed'));
     }
   };
 
   const handleCancel = async (id: string) => {
-    const confirmed = await confirm({ message: 'Bu daveti iptal etmek istediginize emin misiniz?', variant: 'danger' });
+    const confirmed = await confirm({ message: t('admin:invitations.cancelConfirm'), variant: 'danger' });
     if (!confirmed) return;
 
     try {
       await adminInvitationsApi.cancel(id);
       loadData();
     } catch (error) {
-      showToast('error', 'Davet iptal edilemedi');
+      showToast('error', t('admin:invitations.cancelFailed'));
     }
   };
 
@@ -141,38 +139,38 @@ export function InvitationsPage() {
 
   const getStatusBadge = (invitation: Invitation) => {
     if (invitation.accepted_at) {
-      return <Badge variant="success">Kabul Edildi</Badge>;
+      return <Badge variant="success">{t('admin:invitations.statusAccepted')}</Badge>;
     }
     if (new Date(invitation.expires_at) < new Date()) {
-      return <Badge variant="danger">Suresi Dolmus</Badge>;
+      return <Badge variant="danger">{t('admin:invitations.statusExpired')}</Badge>;
     }
-    return <Badge variant="warning">Bekliyor</Badge>;
+    return <Badge variant="warning">{t('admin:invitations.statusPending')}</Badge>;
   };
 
   const columns: Column<Invitation>[] = [
     {
       key: 'email',
-      header: 'E-posta',
+      header: t('admin:invitations.columnEmail'),
       render: (inv) => inv.email,
     },
     {
       key: 'role',
-      header: 'Rol',
+      header: t('admin:invitations.columnRole'),
       render: (inv) => roleLabels[inv.role] || inv.role,
     },
     {
       key: 'tenant',
-      header: 'Organizasyon',
+      header: t('admin:invitations.columnOrganization'),
       render: (inv) => inv.existing_tenant_name || inv.tenant_name || '-',
     },
     {
       key: 'status',
-      header: 'Durum',
+      header: t('admin:invitations.columnStatus'),
       render: (inv) => getStatusBadge(inv),
     },
     {
       key: 'expires',
-      header: 'Bitis Tarihi',
+      header: t('admin:invitations.columnExpires'),
       render: (inv) => new Date(inv.expires_at).toLocaleDateString('tr-TR'),
     },
     {
@@ -188,7 +186,7 @@ export function InvitationsPage() {
                   size="sm"
                   onClick={() => copyLink(inv.invitationLink!)}
                 >
-                  {copiedLink === inv.invitationLink ? 'Kopyalandi!' : 'Link Kopyala'}
+                  {copiedLink === inv.invitationLink ? t('admin:invitations.copied') : t('admin:invitations.copyLink')}
                 </Button>
               )}
               <Button
@@ -196,14 +194,14 @@ export function InvitationsPage() {
                 size="sm"
                 onClick={() => handleResend(inv.id)}
               >
-                Yeniden Gonder
+                {t('admin:invitations.resend')}
               </Button>
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => handleCancel(inv.id)}
               >
-                Iptal
+                {t('admin:invitations.cancel')}
               </Button>
             </>
           )}
@@ -215,9 +213,9 @@ export function InvitationsPage() {
   return (
     <div className={styles.page}>
       <div className={styles.pageHeader}>
-        <h1 className={styles.pageTitle}>Davetler</h1>
+        <h1 className={styles.pageTitle}>{t('admin:invitations.title')}</h1>
         <Button variant="primary" onClick={() => setShowModal(true)}>
-          Yeni Davet Gonder
+          {t('admin:invitations.newInvite')}
         </Button>
       </div>
 
@@ -228,10 +226,10 @@ export function InvitationsPage() {
             onChange={(e) => setStatusFilter(e.target.value as any)}
             className={styles.select}
           >
-            <option value="">Tum Durumlar</option>
-            <option value="pending">Bekliyor</option>
-            <option value="accepted">Kabul Edildi</option>
-            <option value="expired">Suresi Dolmus</option>
+            <option value="">{t('admin:invitations.allStatuses')}</option>
+            <option value="pending">{t('admin:invitations.filterPending')}</option>
+            <option value="accepted">{t('admin:invitations.filterAccepted')}</option>
+            <option value="expired">{t('admin:invitations.filterExpired')}</option>
           </select>
         </div>
       </Card>
@@ -242,7 +240,7 @@ export function InvitationsPage() {
           data={invitations}
           keyExtractor={(inv) => inv.id}
           loading={isLoading}
-          emptyMessage="Davet bulunamadi"
+          emptyMessage={t('admin:invitations.emptyMessage')}
         />
       </Card>
 
@@ -250,12 +248,12 @@ export function InvitationsPage() {
       {createdInviteLink && (
         <div className={styles.modalOverlay} onClick={() => setCreatedInviteLink(null)}>
           <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
-            <h2>Davet Olusturuldu</h2>
+            <h2>{t('admin:invitations.inviteCreated')}</h2>
             <p style={{ marginBottom: '1rem', color: '#059669' }}>
-              Davet basariyla olusturuldu. Asagidaki linki kopyalayip davet etmek istediginiz kisiye gonderin.
+              {t('admin:invitations.inviteSuccess')}
             </p>
             <div className={styles.formField}>
-              <label>Davet Linki</label>
+              <label>{t('admin:invitations.inviteLink')}</label>
               <div style={{ display: 'flex', gap: '0.5rem' }}>
                 <input
                   type="text"
@@ -271,13 +269,13 @@ export function InvitationsPage() {
                     setTimeout(() => setCopiedLink(null), 2000);
                   }}
                 >
-                  {copiedLink === createdInviteLink ? 'Kopyalandi!' : 'Kopyala'}
+                  {copiedLink === createdInviteLink ? t('admin:invitations.copied') : t('admin:invitations.copy')}
                 </Button>
               </div>
             </div>
             <div className={styles.modalActions}>
               <Button variant="secondary" onClick={() => setCreatedInviteLink(null)}>
-                Kapat
+                {t('admin:invitations.close')}
               </Button>
             </div>
           </div>
@@ -287,24 +285,24 @@ export function InvitationsPage() {
       {showModal && (
         <div className={styles.modalOverlay} onClick={() => setShowModal(false)}>
           <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
-            <h2>Yeni Davet Gonder</h2>
+            <h2>{t('admin:invitations.newInviteTitle')}</h2>
 
             {inviteError && <div className={styles.error}>{inviteError}</div>}
 
             <form onSubmit={handleCreateInvitation}>
               <div className={styles.formField}>
-                <label>E-posta *</label>
+                <label>{t('admin:invitations.labelEmail')}</label>
                 <input
                   type="email"
                   value={newInvitation.email}
                   onChange={(e) => setNewInvitation({ ...newInvitation, email: e.target.value })}
-                  placeholder="ornek@sirket.com"
+                  placeholder={t('admin:invitations.emailPlaceholder')}
                   required
                 />
               </div>
 
               <div className={styles.formField}>
-                <label>Rol *</label>
+                <label>{t('admin:invitations.labelRole')}</label>
                 <select
                   value={newInvitation.role}
                   onChange={(e) => setNewInvitation({
@@ -314,15 +312,15 @@ export function InvitationsPage() {
                     tenantName: '',
                   })}
                 >
-                  <option value="tenant_admin">Organizasyon Admini (Yeni Org. Olusturur)</option>
-                  <option value="user">Kullanici (Mevcut Org.)</option>
+                  <option value="tenant_admin">{t('admin:invitations.roleOrgAdminOption')}</option>
+                  <option value="user">{t('admin:invitations.roleUserOption')}</option>
                 </select>
               </div>
 
               {newInvitation.role === 'tenant_admin' && (
                 <>
                   <div className={styles.formField}>
-                    <label>Mevcut Organizasyon (Opsiyonel)</label>
+                    <label>{t('admin:invitations.existingOrg')}</label>
                     <select
                       value={newInvitation.tenantId}
                       onChange={(e) => setNewInvitation({
@@ -331,21 +329,21 @@ export function InvitationsPage() {
                         tenantName: e.target.value ? '' : newInvitation.tenantName,
                       })}
                     >
-                      <option value="">Yeni organizasyon olustur</option>
-                      {tenants.map((t) => (
-                        <option key={t.id} value={t.id}>{t.name}</option>
+                      <option value="">{t('admin:invitations.createNewOrg')}</option>
+                      {tenants.map((tn) => (
+                        <option key={tn.id} value={tn.id}>{tn.name}</option>
                       ))}
                     </select>
                   </div>
 
                   {!newInvitation.tenantId && (
                     <div className={styles.formField}>
-                      <label>Yeni Organizasyon Adi *</label>
+                      <label>{t('admin:invitations.newOrgName')}</label>
                       <input
                         type="text"
                         value={newInvitation.tenantName}
                         onChange={(e) => setNewInvitation({ ...newInvitation, tenantName: e.target.value })}
-                        placeholder="Yeni Sirket Ltd. Sti."
+                        placeholder={t('admin:invitations.newOrgPlaceholder')}
                       />
                     </div>
                   )}
@@ -354,15 +352,15 @@ export function InvitationsPage() {
 
               {newInvitation.role === 'user' && (
                 <div className={styles.formField}>
-                  <label>Organizasyon *</label>
+                  <label>{t('admin:invitations.selectOrg')}</label>
                   <select
                     value={newInvitation.tenantId}
                     onChange={(e) => setNewInvitation({ ...newInvitation, tenantId: e.target.value })}
                     required
                   >
-                    <option value="">Organizasyon secin</option>
-                    {tenants.map((t) => (
-                      <option key={t.id} value={t.id}>{t.name}</option>
+                    <option value="">{t('admin:invitations.selectOrgPlaceholder')}</option>
+                    {tenants.map((tn) => (
+                      <option key={tn.id} value={tn.id}>{tn.name}</option>
                     ))}
                   </select>
                 </div>
@@ -374,10 +372,10 @@ export function InvitationsPage() {
                   variant="secondary"
                   onClick={() => setShowModal(false)}
                 >
-                  Iptal
+                  {t('admin:invitations.cancelButton')}
                 </Button>
                 <Button type="submit" variant="primary" disabled={isSubmitting}>
-                  {isSubmitting ? 'Gonderiliyor...' : 'Davet Gonder'}
+                  {isSubmitting ? t('admin:invitations.sending') : t('admin:invitations.sendInvite')}
                 </Button>
               </div>
             </form>

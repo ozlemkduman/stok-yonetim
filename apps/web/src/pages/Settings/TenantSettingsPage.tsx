@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Card, Button, Input, Spinner } from '@stok/ui';
 import { useTenant } from '../../context/TenantContext';
 import { apiClient } from '../../api/client';
 import styles from './SettingsPages.module.css';
 
 export function TenantSettingsPage() {
+  const { t } = useTranslation(['settings', 'common']);
   const { settings, usage, refreshSettings, isLoading } = useTenant();
   const [formData, setFormData] = useState({
     name: '',
@@ -51,9 +53,9 @@ export function TenantSettingsPage() {
         },
       });
       await refreshSettings();
-      setMessage('Ayarlar kaydedildi.');
+      setMessage(t('settings:tenant.saveSuccess'));
     } catch (error) {
-      setMessage('Ayarlar kaydedilemedi.');
+      setMessage(t('settings:tenant.saveFailed'));
     } finally {
       setIsSaving(false);
     }
@@ -69,14 +71,14 @@ export function TenantSettingsPage() {
 
   return (
     <div className={styles.page}>
-      <h1 className={styles.pageTitle}>Sirket Ayarlari</h1>
+      <h1 className={styles.pageTitle}>{t('settings:tenant.title')}</h1>
 
       <div className={styles.grid}>
         <Card className={styles.section}>
-          <h2 className={styles.sectionTitle}>Genel Bilgiler</h2>
+          <h2 className={styles.sectionTitle}>{t('settings:tenant.generalInfo')}</h2>
           <form onSubmit={handleSubmit} className={styles.form}>
             <div className={styles.field}>
-              <label>Sirket Adi</label>
+              <label>{t('settings:tenant.companyName')}</label>
               <Input
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
@@ -85,16 +87,16 @@ export function TenantSettingsPage() {
             </div>
 
             <div className={styles.field}>
-              <label>Domain</label>
+              <label>{t('settings:tenant.domain')}</label>
               <Input
                 value={formData.domain}
                 onChange={(e) => setFormData({ ...formData, domain: e.target.value })}
-                placeholder="ornek.stokpro.com"
+                placeholder={t('settings:tenant.domainPlaceholder')}
               />
             </div>
 
             <div className={styles.field}>
-              <label>Fatura E-posta</label>
+              <label>{t('settings:tenant.billingEmail')}</label>
               <Input
                 type="email"
                 value={formData.billingEmail}
@@ -103,60 +105,60 @@ export function TenantSettingsPage() {
             </div>
 
             <div className={styles.field}>
-              <label>Adres</label>
+              <label>{t('settings:tenant.address')}</label>
               <Input
                 value={formData.address}
                 onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                placeholder="Sirket adresi"
+                placeholder={t('settings:tenant.addressPlaceholder')}
               />
             </div>
 
             <div className={styles.field}>
-              <label>Telefon</label>
+              <label>{t('settings:tenant.phone')}</label>
               <Input
                 value={formData.phone}
                 onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                placeholder="(XXX) XXX XX XX"
+                placeholder={t('settings:tenant.phonePlaceholder')}
               />
             </div>
 
             <div className={styles.field}>
-              <label>Vergi Dairesi</label>
+              <label>{t('settings:tenant.taxOffice')}</label>
               <Input
                 value={formData.taxOffice}
                 onChange={(e) => setFormData({ ...formData, taxOffice: e.target.value })}
-                placeholder="Vergi dairesi"
+                placeholder={t('settings:tenant.taxOfficePlaceholder')}
               />
             </div>
 
             <div className={styles.field}>
-              <label>Vergi No</label>
+              <label>{t('settings:tenant.taxNumber')}</label>
               <Input
                 value={formData.taxNumber}
                 onChange={(e) => setFormData({ ...formData, taxNumber: e.target.value })}
-                placeholder="Vergi numarasi"
+                placeholder={t('settings:tenant.taxNumberPlaceholder')}
               />
             </div>
 
             {message && <p className={styles.message}>{message}</p>}
 
             <Button type="submit" variant="primary" disabled={isSaving}>
-              {isSaving ? 'Kaydediliyor...' : 'Kaydet'}
+              {isSaving ? t('settings:tenant.saving') : t('settings:tenant.save')}
             </Button>
           </form>
         </Card>
 
         <Card className={styles.section}>
-          <h2 className={styles.sectionTitle}>Plan ve Kullanim</h2>
+          <h2 className={styles.sectionTitle}>{t('settings:tenant.planAndUsage')}</h2>
 
           <div className={styles.planInfo}>
-            <div className={styles.planName}>{settings?.plan_name || 'Plan Yok'}</div>
+            <div className={styles.planName}>{settings?.plan_name || t('settings:tenant.noPlan')}</div>
             <div className={styles.planStatus}>
-              Durum: <strong>{settings?.status === 'trial' ? 'Deneme' : settings?.status === 'active' ? 'Aktif' : settings?.status}</strong>
+              {t('settings:tenant.status')}: <strong>{settings?.status === 'trial' ? t('settings:tenant.statusTrial') : settings?.status === 'active' ? t('settings:tenant.statusActive') : settings?.status}</strong>
             </div>
             {settings?.status === 'trial' && settings?.trial_ends_at && (
               <div className={styles.planStatus}>
-                Deneme suresi: <strong>{Math.max(0, Math.ceil((new Date(settings.trial_ends_at).getTime() - Date.now()) / (1000 * 60 * 60 * 24)))} gun kaldi</strong>
+                {t('settings:tenant.trialPeriod')}: <strong>{t('settings:tenant.daysRemaining', { days: Math.max(0, Math.ceil((new Date(settings.trial_ends_at).getTime() - Date.now()) / (1000 * 60 * 60 * 24))) })}</strong>
               </div>
             )}
           </div>
@@ -164,39 +166,44 @@ export function TenantSettingsPage() {
           {settings?.plan_code !== 'plus' && (
             <div style={{ marginTop: '1rem' }}>
               <Button variant="primary" onClick={() => window.open('mailto:destek@stoksayac.com?subject=Plan%20Yükseltme', '_blank')}>
-                Plani Yukselt
+                {t('settings:tenant.upgradePlan')}
               </Button>
             </div>
           )}
 
-          <h3 className={styles.subsectionTitle}>Kullanim</h3>
+          <h3 className={styles.subsectionTitle}>{t('settings:tenant.usage')}</h3>
 
           {usage && (
             <div className={styles.usageList}>
               <UsageBar
-                label="Kullanicilar"
+                label={t('settings:tenant.usageUsers')}
                 current={usage.users.current}
                 limit={usage.users.limit}
+                unlimitedLabel={t('settings:tenant.unlimited')}
               />
               <UsageBar
-                label="Urunler"
+                label={t('settings:tenant.usageProducts')}
                 current={usage.products.current}
                 limit={usage.products.limit}
+                unlimitedLabel={t('settings:tenant.unlimited')}
               />
               <UsageBar
-                label="Musteriler"
+                label={t('settings:tenant.usageCustomers')}
                 current={usage.customers.current}
                 limit={usage.customers.limit}
+                unlimitedLabel={t('settings:tenant.unlimited')}
               />
               <UsageBar
-                label="Depolar"
+                label={t('settings:tenant.usageWarehouses')}
                 current={usage.warehouses.current}
                 limit={usage.warehouses.limit}
+                unlimitedLabel={t('settings:tenant.unlimited')}
               />
               <UsageBar
-                label="Entegrasyonlar"
+                label={t('settings:tenant.usageIntegrations')}
                 current={usage.integrations.current}
                 limit={usage.integrations.limit}
+                unlimitedLabel={t('settings:tenant.unlimited')}
               />
             </div>
           )}
@@ -206,7 +213,7 @@ export function TenantSettingsPage() {
   );
 }
 
-function UsageBar({ label, current, limit }: { label: string; current: number; limit: number }) {
+function UsageBar({ label, current, limit, unlimitedLabel }: { label: string; current: number; limit: number; unlimitedLabel: string }) {
   const isUnlimited = limit === -1;
   const percentage = isUnlimited ? 0 : (current / limit) * 100;
   const isOverLimit = !isUnlimited && current >= limit;
@@ -216,7 +223,7 @@ function UsageBar({ label, current, limit }: { label: string; current: number; l
       <div className={styles.usageHeader}>
         <span>{label}</span>
         <span>
-          {current} / {isUnlimited ? 'Sinirsiz' : limit}
+          {current} / {isUnlimited ? unlimitedLabel : limit}
         </span>
       </div>
       {!isUnlimited && (

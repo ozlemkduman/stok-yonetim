@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { Button, Input, Select } from '@stok/ui';
 import { Product } from '../../../api/products.api';
 import { SaleFormItem } from '../wizard.types';
@@ -21,6 +22,7 @@ export function StepProducts({
   onItemsChange,
   onOpenProductModal,
 }: StepProductsProps) {
+  const { t } = useTranslation(['sales', 'common']);
 
   const addItem = () => {
     onItemsChange([...items, {
@@ -91,13 +93,13 @@ export function StepProducts({
     <div className={styles.stepContent}>
       <div className={styles.formRow}>
         <div className={styles.formGroup}>
-          <label className={styles.label}>Satis Tipi</label>
+          <label className={styles.label}>{t('sales:stepProducts.saleType')}</label>
           <Select
             value={saleType}
             onChange={(e) => handleSaleTypeChange(e.target.value as 'retail' | 'wholesale')}
             options={[
-              { value: 'retail', label: 'Perakende' },
-              { value: 'wholesale', label: 'Toptan' },
+              { value: 'retail', label: t('common:saleTypes.retail') },
+              { value: 'wholesale', label: t('common:saleTypes.wholesale') },
             ]}
           />
         </div>
@@ -105,32 +107,32 @@ export function StepProducts({
       </div>
 
       <div className={styles.itemsHeader}>
-        <h3>Urunler</h3>
+        <h3>{t('sales:stepProducts.products')}</h3>
         <div className={styles.itemsActions}>
           <Button type="button" size="sm" variant="secondary" onClick={onOpenProductModal}>
-            + Yeni Urun
+            {t('sales:stepProducts.newProduct')}
           </Button>
           <Button type="button" size="sm" onClick={addItem}>
-            + Urun Ekle
+            {t('sales:stepProducts.addProduct')}
           </Button>
         </div>
       </div>
 
       {items.length === 0 ? (
         <div className={styles.emptyItems}>
-          Henuz urun eklenmedi. "Urun Ekle" butonuna tiklayin.
+          {t('sales:stepProducts.emptyItems')}
         </div>
       ) : (
         <div className={styles.itemsTableContainer}>
           <table className={styles.itemsTable}>
             <thead>
               <tr>
-                <th>Urun</th>
-                <th className={styles.alignRight}>Stok</th>
-                <th className={styles.alignRight}>Miktar</th>
-                <th className={styles.alignRight}>Birim Fiyat</th>
-                <th className={styles.alignRight}>Iskonto %</th>
-                <th className={styles.alignRight}>Toplam</th>
+                <th>{t('sales:stepProducts.columns.product')}</th>
+                <th className={styles.alignRight}>{t('sales:stepProducts.columns.stock')}</th>
+                <th className={styles.alignRight}>{t('sales:stepProducts.columns.quantity')}</th>
+                <th className={styles.alignRight}>{t('sales:stepProducts.columns.unitPrice')}</th>
+                <th className={styles.alignRight}>{t('sales:stepProducts.columns.discountPercent')}</th>
+                <th className={styles.alignRight}>{t('sales:stepProducts.columns.total')}</th>
                 <th></th>
               </tr>
             </thead>
@@ -142,7 +144,7 @@ export function StepProducts({
                       value={item.product_id}
                       onChange={(e) => updateItem(index, 'product_id', e.target.value)}
                       options={[
-                        { value: '', label: 'Urun Secin' },
+                        { value: '', label: t('sales:stepProducts.selectProduct') },
                         ...products.map(p => ({
                           value: p.id,
                           label: `${p.name} (${formatCurrency(saleType === 'wholesale' ? (p.wholesale_price || p.sale_price) : p.sale_price)})`,
@@ -189,7 +191,7 @@ export function StepProducts({
                   </td>
                   <td>
                     <Button type="button" size="sm" variant="ghost" onClick={() => removeItem(index)} className={styles.deleteButton}>
-                      Sil
+                      {t('common:buttons.delete')}
                     </Button>
                   </td>
                 </tr>
@@ -202,7 +204,7 @@ export function StepProducts({
       <div className={styles.totalsSection}>
         <div className={styles.totalsGrid}>
           <div className={styles.totalRow}>
-            <span>Ara Toplam:</span>
+            <span>{t('sales:stepProducts.subtotal')}</span>
             <span>{formatCurrency(subtotal)}</span>
           </div>
         </div>

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Card, Button, Badge, Spinner, Input } from '@stok/ui';
 import { adminTenantsApi, Tenant, TenantStats } from '../../api/admin/tenants.api';
 import { adminInvitationsApi } from '../../api/admin/invitations.api';
@@ -15,14 +16,8 @@ const statusColors: Record<string, 'success' | 'warning' | 'danger' | 'default'>
   cancelled: 'default',
 };
 
-const statusLabels: Record<string, string> = {
-  active: 'Aktif',
-  trial: 'Deneme',
-  suspended: 'Askida',
-  cancelled: 'Iptal',
-};
-
 export function TenantDetailPage() {
+  const { t } = useTranslation(['admin', 'common']);
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { impersonate } = useTenant();
@@ -31,6 +26,13 @@ export function TenantDetailPage() {
   const [tenant, setTenant] = useState<Tenant | null>(null);
   const [stats, setStats] = useState<TenantStats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+
+  const statusLabels: Record<string, string> = {
+    active: t('admin:tenantDetail.statusActive'),
+    trial: t('admin:tenantDetail.statusTrial'),
+    suspended: t('admin:tenantDetail.statusSuspended'),
+    cancelled: t('admin:tenantDetail.statusCancelled'),
+  };
 
   // Davet modal state
   const [showInviteModal, setShowInviteModal] = useState(false);
@@ -70,7 +72,7 @@ export function TenantDetailPage() {
       setTenant(tenantRes.data);
       setStats(statsRes.data);
     } catch (error) {
-      showToast('error', 'Organizasyon yuklenemedi');
+      showToast('error', t('admin:tenantDetail.loadFailed'));
     } finally {
       setIsLoading(false);
     }
@@ -78,15 +80,15 @@ export function TenantDetailPage() {
 
   const handleSuspend = async () => {
     if (!id) return;
-    const confirmed = await confirm({ message: 'Bu organizasyonu askiya almak istediginize emin misiniz?', variant: 'danger' });
+    const confirmed = await confirm({ message: t('admin:tenantDetail.suspendConfirm'), variant: 'danger' });
     if (!confirmed) return;
 
     try {
       await adminTenantsApi.suspend(id);
-      showToast('success', 'Organizasyon askiya alindi');
+      showToast('success', t('admin:tenantDetail.suspendSuccess'));
       loadTenant();
     } catch (error) {
-      showToast('error', 'Organizasyon askiya alinamadi');
+      showToast('error', t('admin:tenantDetail.suspendFailed'));
     }
   };
 
@@ -95,23 +97,23 @@ export function TenantDetailPage() {
 
     try {
       await adminTenantsApi.activate(id);
-      showToast('success', 'Organizasyon aktif edildi');
+      showToast('success', t('admin:tenantDetail.activateSuccess'));
       loadTenant();
     } catch (error) {
-      showToast('error', 'Organizasyon aktif edilemedi');
+      showToast('error', t('admin:tenantDetail.activateFailed'));
     }
   };
 
   const handleDelete = async () => {
     if (!id) return;
-    const confirmed = await confirm({ message: 'Bu organizasyonu silmek istediginize emin misiniz? Bu islem geri alinamaz!', variant: 'danger' });
+    const confirmed = await confirm({ message: t('admin:tenantDetail.deleteConfirm'), variant: 'danger' });
     if (!confirmed) return;
 
     try {
       await adminTenantsApi.delete(id);
       navigate('/admin/tenants');
     } catch (error) {
-      showToast('error', 'Organizasyon silinemedi');
+      showToast('error', t('admin:tenantDetail.deleteFailed'));
     }
   };
 
@@ -121,13 +123,13 @@ export function TenantDetailPage() {
 
     const emailTrimmed = inviteEmail.trim();
     if (!emailTrimmed) {
-      setInviteError('E-posta adresi gerekli');
+      setInviteError(t('admin:tenantDetail.emailRequired'));
       return;
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(emailTrimmed)) {
-      setInviteError('Gecerli bir e-posta adresi girin');
+      setInviteError(t('admin:tenantDetail.emailInvalid'));
       return;
     }
 
@@ -146,10 +148,10 @@ export function TenantDetailPage() {
         setInviteEmail('');
         setInviteRole('user');
       } else {
-        setInviteError('Davet olusturuldu ancak link alinamadi');
+        setInviteError(t('admin:tenantDetail.inviteLinkFailed'));
       }
     } catch (error) {
-      setInviteError(error instanceof Error ? error.message : 'Davet gonderilemedi');
+      setInviteError(error instanceof Error ? error.message : t('admin:tenantDetail.inviteFailed'));
     } finally {
       setIsInviting(false);
     }
@@ -184,8 +186,8 @@ export function TenantDetailPage() {
     return (
       <div className={styles.page}>
         <Card>
-          <p>Organizasyon bulunamadi.</p>
-          <Button onClick={() => navigate('/admin/tenants')}>Geri Don</Button>
+          <p>{t('admin:tenantDetail.notFound')}</p>
+          <Button onClick={() => navigate('/admin/tenants')}>{t('admin:tenantDetail.goBack')}</Button>
         </Card>
       </div>
     );
@@ -196,31 +198,31 @@ export function TenantDetailPage() {
       <div className={styles.pageHeader}>
         <div>
           <Button variant="ghost" onClick={() => navigate('/admin/tenants')}>
-            ← Geri
+            &larr; {t('admin:tenantDetail.back')}
           </Button>
           <h1 className={styles.pageTitle}>{tenant.name}</h1>
         </div>
         <div className={styles.actions}>
           <Button variant="primary" onClick={() => setShowInviteModal(true)}>
-            Kullanici Davet Et
+            {t('admin:tenantDetail.inviteUser')}
           </Button>
           <Button variant="secondary" onClick={handleViewPanel}>
-            Paneli Gor
+            {t('admin:tenantDetail.viewPanel')}
           </Button>
           <Button variant="ghost" onClick={() => navigate(`/admin/tenants/${id}/edit`)}>
-            Duzenle
+            {t('admin:tenantDetail.edit')}
           </Button>
           {tenant.status === 'active' || tenant.status === 'trial' ? (
             <Button variant="ghost" onClick={handleSuspend}>
-              Askiya Al
+              {t('admin:tenantDetail.suspend')}
             </Button>
           ) : (
             <Button variant="ghost" onClick={handleActivate}>
-              Aktif Et
+              {t('admin:tenantDetail.activate')}
             </Button>
           )}
           <Button variant="danger" onClick={handleDelete}>
-            Sil
+            {t('admin:tenantDetail.delete')}
           </Button>
         </div>
       </div>
@@ -228,68 +230,68 @@ export function TenantDetailPage() {
       <div className={styles.statsGrid}>
         <Card className={styles.statCard}>
           <div className={styles.statValue}>{stats?.userCount || 0}</div>
-          <div className={styles.statLabel}>Kullanici</div>
+          <div className={styles.statLabel}>{t('admin:tenantDetail.statUsers')}</div>
         </Card>
         <Card className={styles.statCard}>
           <div className={styles.statValue}>{stats?.productCount || 0}</div>
-          <div className={styles.statLabel}>Urun</div>
+          <div className={styles.statLabel}>{t('admin:tenantDetail.statProducts')}</div>
         </Card>
         <Card className={styles.statCard}>
           <div className={styles.statValue}>{stats?.customerCount || 0}</div>
-          <div className={styles.statLabel}>Musteri</div>
+          <div className={styles.statLabel}>{t('admin:tenantDetail.statCustomers')}</div>
         </Card>
         <Card className={styles.statCard}>
           <div className={styles.statValue}>{stats?.saleCount || 0}</div>
-          <div className={styles.statLabel}>Satis</div>
+          <div className={styles.statLabel}>{t('admin:tenantDetail.statSales')}</div>
         </Card>
       </div>
 
       <div className={styles.twoColumn}>
         <Card className={styles.section}>
-          <h2 className={styles.sectionTitle}>Genel Bilgiler</h2>
+          <h2 className={styles.sectionTitle}>{t('admin:tenantDetail.generalInfo')}</h2>
           <dl className={styles.detailList}>
-            <dt>Slug</dt>
+            <dt>{t('admin:tenantDetail.slug')}</dt>
             <dd>{tenant.slug}</dd>
 
-            <dt>Domain</dt>
+            <dt>{t('admin:tenantDetail.domain')}</dt>
             <dd>{tenant.domain || '-'}</dd>
 
-            <dt>Durum</dt>
+            <dt>{t('admin:tenantDetail.status')}</dt>
             <dd>
               <Badge variant={statusColors[tenant.status] || 'default'}>
                 {statusLabels[tenant.status] || tenant.status}
               </Badge>
             </dd>
 
-            <dt>Plan</dt>
-            <dd>{tenant.plan_name || 'Plansiz'}</dd>
+            <dt>{t('admin:tenantDetail.plan')}</dt>
+            <dd>{tenant.plan_name || t('admin:tenantDetail.noPlan')}</dd>
 
-            <dt>Fatura E-posta</dt>
+            <dt>{t('admin:tenantDetail.billingEmail')}</dt>
             <dd>{tenant.billing_email || '-'}</dd>
 
-            <dt>Kayit Tarihi</dt>
+            <dt>{t('admin:tenantDetail.createdAt')}</dt>
             <dd>{new Date(tenant.created_at).toLocaleDateString('tr-TR')}</dd>
           </dl>
         </Card>
 
         <Card className={styles.section}>
-          <h2 className={styles.sectionTitle}>Abonelik Bilgileri</h2>
+          <h2 className={styles.sectionTitle}>{t('admin:tenantDetail.subscriptionInfo')}</h2>
           <dl className={styles.detailList}>
-            <dt>Deneme Bitis</dt>
+            <dt>{t('admin:tenantDetail.trialEnd')}</dt>
             <dd>
               {tenant.trial_ends_at
                 ? new Date(tenant.trial_ends_at).toLocaleDateString('tr-TR')
                 : '-'}
             </dd>
 
-            <dt>Abonelik Baslangic</dt>
+            <dt>{t('admin:tenantDetail.subscriptionStart')}</dt>
             <dd>
               {tenant.subscription_starts_at
                 ? new Date(tenant.subscription_starts_at).toLocaleDateString('tr-TR')
                 : '-'}
             </dd>
 
-            <dt>Abonelik Bitis</dt>
+            <dt>{t('admin:tenantDetail.subscriptionEnd')}</dt>
             <dd>
               {tenant.subscription_ends_at
                 ? new Date(tenant.subscription_ends_at).toLocaleDateString('tr-TR')
@@ -305,12 +307,12 @@ export function TenantDetailPage() {
           <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
             {createdInviteLink ? (
               <>
-                <h2>Davet Olusturuldu</h2>
+                <h2>{t('admin:tenantDetail.inviteCreated')}</h2>
                 <p style={{ marginBottom: '1rem', color: '#059669' }}>
-                  Davet basariyla olusturuldu. Asagidaki linki kopyalayip kullaniciya gonderin.
+                  {t('admin:tenantDetail.inviteSuccess')}
                 </p>
                 <div className={styles.formField}>
-                  <label>Davet Linki</label>
+                  <label>{t('admin:tenantDetail.inviteLink')}</label>
                   <div style={{ display: 'flex', gap: '0.5rem' }}>
                     <input
                       type="text"
@@ -319,55 +321,55 @@ export function TenantDetailPage() {
                       style={{ flex: 1 }}
                     />
                     <Button variant="primary" onClick={copyInviteLink}>
-                      {linkCopied ? 'Kopyalandi!' : 'Kopyala'}
+                      {linkCopied ? t('admin:tenantDetail.copied') : t('admin:tenantDetail.copy')}
                     </Button>
                   </div>
                 </div>
                 <div className={styles.modalActions}>
                   <Button variant="secondary" onClick={closeInviteModal}>
-                    Kapat
+                    {t('admin:tenantDetail.close')}
                   </Button>
                 </div>
               </>
             ) : (
               <>
-                <h2>Kullanici Davet Et</h2>
+                <h2>{t('admin:tenantDetail.inviteTitle')}</h2>
                 <p style={{ marginBottom: '1rem', color: '#6b7280' }}>
-                  {tenant?.name} organizasyonuna kullanici davet edin.
+                  {t('admin:tenantDetail.inviteDescription', { name: tenant?.name })}
                 </p>
 
                 {inviteError && <div className={styles.error}>{inviteError}</div>}
 
                 <form onSubmit={handleInviteUser}>
                   <div className={styles.formField}>
-                    <label>E-posta *</label>
+                    <label>{t('admin:tenantDetail.labelEmail')}</label>
                     <Input
                       type="email"
                       value={inviteEmail}
                       onChange={(e) => setInviteEmail(e.target.value)}
-                      placeholder="kullanici@sirket.com"
+                      placeholder={t('admin:tenantDetail.emailPlaceholder')}
                       required
                     />
                   </div>
 
                   <div className={styles.formField}>
-                    <label>Rol *</label>
+                    <label>{t('admin:tenantDetail.labelRole')}</label>
                     <select
                       value={inviteRole}
                       onChange={(e) => setInviteRole(e.target.value)}
                       className={styles.select}
                     >
-                      <option value="tenant_admin">Organizasyon Yoneticisi</option>
-                      <option value="user">Kullanici</option>
+                      <option value="tenant_admin">{t('admin:tenantDetail.roleOrgAdmin')}</option>
+                      <option value="user">{t('admin:tenantDetail.roleUser')}</option>
                     </select>
                   </div>
 
                   <div className={styles.modalActions}>
                     <Button type="button" variant="secondary" onClick={closeInviteModal}>
-                      Iptal
+                      {t('admin:tenantDetail.cancel')}
                     </Button>
                     <Button type="submit" variant="primary" disabled={isInviting}>
-                      {isInviting ? 'Gonderiliyor...' : 'Davet Gonder'}
+                      {isInviting ? t('admin:tenantDetail.sending') : t('admin:tenantDetail.sendInvite')}
                     </Button>
                   </div>
                 </form>

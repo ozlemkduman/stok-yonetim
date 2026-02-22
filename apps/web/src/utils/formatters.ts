@@ -1,8 +1,14 @@
+import i18n from '../i18n/i18n';
+
+function getLocale(): string {
+  return i18n.language?.startsWith('en') ? 'en-US' : 'tr-TR';
+}
+
 /**
  * Format number as Turkish Lira currency
  */
 export function formatCurrency(value: number): string {
-  return new Intl.NumberFormat('tr-TR', {
+  return new Intl.NumberFormat(getLocale(), {
     style: 'currency',
     currency: 'TRY',
     minimumFractionDigits: 2,
@@ -10,10 +16,10 @@ export function formatCurrency(value: number): string {
 }
 
 /**
- * Format date in Turkish locale
+ * Format date in current locale
  */
 export function formatDate(date: string | Date): string {
-  return new Intl.DateTimeFormat('tr-TR', {
+  return new Intl.DateTimeFormat(getLocale(), {
     year: 'numeric',
     month: 'long',
     day: 'numeric',
@@ -24,7 +30,7 @@ export function formatDate(date: string | Date): string {
  * Format date with time
  */
 export function formatDateTime(date: string | Date): string {
-  return new Intl.DateTimeFormat('tr-TR', {
+  return new Intl.DateTimeFormat(getLocale(), {
     year: 'numeric',
     month: 'short',
     day: 'numeric',
@@ -37,7 +43,7 @@ export function formatDateTime(date: string | Date): string {
  * Format number with thousand separators
  */
 export function formatNumber(value: number): string {
-  return new Intl.NumberFormat('tr-TR').format(value);
+  return new Intl.NumberFormat(getLocale()).format(value);
 }
 
 /**

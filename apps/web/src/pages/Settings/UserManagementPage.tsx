@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Card, Table, Button, Input, Badge, Modal, Pagination, type Column } from '@stok/ui';
 import { apiClient } from '../../api/client';
 import { useConfirmDialog } from '../../context/ConfirmDialogContext';
@@ -26,11 +27,6 @@ interface CreateUserData {
   permissions: string[];
 }
 
-const roleLabels: Record<string, string> = {
-  tenant_admin: 'Yonetici',
-  user: 'Kullanici',
-};
-
 const statusColors: Record<string, 'success' | 'danger' | 'default'> = {
   active: 'success',
   suspended: 'danger',
@@ -38,6 +34,7 @@ const statusColors: Record<string, 'success' | 'danger' | 'default'> = {
 };
 
 export function UserManagementPage() {
+  const { t } = useTranslation(['settings', 'common']);
   const { confirm } = useConfirmDialog();
   const { showToast } = useToast();
   const [users, setUsers] = useState<User[]>([]);
@@ -65,7 +62,7 @@ export function UserManagementPage() {
       setUsers(response.data);
       setTotalPages(response.meta?.totalPages || 1);
     } catch (error) {
-      showToast('error', 'Kullanicilar yuklenemedi');
+      showToast('error', t('settings:users.loadFailed'));
     } finally {
       setIsLoading(false);
     }
@@ -87,26 +84,26 @@ export function UserManagementPage() {
       });
       loadUsers();
     } catch (error) {
-      showToast('error', 'Kullanici olusturulamadi');
+      showToast('error', t('settings:users.createFailed'));
     }
   };
 
   const handleDelete = async (id: string) => {
-    const confirmed = await confirm({ message: 'Bu kullaniciyi silmek istediginize emin misiniz?', variant: 'danger' });
+    const confirmed = await confirm({ message: t('settings:users.deleteConfirm'), variant: 'danger' });
     if (!confirmed) return;
 
     try {
       await apiClient.delete(`/users/${id}`);
       loadUsers();
     } catch (error) {
-      showToast('error', 'Kullanici silinemedi');
+      showToast('error', t('settings:users.deleteFailed'));
     }
   };
 
   const columns: Column<User>[] = [
     {
       key: 'name',
-      header: 'Ad Soyad',
+      header: t('settings:users.columnName'),
       render: (user) => (
         <div>
           <div>{user.name}</div>
@@ -116,21 +113,21 @@ export function UserManagementPage() {
     },
     {
       key: 'role',
-      header: 'Rol',
-      render: (user) => roleLabels[user.role] || user.role,
+      header: t('settings:users.columnRole'),
+      render: (user) => user.role === 'tenant_admin' ? t('settings:users.roleAdmin') : user.role === 'user' ? t('settings:users.roleUser') : user.role,
     },
     {
       key: 'status',
-      header: 'Durum',
+      header: t('settings:users.columnStatus'),
       render: (user) => (
         <Badge variant={statusColors[user.status] || 'default'}>
-          {user.status === 'active' ? 'Aktif' : 'Pasif'}
+          {user.status === 'active' ? t('settings:users.statusActive') : t('settings:users.statusInactive')}
         </Badge>
       ),
     },
     {
       key: 'last_login',
-      header: 'Son Giris',
+      header: t('settings:users.columnLastLogin'),
       render: (user) =>
         user.last_login_at
           ? new Date(user.last_login_at).toLocaleDateString('tr-TR')
@@ -142,7 +139,7 @@ export function UserManagementPage() {
       render: (user) =>
         user.role !== 'tenant_admin' && (
           <Button variant="ghost" size="sm" onClick={() => handleDelete(user.id)}>
-            Sil
+            {t('settings:users.delete')}
           </Button>
         ),
     },
@@ -151,9 +148,9 @@ export function UserManagementPage() {
   return (
     <div className={styles.page}>
       <div className={styles.pageHeader}>
-        <h1 className={styles.pageTitle}>Kullanıcı Yonetimi</h1>
+        <h1 className={styles.pageTitle}>{t('settings:users.title')}</h1>
         <Button variant="primary" onClick={() => setIsModalOpen(true)}>
-          Yeni Kullanici
+          {t('settings:users.newUser')}
         </Button>
       </div>
 
@@ -163,7 +160,7 @@ export function UserManagementPage() {
           data={users}
           keyExtractor={(user) => user.id}
           loading={isLoading}
-          emptyMessage="Kullanici bulunamadi"
+          emptyMessage={t('settings:users.emptyMessage')}
         />
 
         {totalPages > 1 && (
@@ -180,11 +177,11 @@ export function UserManagementPage() {
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        title="Yeni Kullanici"
+        title={t('settings:users.modalTitle')}
       >
         <form onSubmit={handleSubmit} className={styles.form}>
           <div className={styles.field}>
-            <label>Ad Soyad</label>
+            <label>{t('settings:users.labelFullName')}</label>
             <Input
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
@@ -193,7 +190,7 @@ export function UserManagementPage() {
           </div>
 
           <div className={styles.field}>
-            <label>E-posta</label>
+            <label>{t('settings:users.labelEmail')}</label>
             <Input
               type="email"
               value={formData.email}
@@ -203,7 +200,7 @@ export function UserManagementPage() {
           </div>
 
           <div className={styles.field}>
-            <label>Sifre</label>
+            <label>{t('settings:users.labelPassword')}</label>
             <Input
               type="password"
               value={formData.password}
@@ -214,7 +211,7 @@ export function UserManagementPage() {
           </div>
 
           <div className={styles.field}>
-            <label>Telefon</label>
+            <label>{t('settings:users.labelPhone')}</label>
             <Input
               value={formData.phone}
               onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
@@ -222,22 +219,22 @@ export function UserManagementPage() {
           </div>
 
           <div className={styles.field}>
-            <label>Rol</label>
+            <label>{t('settings:users.labelRole')}</label>
             <select
               value={formData.role}
               onChange={(e) => setFormData({ ...formData, role: e.target.value })}
               className={styles.select}
             >
-              <option value="user">Kullanici</option>
+              <option value="user">{t('settings:users.roleUser')}</option>
             </select>
           </div>
 
           <div className={styles.formActions}>
             <Button type="button" variant="ghost" onClick={() => setIsModalOpen(false)}>
-              Iptal
+              {t('settings:users.cancel')}
             </Button>
             <Button type="submit" variant="primary">
-              Olustur
+              {t('settings:users.create')}
             </Button>
           </div>
         </form>

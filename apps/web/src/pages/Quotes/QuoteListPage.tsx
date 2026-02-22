@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Table, Button, Input, Select, Badge, Pagination, type Column } from '@stok/ui';
 import { Quote, quotesApi } from '../../api/quotes.api';
 import { useToast } from '../../context/ToastContext';
@@ -19,26 +20,8 @@ const icons = {
   ),
 };
 
-const STATUS_LABELS: Record<string, string> = {
-  draft: 'Taslak',
-  sent: 'Gönderildi',
-  accepted: 'Kabul Edildi',
-  rejected: 'Reddedildi',
-  expired: 'Süresi Doldu',
-  converted: 'Satışa Dönüştürüldü',
-};
-
-const STATUS_OPTIONS = [
-  { value: '', label: 'Tüm Durumlar' },
-  { value: 'draft', label: 'Taslak' },
-  { value: 'sent', label: 'Gönderildi' },
-  { value: 'accepted', label: 'Kabul Edildi' },
-  { value: 'rejected', label: 'Reddedildi' },
-  { value: 'expired', label: 'Süresi Doldu' },
-  { value: 'converted', label: 'Satışa Dönüştürüldü' },
-];
-
 export function QuoteListPage() {
+  const { t } = useTranslation(['quotes', 'common']);
   const navigate = useNavigate();
   const [quotes, setQuotes] = useState<Quote[]>([]);
   const [loading, setLoading] = useState(true);
@@ -54,6 +37,16 @@ export function QuoteListPage() {
 
   const { showToast } = useToast();
   const { confirm } = useConfirmDialog();
+
+  const STATUS_OPTIONS = [
+    { value: '', label: t('quotes:statusFilter.all') },
+    { value: 'draft', label: t('quotes:statuses.draft') },
+    { value: 'sent', label: t('quotes:statuses.sent') },
+    { value: 'accepted', label: t('quotes:statuses.accepted') },
+    { value: 'rejected', label: t('quotes:statuses.rejected') },
+    { value: 'expired', label: t('quotes:statuses.expired') },
+    { value: 'converted', label: t('quotes:statuses.converted') },
+  ];
 
   const fetchQuotes = useCallback(async () => {
     setLoading(true);
@@ -71,11 +64,11 @@ export function QuoteListPage() {
       setTotal(response.meta?.total || 0);
       setTotalPages(response.meta?.totalPages || 1);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Teklifler yüklenirken hata oluştu');
+      setError(err instanceof Error ? err.message : t('quotes:toast.loadError'));
     } finally {
       setLoading(false);
     }
-  }, [page, search, statusFilter, startDate, endDate]);
+  }, [page, search, statusFilter, startDate, endDate, t]);
 
   useEffect(() => {
     fetchQuotes();
@@ -105,56 +98,56 @@ export function QuoteListPage() {
   const handleSend = async (quote: Quote) => {
     try {
       await quotesApi.send(quote.id);
-      showToast('success', 'Teklif gönderildi');
+      showToast('success', t('quotes:toast.sent'));
       fetchQuotes();
     } catch (err) {
-      showToast('error', err instanceof Error ? err.message : 'İşlem başarısız');
+      showToast('error', err instanceof Error ? err.message : t('quotes:toast.operationFailed'));
     }
   };
 
   const handleAccept = async (quote: Quote) => {
     try {
       await quotesApi.accept(quote.id);
-      showToast('success', 'Teklif kabul edildi');
+      showToast('success', t('quotes:toast.accepted'));
       fetchQuotes();
     } catch (err) {
-      showToast('error', err instanceof Error ? err.message : 'İşlem başarısız');
+      showToast('error', err instanceof Error ? err.message : t('quotes:toast.operationFailed'));
     }
   };
 
   const handleReject = async (quote: Quote) => {
-    const confirmed = await confirm({ message: 'Teklifi reddetmek istediğinizden emin misiniz?', variant: 'warning' });
+    const confirmed = await confirm({ message: t('quotes:confirm.rejectMessage'), variant: 'warning' });
     if (!confirmed) return;
     try {
       await quotesApi.reject(quote.id);
-      showToast('success', 'Teklif reddedildi');
+      showToast('success', t('quotes:toast.rejected'));
       fetchQuotes();
     } catch (err) {
-      showToast('error', err instanceof Error ? err.message : 'İşlem başarısız');
+      showToast('error', err instanceof Error ? err.message : t('quotes:toast.operationFailed'));
     }
   };
 
   const handleConvert = async (quote: Quote) => {
-    const confirmed = await confirm({ message: 'Teklifi satışa dönüştürmek istediğinizden emin misiniz?', variant: 'warning' });
+    const confirmed = await confirm({ message: t('quotes:confirm.convertMessage'), variant: 'warning' });
     if (!confirmed) return;
     try {
       await quotesApi.convertToSale(quote.id, { payment_method: 'nakit' });
-      showToast('success', 'Teklif satışa dönüştürüldü');
+      showToast('success', t('quotes:toast.converted'));
       fetchQuotes();
     } catch (err) {
-      showToast('error', err instanceof Error ? err.message : 'İşlem başarısız');
+      showToast('error', err instanceof Error ? err.message : t('quotes:toast.operationFailed'));
     }
   };
 
   const handleDelete = async (quote: Quote) => {
-    const confirmed = await confirm({ message: `"${quote.quote_number}" teklifini silmek istediğinizden emin misiniz?`, variant: 'danger' });
+    const confirmed = await confirm({ message: t('quotes:confirm.deleteMessage', { number: quote.quote_number }), variant: 'danger' });
     if (!confirmed) return;
     try {
       await quotesApi.delete(quote.id);
-      showToast('success', 'Teklif silindi');
+      showToast('success', t('quotes:toast.deleted'));
       fetchQuotes();
     } catch (err) {
-      showToast('error', err instanceof Error ? err.message : 'Silme işlemi başarısız');
+      showToast('error', err instanceof Error ? err.message : t('quotes:toast.deleteFailed'));
     }
   };
 
@@ -171,7 +164,7 @@ export function QuoteListPage() {
   const columns: Column<Quote>[] = [
     {
       key: 'quote_number',
-      header: 'Teklif',
+      header: t('quotes:columns.quote'),
       render: (q) => (
         <div className={styles.quoteInfo} onClick={() => navigate(`/quotes/${q.id}`)} style={{ cursor: 'pointer' }}>
           <span className={styles.quoteNumber}>{q.quote_number}</span>
@@ -181,12 +174,12 @@ export function QuoteListPage() {
     },
     {
       key: 'quote_date',
-      header: 'Tarih',
+      header: t('quotes:columns.date'),
       render: (q) => formatDate(q.quote_date),
     },
     {
       key: 'valid_until',
-      header: 'Geçerlilik',
+      header: t('quotes:columns.validity'),
       render: (q) => (
         <span className={`${styles.validUntil} ${getValidUntilClass(q.valid_until, q.status)}`}>
           {formatDate(q.valid_until)}
@@ -195,13 +188,13 @@ export function QuoteListPage() {
     },
     {
       key: 'grand_total',
-      header: 'Toplam',
+      header: t('quotes:columns.total'),
       align: 'right',
       render: (q) => <span className={styles.total}>{formatCurrency(q.grand_total)}</span>,
     },
     {
       key: 'status',
-      header: 'Durum',
+      header: t('quotes:columns.status'),
       render: (q) => (
         <Badge variant={
           q.status === 'converted' ? 'success' :
@@ -210,13 +203,13 @@ export function QuoteListPage() {
           q.status === 'expired' ? 'warning' :
           q.status === 'sent' ? 'info' : 'default'
         }>
-          {STATUS_LABELS[q.status] || q.status}
+          {t(`quotes:statuses.${q.status}`, { defaultValue: q.status })}
         </Badge>
       ),
     },
     {
       key: 'created_by_name',
-      header: 'Kaydeden',
+      header: t('quotes:columns.createdBy'),
       render: (q) => q.created_by_name || '-',
     },
     {
@@ -226,19 +219,19 @@ export function QuoteListPage() {
       render: (q) => (
         <div className={styles.actions}>
           {q.status === 'draft' && (
-            <Button size="xs" variant="secondary" onClick={() => handleSend(q)}>Gönder</Button>
+            <Button size="xs" variant="secondary" onClick={() => handleSend(q)}>{t('quotes:actions.send')}</Button>
           )}
           {['draft', 'sent'].includes(q.status) && (
             <>
-              <Button size="xs" variant="secondary" onClick={() => handleAccept(q)}>Kabul</Button>
-              <Button size="xs" variant="secondary" onClick={() => handleReject(q)}>Ret</Button>
+              <Button size="xs" variant="secondary" onClick={() => handleAccept(q)}>{t('quotes:actions.accept')}</Button>
+              <Button size="xs" variant="secondary" onClick={() => handleReject(q)}>{t('quotes:actions.reject')}</Button>
             </>
           )}
           {['draft', 'sent', 'accepted'].includes(q.status) && (
-            <Button size="xs" variant="secondary" onClick={() => handleConvert(q)}>Satışa Dön.</Button>
+            <Button size="xs" variant="secondary" onClick={() => handleConvert(q)}>{t('quotes:actions.convertShort')}</Button>
           )}
           {q.status !== 'converted' && (
-            <Button size="xs" variant="danger" onClick={() => handleDelete(q)}>Sil</Button>
+            <Button size="xs" variant="danger" onClick={() => handleDelete(q)}>{t('quotes:actions.delete')}</Button>
           )}
         </div>
       ),
@@ -251,12 +244,12 @@ export function QuoteListPage() {
         <div className={styles.headerLeft}>
           <h1 className={styles.title}>
             <span className={styles.titleIcon}>{icons.quotes}</span>
-            Teklifler
+            {t('quotes:pageTitle')}
           </h1>
-          <p className={styles.subtitle}>Toplam {total} teklif</p>
+          <p className={styles.subtitle}>{t('quotes:totalQuotes', { count: total })}</p>
         </div>
         <Button onClick={() => navigate('/quotes/new')}>
-          + Yeni Teklif
+          {t('quotes:newQuote')}
         </Button>
       </div>
 
@@ -264,11 +257,11 @@ export function QuoteListPage() {
         <div className={styles.toolbar}>
           <form onSubmit={handleSearch} className={styles.searchForm}>
             <Input
-              placeholder="Teklif ara..."
+              placeholder={t('quotes:searchPlaceholder')}
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
             />
-            <Button type="submit" variant="secondary">Ara</Button>
+            <Button type="submit" variant="secondary">{t('common:buttons.search')}</Button>
           </form>
 
           <div className={styles.filters}>
@@ -289,7 +282,7 @@ export function QuoteListPage() {
           data={quotes}
           keyExtractor={(q) => q.id}
           loading={loading}
-          emptyMessage="Teklif bulunamadı"
+          emptyMessage={t('quotes:emptyMessage')}
         />
 
         {totalPages > 1 && (

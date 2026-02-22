@@ -1,0 +1,140 @@
+{
+  "title": "Müşteriler",
+  "subtitle": "Toplam {{count}} müşteri kaydı",
+  "addNew": "+ Yeni Müşteri",
+  "searchPlaceholder": "Müşteri ara...",
+  "emptyMessage": "Müşteri bulunamadı",
+  "upgradePrompt": "Müşteri limitinize ulaştınız. Daha fazla müşteri eklemek için planınızı yükseltin.",
+
+  "columns": {
+    "customerName": "Müşteri Adı",
+    "email": "E-posta",
+    "balance": "Bakiye",
+    "status": "Durum",
+    "createdBy": "Kaydeden"
+  },
+
+  "actions": {
+    "detail": "Detay",
+    "edit": "Düzenle",
+    "delete": "Sil"
+  },
+
+  "toast": {
+    "createSuccess": "Müşteri başarıyla eklendi",
+    "updateSuccess": "Müşteri başarıyla güncellendi",
+    "deleteSuccess": "Müşteri başarıyla silindi",
+    "deleteFailed": "Silme işlemi başarısız"
+  },
+
+  "confirm": {
+    "deleteMessage": "\"{{name}}\" müşterisini silmek istediğinizden emin misiniz?"
+  },
+
+  "status": {
+    "active": "Aktif",
+    "inactive": "Pasif"
+  },
+
+  "detail": {
+    "backToList": "← Müşteriler",
+    "loading": "Yükleniyor...",
+    "loadError": "Veri yüklenemedi",
+    "notFound": "Müşteri bulunamadı",
+    "backButton": "Geri Dön",
+    "currentBalance": "Cari Bakiye",
+    "debtor": "Borçlu",
+    "creditor": "Alacaklı",
+
+    "info": {
+      "title": "Müşteri Bilgileri",
+      "address": "Adres",
+      "taxNumber": "Vergi No",
+      "taxOffice": "Vergi Dairesi",
+      "notes": "Notlar",
+      "createdBy": "Kaydeden"
+    },
+
+    "stats": {
+      "title": "İstatistikler",
+      "sales": "Satış",
+      "returns": "İade",
+      "payments": "Ödeme"
+    },
+
+    "tabs": {
+      "productStats": "Ürün İstatistikleri ({{count}})",
+      "sales": "Satışlar ({{count}})",
+      "returns": "İadeler ({{count}})",
+      "payments": "Ödemeler ({{count}})"
+    },
+
+    "table": {
+      "product": "Ürün",
+      "barcode": "Barkod",
+      "quantity": "Miktar",
+      "unitPrice": "Birim Fiyat",
+      "vat": "KDV",
+      "total": "Toplam",
+      "totalQuantity": "Toplam Adet",
+      "totalAmount": "Toplam Tutar",
+      "grandTotal": "Toplam",
+      "subtotal": "Ara Toplam",
+      "discount": "İskonto",
+      "vatTotal": "KDV Toplam",
+      "overallTotal": "Genel Toplam",
+      "date": "Tarih",
+      "paymentMethod": "Ödeme Yöntemi",
+      "notes": "Notlar",
+      "amount": "Tutar"
+    },
+
+    "empty": {
+      "sales": "Henüz satış yapılmamış",
+      "returns": "Henüz iade yapılmamış",
+      "products": "Henüz ürün satışı yapılmamış",
+      "payments": "Henüz ödeme yapılmamış"
+    },
+
+    "paymentMethods": {
+      "cash": "Nakit",
+      "credit_card": "Kredi Kartı",
+      "bank_transfer": "Havale/EFT",
+      "credit": "Veresiye"
+    },
+
+    "statusLabels": {
+      "completed": "Tamamlandı",
+      "cancelled": "İptal Edildi",
+      "pending": "Beklemede"
+    }
+  },
+
+  "form": {
+    "createTitle": "Yeni Müşteri",
+    "editTitle": "Müşteri Düzenle",
+    "cancel": "İptal",
+    "save": "Kaydet",
+    "update": "Güncelle",
+    "customerName": "Müşteri Adı *",
+    "phone": "Telefon",
+    "email": "E-posta",
+    "taxNumber": "Vergi No",
+    "taxOffice": "Vergi Dairesi",
+    "address": "Adres",
+    "notes": "Notlar",
+    "namePlaceholder": "Örnek: Ahmet Yılmaz",
+    "phonePlaceholder": "0532 111 2233",
+    "emailPlaceholder": "ornek@email.com",
+    "taxNumberPlaceholder": "1234567890",
+    "taxOfficePlaceholder": "Kadıköy",
+    "addressPlaceholder": "Tam adres",
+    "notesPlaceholder": "Müşteri hakkında notlar...",
+    "errors": {
+      "nameRequired": "Müşteri adı zorunludur",
+      "nameMinLength": "Müşteri adı en az 2 karakter olmalıdır",
+      "emailInvalid": "Geçerli bir e-posta adresi giriniz",
+      "generic": "Bir hata oluştu"
+    }
+  }
+}

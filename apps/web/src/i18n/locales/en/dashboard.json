@@ -1,0 +1,41 @@
+{
+  "title": "Summary",
+  "refresh": "Refresh",
+  "errors": {
+    "loadFailed": "Failed to load summary data"
+  },
+  "stats": {
+    "dailySales": "Daily Sales",
+    "dailySalesTransactions": "{{count}} transactions",
+    "totalProducts": "Total Products",
+    "totalProductsSub": "Active products",
+    "totalCustomers": "Total Customers",
+    "totalCustomersSub": "Registered customers",
+    "lowStock": "Low Stock",
+    "lowStockSub": "Critical level",
+    "totalDebt": "Total Debt",
+    "totalCredit": "Total Credit",
+    "monthlyExpenses": "Monthly Expenses"
+  },
+  "quickActions": {
+    "newSale": "New Sale",
+    "addProduct": "Add Product",
+    "addCustomer": "Add Customer",
+    "reports": "Reports"
+  },
+  "lowStockTable": {
+    "title": "Low Stock Products",
+    "productCount": "{{count}} products",
+    "columnProductName": "Product Name",
+    "columnCurrentStock": "Current Stock",
+    "columnMinLevel": "Min. Level",
+    "empty": "No low stock products"
+  },
+  "debtorsTable": {
+    "title": "Top Debtors",
+    "customerCount": "{{count}} customers",
+    "columnCustomer": "Customer",
+    "columnDebtAmount": "Debt Amount",
+    "empty": "No debtors"
+  }
+}

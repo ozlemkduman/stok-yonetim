@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Table, Button, Select, Badge, Pagination, type Column } from '@stok/ui';
 import { EDocument, EDocumentSummary, eDocumentsApi } from '../../api/e-documents.api';
 import { useToast } from '../../context/ToastContext';
@@ -18,42 +19,8 @@ const icons = {
   ),
 };
 
-const DOCUMENT_TYPE_LABELS: Record<string, string> = {
-  e_fatura: 'e-Fatura',
-  e_arsiv: 'e-Arsiv',
-  e_ihracat: 'e-Ihracat',
-  e_irsaliye: 'e-Irsaliye',
-  e_smm: 'e-SMM',
-};
-
-const STATUS_LABELS: Record<string, string> = {
-  draft: 'Taslak',
-  pending: 'Bekliyor',
-  sent: 'Gonderildi',
-  approved: 'Onaylandi',
-  rejected: 'Reddedildi',
-  cancelled: 'Iptal',
-};
-
-const TYPE_OPTIONS = [
-  { value: '', label: 'Tum Belgeler' },
-  { value: 'e_fatura', label: 'e-Fatura' },
-  { value: 'e_arsiv', label: 'e-Arsiv' },
-  { value: 'e_ihracat', label: 'e-Ihracat' },
-  { value: 'e_irsaliye', label: 'e-Irsaliye' },
-  { value: 'e_smm', label: 'e-SMM' },
-];
-
-const STATUS_OPTIONS = [
-  { value: '', label: 'Tum Durumlar' },
-  { value: 'draft', label: 'Taslak' },
-  { value: 'pending', label: 'Bekliyor' },
-  { value: 'approved', label: 'Onaylandi' },
-  { value: 'rejected', label: 'Reddedildi' },
-  { value: 'cancelled', label: 'Iptal' },
-];
-
 export function EDocumentListPage() {
+  const { t } = useTranslation(['edocuments', 'common']);
   const [documents, setDocuments] = useState<EDocument[]>([]);
   const [summary, setSummary] = useState<EDocumentSummary | null>(null);
   const [loading, setLoading] = useState(true);
@@ -67,6 +34,24 @@ export function EDocumentListPage() {
 
   const { showToast } = useToast();
   const { confirm } = useConfirmDialog();
+
+  const TYPE_OPTIONS = [
+    { value: '', label: t('edocuments:typeFilter.all') },
+    { value: 'e_fatura', label: t('edocuments:documentTypes.e_fatura') },
+    { value: 'e_arsiv', label: t('edocuments:documentTypes.e_arsiv') },
+    { value: 'e_ihracat', label: t('edocuments:documentTypes.e_ihracat') },
+    { value: 'e_irsaliye', label: t('edocuments:documentTypes.e_irsaliye') },
+    { value: 'e_smm', label: t('edocuments:documentTypes.e_smm') },
+  ];
+
+  const STATUS_OPTIONS = [
+    { value: '', label: t('edocuments:statusFilter.all') },
+    { value: 'draft', label: t('edocuments:statuses.draft') },
+    { value: 'pending', label: t('edocuments:statuses.pending') },
+    { value: 'approved', label: t('edocuments:statuses.approved') },
+    { value: 'rejected', label: t('edocuments:statuses.rejected') },
+    { value: 'cancelled', label: t('edocuments:statuses.cancelled') },
+  ];
 
   const fetchDocuments = useCallback(async () => {
     setLoading(true);
@@ -82,20 +67,20 @@ export function EDocumentListPage() {
       setTotal(response.meta?.total || 0);
       setTotalPages(response.meta?.totalPages || 1);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Belgeler yuklenirken hata olustu');
+      setError(err instanceof Error ? err.message : t('edocuments:toast.loadError'));
     } finally {
       setLoading(false);
     }
-  }, [page, typeFilter, statusFilter]);
+  }, [page, typeFilter, statusFilter, t]);
 
   const fetchSummary = useCallback(async () => {
     try {
       const response = await eDocumentsApi.getSummary();
       setSummary(response.data);
     } catch (err) {
-      showToast('error', 'Ozet bilgileri yuklenemedi');
+      showToast('error', t('edocuments:toast.summaryLoadError'));
     }
-  }, []);
+  }, [t]);
 
   useEffect(() => {
     fetchDocuments();
@@ -108,68 +93,69 @@ export function EDocumentListPage() {
   const handleSend = async (doc: EDocument) => {
     try {
       await eDocumentsApi.send(doc.id);
-      showToast('success', 'Belge GIB\'e gonderildi');
+      showToast('success', t('edocuments:toast.sentToGib'));
       fetchDocuments();
       fetchSummary();
     } catch (err) {
-      showToast('error', err instanceof Error ? err.message : 'Gonderim basarisiz');
+      showToast('error', err instanceof Error ? err.message : t('edocuments:toast.sendFailed'));
     }
   };
 
   const handleCheckStatus = async (doc: EDocument) => {
     try {
       const result = await eDocumentsApi.checkStatus(doc.id);
-      showToast('success', `Durum: ${STATUS_LABELS[result.data.status] || result.data.status}`);
+      const statusLabel = t(`edocuments:statuses.${result.data.status}`, { defaultValue: result.data.status });
+      showToast('success', t('edocuments:toast.statusResult', { status: statusLabel }));
       fetchDocuments();
       fetchSummary();
     } catch (err) {
-      showToast('error', err instanceof Error ? err.message : 'Durum sorgulanamadi');
+      showToast('error', err instanceof Error ? err.message : t('edocuments:toast.statusQueryFailed'));
     }
   };
 
   const handleCancel = async (doc: EDocument) => {
-    const confirmed = await confirm({ message: 'Belgeyi iptal etmek istediginizden emin misiniz?', variant: 'danger' });
+    const confirmed = await confirm({ message: t('edocuments:confirm.cancelMessage'), variant: 'danger' });
     if (!confirmed) return;
     try {
       await eDocumentsApi.cancel(doc.id);
-      showToast('success', 'Belge iptal edildi');
+      showToast('success', t('edocuments:toast.cancelled'));
       fetchDocuments();
       fetchSummary();
     } catch (err) {
-      showToast('error', err instanceof Error ? err.message : 'Iptal basarisiz');
+      showToast('error', err instanceof Error ? err.message : t('edocuments:toast.cancelFailed'));
     }
   };
 
   const columns: Column<EDocument>[] = [
     {
       key: 'document_number',
-      header: 'Belge',
+      header: t('edocuments:columns.document'),
       render: (d) => (
         <div className={styles.documentInfo}>
           <Link to={`/e-documents/${d.id}`} className={styles.documentNumber}>{d.document_number}</Link>
-          <span className={styles.documentType}>{DOCUMENT_TYPE_LABELS[d.document_type] || d.document_type}</span>
+          <span className={styles.documentType}>{t(`edocuments:documentTypes.${d.document_type}`, { defaultValue: d.document_type })}</span>
         </div>
       ),
     },
     {
       key: 'customer_name',
-      header: 'Musteri',
+      header: t('edocuments:columns.customer'),
       render: (d) => d.customer_name || '-',
     },
     {
       key: 'issue_date',
-      header: 'Tarih',
+      header: t('edocuments:columns.date'),
       render: (d) => formatDate(d.issue_date),
     },
     {
       key: 'total_amount',
-      header: 'Tutar',
+      header: t('edocuments:columns.amount'),
       align: 'right',
       render: (d) => <span className={styles.total}>{formatCurrency(d.total_amount)}</span>,
     },
     {
       key: 'status',
-      header: 'Durum',
+      header: t('edocuments:columns.status'),
       render: (d) => (
         <Badge variant={
           d.status === 'approved' ? 'success' :
@@ -177,7 +163,7 @@ export function EDocumentListPage() {
           d.status === 'cancelled' ? 'warning' :
           d.status === 'pending' ? 'info' : 'default'
         }>
-          {STATUS_LABELS[d.status] || d.status}
+          {t(`edocuments:statuses.${d.status}`, { defaultValue: d.status })}
         </Badge>
       ),
     },
@@ -188,13 +174,13 @@ export function EDocumentListPage() {
       render: (d) => (
         <div className={styles.actions}>
           {d.status === 'draft' && (
-            <Button size="sm" variant="primary" onClick={() => handleSend(d)}>Gonder</Button>
+            <Button size="sm" variant="primary" onClick={() => handleSend(d)}>{t('edocuments:actions.send')}</Button>
           )}
           {d.status === 'pending' && (
-            <Button size="sm" variant="secondary" onClick={() => handleCheckStatus(d)}>Sorgula</Button>
+            <Button size="sm" variant="secondary" onClick={() => handleCheckStatus(d)}>{t('edocuments:actions.query')}</Button>
           )}
           {['draft', 'pending'].includes(d.status) && (
-            <Button size="sm" variant="danger" onClick={() => handleCancel(d)}>Iptal</Button>
+            <Button size="sm" variant="danger" onClick={() => handleCancel(d)}>{t('edocuments:actions.cancel')}</Button>
           )}
         </div>
       ),
@@ -207,35 +193,35 @@ export function EDocumentListPage() {
         <div className={styles.headerLeft}>
           <h1 className={styles.title}>
             <span className={styles.titleIcon}>{icons.edocuments}</span>
-            e-Belgeler
+            {t('edocuments:pageTitle')}
           </h1>
-          <p className={styles.subtitle}>Toplam {total} belge</p>
+          <p className={styles.subtitle}>{t('edocuments:totalDocuments', { count: total })}</p>
         </div>
         <Button onClick={() => setShowCreateModal(true)}>
-          + Yeni e-Belge
+          {t('edocuments:newDocument')}
         </Button>
       </div>
 
       {summary && (
         <div className={styles.summaryCards}>
           <div className={styles.summaryCard}>
-            <p className={styles.summaryLabel}>e-Fatura</p>
+            <p className={styles.summaryLabel}>{t('edocuments:summary.eFatura')}</p>
             <p className={styles.summaryValue}>{summary.byType.e_fatura || 0}</p>
           </div>
           <div className={styles.summaryCard}>
-            <p className={styles.summaryLabel}>e-Arsiv</p>
+            <p className={styles.summaryLabel}>{t('edocuments:summary.eArsiv')}</p>
             <p className={styles.summaryValue}>{summary.byType.e_arsiv || 0}</p>
           </div>
           <div className={styles.summaryCard}>
-            <p className={styles.summaryLabel}>e-Irsaliye</p>
+            <p className={styles.summaryLabel}>{t('edocuments:summary.eIrsaliye')}</p>
             <p className={styles.summaryValue}>{summary.byType.e_irsaliye || 0}</p>
           </div>
           <div className={styles.summaryCard}>
-            <p className={styles.summaryLabel}>Onaylanan</p>
+            <p className={styles.summaryLabel}>{t('edocuments:summary.approved')}</p>
             <p className={styles.summaryValue}>{summary.byStatus.approved || 0}</p>
           </div>
           <div className={styles.summaryCard}>
-            <p className={styles.summaryLabel}>Bekleyen</p>
+            <p className={styles.summaryLabel}>{t('edocuments:summary.pending')}</p>
             <p className={styles.summaryValue}>{summary.byStatus.pending || 0}</p>
           </div>
         </div>
@@ -264,7 +250,7 @@ export function EDocumentListPage() {
           data={documents}
           keyExtractor={(d) => d.id}
           loading={loading}
-          emptyMessage="e-Belge bulunamadi"
+          emptyMessage={t('edocuments:emptyMessage')}
         />
 
         {totalPages > 1 && (

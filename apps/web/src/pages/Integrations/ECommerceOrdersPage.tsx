@@ -1,18 +1,13 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Button, Card, Input, Select, Table, Badge, type Column } from '@stok/ui';
 import { ECommerceOrder, integrationsApi, Integration } from '../../api/integrations.api';
 import { useToast } from '../../context/ToastContext';
 import { formatCurrency, formatDate } from '../../utils/formatters';
 import styles from './ECommerceOrdersPage.module.css';
 
-const SYNC_STATUS_LABELS: Record<string, string> = {
-  pending: 'Bekliyor',
-  synced: 'Senkronize',
-  error: 'Hata',
-  ignored: 'Yoksayildi',
-};
-
 export function ECommerceOrdersPage() {
+  const { t } = useTranslation(['integrations', 'common']);
   const { showToast } = useToast();
 
   const [orders, setOrders] = useState<ECommerceOrder[]>([]);
@@ -47,7 +42,7 @@ export function ECommerceOrdersPage() {
         setTotalPages(ordersRes.meta.totalPages);
       }
     } catch (err) {
-      showToast('error', 'Siparisler yuklenirken hata olustu');
+      showToast('error', t('integrations:orders.loadError'));
     } finally {
       setLoading(false);
     }
@@ -74,44 +69,44 @@ export function ECommerceOrdersPage() {
   const columns: Column<ECommerceOrder>[] = [
     {
       key: 'external_order_number',
-      header: 'Siparis No',
+      header: t('integrations:orders.columns.orderNo'),
       width: '12%',
       render: (o) => <strong>{o.external_order_number || o.external_order_id}</strong>,
     },
     {
       key: 'integration_name',
-      header: 'Platform',
+      header: t('integrations:orders.columns.platform'),
       width: '10%',
       render: (o) => o.integration_name || '-',
     },
     {
       key: 'order_date',
-      header: 'Tarih',
+      header: t('integrations:orders.columns.date'),
       width: '10%',
       render: (o) => formatDate(o.order_date),
     },
     {
       key: 'customer_name',
-      header: 'Musteri',
+      header: t('integrations:orders.columns.customer'),
       width: '15%',
       render: (o) => o.customer_name || '-',
     },
     {
       key: 'total',
-      header: 'Tutar',
+      header: t('integrations:orders.columns.amount'),
       align: 'right',
       width: '10%',
       render: (o) => formatCurrency(o.total),
     },
     {
       key: 'status',
-      header: 'Durum',
+      header: t('integrations:orders.columns.status'),
       width: '10%',
       render: (o) => <Badge variant="default">{o.status}</Badge>,
     },
     {
       key: 'sync_status',
-      header: 'Senkron',
+      header: t('integrations:orders.columns.syncStatus'),
       width: '10%',
       render: (o) => (
         <Badge variant={
@@ -119,20 +114,20 @@ export function ECommerceOrdersPage() {
           o.sync_status === 'error' ? 'danger' :
           o.sync_status === 'ignored' ? 'default' : 'warning'
         }>
-          {SYNC_STATUS_LABELS[o.sync_status] || o.sync_status}
+          {t(`integrations:orders.syncStatuses.${o.sync_status}`, { defaultValue: o.sync_status })}
         </Badge>
       ),
     },
     {
       key: 'commission',
-      header: 'Komisyon',
+      header: t('integrations:orders.columns.commission'),
       align: 'right',
       width: '8%',
       render: (o) => formatCurrency(o.commission),
     },
     {
       key: 'shipping_cost',
-      header: 'Kargo',
+      header: t('integrations:orders.columns.shipping'),
       align: 'right',
       width: '8%',
       render: (o) => formatCurrency(o.shipping_cost),
@@ -148,59 +143,59 @@ export function ECommerceOrdersPage() {
     <div className={styles.page}>
       <div className={styles.header}>
         <div>
-          <h1 className={styles.title}>e-Ticaret Siparisleri</h1>
-          <p className={styles.subtitle}>Pazaryeri ve e-ticaret entegrasyonlarindan gelen siparisler</p>
+          <h1 className={styles.title}>{t('integrations:orders.pageTitle')}</h1>
+          <p className={styles.subtitle}>{t('integrations:orders.subtitle')}</p>
         </div>
       </div>
 
       <div className={styles.statsGrid}>
         <Card className={styles.statCard}>
           <span className={styles.statValue}>{totalOrders}</span>
-          <span className={styles.statLabel}>Toplam Siparis</span>
+          <span className={styles.statLabel}>{t('integrations:orders.stats.totalOrders')}</span>
         </Card>
         <Card className={`${styles.statCard} ${styles.success}`}>
           <span className={styles.statValue}>{syncedCount}</span>
-          <span className={styles.statLabel}>Senkronize</span>
+          <span className={styles.statLabel}>{t('integrations:orders.stats.synced')}</span>
         </Card>
         <Card className={`${styles.statCard} ${styles.warning}`}>
           <span className={styles.statValue}>{pendingCount}</span>
-          <span className={styles.statLabel}>Bekleyen</span>
+          <span className={styles.statLabel}>{t('integrations:orders.stats.pending')}</span>
         </Card>
         <Card className={`${styles.statCard} ${styles.danger}`}>
           <span className={styles.statValue}>{errorCount}</span>
-          <span className={styles.statLabel}>Hatali</span>
+          <span className={styles.statLabel}>{t('integrations:orders.stats.withErrors')}</span>
         </Card>
       </div>
 
       <Card className={styles.filtersCard}>
         <div className={styles.filtersGrid}>
           <div className={styles.filterGroup}>
-            <label className={styles.label}>Platform</label>
+            <label className={styles.label}>{t('integrations:orders.filters.platform')}</label>
             <Select
               value={integrationId}
               onChange={(e) => setIntegrationId(e.target.value)}
               options={[
-                { value: '', label: 'Tum Platformlar' },
+                { value: '', label: t('integrations:orders.filters.allPlatforms') },
                 ...integrations.map(i => ({ value: i.id, label: i.name })),
               ]}
             />
           </div>
           <div className={styles.filterGroup}>
-            <label className={styles.label}>Senkron Durumu</label>
+            <label className={styles.label}>{t('integrations:orders.filters.syncStatus')}</label>
             <Select
               value={syncStatus}
               onChange={(e) => setSyncStatus(e.target.value)}
               options={[
-                { value: '', label: 'Tum Durumlar' },
-                { value: 'pending', label: 'Bekliyor' },
-                { value: 'synced', label: 'Senkronize' },
-                { value: 'error', label: 'Hata' },
-                { value: 'ignored', label: 'Yoksayildi' },
+                { value: '', label: t('integrations:orders.filters.allStatuses') },
+                { value: 'pending', label: t('integrations:orders.syncStatuses.pending') },
+                { value: 'synced', label: t('integrations:orders.syncStatuses.synced') },
+                { value: 'error', label: t('integrations:orders.syncStatuses.error') },
+                { value: 'ignored', label: t('integrations:orders.syncStatuses.ignored') },
               ]}
             />
           </div>
           <div className={styles.filterGroup}>
-            <label className={styles.label}>Baslangic</label>
+            <label className={styles.label}>{t('integrations:orders.filters.startDate')}</label>
             <Input
               type="date"
               value={startDate}
@@ -208,7 +203,7 @@ export function ECommerceOrdersPage() {
             />
           </div>
           <div className={styles.filterGroup}>
-            <label className={styles.label}>Bitis</label>
+            <label className={styles.label}>{t('integrations:orders.filters.endDate')}</label>
             <Input
               type="date"
               value={endDate}
@@ -216,8 +211,8 @@ export function ECommerceOrdersPage() {
             />
           </div>
           <div className={styles.filterActions}>
-            <Button onClick={handleFilter}>Filtrele</Button>
-            <Button variant="ghost" onClick={handleReset}>Sifirla</Button>
+            <Button onClick={handleFilter}>{t('integrations:orders.filters.filter')}</Button>
+            <Button variant="ghost" onClick={handleReset}>{t('integrations:orders.filters.reset')}</Button>
           </div>
         </div>
       </Card>
@@ -228,17 +223,17 @@ export function ECommerceOrdersPage() {
           data={orders}
           keyExtractor={(o) => o.id}
           loading={loading}
-          emptyMessage="Siparis bulunamadi"
+          emptyMessage={t('integrations:orders.emptyMessage')}
         />
 
         {totalPages > 1 && (
           <div className={styles.pagination}>
             <Button size="sm" variant="secondary" disabled={page === 1} onClick={() => setPage(page - 1)}>
-              Onceki
+              {t('integrations:orders.pagination.previous')}
             </Button>
-            <span>Sayfa {page} / {totalPages}</span>
+            <span>{t('integrations:orders.pagination.pageOf', { page, totalPages })}</span>
             <Button size="sm" variant="secondary" disabled={page === totalPages} onClick={() => setPage(page + 1)}>
-              Sonraki
+              {t('integrations:orders.pagination.next')}
             </Button>
           </div>
         )}

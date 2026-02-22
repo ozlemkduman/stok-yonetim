@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Outlet, NavLink, useLocation, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useIsMobile, useIsTablet } from '@stok/ui';
 import { reportsApi } from '../api/reports.api';
 import { useAuth } from '../context/AuthContext';
@@ -7,78 +8,79 @@ import { useTenant } from '../context/TenantContext';
 import { usePermissions } from '../hooks/usePermissions';
 import { useHelp } from '../context/HelpContext';
 import { Logo } from '../components/Logo';
+import { LanguageSwitcher } from '../components/LanguageSwitcher';
 import styles from './MainLayout.module.css';
 
 interface MenuItem {
   path: string;
-  label: string;
+  labelKey: string;
   feature?: string;
 }
 
 interface MenuGroup {
   id: string;
-  label: string;
+  labelKey: string;
   items: MenuItem[];
 }
 
 const menuGroups: MenuGroup[] = [
   {
     id: 'main',
-    label: 'Ana Sayfa',
+    labelKey: 'groups.main',
     items: [
-      { path: '/dashboard', label: 'Özet' },
+      { path: '/dashboard', labelKey: 'items.dashboard' },
     ],
   },
   {
     id: 'sales',
-    label: 'Satış Yönetimi',
+    labelKey: 'groups.sales',
     items: [
-      { path: '/customers', label: 'Müşteriler' },
-      { path: '/quotes', label: 'Teklifler', feature: 'quotes' },
-      { path: '/sales', label: 'Satışlar' },
-      { path: '/returns', label: 'İadeler' },
+      { path: '/customers', labelKey: 'items.customers' },
+      { path: '/quotes', labelKey: 'items.quotes', feature: 'quotes' },
+      { path: '/sales', labelKey: 'items.sales' },
+      { path: '/returns', labelKey: 'items.returns' },
     ],
   },
   {
     id: 'inventory',
-    label: 'Stok Yönetimi',
+    labelKey: 'groups.inventory',
     items: [
-      { path: '/products', label: 'Ürünler' },
-      { path: '/warehouses', label: 'Depolar', feature: 'warehouses' },
+      { path: '/products', labelKey: 'items.products' },
+      { path: '/warehouses', labelKey: 'items.warehouses', feature: 'warehouses' },
     ],
   },
   {
     id: 'finance',
-    label: 'Finans',
+    labelKey: 'groups.finance',
     items: [
-      { path: '/accounts', label: 'Kasa/Banka' },
-      { path: '/expenses', label: 'Giderler' },
-      { path: '/e-documents', label: 'e-Belgeler', feature: 'eDocuments' },
+      { path: '/accounts', labelKey: 'items.accounts' },
+      { path: '/expenses', labelKey: 'items.expenses' },
+      { path: '/e-documents', labelKey: 'items.edocuments', feature: 'eDocuments' },
     ],
   },
   {
     id: 'crm',
-    label: 'CRM & Saha',
+    labelKey: 'groups.crm',
     items: [
-      { path: '/crm', label: 'CRM', feature: 'crm' },
-      { path: '/field-team', label: 'Saha Ekip', feature: 'fieldTeam' },
-      { path: '/integrations', label: 'Entegrasyonlar', feature: 'integrations' },
+      { path: '/crm', labelKey: 'items.crm', feature: 'crm' },
+      { path: '/field-team', labelKey: 'items.fieldTeam', feature: 'fieldTeam' },
+      { path: '/integrations', labelKey: 'items.integrations', feature: 'integrations' },
     ],
   },
   {
     id: 'reports',
-    label: 'Raporlar',
+    labelKey: 'groups.reports',
     items: [
-      { path: '/reports', label: 'Raporlar' },
+      { path: '/reports', labelKey: 'items.reports' },
     ],
   },
   {
     id: 'settings',
-    label: 'Ayarlar',
+    labelKey: 'groups.settings',
     items: [
-      { path: '/settings', label: 'Şirket Ayarları' },
-      { path: '/settings/users', label: 'Kullanıcılar' },
-      { path: '/profile', label: 'Profil' },
+      { path: '/settings', labelKey: 'items.companySettings' },
+      { path: '/settings/users', labelKey: 'items.users' },
+      { path: '/profile', labelKey: 'items.profile' },
     ],
   },
 ];
@@ -93,6 +95,7 @@ interface Notification {
 }
 
 export function MainLayout() {
+  const { t, i18n } = useTranslation('nav');
   const isMobile = useIsMobile();
   const isTablet = useIsTablet();
   const isCompact = isMobile || isTablet;
@@ -109,6 +112,7 @@ export function MainLayout() {
   const [showUserMenu, setShowUserMenu] = useState(false);
   const notificationRef = useRef<HTMLDivElement>(null);
   const userMenuRef = useRef<HTMLDivElement>(null);
+  const locale = i18n.language?.startsWith('en') ? 'en-US' : 'tr-TR';
 
   const handleLogout = async () => {
     await logout();
@@ -131,8 +135,8 @@ export function MainLayout() {
           newNotifications.push({
             id: 'overdue',
             type: 'danger',
-            title: 'Geciken Ödemeler',
-            message: `${overdueRes.data.totalCount} adet geciken ödeme var`,
+            title: t('notifications.overdueTitle'),
+            message: t('notifications.overdueMessage', { count: overdueRes.data.totalCount }),
             link: '/reports',
           });
         }
@@ -142,8 +146,8 @@ export function MainLayout() {
           newNotifications.push({
             id: 'lowstock',
             type: 'warning',
-            title: 'Düşük Stok',
-            message: `${stockRes.data.summary.lowStockCount} ürün stok seviyesi düşük`,
+            title: t('notifications.lowStockTitle'),
+            message: t('notifications.lowStockMessage', { count: stockRes.data.summary.lowStockCount }),
             link: '/reports',
           });
         }
@@ -153,8 +157,8 @@ export function MainLayout() {
           newNotifications.push({
             id: 'outofstock',
             type: 'danger',
-            title: 'Stok Bitti',
-            message: `${stockRes.data.summary.outOfStockCount} ürün stokta yok`,
+            title: t('notifications.outOfStockTitle'),
+            message: t('notifications.outOfStockMessage', { count: stockRes.data.summary.outOfStockCount }),
             link: '/products',
           });
         }
@@ -168,7 +172,7 @@ export function MainLayout() {
     fetchNotifications();
     const interval = setInterval(fetchNotifications, 60000); // Refresh every minute
     return () => clearInterval(interval);
-  }, []);
+  }, [t]);
 
   // Close dropdowns when clicking outside
   useEffect(() => {
@@ -244,7 +248,7 @@ export function MainLayout() {
                     }
                     onClick={closeSidebar}
                   >
-                    <span className={styles.menuLabel}>{visibleItems[0].label}</span>
+                    <span className={styles.menuLabel}>{t(visibleItems[0].labelKey)}</span>
                   </NavLink>
                 ) : (
                   <>
@@ -252,7 +256,7 @@ export function MainLayout() {
                       className={`${styles.groupHeader} ${isGroupActive(group) ? styles.groupHeaderActive : ''}`}
                       onClick={() => toggleGroup(group.id)}
                     >
-                      <span>{group.label}</span>
+                      <span>{t(group.labelKey)}</span>
                       <svg
                         className={`${styles.chevron} ${expandedGroups.includes(group.id) ? styles.chevronOpen : ''}`}
                         width="14"
@@ -275,7 +279,7 @@ export function MainLayout() {
                           }
                           onClick={closeSidebar}
                         >
-                          <span className={styles.menuLabel}>{item.label}</span>
+                          <span className={styles.menuLabel}>{t(item.labelKey)}</span>
                         </NavLink>
                       ))}
                     </div>
@@ -289,14 +293,14 @@ export function MainLayout() {
         <div className={styles.sidebarFooter}>
           {isSuperAdmin() && (
             <NavLink to="/admin" className={styles.adminLink}>
-              Admin Panel
+              {t('userMenu.adminPanel')}
             </NavLink>
           )}
           <div className={styles.userInfo} ref={userMenuRef}>
             <button className={styles.userButton} onClick={() => setShowUserMenu(!showUserMenu)}>
               <div className={styles.avatar}>{user?.name?.charAt(0).toUpperCase() || 'U'}</div>
               <div className={styles.userDetails}>
-                <span className={styles.userName}>{user?.name || 'Kullanıcı'}</span>
+                <span className={styles.userName}>{user?.name || 'User'}</span>
                 <span className={styles.userRole}>{user?.tenant?.name || user?.role}</span>
               </div>
               <svg
@@ -317,14 +321,14 @@ export function MainLayout() {
                 </div>
                 <div className={styles.userMenuDivider} />
                 <NavLink to="/profile" className={styles.userMenuItem} onClick={() => setShowUserMenu(false)}>
-                  <span>👤</span> Profil
+                  <span>👤</span> {t('userMenu.profile')}
                 </NavLink>
                 <NavLink to="/settings" className={styles.userMenuItem} onClick={() => setShowUserMenu(false)}>
-                  <span>⚙️</span> Ayarlar
+                  <span>⚙️</span> {t('userMenu.settings')}
                 </NavLink>
                 <div className={styles.userMenuDivider} />
                 <button className={`${styles.userMenuItem} ${styles.userMenuItemDanger}`} onClick={handleLogout}>
-                  <span>🚪</span> Çıkış Yap
+                  <span>🚪</span> {t('userMenu.logout')}
                 </button>
               </div>
             )}
@@ -340,7 +344,7 @@ export function MainLayout() {
             <button
               className={styles.menuButton}
               onClick={toggleSidebar}
-              aria-label="Toggle menu"
+              aria-label={t('topbar.toggleMenu')}
             >
               <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z" />
@@ -353,14 +357,14 @@ export function MainLayout() {
               <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" />
               </svg>
-              <input type="text" placeholder="Ara..." className={styles.searchInput} />
+              <input type="text" placeholder={t('topbar.search')} className={styles.searchInput} />
             </div>
             {hasHelp && (
               <button
                 className={styles.iconButton}
                 onClick={openHelp}
-                aria-label="Yardım"
-                title="Sayfa Yardımı"
+                aria-label={t('topbar.help')}
+                title={t('topbar.help')}
               >
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z" />
@@ -382,14 +386,14 @@ export function MainLayout() {
               {showNotifications && (
                 <div className={styles.notificationDropdown}>
                   <div className={styles.notificationHeader}>
-                    <span>Bildirimler</span>
+                    <span>{t('notifications.title')}</span>
                     {notifications.length > 0 && (
                       <span className={styles.notificationCount}>{notifications.length}</span>
                     )}
                   </div>
                   {notifications.length === 0 ? (
                     <div className={styles.notificationEmpty}>
-                      Bildirim yok
+                      {t('notifications.empty')}
                     </div>
                   ) : (
                     <div className={styles.notificationList}>
@@ -413,8 +417,9 @@ export function MainLayout() {
                 </div>
               )}
             </div>
+            <LanguageSwitcher />
             <div className={styles.dateTime}>
-              {new Date().toLocaleDateString('tr-TR', {
+              {new Date().toLocaleDateString(locale, {
                 weekday: 'short',
                 day: 'numeric',
                 month: 'short',
@@ -427,7 +432,7 @@ export function MainLayout() {
         {isImpersonating && impersonatedTenant && (
           <div className={styles.impersonationBanner}>
             <span>
-              <strong>{impersonatedTenant.name}</strong> olarak görüntülüyorsunuz
+              {t('impersonation.viewingAs', { name: impersonatedTenant.name })}
             </span>
             <button
               onClick={() => {
@@ -436,7 +441,7 @@ export function MainLayout() {
               }}
               className={styles.impersonationButton}
             >
-              Admin Paneline Dön
+              {t('impersonation.backToAdmin')}
             </button>
           </div>
         )}

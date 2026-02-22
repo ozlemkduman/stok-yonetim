@@ -1,0 +1,45 @@
+{
+  "title": "Giderler",
+  "subtitle": "Toplam {{total}} gider kaydı",
+  "newExpense": "+ Yeni Gider",
+  "columns": {
+    "category": "Kategori",
+    "description": "Açıklama",
+    "amount": "Tutar",
+    "date": "Tarih",
+    "recurring": "Tekrar",
+    "createdBy": "Kaydeden"
+  },
+  "filters": {
+    "allCategories": "Tüm Kategoriler",
+    "startDate": "Başlangıç",
+    "endDate": "Bitiş"
+  },
+  "emptyMessage": "Gider bulunamadı",
+  "toast": {
+    "loadError": "Giderler yüklenemedi",
+    "createSuccess": "Gider eklendi",
+    "updateSuccess": "Gider güncellendi",
+    "deleteSuccess": "Gider silindi",
+    "deleteError": "Silme başarısız",
+    "error": "Hata"
+  },
+  "modal": {
+    "createTitle": "Yeni Gider",
+    "editTitle": "Gider Düzenle",
+    "category": "Kategori *",
+    "amount": "Tutar *",
+    "date": "Tarih *",
+    "description": "Açıklama",
+    "cancel": "İptal",
+    "save": "Kaydet",
+    "update": "Güncelle"
+  },
+  "confirm": {
+    "deleteMessage": "Bu gideri silmek istediğinizden emin misiniz?"
+  },
+  "actions": {
+    "edit": "Düzenle",
+    "delete": "Sil"
+  }
+}

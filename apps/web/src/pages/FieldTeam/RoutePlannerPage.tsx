@@ -1,20 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Button, Card, Input, Select } from '@stok/ui';
 import { fieldTeamApi, VisitInput } from '../../api/field-team.api';
 import { Customer, customersApi } from '../../api/customers.api';
 import { crmApi, CrmContact } from '../../api/crm.api';
 import { useToast } from '../../context/ToastContext';
 import styles from './RoutePlannerPage.module.css';
-
-const VISIT_TYPES = [
-  { value: 'sales', label: 'Satis' },
-  { value: 'support', label: 'Destek' },
-  { value: 'collection', label: 'Tahsilat' },
-  { value: 'delivery', label: 'Teslimat' },
-  { value: 'meeting', label: 'Toplanti' },
-  { value: 'other', label: 'Diger' },
-];
 
 interface PlannerVisit extends VisitInput {
   id?: string;
@@ -23,6 +15,7 @@ interface PlannerVisit extends VisitInput {
 }
 
 export function RoutePlannerPage() {
+  const { t } = useTranslation(['fieldteam', 'common']);
   const navigate = useNavigate();
   const { showToast } = useToast();
 
@@ -39,6 +32,15 @@ export function RoutePlannerPage() {
   const [notes, setNotes] = useState('');
   const [visits, setVisits] = useState<PlannerVisit[]>([]);
 
+  const visitTypeOptions = [
+    { value: 'sales', label: t('fieldteam:visitType.sales') },
+    { value: 'support', label: t('fieldteam:visitType.support') },
+    { value: 'collection', label: t('fieldteam:visitType.collection') },
+    { value: 'delivery', label: t('fieldteam:visitType.delivery') },
+    { value: 'meeting', label: t('fieldteam:visitType.meeting') },
+    { value: 'other', label: t('fieldteam:visitType.other') },
+  ];
+
   useEffect(() => {
     const loadData = async () => {
       try {
@@ -49,7 +51,7 @@ export function RoutePlannerPage() {
         setCustomers(customersRes.data);
         setContacts(contactsRes.data);
       } catch (err) {
-        showToast('error', 'Veriler yuklenirken hata olustu');
+        showToast('error', t('fieldteam:toast.dataLoadError'));
       } finally {
         setLoading(false);
       }
@@ -109,12 +111,12 @@ export function RoutePlannerPage() {
     e.preventDefault();
 
     if (!routeName.trim()) {
-      showToast('error', 'Rota adi gerekli');
+      showToast('error', t('fieldteam:toast.routeNameRequired'));
       return;
     }
 
     if (visits.length === 0) {
-      showToast('error', 'En az bir ziyaret ekleyin');
+      showToast('error', t('fieldteam:toast.addVisitRequired'));
       return;
     }
 
@@ -135,10 +137,10 @@ export function RoutePlannerPage() {
           notes: v.notes,
         })),
       });
-      showToast('success', 'Rota olusturuldu');
+      showToast('success', t('fieldteam:toast.createSuccess'));
       navigate('/field-team');
     } catch (err) {
-      showToast('error', err instanceof Error ? err.message : 'Rota olusturulamadi');
+      showToast('error', err instanceof Error ? err.message : t('fieldteam:toast.createError'));
     } finally {
       setSaving(false);
     }
@@ -147,7 +149,7 @@ export function RoutePlannerPage() {
   if (loading) {
     return (
       <div className={styles.page}>
-        <div className={styles.loading}>Yukleniyor...</div>
+        <div className={styles.loading}>{t('fieldteam:detail.loading')}</div>
       </div>
     );
   }
@@ -156,26 +158,26 @@ export function RoutePlannerPage() {
     <div className={styles.page}>
       <div className={styles.header}>
         <Button variant="ghost" onClick={() => navigate('/field-team')}>
-          ← Rotalar
+          {t('fieldteam:buttons.backToRoutes')}
         </Button>
-        <h1 className={styles.title}>Yeni Rota Planla</h1>
+        <h1 className={styles.title}>{t('fieldteam:planner.title')}</h1>
       </div>
 
       <form onSubmit={handleSubmit}>
         <Card className={styles.formCard}>
-          <h3>Rota Bilgileri</h3>
+          <h3>{t('fieldteam:planner.routeInfo')}</h3>
           <div className={styles.formGrid}>
             <div className={styles.formGroup}>
-              <label className={styles.label}>Rota Adi *</label>
+              <label className={styles.label}>{t('fieldteam:planner.routeNameLabel')}</label>
               <Input
                 value={routeName}
                 onChange={(e) => setRouteName(e.target.value)}
-                placeholder="Orn: Kadikoy Bolge Ziyareti"
+                placeholder={t('fieldteam:planner.routeNamePlaceholder')}
                 required
               />
             </div>
             <div className={styles.formGroup}>
-              <label className={styles.label}>Tarih *</label>
+              <label className={styles.label}>{t('fieldteam:planner.dateLabel')}</label>
               <Input
                 type="date"
                 value={routeDate}
@@ -184,39 +186,39 @@ export function RoutePlannerPage() {
               />
             </div>
             <div className={styles.formGroup}>
-              <label className={styles.label}>Tahmini Sure (dakika)</label>
+              <label className={styles.label}>{t('fieldteam:planner.estimatedDurationLabel')}</label>
               <Input
                 type="number"
                 min="0"
                 value={estimatedDuration || ''}
                 onChange={(e) => setEstimatedDuration(Number(e.target.value))}
-                placeholder="Orn: 180"
+                placeholder={t('fieldteam:planner.estimatedDurationPlaceholder')}
               />
             </div>
           </div>
           <div className={styles.formGroup}>
-            <label className={styles.label}>Notlar</label>
+            <label className={styles.label}>{t('fieldteam:planner.notesLabel')}</label>
             <textarea
               className={styles.textarea}
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               rows={2}
-              placeholder="Rota ile ilgili notlar..."
+              placeholder={t('fieldteam:planner.notesPlaceholder')}
             />
           </div>
         </Card>
 
         <Card className={styles.visitsCard}>
           <div className={styles.visitsHeader}>
-            <h3>Ziyaretler ({visits.length})</h3>
+            <h3>{t('fieldteam:planner.visitsTitle', { count: visits.length })}</h3>
             <Button type="button" size="sm" onClick={addVisit}>
-              + Ziyaret Ekle
+              {t('fieldteam:buttons.addVisit')}
             </Button>
           </div>
 
           {visits.length === 0 ? (
             <div className={styles.emptyVisits}>
-              Henuz ziyaret eklenmedi. "Ziyaret Ekle" butonuna tiklayin.
+              {t('fieldteam:planner.emptyVisits')}
             </div>
           ) : (
             <div className={styles.visitsList}>
@@ -236,37 +238,37 @@ export function RoutePlannerPage() {
                   <div className={styles.visitContent}>
                     <div className={styles.visitRow}>
                       <div className={styles.visitField}>
-                        <label>Musteri</label>
+                        <label>{t('fieldteam:planner.customerLabel')}</label>
                         <Select
                           value={visit.customer_id || ''}
                           onChange={(e) => updateVisit(index, 'customer_id', e.target.value)}
                           options={[
-                            { value: '', label: 'Musteri Secin' },
+                            { value: '', label: t('fieldteam:planner.customerSelect') },
                             ...customers.map(c => ({ value: c.id, label: c.name })),
                           ]}
                         />
                       </div>
                       <div className={styles.visitField}>
-                        <label>Kontak (CRM)</label>
+                        <label>{t('fieldteam:planner.contactLabel')}</label>
                         <Select
                           value={visit.contact_id || ''}
                           onChange={(e) => updateVisit(index, 'contact_id', e.target.value)}
                           options={[
-                            { value: '', label: 'Kontak Secin' },
+                            { value: '', label: t('fieldteam:planner.contactSelect') },
                             ...contacts.map(c => ({ value: c.id, label: c.name })),
                           ]}
                         />
                       </div>
                       <div className={styles.visitField}>
-                        <label>Ziyaret Tipi</label>
+                        <label>{t('fieldteam:planner.visitTypeLabel')}</label>
                         <Select
                           value={visit.visit_type}
                           onChange={(e) => updateVisit(index, 'visit_type', e.target.value)}
-                          options={VISIT_TYPES}
+                          options={visitTypeOptions}
                         />
                       </div>
                       <div className={styles.visitField}>
-                        <label>Planlanan Saat</label>
+                        <label>{t('fieldteam:planner.scheduledTimeLabel')}</label>
                         <Input
                           type="time"
                           value={visit.scheduled_time || ''}
@@ -276,21 +278,21 @@ export function RoutePlannerPage() {
                     </div>
                     <div className={styles.visitRow}>
                       <div className={styles.visitFieldFull}>
-                        <label>Adres</label>
+                        <label>{t('fieldteam:planner.addressLabel')}</label>
                         <Input
                           value={visit.address || ''}
                           onChange={(e) => updateVisit(index, 'address', e.target.value)}
-                          placeholder="Ziyaret adresi"
+                          placeholder={t('fieldteam:planner.addressPlaceholder')}
                         />
                       </div>
                     </div>
                     <div className={styles.visitRow}>
                       <div className={styles.visitFieldFull}>
-                        <label>Notlar</label>
+                        <label>{t('fieldteam:planner.visitNotesLabel')}</label>
                         <Input
                           value={visit.notes || ''}
                           onChange={(e) => updateVisit(index, 'notes', e.target.value)}
-                          placeholder="Ziyaret notlari"
+                          placeholder={t('fieldteam:planner.visitNotesPlaceholder')}
                         />
                       </div>
                     </div>
@@ -302,7 +304,7 @@ export function RoutePlannerPage() {
                     className={styles.removeButton}
                     onClick={() => removeVisit(index)}
                   >
-                    Sil
+                    {t('fieldteam:buttons.delete')}
                   </Button>
                 </div>
               ))}
@@ -312,10 +314,10 @@ export function RoutePlannerPage() {
 
         <div className={styles.formActions}>
           <Button type="button" variant="ghost" onClick={() => navigate('/field-team')}>
-            Iptal
+            {t('fieldteam:buttons.cancel')}
           </Button>
           <Button type="submit" disabled={saving}>
-            {saving ? 'Kaydediliyor...' : 'Rota Olustur'}
+            {saving ? t('fieldteam:buttons.saving') : t('fieldteam:buttons.createRoute')}
           </Button>
         </div>
       </form>

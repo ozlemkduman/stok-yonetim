@@ -1,0 +1,140 @@
+{
+  "title": "Customers",
+  "subtitle": "Total {{count}} customer records",
+  "addNew": "+ New Customer",
+  "searchPlaceholder": "Search customers...",
+  "emptyMessage": "No customers found",
+  "upgradePrompt": "You have reached your customer limit. Upgrade your plan to add more customers.",
+
+  "columns": {
+    "customerName": "Customer Name",
+    "email": "Email",
+    "balance": "Balance",
+    "status": "Status",
+    "createdBy": "Created By"
+  },
+
+  "actions": {
+    "detail": "Detail",
+    "edit": "Edit",
+    "delete": "Delete"
+  },
+
+  "toast": {
+    "createSuccess": "Customer added successfully",
+    "updateSuccess": "Customer updated successfully",
+    "deleteSuccess": "Customer deleted successfully",
+    "deleteFailed": "Failed to delete customer"
+  },
+
+  "confirm": {
+    "deleteMessage": "Are you sure you want to delete customer \"{{name}}\"?"
+  },
+
+  "status": {
+    "active": "Active",
+    "inactive": "Inactive"
+  },
+
+  "detail": {
+    "backToList": "← Customers",
+    "loading": "Loading...",
+    "loadError": "Failed to load data",
+    "notFound": "Customer not found",
+    "backButton": "Go Back",
+    "currentBalance": "Current Balance",
+    "debtor": "Debtor",
+    "creditor": "Creditor",
+
+    "info": {
+      "title": "Customer Information",
+      "address": "Address",
+      "taxNumber": "Tax Number",
+      "taxOffice": "Tax Office",
+      "notes": "Notes",
+      "createdBy": "Created By"
+    },
+
+    "stats": {
+      "title": "Statistics",
+      "sales": "Sales",
+      "returns": "Returns",
+      "payments": "Payments"
+    },
+
+    "tabs": {
+      "productStats": "Product Statistics ({{count}})",
+      "sales": "Sales ({{count}})",
+      "returns": "Returns ({{count}})",
+      "payments": "Payments ({{count}})"
+    },
+
+    "table": {
+      "product": "Product",
+      "barcode": "Barcode",
+      "quantity": "Quantity",
+      "unitPrice": "Unit Price",
+      "vat": "VAT",
+      "total": "Total",
+      "totalQuantity": "Total Quantity",
+      "totalAmount": "Total Amount",
+      "grandTotal": "Total",
+      "subtotal": "Subtotal",
+      "discount": "Discount",
+      "vatTotal": "VAT Total",
+      "overallTotal": "Grand Total",
+      "date": "Date",
+      "paymentMethod": "Payment Method",
+      "notes": "Notes",
+      "amount": "Amount"
+    },
+
+    "empty": {
+      "sales": "No sales yet",
+      "returns": "No returns yet",
+      "products": "No product sales yet",
+      "payments": "No payments yet"
+    },
+
+    "paymentMethods": {
+      "cash": "Cash",
+      "credit_card": "Credit Card",
+      "bank_transfer": "Bank Transfer",
+      "credit": "Credit"
+    },
+
+    "statusLabels": {
+      "completed": "Completed",
+      "cancelled": "Cancelled",
+      "pending": "Pending"
+    }
+  },
+
+  "form": {
+    "createTitle": "New Customer",
+    "editTitle": "Edit Customer",
+    "cancel": "Cancel",
+    "save": "Save",
+    "update": "Update",
+    "customerName": "Customer Name *",
+    "phone": "Phone",
+    "email": "Email",
+    "taxNumber": "Tax Number",
+    "taxOffice": "Tax Office",
+    "address": "Address",
+    "notes": "Notes",
+    "namePlaceholder": "E.g.: John Doe",
+    "phonePlaceholder": "0532 111 2233",
+    "emailPlaceholder": "example@email.com",
+    "taxNumberPlaceholder": "1234567890",
+    "taxOfficePlaceholder": "Kadikoy",
+    "addressPlaceholder": "Full address",
+    "notesPlaceholder": "Notes about the customer...",
+    "errors": {
+      "nameRequired": "Customer name is required",
+      "nameMinLength": "Customer name must be at least 2 characters",
+      "emailInvalid": "Please enter a valid email address",
+      "generic": "An error occurred"
+    }
+  }
+}

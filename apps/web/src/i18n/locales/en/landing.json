@@ -1,0 +1,227 @@
+{
+  "nav": {
+    "features": "Features",
+    "plans": "Plans",
+    "demo": "Demo",
+    "contact": "Contact",
+    "login": "Sign In",
+    "freeTrial": "Free Trial"
+  },
+  "hero": {
+    "badge": "Turkey's Next-Generation Inventory Management Platform",
+    "titleLine1": "We Bring Your",
+    "titleHighlight": "Business to Digital",
+    "subtitle": "Inventory tracking, sales management, e-Invoice, reporting and CRM — all in one platform. Say goodbye to Excel files, scattered data and lost stock.",
+    "ctaPrimary": "45-Day Free Trial",
+    "ctaSecondary": "How It Works?",
+    "note": "No credit card required \u00b7 Start right away"
+  },
+  "mockup": {
+    "totalProducts": "Total Products",
+    "monthlySales": "Monthly Sales",
+    "customers": "Customers"
+  },
+  "stats": {
+    "0": { "label": "Active Businesses" },
+    "1": { "label": "Monthly Transactions" },
+    "2": { "label": "Uptime" },
+    "3": { "label": "Support" }
+  },
+  "scenarios": {
+    "title": "Does This Sound Familiar?",
+    "subtitle": "Professional solutions to the problems businesses face every day",
+    "beforeLabel": "Before",
+    "afterLabel": "After",
+    "0": {
+      "title": "What's Left in Stock?",
+      "before": "You go to the warehouse and count one by one, write it in Excel, and the numbers still don't match.",
+      "after": "See real-time stock status from your phone. Get automatic alerts for products dropping to critical levels."
+    },
+    "1": {
+      "title": "Invoice Tracking",
+      "before": "Your invoices are on one portal, your sales are elsewhere — you spend hours matching them.",
+      "after": "Import your e-Invoice XML file into the system, auto-match with sales. All documents on one screen."
+    },
+    "2": {
+      "title": "Am I Making Profit?",
+      "before": "At the end of the month you add up with a calculator, finding the real profit is impossible.",
+      "after": "Real-time profit/loss reports, product-based profitability analysis — make your decisions based on data."
+    },
+    "3": {
+      "title": "Customer Lost",
+      "before": "Customer info is in a notebook, you don't remember who bought what, repeat sales opportunities are gone.",
+      "after": "All customer history on one screen. Last purchase, payment status, notes — everything at your fingertips."
+    },
+    "4": {
+      "title": "Multi-Warehouse Struggle",
+      "before": "Nobody knows what's in which warehouse, transfers are on paper, losses have become normal.",
+      "after": "Inter-warehouse transfer with one click. Monitor each warehouse's stock in real-time, spot differences instantly."
+    },
+    "5": {
+      "title": "Field Disconnection",
+      "before": "Should the field team call the office, send photos via WhatsApp — information flow is broken.",
+      "after": "Field team enters orders on mobile, saves time with route planning, real-time synchronization."
+    }
+  },
+  "features": {
+    "title": "Powerful Features",
+    "subtitle": "All the tools you need to grow your business under one roof",
+    "0": { "title": "Inventory Tracking", "desc": "Categorize your products, track stock levels in real-time. Never lose a product with critical stock alerts." },
+    "1": { "title": "Sales Management", "desc": "Record your sales, invoice them and view your entire sales history on a single screen." },
+    "2": { "title": "e-Document", "desc": "Create your e-Invoice and e-Archive documents in seconds, send them to your customers." },
+    "3": { "title": "Reporting", "desc": "Keep your finger on the pulse of your business with detailed sales, stock and profit/loss reports." },
+    "4": { "title": "CRM", "desc": "Manage your customers, track communication history, never miss sales opportunities." },
+    "5": { "title": "Warehouse Management", "desc": "Easily manage stock transfers and movements with multiple warehouses." }
+  },
+  "steps": {
+    "title": "Get Started in 3 Steps",
+    "subtitle": "No setup, no installation — start right away",
+    "0": { "title": "Fill the Form", "desc": "Enter your name, phone and business information. Takes 30 seconds." },
+    "1": { "title": "We'll Call You", "desc": "Our team will contact you and listen to your needs." },
+    "2": { "title": "Try Free for 45 Days", "desc": "Your demo account will be created, test all features." }
+  },
+  "testimonials": {
+    "title": "What Our Customers Say?",
+    "subtitle": "Thousands of businesses are growing with StokSayac",
+    "0": {
+      "name": "Ahmet Y.",
+      "role": "Market Owner",
+      "text": "I used to spend 2 days on inventory counting. Now I can see it instantly from my phone. A life-saving system.",
+      "avatar": "AY"
+    },
+    "1": {
+      "name": "Fatma K.",
+      "role": "Wholesale Food",
+      "text": "e-Invoice integration is amazing. I used to spend 10 minutes per invoice, now it's ready with one click.",
+      "avatar": "FK"
+    },
+    "2": {
+      "name": "Mehmet S.",
+      "role": "Spare Parts",
+      "text": "We have 3 warehouses and transfers were always a problem. With StokSayac we instantly see what's in which warehouse. Our losses dropped to zero.",
+      "avatar": "MS"
+    }
+  },
+  "plans": {
+    "title": "The Right Plan for You",
+    "subtitle": "Flexible pricing for businesses of all sizes",
+    "popular": "Most Popular",
+    "perMonth": "/mo",
+    "cta": "Get Started",
+    "basic": {
+      "users": "1 User / 200 Products / 100 Customers",
+      "features": {
+        "stockTracking": "Inventory Tracking",
+        "salesReturn": "Sales & Returns",
+        "storage5": "5 GB Storage",
+        "quoteManagement": "Quote Management",
+        "invoiceImport": "Invoice Import (XML)",
+        "eDocument": "e-Document",
+        "multiWarehouse": "Multi-Warehouse",
+        "integrations": "Integrations",
+        "advancedReporting": "Advanced Reporting",
+        "crm": "CRM",
+        "fieldTeam": "Field Team",
+        "apiAccess": "API Access"
+      }
+    },
+    "pro": {
+      "users": "5 Users / 5,000 Products / 2,000 Customers",
+      "features": {
+        "stockTracking": "Inventory Tracking",
+        "salesReturn": "Sales & Returns",
+        "storage25": "25 GB Storage",
+        "quoteManagement": "Quote Management",
+        "invoiceImport": "Invoice Import (XML)",
+        "eDocument": "e-Document",
+        "multiWarehouse": "Multi-Warehouse (3 Warehouses)",
+        "integrations": "Integrations (3 Units)",
+        "advancedReporting": "Advanced Reporting",
+        "crm": "CRM",
+        "fieldTeam": "Field Team",
+        "apiAccess": "API Access"
+      }
+    },
+    "plus": {
+      "users": "Unlimited Users, Products & Customers",
+      "features": {
+        "stockTracking": "Inventory Tracking",
+        "salesReturn": "Sales & Returns",
+        "storage100": "100 GB Storage",
+        "quoteManagement": "Quote Management",
+        "invoiceImport": "Invoice Import (XML)",
+        "eDocument": "e-Document",
+        "unlimitedWarehouse": "Unlimited Warehouses",
+        "unlimitedIntegrations": "Unlimited Integrations",
+        "advancedReporting": "Advanced Reporting",
+        "crm": "CRM",
+        "fieldTeam": "Field Team",
+        "apiAccess": "API Access"
+      }
+    }
+  },
+  "demo": {
+    "title": "Free Demo Application",
+    "subtitle": "Fill out the form, try all features free for 45 days. Our team will contact you as soon as possible.",
+    "benefits": {
+      "0": "45-day free trial period",
+      "1": "No credit card required",
+      "2": "All features unlocked",
+      "3": "Free setup support",
+      "4": "Cancel anytime"
+    },
+    "form": {
+      "nameLabel": "Full Name *",
+      "namePlaceholder": "Your Full Name",
+      "phoneLabel": "Phone *",
+      "phonePlaceholder": "05XX XXX XX XX",
+      "companyLabel": "Company Name",
+      "companyPlaceholder": "Your company name",
+      "sectorLabel": "Industry",
+      "sectorPlaceholder": "Select",
+      "sectors": {
+        "retail": "Retail",
+        "wholesale": "Wholesale",
+        "food": "Food",
+        "textile": "Textile",
+        "spareParts": "Spare Parts",
+        "electronics": "Electronics",
+        "construction": "Construction / Building Materials",
+        "cosmetics": "Cosmetics",
+        "other": "Other"
+      },
+      "noteLabel": "Your Note",
+      "notePlaceholder": "If you have a note you'd like to add, you can write it here...",
+      "submit": "Submit Demo Application",
+      "formNote": "45 days free \u00b7 No credit card required \u00b7 Start now",
+      "whatsappMessage": "Hello, I would like to apply for a demo.",
+      "whatsappName": "Full Name",
+      "whatsappPhone": "Phone",
+      "whatsappCompany": "Company",
+      "whatsappSector": "Industry",
+      "whatsappNote": "Note"
+    },
+    "success": {
+      "title": "Application Received!",
+      "text1": "We will contact you as soon as possible.",
+      "text2": "We will prepare your 45-day free demo account.",
+      "newApplication": "New Application"
+    }
+  },
+  "cta": {
+    "title": "It's Time to Bring Your Business to Digital",
+    "text": "Try all features free for 45 days. If you're not satisfied, you won't pay anything.",
+    "primary": "Free Demo Application",
+    "whatsapp": "Get Info via WhatsApp"
+  },
+  "footer": {
+    "about": "Professional inventory and sales management platform developed for your business.",
+    "quickAccess": "Quick Access",
+    "login": "Sign In",
+    "demoApplication": "Demo Application",
+    "plans": "Plans",
+    "contact": "Contact",
+    "copyright": "\u00a9 2026 Pancar Information Technologies and Software Services Ltd. All rights reserved."
+  },
+  "whatsappAriaLabel": "Contact us via WhatsApp"
+}

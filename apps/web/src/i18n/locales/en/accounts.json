@@ -1,0 +1,156 @@
+{
+  "title": "Cash / Bank Accounts",
+  "subtitle": "Total {{count}} accounts",
+  "newAccount": "+ New Account",
+  "transfer": "Transfer",
+  "tabs": {
+    "all": "All",
+    "kasa": "Cash Registers",
+    "banka": "Bank Accounts"
+  },
+  "columns": {
+    "account": "Account",
+    "type": "Type",
+    "currentBalance": "Current Balance",
+    "default": "Default",
+    "date": "Date",
+    "movementType": "Type",
+    "category": "Category",
+    "description": "Description",
+    "amount": "Amount",
+    "balance": "Balance",
+    "direction": "Direction",
+    "targetAccount": "Account"
+  },
+  "accountTypes": {
+    "kasa": "Cash",
+    "banka": "Bank"
+  },
+  "badges": {
+    "default": "Default",
+    "active": "Active",
+    "inactive": "Inactive"
+  },
+  "summary": {
+    "totalKasa": "Total Cash",
+    "totalBanka": "Total Bank",
+    "totalBalance": "Grand Total"
+  },
+  "buttons": {
+    "movement": "Movement",
+    "edit": "Edit",
+    "delete": "Delete"
+  },
+  "empty": {
+    "accounts": "No accounts found",
+    "movements": "No account movements yet",
+    "transfers": "No transfer transactions yet"
+  },
+  "toast": {
+    "summaryError": "Failed to load account summary",
+    "loadError": "Error loading accounts",
+    "deleteSuccess": "Account deleted successfully",
+    "deleteFailed": "Delete operation failed",
+    "updateSuccess": "Account updated successfully",
+    "createSuccess": "Account created successfully",
+    "movementSuccess": "Movement added successfully",
+    "transferSuccess": "Transfer completed successfully",
+    "saveFailed": "Failed to save account",
+    "movementFailed": "Failed to add movement",
+    "transferFailed": "Transfer failed",
+    "accountsLoadFailed": "Failed to load accounts",
+    "amountError": "Amount must be greater than 0",
+    "selectAccountsError": "Please select source and target accounts",
+    "sameAccountError": "Source and target accounts cannot be the same"
+  },
+  "confirm": {
+    "deleteAccount": "Are you sure you want to delete the account \"{{name}}\"?"
+  },
+  "detail": {
+    "back": "← Accounts",
+    "loading": "Loading...",
+    "notFound": "Account not found",
+    "backButton": "Go Back",
+    "loadError": "Failed to load data",
+    "currentBalance": "Current Balance",
+    "accountInfo": "Account Information",
+    "accountType": "Account Type",
+    "bankName": "Bank Name",
+    "branch": "Branch",
+    "accountNumber": "Account Number",
+    "iban": "IBAN",
+    "openingBalance": "Opening Balance",
+    "createdAt": "Created Date",
+    "statistics": "Statistics",
+    "movementCount": "Movements",
+    "totalIncome": "Total Income",
+    "totalExpense": "Total Expense",
+    "transferCount": "Transfers",
+    "incomingTransfer": "Incoming Transfer",
+    "outgoingTransfer": "Outgoing Transfer",
+    "movementsTab": "Movements ({{count}})",
+    "transfersTab": "Transfers ({{count}})"
+  },
+  "movementTypes": {
+    "gelir": "Income",
+    "gider": "Expense",
+    "transfer_in": "Transfer In",
+    "transfer_out": "Transfer Out"
+  },
+  "transferDirections": {
+    "incoming": "Incoming",
+    "outgoing": "Outgoing",
+    "thisAccount": "This Account"
+  },
+  "form": {
+    "editTitle": "Edit Account",
+    "createTitle": "New Account",
+    "accountName": "Account Name *",
+    "accountType": "Account Type *",
+    "bankName": "Bank Name",
+    "iban": "IBAN",
+    "ibanPlaceholder": "TR00 0000 0000 0000 0000 0000 00",
+    "accountNumber": "Account Number",
+    "branchName": "Branch Name",
+    "openingBalance": "Opening Balance",
+    "setDefault": "Set as default account",
+    "cancel": "Cancel",
+    "update": "Update",
+    "create": "Create"
+  },
+  "movementForm": {
+    "title": "Add Movement - {{name}}",
+    "movementType": "Movement Type *",
+    "typeIncome": "Income (In)",
+    "typeExpense": "Expense (Out)",
+    "amount": "Amount *",
+    "category": "Category",
+    "description": "Description",
+    "date": "Date",
+    "cancel": "Cancel",
+    "submit": "Add"
+  },
+  "movementCategories": {
+    "select": "Select Category",
+    "satis": "Sale",
+    "tahsilat": "Collection",
+    "odeme": "Payment",
+    "maas": "Salary",
+    "kira": "Rent",
+    "fatura": "Bill",
+    "vergi": "Tax",
+    "diger": "Other"
+  },
+  "transferForm": {
+    "title": "Inter-Account Transfer",
+    "sourceAccount": "Source Account *",
+    "targetAccount": "Target Account *",
+    "selectAccount": "Select Account",
+    "currentBalance": "Current balance: {{balance}}",
+    "amount": "Transfer Amount *",
+    "description": "Description",
+    "date": "Transfer Date",
+    "cancel": "Cancel",
+    "submit": "Make Transfer"
+  }
+}

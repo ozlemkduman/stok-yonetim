@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@stok/ui';
 import { salesApi, CreateSaleData } from '../../api/sales.api';
 import { Customer, customersApi } from '../../api/customers.api';
@@ -19,6 +20,7 @@ import styles from './SaleFormPage.module.css';
 
 export function SaleFormPage() {
   const navigate = useNavigate();
+  const { t } = useTranslation(['sales', 'common']);
   const { showToast } = useToast();
 
   const [loading, setLoading] = useState(true);
@@ -68,7 +70,7 @@ export function SaleFormPage() {
           setWizardData(prev => ({ ...prev, warehouseId: defaultWarehouse.id }));
         }
       } catch (err) {
-        showToast('error', 'Veriler yuklenirken hata olustu');
+        showToast('error', t('sales:toast.dataLoadingError'));
       } finally {
         setLoading(false);
       }
@@ -101,20 +103,20 @@ export function SaleFormPage() {
     switch (step) {
       case 1:
         if (wizardData.items.length === 0) {
-          showToast('error', 'En az bir urun ekleyin');
+          showToast('error', t('sales:validation.addProduct'));
           return false;
         }
         for (const item of wizardData.items) {
           if (!item.product_id) {
-            showToast('error', 'Tum urun satirlari icin urun seciniz');
+            showToast('error', t('sales:validation.selectProduct'));
             return false;
           }
           if (item.stock_quantity !== undefined && item.stock_quantity <= 0) {
-            showToast('error', `"${item.product_name}" icin yeterli stok yok (Mevcut: ${item.stock_quantity})`);
+            showToast('error', t('sales:validation.insufficientStock', { name: item.product_name, stock: item.stock_quantity }));
             return false;
           }
           if (item.stock_quantity !== undefined && item.quantity > item.stock_quantity) {
-            showToast('error', `"${item.product_name}" icin yeterli stok yok (Mevcut: ${item.stock_quantity}, Istenen: ${item.quantity})`);
+            showToast('error', t('sales:validation.insufficientStockWithRequested', { name: item.product_name, stock: item.stock_quantity, requested: item.quantity }));
             return false;
           }
         }
@@ -123,15 +125,15 @@ export function SaleFormPage() {
         return true; // Customer is optional
       case 3:
         if (!wizardData.warehouseId) {
-          showToast('error', 'Depo seciniz');
+          showToast('error', t('sales:validation.selectWarehouse'));
           return false;
         }
         if (!wizardData.paymentMethod) {
-          showToast('error', 'Odeme yontemi seciniz');
+          showToast('error', t('sales:validation.selectPaymentMethod'));
           return false;
         }
         if (wizardData.paymentMethod === 'veresiye' && !wizardData.customerId) {
-          showToast('error', 'Veresiye satis icin musteri secilmeli. Lutfen Adim 2\'ye donun.');
+          showToast('error', t('sales:validation.creditNeedsCustomer'));
           return false;
         }
         return true;
@@ -158,7 +160,7 @@ export function SaleFormPage() {
     // Stock check
     for (const item of wizardData.items) {
       if (item.stock_quantity !== undefined && item.quantity > item.stock_quantity) {
-        showToast('error', `${item.product_name} icin yeterli stok yok (Mevcut: ${item.stock_quantity})`);
+        showToast('error', t('sales:validation.insufficientStock', { name: item.product_name, stock: item.stock_quantity }));
         return;
       }
     }
@@ -183,10 +185,10 @@ export function SaleFormPage() {
       };
 
       await salesApi.create(data);
-      showToast('success', 'Satis olusturuldu');
+      showToast('success', t('sales:toast.saleCreated'));
       navigate('/sales');
     } catch (err) {
-      showToast('error', err instanceof Error ? err.message : 'Satis olusturulamadi');
+      showToast('error', err instanceof Error ? err.message : t('sales:toast.saleCreateError'));
     } finally {
       setSaving(false);
     }
@@ -231,7 +233,7 @@ export function SaleFormPage() {
   if (loading) {
     return (
       <div className={styles.page}>
-        <div className={styles.loading}>Yukleniyor...</div>
+        <div className={styles.loading}>{t('common:labels.loading')}</div>
       </div>
     );
   }
@@ -240,12 +242,12 @@ export function SaleFormPage() {
     <div className={styles.page}>
       <div className={styles.header}>
         <Button variant="ghost" onClick={() => navigate('/sales')}>
-          ← Satislar
+          &larr; {t('sales:form.backToSales')}
         </Button>
-        <h1 className={styles.title}>Yeni Satis</h1>
+        <h1 className={styles.title}>{t('sales:form.title')}</h1>
         <div className={styles.headerSpacer} />
         <Button variant="secondary" onClick={() => navigate('/sales/import')}>
-          Fatura Yukle
+          {t('sales:form.uploadInvoice')}
         </Button>
       </div>
 
@@ -301,21 +303,21 @@ export function SaleFormPage() {
         <div>
           {currentStep > 1 && (
             <Button type="button" variant="secondary" onClick={goBack}>
-              ← Geri
+              &larr; {t('sales:form.back')}
             </Button>
           )}
         </div>
         <div className={styles.wizardActionsRight}>
           <Button type="button" variant="ghost" onClick={() => navigate('/sales')}>
-            Iptal
+            {t('sales:form.cancel')}
           </Button>
           {currentStep < 4 ? (
             <Button type="button" onClick={goNext}>
-              Ileri →
+              {t('sales:form.next')} &rarr;
             </Button>
           ) : (
             <Button type="button" onClick={handleSubmit} disabled={saving}>
-              {saving ? 'Kaydediliyor...' : 'Satisi Tamamla'}
+              {saving ? t('sales:form.saving') : t('sales:form.completeSale')}
             </Button>
           )}
         </div>

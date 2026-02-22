@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Button, Badge, Card } from '@stok/ui';
 import { productsApi, ProductDetail, ProductSale, ProductReturn, StockMovement } from '../../api/products.api';
 import { formatCurrency, formatDate, formatDateTime, formatNumber } from '../../utils/formatters';
@@ -8,6 +9,7 @@ import styles from './ProductDetailPage.module.css';
 type TabType = 'sales' | 'returns' | 'movements';
 
 export function ProductDetailPage() {
+  const { t } = useTranslation(['products', 'common']);
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [data, setData] = useState<ProductDetail | null>(null);
@@ -24,7 +26,7 @@ export function ProductDetailPage() {
         const response = await productsApi.getDetail(id);
         setData(response.data);
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Veri yuklenemedi');
+        setError(err instanceof Error ? err.message : t('products:detail.loadError'));
       } finally {
         setLoading(false);
       }
@@ -36,7 +38,7 @@ export function ProductDetailPage() {
   if (loading) {
     return (
       <div className={styles.page}>
-        <div className={styles.loading}>Yukleniyor...</div>
+        <div className={styles.loading}>{t('products:detail.loading')}</div>
       </div>
     );
   }
@@ -44,35 +46,13 @@ export function ProductDetailPage() {
   if (error || !data) {
     return (
       <div className={styles.page}>
-        <div className={styles.error}>{error || 'Urun bulunamadi'}</div>
-        <Button onClick={() => navigate('/products')}>Geri Don</Button>
+        <div className={styles.error}>{error || t('products:detail.notFound')}</div>
+        <Button onClick={() => navigate('/products')}>{t('products:detail.goBack')}</Button>
       </div>
     );
   }
 
   const { product, sales, returns, movements, stats, warehouseStocks } = data;
-
-  const paymentMethodLabels: Record<string, string> = {
-    cash: 'Nakit',
-    credit_card: 'Kredi Karti',
-    bank_transfer: 'Havale/EFT',
-    credit: 'Veresiye',
-  };
-
-  const statusLabels: Record<string, string> = {
-    completed: 'Tamamlandi',
-    cancelled: 'Iptal Edildi',
-    pending: 'Beklemede',
-  };
-
-  const movementTypeLabels: Record<string, string> = {
-    sale: 'Satis',
-    return: 'Iade',
-    transfer_in: 'Transfer Giris',
-    transfer_out: 'Transfer Cikis',
-    adjustment: 'Duzeltme',
-    purchase: 'Alis',
-  };
 
   const isLowStock = product.stock_quantity <= product.min_stock_level;
 
@@ -81,27 +61,27 @@ export function ProductDetailPage() {
       <div className={styles.header}>
         <div className={styles.headerLeft}>
           <Button variant="ghost" onClick={() => navigate('/products')}>
-            ← Urunler
+            {t('products:detail.backToProducts')}
           </Button>
           <h1 className={styles.title}>{product.name}</h1>
           <div className={styles.productMeta}>
             {product.barcode && <span className={styles.barcode}>{product.barcode}</span>}
             {product.category && <span className={styles.category}>{product.category}</span>}
             <Badge variant={product.is_active ? 'success' : 'default'}>
-              {product.is_active ? 'Aktif' : 'Pasif'}
+              {product.is_active ? t('products:detail.active') : t('products:detail.inactive')}
             </Badge>
             {isLowStock && (
-              <Badge variant="danger">Dusuk Stok</Badge>
+              <Badge variant="danger">{t('products:detail.lowStock')}</Badge>
             )}
           </div>
         </div>
         <div className={styles.headerRight}>
           <div className={styles.stockCard}>
-            <span className={styles.stockLabel}>Mevcut Stok</span>
+            <span className={styles.stockLabel}>{t('products:detail.currentStock')}</span>
             <span className={`${styles.stockValue} ${isLowStock ? styles.lowStock : ''}`}>
               {formatNumber(product.stock_quantity)} {product.unit}
             </span>
-            <span className={styles.stockNote}>Min: {formatNumber(product.min_stock_level)} {product.unit}</span>
+            <span className={styles.stockNote}>{t('products:detail.minStock', { value: formatNumber(product.min_stock_level), unit: product.unit })}</span>
           </div>
         </div>
       </div>
@@ -109,35 +89,35 @@ export function ProductDetailPage() {
       {/* Product Info */}
       <div className={styles.infoGrid}>
         <Card className={styles.infoCard}>
-          <h3>Urun Bilgileri</h3>
+          <h3>{t('products:detail.productInfo')}</h3>
           <div className={styles.infoList}>
             <div className={styles.infoItem}>
-              <span className={styles.infoLabel}>Satis Fiyati</span>
+              <span className={styles.infoLabel}>{t('products:detail.salePrice')}</span>
               <span className={styles.infoValue}>{formatCurrency(product.sale_price)}</span>
             </div>
             <div className={styles.infoItem}>
-              <span className={styles.infoLabel}>Toptan Satis Fiyati</span>
+              <span className={styles.infoLabel}>{t('products:detail.wholesalePrice')}</span>
               <span className={styles.infoValue}>{formatCurrency(product.wholesale_price)}</span>
             </div>
             <div className={styles.infoItem}>
-              <span className={styles.infoLabel}>Alis Fiyati</span>
+              <span className={styles.infoLabel}>{t('products:detail.purchasePrice')}</span>
               <span className={styles.infoValue}>{formatCurrency(product.purchase_price)}</span>
             </div>
             <div className={styles.infoItem}>
-              <span className={styles.infoLabel}>KDV Orani</span>
+              <span className={styles.infoLabel}>{t('products:detail.vatRate')}</span>
               <span className={styles.infoValue}>%{product.vat_rate}</span>
             </div>
             <div className={styles.infoItem}>
-              <span className={styles.infoLabel}>Birim</span>
+              <span className={styles.infoLabel}>{t('products:detail.unit')}</span>
               <span className={styles.infoValue}>{product.unit}</span>
             </div>
             <div className={styles.infoItem}>
-              <span className={styles.infoLabel}>Olusturulma</span>
+              <span className={styles.infoLabel}>{t('products:detail.createdAt')}</span>
               <span className={styles.infoValue}>{formatDate(product.created_at)}</span>
             </div>
             {product.created_by_name && (
               <div className={styles.infoItem}>
-                <span className={styles.infoLabel}>Kaydeden</span>
+                <span className={styles.infoLabel}>{t('products:detail.createdBy')}</span>
                 <span className={styles.infoValue}>{product.created_by_name}</span>
               </div>
             )}
@@ -145,22 +125,22 @@ export function ProductDetailPage() {
         </Card>
 
         <Card className={styles.statsCard}>
-          <h3>Istatistikler</h3>
+          <h3>{t('products:detail.statistics')}</h3>
           <div className={styles.statsGrid}>
             <div className={styles.statItem}>
               <span className={styles.statValue}>{formatNumber(stats.totalSold)}</span>
-              <span className={styles.statLabel}>Satilan</span>
-              <span className={styles.statTotal}>{stats.salesCount} satis</span>
+              <span className={styles.statLabel}>{t('products:detail.totalSold')}</span>
+              <span className={styles.statTotal}>{t('products:detail.salesCount', { count: stats.salesCount })}</span>
             </div>
             <div className={styles.statItem}>
               <span className={styles.statValue}>{formatNumber(stats.totalReturned)}</span>
-              <span className={styles.statLabel}>Iade Edilen</span>
-              <span className={styles.statTotal}>{stats.returnsCount} iade</span>
+              <span className={styles.statLabel}>{t('products:detail.totalReturned')}</span>
+              <span className={styles.statTotal}>{t('products:detail.returnsCount', { count: stats.returnsCount })}</span>
             </div>
             <div className={styles.statItem}>
               <span className={styles.statValue}>{formatCurrency(stats.totalRevenue)}</span>
-              <span className={styles.statLabel}>Toplam Gelir</span>
-              <span className={styles.statTotal}>Net: {formatNumber(stats.totalSold - stats.totalReturned)} adet</span>
+              <span className={styles.statLabel}>{t('products:detail.totalRevenue')}</span>
+              <span className={styles.statTotal}>{t('products:detail.netQuantity', { count: stats.totalSold - stats.totalReturned })}</span>
             </div>
           </div>
         </Card>
@@ -169,13 +149,13 @@ export function ProductDetailPage() {
       {/* Warehouse Stocks */}
       {warehouseStocks && warehouseStocks.length > 0 && (
         <Card className={styles.warehouseStocksCard}>
-          <h3>Depo Stoklari</h3>
+          <h3>{t('products:detail.warehouseStocks')}</h3>
           <div className={styles.tableContainer}>
             <table className={styles.dataTable}>
               <thead>
                 <tr>
-                  <th>Depo</th>
-                  <th>Stok Miktari</th>
+                  <th>{t('products:detail.warehouseStocksColumns.warehouse')}</th>
+                  <th>{t('products:detail.warehouseStocksColumns.stockQuantity')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -198,19 +178,19 @@ export function ProductDetailPage() {
             className={`${styles.tab} ${activeTab === 'sales' ? styles.tabActive : ''}`}
             onClick={() => setActiveTab('sales')}
           >
-            Satislar ({sales.length})
+            {t('products:tabs.sales', { count: sales.length })}
           </button>
           <button
             className={`${styles.tab} ${activeTab === 'returns' ? styles.tabActive : ''}`}
             onClick={() => setActiveTab('returns')}
           >
-            Iadeler ({returns.length})
+            {t('products:tabs.returns', { count: returns.length })}
           </button>
           <button
             className={`${styles.tab} ${activeTab === 'movements' ? styles.tabActive : ''}`}
             onClick={() => setActiveTab('movements')}
           >
-            Stok Hareketleri ({movements.length})
+            {t('products:tabs.movements', { count: movements.length })}
           </button>
         </div>
 
@@ -218,22 +198,18 @@ export function ProductDetailPage() {
           {activeTab === 'sales' && (
             <SalesTab
               sales={sales}
-              paymentMethodLabels={paymentMethodLabels}
-              statusLabels={statusLabels}
               unit={product.unit}
             />
           )}
           {activeTab === 'returns' && (
             <ReturnsTab
               returns={returns}
-              statusLabels={statusLabels}
               unit={product.unit}
             />
           )}
           {activeTab === 'movements' && (
             <MovementsTab
               movements={movements}
-              movementTypeLabels={movementTypeLabels}
               unit={product.unit}
             />
           )}
@@ -245,17 +221,15 @@ export function ProductDetailPage() {
 
 function SalesTab({
   sales,
-  paymentMethodLabels,
-  statusLabels,
   unit
 }: {
   sales: ProductSale[];
-  paymentMethodLabels: Record<string, string>;
-  statusLabels: Record<string, string>;
   unit: string;
 }) {
+  const { t } = useTranslation(['products', 'common']);
+
   if (sales.length === 0) {
-    return <div className={styles.emptyState}>Bu urun henuz satilmamis</div>;
+    return <div className={styles.emptyState}>{t('products:salesTab.empty')}</div>;
   }
 
   return (
@@ -263,15 +237,15 @@ function SalesTab({
       <table className={styles.dataTable}>
         <thead>
           <tr>
-            <th>Fatura No</th>
-            <th>Tarih</th>
-            <th>Musteri</th>
-            <th>Miktar</th>
-            <th>Birim Fiyat</th>
-            <th>KDV</th>
-            <th>Toplam</th>
-            <th>Odeme</th>
-            <th>Durum</th>
+            <th>{t('products:salesTab.invoiceNo')}</th>
+            <th>{t('products:salesTab.date')}</th>
+            <th>{t('products:salesTab.customer')}</th>
+            <th>{t('products:salesTab.quantity')}</th>
+            <th>{t('products:salesTab.unitPrice')}</th>
+            <th>{t('products:salesTab.vat')}</th>
+            <th>{t('products:salesTab.total')}</th>
+            <th>{t('products:salesTab.payment')}</th>
+            <th>{t('products:salesTab.status')}</th>
           </tr>
         </thead>
         <tbody>
@@ -286,12 +260,12 @@ function SalesTab({
               <td className={styles.amount}>{formatCurrency(sale.line_total)}</td>
               <td>
                 <span className={styles.paymentBadge}>
-                  {paymentMethodLabels[sale.payment_method] || sale.payment_method}
+                  {t(`products:paymentMethods.${sale.payment_method}`, { defaultValue: sale.payment_method })}
                 </span>
               </td>
               <td>
                 <Badge variant={sale.status === 'completed' ? 'success' : sale.status === 'cancelled' ? 'danger' : 'warning'}>
-                  {statusLabels[sale.status] || sale.status}
+                  {t(`products:statuses.${sale.status}`, { defaultValue: sale.status })}
                 </Badge>
               </td>
             </tr>
@@ -304,15 +278,15 @@ function SalesTab({
 
 function ReturnsTab({
   returns,
-  statusLabels,
   unit
 }: {
   returns: ProductReturn[];
-  statusLabels: Record<string, string>;
   unit: string;
 }) {
+  const { t } = useTranslation(['products', 'common']);
+
   if (returns.length === 0) {
-    return <div className={styles.emptyState}>Bu urun icin iade yapilmamis</div>;
+    return <div className={styles.emptyState}>{t('products:returnsTab.empty')}</div>;
   }
 
   return (
@@ -320,15 +294,15 @@ function ReturnsTab({
       <table className={styles.dataTable}>
         <thead>
           <tr>
-            <th>Iade No</th>
-            <th>Tarih</th>
-            <th>Musteri</th>
-            <th>Miktar</th>
-            <th>Birim Fiyat</th>
-            <th>KDV</th>
-            <th>Toplam</th>
-            <th>Sebep</th>
-            <th>Durum</th>
+            <th>{t('products:returnsTab.returnNo')}</th>
+            <th>{t('products:returnsTab.date')}</th>
+            <th>{t('products:returnsTab.customer')}</th>
+            <th>{t('products:returnsTab.quantity')}</th>
+            <th>{t('products:returnsTab.unitPrice')}</th>
+            <th>{t('products:returnsTab.vat')}</th>
+            <th>{t('products:returnsTab.total')}</th>
+            <th>{t('products:returnsTab.reason')}</th>
+            <th>{t('products:returnsTab.status')}</th>
           </tr>
         </thead>
         <tbody>
@@ -344,7 +318,7 @@ function ReturnsTab({
               <td>{ret.reason || '-'}</td>
               <td>
                 <Badge variant={ret.status === 'completed' ? 'success' : ret.status === 'cancelled' ? 'danger' : 'warning'}>
-                  {statusLabels[ret.status] || ret.status}
+                  {t(`products:statuses.${ret.status}`, { defaultValue: ret.status })}
                 </Badge>
               </td>
             </tr>
@@ -357,15 +331,15 @@ function ReturnsTab({
 
 function MovementsTab({
   movements,
-  movementTypeLabels,
   unit
 }: {
   movements: StockMovement[];
-  movementTypeLabels: Record<string, string>;
   unit: string;
 }) {
+  const { t } = useTranslation(['products', 'common']);
+
   if (movements.length === 0) {
-    return <div className={styles.emptyState}>Stok hareketi bulunmuyor</div>;
+    return <div className={styles.emptyState}>{t('products:movementsTab.empty')}</div>;
   }
 
   const getMovementVariant = (type: string): 'success' | 'danger' | 'warning' | 'default' => {
@@ -379,12 +353,12 @@ function MovementsTab({
       <table className={styles.dataTable}>
         <thead>
           <tr>
-            <th>Tarih</th>
-            <th>Hareket Tipi</th>
-            <th>Miktar</th>
-            <th>Sonraki Stok</th>
-            <th>Depo</th>
-            <th>Notlar</th>
+            <th>{t('products:movementsTab.date')}</th>
+            <th>{t('products:movementsTab.movementType')}</th>
+            <th>{t('products:movementsTab.quantity')}</th>
+            <th>{t('products:movementsTab.stockAfter')}</th>
+            <th>{t('products:movementsTab.warehouse')}</th>
+            <th>{t('products:movementsTab.notes')}</th>
           </tr>
         </thead>
         <tbody>
@@ -393,7 +367,7 @@ function MovementsTab({
               <td>{formatDateTime(movement.movement_date)}</td>
               <td>
                 <Badge variant={getMovementVariant(movement.movement_type)}>
-                  {movementTypeLabels[movement.movement_type] || movement.movement_type}
+                  {t(`products:movementTypes.${movement.movement_type}`, { defaultValue: movement.movement_type })}
                 </Badge>
               </td>
               <td className={movement.quantity > 0 ? styles.positive : styles.negative}>

@@ -1,0 +1,176 @@
+{
+  "pageTitle": "Field Team - Routes",
+  "newRoute": "New Route",
+  "columns": {
+    "routeName": "Route Name",
+    "date": "Date",
+    "status": "Status",
+    "visits": "Visits",
+    "estimatedDuration": "Est. Duration",
+    "actions": "Actions"
+  },
+  "buttons": {
+    "detail": "Detail",
+    "start": "Start",
+    "complete": "Complete",
+    "edit": "Edit",
+    "delete": "Delete",
+    "back": "Go Back",
+    "backToRoutes": "← Routes",
+    "startRoute": "Start Route",
+    "completeRoute": "Complete Route",
+    "cancel": "Cancel",
+    "save": "Save",
+    "saving": "Saving...",
+    "createRoute": "Create Route",
+    "addVisit": "+ Add Visit",
+    "checkIn": "Check In",
+    "checkOut": "Check Out",
+    "skip": "Skip",
+    "checkInAction": "Check In",
+    "checkOutAction": "Check Out",
+    "close": "Close"
+  },
+  "status": {
+    "planned": "Planned",
+    "in_progress": "In Progress",
+    "completed": "Completed",
+    "cancelled": "Cancelled"
+  },
+  "visitStatus": {
+    "pending": "Pending",
+    "in_progress": "In Progress",
+    "completed": "Completed",
+    "skipped": "Skipped",
+    "rescheduled": "Rescheduled"
+  },
+  "visitStatusForm": {
+    "pending": "Pending",
+    "in_progress": "In Progress",
+    "completed": "Completed",
+    "skipped": "Skipped",
+    "rescheduled": "Rescheduled"
+  },
+  "visitType": {
+    "sales": "Sales",
+    "support": "Support",
+    "collection": "Collection",
+    "delivery": "Delivery",
+    "meeting": "Meeting",
+    "other": "Other"
+  },
+  "filter": {
+    "allStatuses": "All Statuses"
+  },
+  "pagination": {
+    "previous": "Previous",
+    "next": "Next",
+    "pageOf": "Page {{page}} / {{totalPages}}"
+  },
+  "empty": "No routes found",
+  "durationFormat": "{{hours}}h {{minutes}}m",
+  "durationMinutes": "{{minutes}} min",
+  "toast": {
+    "loadError": "Failed to load routes",
+    "deleteError": "Failed to delete route",
+    "startError": "Failed to start route",
+    "completeError": "Failed to complete route",
+    "saveError": "Failed to save route",
+    "createSuccess": "Route created",
+    "createError": "Failed to create route",
+    "dataLoadError": "Error loading data",
+    "routeNameRequired": "Route name is required",
+    "addVisitRequired": "Add at least one visit",
+    "checkInError": "Error during check-in",
+    "checkOutError": "Error during check-out",
+    "skipError": "Failed to skip visit",
+    "visitUpdateSuccess": "Visit updated",
+    "visitUpdateError": "Update failed",
+    "checkInSuccess": "Checked in",
+    "checkInNoLocation": "Checked in (location unavailable)",
+    "checkInFailed": "Check-in failed",
+    "checkOutSuccess": "Checked out",
+    "checkOutFailed": "Check-out failed",
+    "visitSkipped": "Visit skipped",
+    "operationFailed": "Operation failed"
+  },
+  "confirm": {
+    "delete": "Are you sure you want to delete this route?",
+    "skipVisit": "Are you sure you want to skip this visit?"
+  },
+  "detail": {
+    "loading": "Loading...",
+    "notFound": "Route not found",
+    "routeInfo": "Route Information",
+    "statistics": "Statistics",
+    "assignedTo": "Assigned: {{name}}",
+    "labels": {
+      "date": "Date",
+      "assignedUser": "Assigned User",
+      "estimatedDuration": "Estimated Duration",
+      "actualDuration": "Actual Duration",
+      "notes": "Notes",
+      "address": "Address",
+      "checkInTime": "Check-in Time",
+      "checkOutTime": "Check-out Time",
+      "duration": "Duration",
+      "outcome": "Outcome",
+      "scheduled": "Scheduled: {{time}}"
+    },
+    "stats": {
+      "totalVisits": "Total Visits",
+      "completed": "Completed",
+      "pending": "Pending",
+      "completionPercent": "{{percent}}% Completed"
+    },
+    "visitsSection": "Visits ({{count}})",
+    "noVisits": "No visits added to this route yet",
+    "unnamedVisit": "Unnamed Visit"
+  },
+  "planner": {
+    "title": "Plan New Route",
+    "routeInfo": "Route Information",
+    "routeNameLabel": "Route Name *",
+    "routeNamePlaceholder": "E.g.: Kadikoy Area Visit",
+    "dateLabel": "Date *",
+    "estimatedDurationLabel": "Estimated Duration (minutes)",
+    "estimatedDurationPlaceholder": "E.g.: 180",
+    "notesLabel": "Notes",
+    "notesPlaceholder": "Notes about the route...",
+    "visitsTitle": "Visits ({{count}})",
+    "emptyVisits": "No visits added yet. Click \"Add Visit\" button.",
+    "customerLabel": "Customer",
+    "customerSelect": "Select Customer",
+    "contactLabel": "Contact (CRM)",
+    "contactSelect": "Select Contact",
+    "visitTypeLabel": "Visit Type",
+    "scheduledTimeLabel": "Scheduled Time",
+    "addressLabel": "Address",
+    "addressPlaceholder": "Visit address",
+    "visitNotesLabel": "Notes",
+    "visitNotesPlaceholder": "Visit notes"
+  },
+  "form": {
+    "editTitle": "Edit Route",
+    "createTitle": "New Route",
+    "routeNameLabel": "Route Name *",
+    "dateLabel": "Date *",
+    "estimatedDurationLabel": "Estimated Duration (minutes)",
+    "notesLabel": "Notes"
+  },
+  "visitForm": {
+    "title": "Visit Detail",
+    "visitTypeLabel": "Visit Type",
+    "customerLabel": "Customer",
+    "contactLabel": "Contact",
+    "addressLabel": "Address",
+    "scheduledTimeLabel": "Scheduled Time",
+    "checkInLabel": "Check-in",
+    "checkOutLabel": "Check-out",
+    "statusLabel": "Status",
+    "notesLabel": "Notes",
+    "notesPlaceholder": "Visit notes...",
+    "outcomeLabel": "Outcome",
+    "outcomePlaceholder": "Visit outcome..."
+  }
+}

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Modal, Input, Select, Button } from '@stok/ui';
 import { Account, CreateTransferData, accountsApi } from '../../api/accounts.api';
 import { useToast } from '../../context/ToastContext';
@@ -10,6 +11,7 @@ interface TransferFormModalProps {
 }
 
 export function TransferFormModal({ isOpen, onClose, onSubmit }: TransferFormModalProps) {
+  const { t } = useTranslation(['accounts', 'common']);
   const { showToast } = useToast();
   const [loading, setLoading] = useState(false);
   const [accounts, setAccounts] = useState<Account[]>([]);
@@ -32,7 +34,7 @@ export function TransferFormModal({ isOpen, onClose, onSubmit }: TransferFormMod
       const response = await accountsApi.getAll({ isActive: true, limit: 100 });
       setAccounts(response.data);
     } catch (error) {
-      showToast('error', 'Hesaplar yuklenemedi');
+      showToast('error', t('accounts:toast.accountsLoadFailed'));
     }
   };
 
@@ -40,17 +42,17 @@ export function TransferFormModal({ isOpen, onClose, onSubmit }: TransferFormMod
     e.preventDefault();
 
     if (!formData.from_account_id || !formData.to_account_id) {
-      showToast('error', 'Lutfen kaynak ve hedef hesaplari secin');
+      showToast('error', t('accounts:toast.selectAccountsError'));
       return;
     }
 
     if (formData.from_account_id === formData.to_account_id) {
-      showToast('error', 'Kaynak ve hedef hesaplar ayni olamaz');
+      showToast('error', t('accounts:toast.sameAccountError'));
       return;
     }
 
     if (formData.amount <= 0) {
-      showToast('error', 'Tutar 0\'dan buyuk olmalidir');
+      showToast('error', t('accounts:toast.amountError'));
       return;
     }
 
@@ -66,17 +68,17 @@ export function TransferFormModal({ isOpen, onClose, onSubmit }: TransferFormMod
       });
       onClose();
     } catch (error) {
-      showToast('error', 'Transfer yapilamadi');
+      showToast('error', t('accounts:toast.transferFailed'));
     } finally {
       setLoading(false);
     }
   };
 
   const accountOptions = [
-    { value: '', label: 'Hesap Sec' },
+    { value: '', label: t('accounts:transferForm.selectAccount') },
     ...accounts.map((acc) => ({
       value: acc.id,
-      label: `${acc.name} (${acc.account_type === 'kasa' ? 'Kasa' : 'Banka'})`,
+      label: `${acc.name} (${t(`accounts:accountTypes.${acc.account_type}`)})`,
     })),
   ];
 
@@ -86,13 +88,13 @@ export function TransferFormModal({ isOpen, onClose, onSubmit }: TransferFormMod
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title="Hesaplar Arasi Transfer"
+      title={t('accounts:transferForm.title')}
       size="md"
     >
       <form onSubmit={handleSubmit}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
           <Select
-            label="Kaynak Hesap *"
+            label={t('accounts:transferForm.sourceAccount')}
             options={accountOptions}
             value={formData.from_account_id}
             onChange={(e) => setFormData({ ...formData, from_account_id: e.target.value })}
@@ -100,12 +102,12 @@ export function TransferFormModal({ isOpen, onClose, onSubmit }: TransferFormMod
           />
           {fromAccount && (
             <p style={{ margin: '-8px 0 0 0', fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)' }}>
-              Mevcut bakiye: {new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY' }).format(fromAccount.current_balance)}
+              {t('accounts:transferForm.currentBalance', { balance: new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY' }).format(fromAccount.current_balance) })}
             </p>
           )}
 
           <Select
-            label="Hedef Hesap *"
+            label={t('accounts:transferForm.targetAccount')}
             options={accountOptions.filter((opt) => opt.value !== formData.from_account_id)}
             value={formData.to_account_id}
             onChange={(e) => setFormData({ ...formData, to_account_id: e.target.value })}
@@ -113,7 +115,7 @@ export function TransferFormModal({ isOpen, onClose, onSubmit }: TransferFormMod
           />
 
           <Input
-            label="Transfer Tutari *"
+            label={t('accounts:transferForm.amount')}
             type="number"
             step="0.01"
             min="0.01"
@@ -125,14 +127,14 @@ export function TransferFormModal({ isOpen, onClose, onSubmit }: TransferFormMod
           />
 
           <Input
-            label="Aciklama"
+            label={t('accounts:transferForm.description')}
             value={formData.description}
             onChange={(e) => setFormData({ ...formData, description: e.target.value })}
             fullWidth
           />
 
           <Input
-            label="Transfer Tarihi"
+            label={t('accounts:transferForm.date')}
             type="date"
             value={formData.transfer_date}
             onChange={(e) => setFormData({ ...formData, transfer_date: e.target.value })}
@@ -142,10 +144,10 @@ export function TransferFormModal({ isOpen, onClose, onSubmit }: TransferFormMod
 
         <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 'var(--space-2)', marginTop: 'var(--space-6)' }}>
           <Button type="button" variant="ghost" onClick={onClose}>
-            Iptal
+            {t('accounts:transferForm.cancel')}
           </Button>
           <Button type="submit" loading={loading}>
-            Transfer Yap
+            {t('accounts:transferForm.submit')}
           </Button>
         </div>
       </form>

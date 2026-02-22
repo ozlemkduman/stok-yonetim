@@ -1,10 +1,17 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Table, Badge, Spinner, type Column } from '@stok/ui';
 import { useToast } from '../../context/ToastContext';
 import { dashboardApi, DashboardSummary, LowStockProduct, TopDebtor } from '../../api/dashboard.api';
 import { formatCurrency } from '../../utils/formatters';
 import styles from './DashboardPage.module.css';
+
+// Map i18n language codes to date locale strings
+const dateLocaleMap: Record<string, string> = {
+  tr: 'tr-TR',
+  en: 'en-US',
+};
 
 // SVG Icons
 const icons = {
@@ -116,6 +123,7 @@ const icons = {
 };
 
 export function DashboardPage() {
+  const { t, i18n } = useTranslation(['dashboard', 'common']);
   const { showToast } = useToast();
   const [summary, setSummary] = useState<DashboardSummary | null>(null);
   const [lowStock, setLowStock] = useState<LowStockProduct[]>([]);
@@ -134,7 +142,7 @@ export function DashboardPage() {
       setLowStock(lowStockRes.data);
       setTopDebtors(debtorsRes.data);
     } catch (err) {
-      showToast('error', 'Ozet verileri yuklenemedi');
+      showToast('error', t('dashboard:errors.loadFailed'));
     }
     setLoading(false);
   };
@@ -151,7 +159,8 @@ export function DashboardPage() {
     );
   }
 
-  const today = new Date().toLocaleDateString('tr-TR', {
+  const dateLocale = dateLocaleMap[i18n.language] || i18n.language;
+  const today = new Date().toLocaleDateString(dateLocale, {
     weekday: 'long',
     year: 'numeric',
     month: 'long',
@@ -159,21 +168,21 @@ export function DashboardPage() {
   });
 
   const lowStockColumns: Column<any>[] = [
-    { key: 'name', header: 'Ürün Adı' },
+    { key: 'name', header: t('dashboard:lowStockTable.columnProductName') },
     {
       key: 'stock_quantity',
-      header: 'Mevcut Stok',
+      header: t('dashboard:lowStockTable.columnCurrentStock'),
       align: 'right',
       render: (p) => <Badge variant="danger">{p.stock_quantity}</Badge>,
     },
-    { key: 'min_stock_level', header: 'Min. Seviye', align: 'right' },
+    { key: 'min_stock_level', header: t('dashboard:lowStockTable.columnMinLevel'), align: 'right' },
   ];
 
   const debtorColumns: Column<any>[] = [
-    { key: 'name', header: 'Müşteri' },
+    { key: 'name', header: t('dashboard:debtorsTable.columnCustomer') },
     {
       key: 'balance',
-      header: 'Borç Tutarı',
+      header: t('dashboard:debtorsTable.columnDebtAmount'),
       align: 'right',
       render: (c) => (
         <span style={{ color: 'var(--color-danger)', fontWeight: 600 }}>
@@ -188,13 +197,13 @@ export function DashboardPage() {
       {/* Header */}
       <div className={styles.header}>
         <div className={styles.headerLeft}>
-          <h1 className={styles.title}>Özet</h1>
+          <h1 className={styles.title}>{t('dashboard:title')}</h1>
           <p className={styles.subtitle}>{today}</p>
         </div>
         <div className={styles.headerRight}>
           <button className={styles.refreshButton} onClick={loadData}>
             {icons.refresh}
-            <span>Yenile</span>
+            <span>{t('dashboard:refresh')}</span>
           </button>
         </div>
       </div>
@@ -209,8 +218,8 @@ export function DashboardPage() {
             <span className={styles.statValue}>
               {formatCurrency(summary?.todaySales.total || 0)}
             </span>
-            <span className={styles.statLabel}>Günlük Satış</span>
-            <span className={styles.statSub}>{summary?.todaySales.count || 0} işlem</span>
+            <span className={styles.statLabel}>{t('dashboard:stats.dailySales')}</span>
+            <span className={styles.statSub}>{t('dashboard:stats.dailySalesTransactions', { count: summary?.todaySales.count || 0 })}</span>
           </div>
         </div>
 
@@ -220,8 +229,8 @@ export function DashboardPage() {
           </div>
           <div className={styles.statContent}>
             <span className={styles.statValue}>{summary?.totalProducts || 0}</span>
-            <span className={styles.statLabel}>Toplam Ürün</span>
-            <span className={styles.statSub}>Aktif ürünler</span>
+            <span className={styles.statLabel}>{t('dashboard:stats.totalProducts')}</span>
+            <span className={styles.statSub}>{t('dashboard:stats.totalProductsSub')}</span>
           </div>
         </div>
 
@@ -231,8 +240,8 @@ export function DashboardPage() {
           </div>
           <div className={styles.statContent}>
             <span className={styles.statValue}>{summary?.totalCustomers || 0}</span>
-            <span className={styles.statLabel}>Toplam Müşteri</span>
-            <span className={styles.statSub}>Kayıtlı müşteriler</span>
+            <span className={styles.statLabel}>{t('dashboard:stats.totalCustomers')}</span>
+            <span className={styles.statSub}>{t('dashboard:stats.totalCustomersSub')}</span>
           </div>
         </div>
 
@@ -244,8 +253,8 @@ export function DashboardPage() {
             <span className={`${styles.statValue} ${styles.danger}`}>
               {summary?.lowStockCount || 0}
             </span>
-            <span className={styles.statLabel}>Düşük Stok</span>
-            <span className={styles.statSub}>Kritik seviye</span>
+            <span className={styles.statLabel}>{t('dashboard:stats.lowStock')}</span>
+            <span className={styles.statSub}>{t('dashboard:stats.lowStockSub')}</span>
           </div>
         </div>
       </div>
@@ -257,7 +266,7 @@ export function DashboardPage() {
             <div className={`${styles.secondaryStatIcon} ${styles.danger}`}>
               {icons.debt}
             </div>
-            <span className={styles.secondaryStatLabel}>Toplam Borç</span>
+            <span className={styles.secondaryStatLabel}>{t('dashboard:stats.totalDebt')}</span>
           </div>
           <span className={`${styles.secondaryStatValue} ${styles.danger}`}>
             {formatCurrency(summary?.totalDebt || 0)}
@@ -269,7 +278,7 @@ export function DashboardPage() {
             <div className={`${styles.secondaryStatIcon} ${styles.success}`}>
               {icons.credit}
             </div>
-            <span className={styles.secondaryStatLabel}>Toplam Alacak</span>
+            <span className={styles.secondaryStatLabel}>{t('dashboard:stats.totalCredit')}</span>
           </div>
           <span className={`${styles.secondaryStatValue} ${styles.success}`}>
             {formatCurrency(summary?.totalCredit || 0)}
@@ -281,7 +290,7 @@ export function DashboardPage() {
             <div className={`${styles.secondaryStatIcon} ${styles.warning}`}>
               {icons.expense}
             </div>
-            <span className={styles.secondaryStatLabel}>Aylık Gider</span>
+            <span className={styles.secondaryStatLabel}>{t('dashboard:stats.monthlyExpenses')}</span>
           </div>
           <span className={styles.secondaryStatValue}>
             {formatCurrency(summary?.monthlyExpenses || 0)}
@@ -293,19 +302,19 @@ export function DashboardPage() {
       <div className={styles.quickActions}>
         <Link to="/sales/new" className={styles.quickActionButton}>
           {icons.newSale}
-          <span>Yeni Satış</span>
+          <span>{t('dashboard:quickActions.newSale')}</span>
         </Link>
         <Link to="/products" className={styles.quickActionButton}>
           {icons.newProduct}
-          <span>Ürün Ekle</span>
+          <span>{t('dashboard:quickActions.addProduct')}</span>
         </Link>
         <Link to="/customers" className={styles.quickActionButton}>
           {icons.newCustomer}
-          <span>Müşteri Ekle</span>
+          <span>{t('dashboard:quickActions.addCustomer')}</span>
         </Link>
         <Link to="/reports" className={styles.quickActionButton}>
           {icons.reports}
-          <span>Raporlar</span>
+          <span>{t('dashboard:quickActions.reports')}</span>
         </Link>
       </div>
 
@@ -315,10 +324,10 @@ export function DashboardPage() {
           <div className={styles.tableHeader}>
             <h3 className={styles.tableTitle}>
               {icons.lowStock}
-              Düşük Stok Ürünleri
+              {t('dashboard:lowStockTable.title')}
             </h3>
             {lowStock.length > 0 && (
-              <span className={styles.tableBadge}>{lowStock.length} ürün</span>
+              <span className={styles.tableBadge}>{t('dashboard:lowStockTable.productCount', { count: lowStock.length })}</span>
             )}
           </div>
           <div className={styles.tableBody}>
@@ -331,7 +340,7 @@ export function DashboardPage() {
             ) : (
               <div className={styles.emptyState}>
                 {icons.empty}
-                <span>Düşük stok ürünü yok</span>
+                <span>{t('dashboard:lowStockTable.empty')}</span>
               </div>
             )}
           </div>
@@ -341,11 +350,11 @@ export function DashboardPage() {
           <div className={styles.tableHeader}>
             <h3 className={styles.tableTitle}>
               {icons.debtors}
-              En Borçlu Müşteriler
+              {t('dashboard:debtorsTable.title')}
             </h3>
             {topDebtors.length > 0 && (
               <span className={`${styles.tableBadge} ${styles.warning}`}>
-                {topDebtors.length} müşteri
+                {t('dashboard:debtorsTable.customerCount', { count: topDebtors.length })}
               </span>
             )}
           </div>
@@ -359,7 +368,7 @@ export function DashboardPage() {
             ) : (
               <div className={styles.emptyState}>
                 {icons.empty}
-                <span>Borçlu müşteri yok</span>
+                <span>{t('dashboard:debtorsTable.empty')}</span>
               </div>
             )}
           </div>

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Button, Badge, Card } from '@stok/ui';
 import { accountsApi, AccountDetail, AccountMovement, AccountTransfer } from '../../api/accounts.api';
 import { formatCurrency, formatDate } from '../../utils/formatters';
@@ -8,6 +9,7 @@ import styles from './AccountDetailPage.module.css';
 type TabType = 'movements' | 'transfers';
 
 export function AccountDetailPage() {
+  const { t } = useTranslation(['accounts', 'common']);
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [data, setData] = useState<AccountDetail | null>(null);
@@ -24,19 +26,19 @@ export function AccountDetailPage() {
         const response = await accountsApi.getDetail(id);
         setData(response.data);
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Veri yuklenemedi');
+        setError(err instanceof Error ? err.message : t('accounts:detail.loadError'));
       } finally {
         setLoading(false);
       }
     };
 
     fetchData();
-  }, [id]);
+  }, [id, t]);
 
   if (loading) {
     return (
       <div className={styles.page}>
-        <div className={styles.loading}>Yukleniyor...</div>
+        <div className={styles.loading}>{t('accounts:detail.loading')}</div>
       </div>
     );
   }
@@ -44,48 +46,36 @@ export function AccountDetailPage() {
   if (error || !data) {
     return (
       <div className={styles.page}>
-        <div className={styles.error}>{error || 'Hesap bulunamadi'}</div>
-        <Button onClick={() => navigate('/accounts')}>Geri Don</Button>
+        <div className={styles.error}>{error || t('accounts:detail.notFound')}</div>
+        <Button onClick={() => navigate('/accounts')}>{t('accounts:detail.backButton')}</Button>
       </div>
     );
   }
 
   const { account, movements, transfers, stats } = data;
 
-  const accountTypeLabels: Record<string, string> = {
-    kasa: 'Kasa',
-    banka: 'Banka',
-  };
-
-  const movementTypeLabels: Record<string, string> = {
-    gelir: 'Gelir',
-    gider: 'Gider',
-    transfer_in: 'Transfer Girisi',
-    transfer_out: 'Transfer Cikisi',
-  };
-
   return (
     <div className={styles.page}>
       <div className={styles.header}>
         <div className={styles.headerLeft}>
           <Button variant="ghost" onClick={() => navigate('/accounts')}>
-            ← Hesaplar
+            {t('accounts:detail.back')}
           </Button>
           <h1 className={styles.title}>{account.name}</h1>
           <div className={styles.accountMeta}>
             <Badge variant={account.account_type === 'kasa' ? 'warning' : 'info'}>
-              {accountTypeLabels[account.account_type] || account.account_type}
+              {t(`accounts:accountTypes.${account.account_type}`)}
             </Badge>
             {account.bank_name && <span>{account.bank_name}</span>}
-            {account.is_default && <Badge variant="success">Varsayilan</Badge>}
+            {account.is_default && <Badge variant="success">{t('accounts:badges.default')}</Badge>}
             <Badge variant={account.is_active ? 'success' : 'default'}>
-              {account.is_active ? 'Aktif' : 'Pasif'}
+              {account.is_active ? t('accounts:badges.active') : t('accounts:badges.inactive')}
             </Badge>
           </div>
         </div>
         <div className={styles.headerRight}>
           <div className={styles.balanceCard}>
-            <span className={styles.balanceLabel}>Guncel Bakiye</span>
+            <span className={styles.balanceLabel}>{t('accounts:detail.currentBalance')}</span>
             <span className={`${styles.balanceValue} ${account.current_balance < 0 ? styles.negative : styles.positive}`}>
               {formatCurrency(account.current_balance)}
             </span>
@@ -97,73 +87,73 @@ export function AccountDetailPage() {
       {/* Account Info */}
       <div className={styles.infoGrid}>
         <Card className={styles.infoCard}>
-          <h3>Hesap Bilgileri</h3>
+          <h3>{t('accounts:detail.accountInfo')}</h3>
           <div className={styles.infoList}>
             <div className={styles.infoItem}>
-              <span className={styles.infoLabel}>Hesap Turu</span>
-              <span className={styles.infoValue}>{accountTypeLabels[account.account_type] || account.account_type}</span>
+              <span className={styles.infoLabel}>{t('accounts:detail.accountType')}</span>
+              <span className={styles.infoValue}>{t(`accounts:accountTypes.${account.account_type}`)}</span>
             </div>
             {account.bank_name && (
               <div className={styles.infoItem}>
-                <span className={styles.infoLabel}>Banka Adi</span>
+                <span className={styles.infoLabel}>{t('accounts:detail.bankName')}</span>
                 <span className={styles.infoValue}>{account.bank_name}</span>
               </div>
             )}
             {account.branch_name && (
               <div className={styles.infoItem}>
-                <span className={styles.infoLabel}>Sube</span>
+                <span className={styles.infoLabel}>{t('accounts:detail.branch')}</span>
                 <span className={styles.infoValue}>{account.branch_name}</span>
               </div>
             )}
             {account.account_number && (
               <div className={styles.infoItem}>
-                <span className={styles.infoLabel}>Hesap Numarasi</span>
+                <span className={styles.infoLabel}>{t('accounts:detail.accountNumber')}</span>
                 <span className={styles.infoValue}>{account.account_number}</span>
               </div>
             )}
             {account.iban && (
               <div className={styles.infoItem}>
-                <span className={styles.infoLabel}>IBAN</span>
+                <span className={styles.infoLabel}>{t('accounts:detail.iban')}</span>
                 <span className={styles.infoValue}>{account.iban}</span>
               </div>
             )}
             <div className={styles.infoItem}>
-              <span className={styles.infoLabel}>Acilis Bakiyesi</span>
+              <span className={styles.infoLabel}>{t('accounts:detail.openingBalance')}</span>
               <span className={styles.infoValue}>{formatCurrency(account.opening_balance)}</span>
             </div>
             <div className={styles.infoItem}>
-              <span className={styles.infoLabel}>Olusturulma Tarihi</span>
+              <span className={styles.infoLabel}>{t('accounts:detail.createdAt')}</span>
               <span className={styles.infoValue}>{formatDate(account.created_at)}</span>
             </div>
           </div>
         </Card>
 
         <Card className={styles.statsCard}>
-          <h3>Istatistikler</h3>
+          <h3>{t('accounts:detail.statistics')}</h3>
           <div className={styles.statsGrid}>
             <div className={styles.statItem}>
               <span className={styles.statValue}>{stats.movementsCount}</span>
-              <span className={styles.statLabel}>Hareket</span>
+              <span className={styles.statLabel}>{t('accounts:detail.movementCount')}</span>
             </div>
             <div className={styles.statItem}>
               <span className={`${styles.statValue} ${styles.positive}`}>{formatCurrency(stats.totalIncome)}</span>
-              <span className={styles.statLabel}>Toplam Gelir</span>
+              <span className={styles.statLabel}>{t('accounts:detail.totalIncome')}</span>
             </div>
             <div className={styles.statItem}>
               <span className={`${styles.statValue} ${styles.negative}`}>{formatCurrency(stats.totalExpense)}</span>
-              <span className={styles.statLabel}>Toplam Gider</span>
+              <span className={styles.statLabel}>{t('accounts:detail.totalExpense')}</span>
             </div>
             <div className={styles.statItem}>
               <span className={styles.statValue}>{stats.transfersCount}</span>
-              <span className={styles.statLabel}>Transfer</span>
+              <span className={styles.statLabel}>{t('accounts:detail.transferCount')}</span>
             </div>
             <div className={styles.statItem}>
               <span className={`${styles.statValue} ${styles.positive}`}>{formatCurrency(stats.totalTransferIn)}</span>
-              <span className={styles.statLabel}>Gelen Transfer</span>
+              <span className={styles.statLabel}>{t('accounts:detail.incomingTransfer')}</span>
             </div>
             <div className={styles.statItem}>
               <span className={`${styles.statValue} ${styles.negative}`}>{formatCurrency(stats.totalTransferOut)}</span>
-              <span className={styles.statLabel}>Giden Transfer</span>
+              <span className={styles.statLabel}>{t('accounts:detail.outgoingTransfer')}</span>
             </div>
           </div>
         </Card>
@@ -176,22 +166,22 @@ export function AccountDetailPage() {
             className={`${styles.tab} ${activeTab === 'movements' ? styles.tabActive : ''}`}
             onClick={() => setActiveTab('movements')}
           >
-            Hareketler ({movements.length})
+            {t('accounts:detail.movementsTab', { count: movements.length })}
           </button>
           <button
             className={`${styles.tab} ${activeTab === 'transfers' ? styles.tabActive : ''}`}
             onClick={() => setActiveTab('transfers')}
           >
-            Transferler ({transfers.length})
+            {t('accounts:detail.transfersTab', { count: transfers.length })}
           </button>
         </div>
 
         <div className={styles.tabContent}>
           {activeTab === 'movements' && (
-            <MovementsTab movements={movements} movementTypeLabels={movementTypeLabels} />
+            <MovementsTab movements={movements} t={t} />
           )}
           {activeTab === 'transfers' && (
-            <TransfersTab transfers={transfers} accountId={account.id} />
+            <TransfersTab transfers={transfers} accountId={account.id} t={t} />
           )}
         </div>
       </div>
@@ -199,9 +189,9 @@ export function AccountDetailPage() {
   );
 }
 
-function MovementsTab({ movements, movementTypeLabels }: { movements: AccountMovement[]; movementTypeLabels: Record<string, string> }) {
+function MovementsTab({ movements, t }: { movements: AccountMovement[]; t: (key: string) => string }) {
   if (movements.length === 0) {
-    return <div className={styles.emptyState}>Henuz hesap hareketi yok</div>;
+    return <div className={styles.emptyState}>{t('accounts:empty.movements')}</div>;
   }
 
   const getMovementBadgeVariant = (type: string) => {
@@ -222,12 +212,12 @@ function MovementsTab({ movements, movementTypeLabels }: { movements: AccountMov
       <table className={styles.movementsTable}>
         <thead>
           <tr>
-            <th>Tarih</th>
-            <th>Tur</th>
-            <th>Kategori</th>
-            <th>Aciklama</th>
-            <th>Tutar</th>
-            <th>Bakiye</th>
+            <th>{t('accounts:columns.date')}</th>
+            <th>{t('accounts:columns.movementType')}</th>
+            <th>{t('accounts:columns.category')}</th>
+            <th>{t('accounts:columns.description')}</th>
+            <th>{t('accounts:columns.amount')}</th>
+            <th>{t('accounts:columns.balance')}</th>
           </tr>
         </thead>
         <tbody>
@@ -236,7 +226,7 @@ function MovementsTab({ movements, movementTypeLabels }: { movements: AccountMov
               <td>{formatDate(movement.movement_date)}</td>
               <td>
                 <Badge variant={getMovementBadgeVariant(movement.movement_type)}>
-                  {movementTypeLabels[movement.movement_type] || movement.movement_type}
+                  {t(`accounts:movementTypes.${movement.movement_type}`)}
                 </Badge>
               </td>
               <td>{movement.category || '-'}</td>
@@ -254,9 +244,9 @@ function MovementsTab({ movements, movementTypeLabels }: { movements: AccountMov
   );
 }
 
-function TransfersTab({ transfers, accountId }: { transfers: AccountTransfer[]; accountId: string }) {
+function TransfersTab({ transfers, accountId, t }: { transfers: AccountTransfer[]; accountId: string; t: (key: string) => string }) {
   if (transfers.length === 0) {
-    return <div className={styles.emptyState}>Henuz transfer islemi yok</div>;
+    return <div className={styles.emptyState}>{t('accounts:empty.transfers')}</div>;
   }
 
   return (
@@ -264,11 +254,11 @@ function TransfersTab({ transfers, accountId }: { transfers: AccountTransfer[]; 
       <table className={styles.transfersTable}>
         <thead>
           <tr>
-            <th>Tarih</th>
-            <th>Yon</th>
-            <th>Hesap</th>
-            <th>Aciklama</th>
-            <th>Tutar</th>
+            <th>{t('accounts:columns.date')}</th>
+            <th>{t('accounts:columns.direction')}</th>
+            <th>{t('accounts:columns.targetAccount')}</th>
+            <th>{t('accounts:columns.description')}</th>
+            <th>{t('accounts:columns.amount')}</th>
           </tr>
         </thead>
         <tbody>
@@ -281,14 +271,14 @@ function TransfersTab({ transfers, accountId }: { transfers: AccountTransfer[]; 
                 <td>{formatDate(transfer.transfer_date)}</td>
                 <td>
                   <Badge variant={isIncoming ? 'success' : 'warning'}>
-                    {isIncoming ? 'Gelen' : 'Giden'}
+                    {isIncoming ? t('accounts:transferDirections.incoming') : t('accounts:transferDirections.outgoing')}
                   </Badge>
                 </td>
                 <td>
                   {isIncoming ? (
-                    <span>{otherAccountName || '-'} → Bu Hesap</span>
+                    <span>{otherAccountName || '-'} → {t('accounts:transferDirections.thisAccount')}</span>
                   ) : (
-                    <span>Bu Hesap → {otherAccountName || '-'}</span>
+                    <span>{t('accounts:transferDirections.thisAccount')} → {otherAccountName || '-'}</span>
                   )}
                 </td>
                 <td>{transfer.description || '-'}</td>

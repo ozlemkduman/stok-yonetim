@@ -1,0 +1,122 @@
+{
+  "pageTitle": "CRM - Kisiler",
+  "newContact": "Yeni Kisi",
+  "searchPlaceholder": "Ara...",
+  "search": "Ara",
+  "columns": {
+    "name": "Ad Soyad",
+    "status": "Durum",
+    "email": "E-posta",
+    "phone": "Telefon",
+    "source": "Kaynak",
+    "nextFollowUp": "Sonraki Takip",
+    "actions": "Islemler"
+  },
+  "buttons": {
+    "detail": "Detay",
+    "edit": "Duzenle",
+    "delete": "Sil",
+    "back": "Geri Don",
+    "backToContacts": "← Kisiler",
+    "cancel": "Iptal",
+    "save": "Kaydet",
+    "saving": "Kaydediliyor...",
+    "convertToCustomer": "Musteriye Donustur",
+    "converting": "Donusturuluyor...",
+    "viewCustomer": "Musteriyi Gor"
+  },
+  "status": {
+    "lead": "Potansiyel",
+    "prospect": "Aday",
+    "customer": "Musteri",
+    "inactive": "Pasif"
+  },
+  "source": {
+    "website": "Web Sitesi",
+    "referral": "Referans",
+    "social": "Sosyal Medya",
+    "cold_call": "Soguk Arama",
+    "event": "Etkinlik",
+    "other": "Diger"
+  },
+  "filter": {
+    "allStatuses": "Tum Durumlar"
+  },
+  "pagination": {
+    "previous": "Onceki",
+    "next": "Sonraki",
+    "pageOf": "Sayfa {{page}} / {{totalPages}}"
+  },
+  "empty": "Kisi bulunamadi",
+  "toast": {
+    "loadError": "Kisiler yuklenemedi",
+    "deleteError": "Kisi silinemedi",
+    "saveError": "Kisi kaydedilemedi",
+    "alreadyLinked": "Bu kisi zaten bir musteriye baglidir.",
+    "convertSuccess": "Kisi basariyla musteriye donusturuldu!",
+    "convertError": "Donusturme islemi basarisiz oldu",
+    "dataLoadError": "Veri yuklenemedi"
+  },
+  "confirm": {
+    "delete": "Bu kisiyi silmek istediginize emin misiniz?",
+    "convert": "Bu kisiyi musteriye donusturmek istediginize emin misiniz?"
+  },
+  "detail": {
+    "loading": "Yukleniyor...",
+    "notFound": "Kisi bulunamadi",
+    "customerLinked": "Musteri Bagli",
+    "contactInfo": "Kisi Bilgileri",
+    "activitySummary": "Aktivite Ozeti",
+    "labels": {
+      "name": "Ad Soyad",
+      "email": "E-posta",
+      "phone": "Telefon",
+      "mobile": "Mobil",
+      "company": "Sirket",
+      "position": "Pozisyon",
+      "source": "Kaynak",
+      "notes": "Notlar",
+      "lastContact": "Son Iletisim",
+      "nextFollowUp": "Sonraki Takip"
+    },
+    "stats": {
+      "total": "Toplam",
+      "completed": "Tamamlanan",
+      "planned": "Planlanan"
+    },
+    "tabs": {
+      "callsEmails": "Aramalar / E-postalar ({{count}})",
+      "meetings": "Toplantilar ({{count}})",
+      "notesAndTasks": "Notlar / Gorevler ({{count}})"
+    },
+    "emptyActivities": "Henuz aktivite yok",
+    "completedAt": "Tamamlandi: {{date}}",
+    "durationMinutes": "{{minutes}} dk"
+  },
+  "activityType": {
+    "call": "Arama",
+    "email": "E-posta",
+    "meeting": "Toplanti",
+    "note": "Not",
+    "task": "Gorev"
+  },
+  "activityStatus": {
+    "planned": "Planlandi",
+    "completed": "Tamamlandi",
+    "cancelled": "Iptal Edildi"
+  },
+  "form": {
+    "editTitle": "Kisi Duzenle",
+    "createTitle": "Yeni Kisi",
+    "nameLabel": "Ad Soyad *",
+    "titleLabel": "Unvan",
+    "emailLabel": "E-posta",
+    "phoneLabel": "Telefon",
+    "mobileLabel": "Cep Telefonu",
+    "statusLabel": "Durum",
+    "sourceLabel": "Kaynak",
+    "nextFollowUpLabel": "Sonraki Takip",
+    "notesLabel": "Notlar",
+    "sourceSelect": "Secin"
+  }
+}

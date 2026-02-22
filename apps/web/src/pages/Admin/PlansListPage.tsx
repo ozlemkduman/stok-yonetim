@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Card, Table, Button, Badge, Modal, Input, type Column } from '@stok/ui';
 import { adminPlansApi, Plan, CreatePlanData, UpdatePlanData } from '../../api/admin/plans.api';
 import { useToast } from '../../context/ToastContext';
@@ -6,6 +7,7 @@ import { useConfirmDialog } from '../../context/ConfirmDialogContext';
 import styles from './AdminPages.module.css';
 
 export function PlansListPage() {
+  const { t } = useTranslation(['admin', 'common']);
   const { showToast } = useToast();
   const { confirm } = useConfirmDialog();
   const [plans, setPlans] = useState<Plan[]>([]);
@@ -33,7 +35,7 @@ export function PlansListPage() {
       const response = await adminPlansApi.getAll(true);
       setPlans(response.data);
     } catch (error) {
-      showToast('error', 'Planlar yuklenemedi');
+      showToast('error', t('admin:plans.loadFailed'));
     } finally {
       setIsLoading(false);
     }
@@ -80,43 +82,43 @@ export function PlansListPage() {
       setIsModalOpen(false);
       loadPlans();
     } catch (error) {
-      showToast('error', 'Plan kaydedilemedi');
+      showToast('error', t('admin:plans.saveFailed'));
     }
   };
 
   const handleDelete = async (id: string) => {
-    const confirmed = await confirm({ message: 'Bu plani silmek istediginize emin misiniz?', variant: 'danger' });
+    const confirmed = await confirm({ message: t('admin:plans.deleteConfirm'), variant: 'danger' });
     if (!confirmed) return;
 
     try {
       await adminPlansApi.delete(id);
       loadPlans();
     } catch (error) {
-      showToast('error', 'Plan silinemedi. Plan kullanımda olabilir.');
+      showToast('error', t('admin:plans.deleteFailed'));
     }
   };
 
   const columns: Column<Plan>[] = [
-    { key: 'name', header: 'Plan Adi' },
-    { key: 'code', header: 'Kod' },
+    { key: 'name', header: t('admin:plans.columnName') },
+    { key: 'code', header: t('admin:plans.columnCode') },
     {
       key: 'price',
-      header: 'Fiyat',
+      header: t('admin:plans.columnPrice'),
       render: (plan) =>
         new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY' }).format(plan.price),
     },
-    { key: 'billing_period', header: 'Periyot' },
+    { key: 'billing_period', header: t('admin:plans.columnPeriod') },
     {
       key: 'tenant_count',
-      header: 'Kullanici Sayisi',
+      header: t('admin:plans.columnUserCount'),
       render: (plan) => plan.tenant_count || 0,
     },
     {
       key: 'is_active',
-      header: 'Durum',
+      header: t('admin:plans.columnStatus'),
       render: (plan) => (
         <Badge variant={plan.is_active ? 'success' : 'default'}>
-          {plan.is_active ? 'Aktif' : 'Pasif'}
+          {plan.is_active ? t('admin:plans.statusActive') : t('admin:plans.statusInactive')}
         </Badge>
       ),
     },
@@ -126,10 +128,10 @@ export function PlansListPage() {
       render: (plan) => (
         <div className={styles.actions}>
           <Button variant="ghost" size="sm" onClick={() => handleOpenModal(plan)}>
-            Duzenle
+            {t('admin:plans.edit')}
           </Button>
           <Button variant="ghost" size="sm" onClick={() => handleDelete(plan.id)}>
-            Sil
+            {t('admin:plans.delete')}
           </Button>
         </div>
       ),
@@ -139,9 +141,9 @@ export function PlansListPage() {
   return (
     <div className={styles.page}>
       <div className={styles.pageHeader}>
-        <h1 className={styles.pageTitle}>Planlar</h1>
+        <h1 className={styles.pageTitle}>{t('admin:plans.title')}</h1>
         <Button variant="primary" onClick={() => handleOpenModal()}>
-          Yeni Plan
+          {t('admin:plans.newPlan')}
         </Button>
       </div>
 
@@ -151,18 +153,18 @@ export function PlansListPage() {
           data={plans}
           keyExtractor={(plan) => plan.id}
           loading={isLoading}
-          emptyMessage="Plan bulunamadi"
+          emptyMessage={t('admin:plans.emptyMessage')}
         />
       </Card>
 
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        title={editingPlan ? 'Plan Duzenle' : 'Yeni Plan'}
+        title={editingPlan ? t('admin:plans.editModal') : t('admin:plans.newModal')}
       >
         <form onSubmit={handleSubmit} className={styles.form}>
           <div className={styles.field}>
-            <label>Plan Adi</label>
+            <label>{t('admin:plans.labelName')}</label>
             <Input
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
@@ -171,7 +173,7 @@ export function PlansListPage() {
           </div>
 
           <div className={styles.field}>
-            <label>Kod</label>
+            <label>{t('admin:plans.labelCode')}</label>
             <Input
               value={formData.code}
               onChange={(e) => setFormData({ ...formData, code: e.target.value })}
@@ -181,7 +183,7 @@ export function PlansListPage() {
           </div>
 
           <div className={styles.field}>
-            <label>Fiyat (TL)</label>
+            <label>{t('admin:plans.labelPrice')}</label>
             <Input
               type="number"
               value={formData.price}
@@ -191,19 +193,19 @@ export function PlansListPage() {
           </div>
 
           <div className={styles.field}>
-            <label>Periyot</label>
+            <label>{t('admin:plans.labelPeriod')}</label>
             <select
               value={formData.billingPeriod}
               onChange={(e) => setFormData({ ...formData, billingPeriod: e.target.value })}
               className={styles.select}
             >
-              <option value="monthly">Aylik</option>
-              <option value="yearly">Yillik</option>
+              <option value="monthly">{t('admin:plans.periodMonthly')}</option>
+              <option value="yearly">{t('admin:plans.periodYearly')}</option>
             </select>
           </div>
 
           <div className={styles.field}>
-            <label>Sira</label>
+            <label>{t('admin:plans.labelOrder')}</label>
             <Input
               type="number"
               value={formData.sortOrder}
@@ -218,16 +220,16 @@ export function PlansListPage() {
                 checked={formData.isActive}
                 onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
               />{' '}
-              Aktif
+              {t('admin:plans.labelActive')}
             </label>
           </div>
 
           <div className={styles.formActions}>
             <Button type="button" variant="ghost" onClick={() => setIsModalOpen(false)}>
-              Iptal
+              {t('admin:plans.cancel')}
             </Button>
             <Button type="submit" variant="primary">
-              Kaydet
+              {t('admin:plans.save')}
             </Button>
           </div>
         </form>

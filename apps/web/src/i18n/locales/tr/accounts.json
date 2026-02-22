@@ -1,0 +1,156 @@
+{
+  "title": "Kasa / Banka Hesapları",
+  "subtitle": "Toplam {{count}} hesap",
+  "newAccount": "+ Yeni Hesap",
+  "transfer": "Transfer",
+  "tabs": {
+    "all": "Tümü",
+    "kasa": "Kasalar",
+    "banka": "Banka Hesapları"
+  },
+  "columns": {
+    "account": "Hesap",
+    "type": "Tür",
+    "currentBalance": "Güncel Bakiye",
+    "default": "Varsayılan",
+    "date": "Tarih",
+    "movementType": "Tür",
+    "category": "Kategori",
+    "description": "Açıklama",
+    "amount": "Tutar",
+    "balance": "Bakiye",
+    "direction": "Yön",
+    "targetAccount": "Hesap"
+  },
+  "accountTypes": {
+    "kasa": "Kasa",
+    "banka": "Banka"
+  },
+  "badges": {
+    "default": "Varsayılan",
+    "active": "Aktif",
+    "inactive": "Pasif"
+  },
+  "summary": {
+    "totalKasa": "Toplam Kasa",
+    "totalBanka": "Toplam Banka",
+    "totalBalance": "Genel Toplam"
+  },
+  "buttons": {
+    "movement": "Hareket",
+    "edit": "Düzenle",
+    "delete": "Sil"
+  },
+  "empty": {
+    "accounts": "Hesap bulunamadı",
+    "movements": "Henüz hesap hareketi yok",
+    "transfers": "Henüz transfer işlemi yok"
+  },
+  "toast": {
+    "summaryError": "Hesap özeti yüklenemedi",
+    "loadError": "Hesaplar yüklenirken hata oluştu",
+    "deleteSuccess": "Hesap başarıyla silindi",
+    "deleteFailed": "Silme işlemi başarısız",
+    "updateSuccess": "Hesap başarıyla güncellendi",
+    "createSuccess": "Hesap başarıyla eklendi",
+    "movementSuccess": "Hareket başarıyla eklendi",
+    "transferSuccess": "Transfer başarıyla yapıldı",
+    "saveFailed": "Hesap kaydedilemedi",
+    "movementFailed": "Hareket eklenemedi",
+    "transferFailed": "Transfer yapılamadı",
+    "accountsLoadFailed": "Hesaplar yüklenemedi",
+    "amountError": "Tutar 0'dan büyük olmalıdır",
+    "selectAccountsError": "Lütfen kaynak ve hedef hesapları seçin",
+    "sameAccountError": "Kaynak ve hedef hesaplar aynı olamaz"
+  },
+  "confirm": {
+    "deleteAccount": "\"{{name}}\" hesabını silmek istediğinizden emin misiniz?"
+  },
+  "detail": {
+    "back": "← Hesaplar",
+    "loading": "Yükleniyor...",
+    "notFound": "Hesap bulunamadı",
+    "backButton": "Geri Dön",
+    "loadError": "Veri yüklenemedi",
+    "currentBalance": "Güncel Bakiye",
+    "accountInfo": "Hesap Bilgileri",
+    "accountType": "Hesap Türü",
+    "bankName": "Banka Adı",
+    "branch": "Şube",
+    "accountNumber": "Hesap Numarası",
+    "iban": "IBAN",
+    "openingBalance": "Açılış Bakiyesi",
+    "createdAt": "Oluşturulma Tarihi",
+    "statistics": "İstatistikler",
+    "movementCount": "Hareket",
+    "totalIncome": "Toplam Gelir",
+    "totalExpense": "Toplam Gider",
+    "transferCount": "Transfer",
+    "incomingTransfer": "Gelen Transfer",
+    "outgoingTransfer": "Giden Transfer",
+    "movementsTab": "Hareketler ({{count}})",
+    "transfersTab": "Transferler ({{count}})"
+  },
+  "movementTypes": {
+    "gelir": "Gelir",
+    "gider": "Gider",
+    "transfer_in": "Transfer Girişi",
+    "transfer_out": "Transfer Çıkışı"
+  },
+  "transferDirections": {
+    "incoming": "Gelen",
+    "outgoing": "Giden",
+    "thisAccount": "Bu Hesap"
+  },
+  "form": {
+    "editTitle": "Hesap Düzenle",
+    "createTitle": "Yeni Hesap",
+    "accountName": "Hesap Adı *",
+    "accountType": "Hesap Türü *",
+    "bankName": "Banka Adı",
+    "iban": "IBAN",
+    "ibanPlaceholder": "TR00 0000 0000 0000 0000 0000 00",
+    "accountNumber": "Hesap Numarası",
+    "branchName": "Şube Adı",
+    "openingBalance": "Açılış Bakiyesi",
+    "setDefault": "Varsayılan hesap olarak ayarla",
+    "cancel": "İptal",
+    "update": "Güncelle",
+    "create": "Oluştur"
+  },
+  "movementForm": {
+    "title": "Hareket Ekle - {{name}}",
+    "movementType": "Hareket Türü *",
+    "typeIncome": "Gelir (Giriş)",
+    "typeExpense": "Gider (Çıkış)",
+    "amount": "Tutar *",
+    "category": "Kategori",
+    "description": "Açıklama",
+    "date": "Tarih",
+    "cancel": "İptal",
+    "submit": "Ekle"
+  },
+  "movementCategories": {
+    "select": "Kategori Seç",
+    "satis": "Satış",
+    "tahsilat": "Tahsilat",
+    "odeme": "Ödeme",
+    "maas": "Maaş",
+    "kira": "Kira",
+    "fatura": "Fatura",
+    "vergi": "Vergi",
+    "diger": "Diğer"
+  },
+  "transferForm": {
+    "title": "Hesaplar Arası Transfer",
+    "sourceAccount": "Kaynak Hesap *",
+    "targetAccount": "Hedef Hesap *",
+    "selectAccount": "Hesap Seç",
+    "currentBalance": "Mevcut bakiye: {{balance}}",
+    "amount": "Transfer Tutarı *",
+    "description": "Açıklama",
+    "date": "Transfer Tarihi",
+    "cancel": "İptal",
+    "submit": "Transfer Yap"
+  }
+}

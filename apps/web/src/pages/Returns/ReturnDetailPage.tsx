@@ -1,15 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Button, Badge, Card } from '@stok/ui';
 import { returnsApi, ReturnDetail } from '../../api/returns.api';
 import { formatCurrency, formatDate } from '../../utils/formatters';
 import styles from './ReturnDetailPage.module.css';
-
-const statusLabels: Record<string, string> = {
-  completed: 'Tamamlandi',
-  cancelled: 'Iptal Edildi',
-  pending: 'Beklemede',
-};
 
 const statusVariants: Record<string, 'success' | 'danger' | 'warning' | 'default'> = {
   completed: 'success',
@@ -18,6 +13,7 @@ const statusVariants: Record<string, 'success' | 'danger' | 'warning' | 'default
 };
 
 export function ReturnDetailPage() {
+  const { t } = useTranslation(['returns', 'common']);
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [data, setData] = useState<ReturnDetail | null>(null);
@@ -33,7 +29,7 @@ export function ReturnDetailPage() {
         const response = await returnsApi.getById(id);
         setData(response.data);
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Veri yuklenemedi');
+        setError(err instanceof Error ? err.message : t('returns:detail.loadError'));
       } finally {
         setLoading(false);
       }
@@ -45,7 +41,7 @@ export function ReturnDetailPage() {
   if (loading) {
     return (
       <div className={styles.page}>
-        <div className={styles.loading}>Yukleniyor...</div>
+        <div className={styles.loading}>{t('returns:detail.loading')}</div>
       </div>
     );
   }
@@ -53,8 +49,8 @@ export function ReturnDetailPage() {
   if (error || !data) {
     return (
       <div className={styles.page}>
-        <div className={styles.error}>{error || 'Iade bulunamadi'}</div>
-        <Button onClick={() => navigate('/returns')}>Geri Don</Button>
+        <div className={styles.error}>{error || t('returns:detail.notFound')}</div>
+        <Button onClick={() => navigate('/returns')}>{t('returns:detail.goBack')}</Button>
       </div>
     );
   }
@@ -67,19 +63,19 @@ export function ReturnDetailPage() {
       <div className={styles.header}>
         <div className={styles.headerLeft}>
           <Button variant="ghost" onClick={() => navigate('/returns')}>
-            ← Iadeler
+            {t('returns:detail.backToList')}
           </Button>
           <h1 className={styles.title}>{data.return_number}</h1>
           <div className={styles.returnMeta}>
             <span>{formatDate(data.return_date)}</span>
             <Badge variant={statusVariants[data.status] || 'default'}>
-              {statusLabels[data.status] || data.status}
+              {t(`returns:detail.statusLabels.${data.status}`, { defaultValue: data.status })}
             </Badge>
           </div>
         </div>
         <div className={styles.headerRight}>
           <div className={styles.totalCard}>
-            <span className={styles.totalLabel}>Toplam Tutar</span>
+            <span className={styles.totalLabel}>{t('returns:detail.totalAmount')}</span>
             <span className={styles.totalValue}>{formatCurrency(data.total_amount)}</span>
           </div>
         </div>
@@ -89,33 +85,33 @@ export function ReturnDetailPage() {
       <div className={styles.infoGrid}>
         {/* Return Info */}
         <Card className={styles.infoCard}>
-          <h3>Iade Bilgileri</h3>
+          <h3>{t('returns:detail.returnInfo')}</h3>
           <div className={styles.infoList}>
             <div className={styles.infoItem}>
-              <span className={styles.infoLabel}>Iade No</span>
+              <span className={styles.infoLabel}>{t('returns:detail.returnNumber')}</span>
               <span className={styles.infoValue}>{data.return_number}</span>
             </div>
             <div className={styles.infoItem}>
-              <span className={styles.infoLabel}>Tarih</span>
+              <span className={styles.infoLabel}>{t('returns:detail.date')}</span>
               <span className={styles.infoValue}>{formatDate(data.return_date)}</span>
             </div>
             <div className={styles.infoItem}>
-              <span className={styles.infoLabel}>Durum</span>
+              <span className={styles.infoLabel}>{t('returns:detail.status')}</span>
               <span className={styles.infoValue}>
                 <Badge variant={statusVariants[data.status] || 'default'}>
-                  {statusLabels[data.status] || data.status}
+                  {t(`returns:detail.statusLabels.${data.status}`, { defaultValue: data.status })}
                 </Badge>
               </span>
             </div>
             {data.reason && (
               <div className={styles.infoItem}>
-                <span className={styles.infoLabel}>Iade Nedeni</span>
+                <span className={styles.infoLabel}>{t('returns:detail.returnReason')}</span>
                 <span className={styles.infoValue}>{data.reason}</span>
               </div>
             )}
             {data.created_by_name && (
               <div className={styles.infoItem}>
-                <span className={styles.infoLabel}>Kaydeden</span>
+                <span className={styles.infoLabel}>{t('returns:detail.createdBy')}</span>
                 <span className={styles.infoValue}>{data.created_by_name}</span>
               </div>
             )}
@@ -124,12 +120,12 @@ export function ReturnDetailPage() {
 
         {/* Customer Info */}
         <Card className={styles.infoCard}>
-          <h3>Musteri Bilgileri</h3>
+          <h3>{t('returns:detail.customerInfo')}</h3>
           <div className={styles.infoList}>
             {data.customer_name ? (
               <>
                 <div className={styles.infoItem}>
-                  <span className={styles.infoLabel}>Musteri</span>
+                  <span className={styles.infoLabel}>{t('returns:detail.customer')}</span>
                   <span className={styles.infoValue}>
                     {data.customer_id ? (
                       <Link to={`/customers/${data.customer_id}`} className={styles.link}>
@@ -142,32 +138,32 @@ export function ReturnDetailPage() {
                 </div>
               </>
             ) : (
-              <div className={styles.emptyInfo}>Musteri bilgisi yok</div>
+              <div className={styles.emptyInfo}>{t('returns:detail.noCustomerInfo')}</div>
             )}
           </div>
         </Card>
 
         {/* Related Sale Info */}
         <Card className={styles.infoCard}>
-          <h3>Iliskili Satis</h3>
+          <h3>{t('returns:detail.relatedSale')}</h3>
           <div className={styles.infoList}>
             {data.sale_id && data.sale_invoice_number ? (
               <>
                 <div className={styles.infoItem}>
-                  <span className={styles.infoLabel}>Fatura No</span>
+                  <span className={styles.infoLabel}>{t('returns:detail.invoiceNumber')}</span>
                   <span className={styles.infoValue}>
                     <span className={styles.saleNumber}>{data.sale_invoice_number}</span>
                   </span>
                 </div>
                 {data.sale_date && (
                   <div className={styles.infoItem}>
-                    <span className={styles.infoLabel}>Satis Tarihi</span>
+                    <span className={styles.infoLabel}>{t('returns:detail.saleDate')}</span>
                     <span className={styles.infoValue}>{formatDate(data.sale_date)}</span>
                   </div>
                 )}
               </>
             ) : (
-              <div className={styles.emptyInfo}>Iliskili satis yok</div>
+              <div className={styles.emptyInfo}>{t('returns:detail.noRelatedSale')}</div>
             )}
           </div>
         </Card>
@@ -175,18 +171,18 @@ export function ReturnDetailPage() {
 
       {/* Return Items */}
       <Card className={styles.itemsCard}>
-        <h3>Iade Kalemleri</h3>
+        <h3>{t('returns:detail.returnItems')}</h3>
         {data.items && data.items.length > 0 ? (
           <div className={styles.tableContainer}>
             <table className={styles.itemsTable}>
               <thead>
                 <tr>
-                  <th>Urun</th>
-                  <th>Barkod</th>
-                  <th className={styles.textRight}>Miktar</th>
-                  <th className={styles.textRight}>Birim Fiyat</th>
-                  <th className={styles.textRight}>KDV</th>
-                  <th className={styles.textRight}>Toplam</th>
+                  <th>{t('returns:detail.product')}</th>
+                  <th>{t('returns:detail.barcode')}</th>
+                  <th className={styles.textRight}>{t('returns:detail.quantity')}</th>
+                  <th className={styles.textRight}>{t('returns:detail.unitPrice')}</th>
+                  <th className={styles.textRight}>{t('returns:detail.vat')}</th>
+                  <th className={styles.textRight}>{t('returns:detail.total')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -204,24 +200,24 @@ export function ReturnDetailPage() {
             </table>
           </div>
         ) : (
-          <div className={styles.emptyState}>Iade kalemi bulunamadi</div>
+          <div className={styles.emptyState}>{t('returns:detail.noItems')}</div>
         )}
       </Card>
 
       {/* Totals */}
       <Card className={styles.totalsCard}>
-        <h3>Ozet</h3>
+        <h3>{t('returns:detail.summary')}</h3>
         <div className={styles.totalsGrid}>
           <div className={styles.totalRow}>
-            <span className={styles.totalRowLabel}>Ara Toplam</span>
+            <span className={styles.totalRowLabel}>{t('returns:detail.subtotal')}</span>
             <span className={styles.totalRowValue}>{formatCurrency(subtotal)}</span>
           </div>
           <div className={styles.totalRow}>
-            <span className={styles.totalRowLabel}>KDV Toplam</span>
+            <span className={styles.totalRowLabel}>{t('returns:detail.vatTotal')}</span>
             <span className={styles.totalRowValue}>{formatCurrency(data.vat_total)}</span>
           </div>
           <div className={`${styles.totalRow} ${styles.grandTotalRow}`}>
-            <span className={styles.totalRowLabel}>Genel Toplam</span>
+            <span className={styles.totalRowLabel}>{t('returns:detail.grandTotal')}</span>
             <span className={styles.grandTotalValue}>{formatCurrency(data.total_amount)}</span>
           </div>
         </div>

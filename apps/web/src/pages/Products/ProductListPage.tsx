@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Table, Button, Input, Badge, Pagination, Modal, type Column } from '@stok/ui';
 import { productsApi, Product, CreateProductData } from '../../api/products.api';
 import { useToast } from '../../context/ToastContext';
@@ -20,6 +21,7 @@ const icons = {
 };
 
 export function ProductListPage() {
+  const { t } = useTranslation(['products', 'common']);
   const navigate = useNavigate();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
@@ -54,7 +56,7 @@ export function ProductListPage() {
       setTotalPages(response.meta?.totalPages || 1);
       setTotal(response.meta?.total || 0);
     } catch (err) {
-      showToast('error', 'Ürünler yüklenemedi');
+      showToast('error', t('products:toast.loadError'));
     }
     setLoading(false);
   };
@@ -71,27 +73,27 @@ export function ProductListPage() {
     try {
       if (editingProduct) {
         await productsApi.update(editingProduct.id, formData);
-        showToast('success', 'Ürün güncellendi');
+        showToast('success', t('products:toast.updateSuccess'));
       } else {
         await productsApi.create(formData);
-        showToast('success', 'Ürün eklendi');
+        showToast('success', t('products:toast.createSuccess'));
       }
       setIsModalOpen(false);
       fetchProducts();
     } catch (err) {
-      showToast('error', err instanceof Error ? err.message : 'Hata oluştu');
+      showToast('error', err instanceof Error ? err.message : t('products:toast.genericError'));
     }
   };
 
   const handleDelete = async (product: Product) => {
-    const confirmed = await confirm({ message: `"${product.name}" ürününü silmek istediğinizden emin misiniz?`, variant: 'danger' });
+    const confirmed = await confirm({ message: t('products:toast.deleteConfirm', { name: product.name }), variant: 'danger' });
     if (!confirmed) return;
     try {
       await productsApi.delete(product.id);
-      showToast('success', 'Ürün silindi');
+      showToast('success', t('products:toast.deleteSuccess'));
       fetchProducts();
     } catch (err) {
-      showToast('error', err instanceof Error ? err.message : 'Silme başarısız');
+      showToast('error', err instanceof Error ? err.message : t('products:toast.deleteFailed'));
     }
   };
 
@@ -186,16 +188,18 @@ export function ProductListPage() {
     const basePrice = formData[field] || 0;
     const vatInc = isVatIncludedForField(field);
     if (vatInc) {
-      return `KDV Hariç: ${basePrice.toFixed(2)} ₺`;
+      return t('products:priceInfo.vatExcluded', { price: basePrice.toFixed(2) });
     } else {
-      return `KDV Dahil: ${(basePrice * vatMultiplier).toFixed(2)} ₺`;
+      return t('products:priceInfo.vatIncluded', { price: (basePrice * vatMultiplier).toFixed(2) });
     }
   };
+
+  const vatStatusLabel = (included: boolean) => included ? t('products:form.vatIncluded') : t('products:form.vatExcluded');
 
   const columns: Column<Product>[] = [
     {
       key: 'name',
-      header: 'Ürün Adı',
+      header: t('products:columns.productName'),
       render: (p) => (
         <div className={styles.productName}>
           <span className={styles.name} onClick={() => navigate(`/products/${p.id}`)} style={{ cursor: 'pointer' }}>{p.name}</span>
@@ -203,10 +207,10 @@ export function ProductListPage() {
         </div>
       )
     },
-    { key: 'category', header: 'Kategori', render: (p) => p.category || '-' },
+    { key: 'category', header: t('products:columns.category'), render: (p) => p.category || '-' },
     {
       key: 'total_sold',
-      header: 'Satilan',
+      header: t('products:columns.totalSold'),
       align: 'right',
       render: (p) => (
         <strong>{p.total_sold ?? '-'}</strong>
@@ -214,7 +218,7 @@ export function ProductListPage() {
     },
     {
       key: 'stock_quantity',
-      header: 'Stok',
+      header: t('products:columns.stock'),
       align: 'right',
       render: (p) => (
         <Badge variant={p.stock_quantity <= p.min_stock_level ? 'danger' : 'success'}>
@@ -222,18 +226,18 @@ export function ProductListPage() {
         </Badge>
       )
     },
-    { key: 'purchase_price', header: 'Alış Fiyatı', align: 'right', render: (p) => formatCurrency(p.purchase_price) },
-    { key: 'sale_price', header: 'Satış Fiyatı', align: 'right', render: (p) => formatCurrency(p.sale_price) },
-    { key: 'created_by_name', header: 'Kaydeden', render: (p) => p.created_by_name || '-' },
+    { key: 'purchase_price', header: t('products:columns.purchasePrice'), align: 'right', render: (p) => formatCurrency(p.purchase_price) },
+    { key: 'sale_price', header: t('products:columns.salePrice'), align: 'right', render: (p) => formatCurrency(p.sale_price) },
+    { key: 'created_by_name', header: t('products:columns.createdBy'), render: (p) => p.created_by_name || '-' },
     {
       key: 'actions',
       header: '',
       width: '150px',
       render: (p) => (
         <div className={styles.actions}>
-          <Button size="sm" variant="secondary" onClick={() => navigate(`/products/${p.id}`)}>Detay</Button>
-          <Button size="sm" variant="primary" onClick={() => openModal(p)}>Düzenle</Button>
-          <Button size="sm" variant="danger" onClick={() => handleDelete(p)}>Sil</Button>
+          <Button size="sm" variant="secondary" onClick={() => navigate(`/products/${p.id}`)}>{t('products:actions.detail')}</Button>
+          <Button size="sm" variant="primary" onClick={() => openModal(p)}>{t('products:actions.edit')}</Button>
+          <Button size="sm" variant="danger" onClick={() => handleDelete(p)}>{t('products:actions.delete')}</Button>
         </div>
       )
     },
@@ -245,22 +249,22 @@ export function ProductListPage() {
         <div className={styles.headerLeft}>
           <h1 className={styles.title}>
             <span className={styles.titleIcon}>{icons.products}</span>
-            Ürünler
+            {t('products:pageTitle')}
           </h1>
-          <p className={styles.subtitle}>Toplam {total} ürün kaydı</p>
+          <p className={styles.subtitle}>{t('products:subtitle', { count: total })}</p>
         </div>
-        {canAddProduct && <Button onClick={() => openModal()}>+ Yeni Ürün</Button>}
+        {canAddProduct && <Button onClick={() => openModal()}>{t('products:newProduct')}</Button>}
       </div>
 
       {!canAddProduct && (
-        <UpgradePrompt variant="inline" message="Urun limitinize ulastiniz. Daha fazla urun eklemek icin planinizi yukseltin." />
+        <UpgradePrompt variant="inline" message={t('products:upgradeMessage')} />
       )}
 
       <div className={styles.card}>
         <div className={styles.toolbar}>
           <div className={styles.searchWrapper}>
             <Input
-              placeholder="Ürün ara..."
+              placeholder={t('products:searchPlaceholder')}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
@@ -271,7 +275,7 @@ export function ProductListPage() {
               value={categoryFilter}
               onChange={(e) => { setCategoryFilter(e.target.value); setPage(1); }}
             >
-              <option value="">Tüm Kategoriler</option>
+              <option value="">{t('products:filters.allCategories')}</option>
               {categories.map((cat) => (
                 <option key={cat} value={cat}>{cat}</option>
               ))}
@@ -286,15 +290,15 @@ export function ProductListPage() {
                 setPage(1);
               }}
             >
-              <option value="total_sold_desc">En Cok Satan</option>
-              <option value="total_sold_asc">En Az Satan</option>
-              <option value="name_asc">Ada Gore (A-Z)</option>
-              <option value="name_desc">Ada Gore (Z-A)</option>
-              <option value="stock_quantity_asc">Stok (Az-Cok)</option>
-              <option value="stock_quantity_desc">Stok (Cok-Az)</option>
-              <option value="sale_price_desc">Fiyat (Yuksek-Dusuk)</option>
-              <option value="sale_price_asc">Fiyat (Dusuk-Yuksek)</option>
-              <option value="created_at_desc">En Yeni</option>
+              <option value="total_sold_desc">{t('products:filters.bestSelling')}</option>
+              <option value="total_sold_asc">{t('products:filters.leastSelling')}</option>
+              <option value="name_asc">{t('products:filters.nameAZ')}</option>
+              <option value="name_desc">{t('products:filters.nameZA')}</option>
+              <option value="stock_quantity_asc">{t('products:filters.stockLowHigh')}</option>
+              <option value="stock_quantity_desc">{t('products:filters.stockHighLow')}</option>
+              <option value="sale_price_desc">{t('products:filters.priceHighLow')}</option>
+              <option value="sale_price_asc">{t('products:filters.priceLowHigh')}</option>
+              <option value="created_at_desc">{t('products:filters.newest')}</option>
             </select>
           </div>
         </div>
@@ -304,7 +308,7 @@ export function ProductListPage() {
           data={products}
           keyExtractor={(p) => p.id}
           loading={loading}
-          emptyMessage="Ürün bulunamadı"
+          emptyMessage={t('products:emptyMessage')}
         />
 
         {totalPages > 1 && (
@@ -317,35 +321,35 @@ export function ProductListPage() {
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        title={editingProduct ? 'Ürün Düzenle' : 'Yeni Ürün'}
+        title={editingProduct ? t('products:modal.editTitle') : t('products:modal.createTitle')}
         size="lg"
         footer={
           <>
-            <Button variant="secondary" onClick={() => setIsModalOpen(false)}>İptal</Button>
-            <Button onClick={handleSubmit}>{editingProduct ? 'Güncelle' : 'Kaydet'}</Button>
+            <Button variant="secondary" onClick={() => setIsModalOpen(false)}>{t('products:modal.cancel')}</Button>
+            <Button onClick={handleSubmit}>{editingProduct ? t('products:modal.update') : t('products:modal.save')}</Button>
           </>
         }
       >
         <div className={styles.form}>
-          <Input label="Ürün Adı *" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} fullWidth />
-          <Input label="Barkod" value={formData.barcode || ''} onChange={(e) => setFormData({ ...formData, barcode: e.target.value })} fullWidth />
-          <Input label="Kategori" value={formData.category || ''} onChange={(e) => setFormData({ ...formData, category: e.target.value })} fullWidth />
-          <Input label="Birim" value={formData.unit || 'adet'} onChange={(e) => setFormData({ ...formData, unit: e.target.value })} fullWidth />
+          <Input label={t('products:form.productName')} value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} fullWidth />
+          <Input label={t('products:form.barcode')} value={formData.barcode || ''} onChange={(e) => setFormData({ ...formData, barcode: e.target.value })} fullWidth />
+          <Input label={t('products:form.category')} value={formData.category || ''} onChange={(e) => setFormData({ ...formData, category: e.target.value })} fullWidth />
+          <Input label={t('products:form.unit')} value={formData.unit || 'adet'} onChange={(e) => setFormData({ ...formData, unit: e.target.value })} fullWidth />
           <div className={styles.vatRateRow}>
-            <Input label="KDV Oranı (%)" type="number" step="any" value={formData.vat_rate ?? 20} onChange={(e) => handleVatRateChange(parseFloat(e.target.value) || 0)} fullWidth />
+            <Input label={t('products:form.vatRate')} type="number" step="any" value={formData.vat_rate ?? 20} onChange={(e) => handleVatRateChange(parseFloat(e.target.value) || 0)} fullWidth />
           </div>
 
           <div className={styles.priceSection}>
             <div className={styles.priceSectionHeader}>
-              <span className={styles.priceSectionTitle}>Alış Fiyatı</span>
+              <span className={styles.priceSectionTitle}>{t('products:form.purchasePriceSection')}</span>
               <div className={styles.vatToggle}>
-                <button type="button" className={`${styles.vatToggleBtn} ${!purchaseVatIncluded ? styles.vatToggleActive : ''}`} onClick={() => handlePurchaseVatToggle(false)}>KDV Hariç</button>
-                <button type="button" className={`${styles.vatToggleBtn} ${purchaseVatIncluded ? styles.vatToggleActive : ''}`} onClick={() => handlePurchaseVatToggle(true)}>KDV Dahil</button>
+                <button type="button" className={`${styles.vatToggleBtn} ${!purchaseVatIncluded ? styles.vatToggleActive : ''}`} onClick={() => handlePurchaseVatToggle(false)}>{t('products:form.vatExcluded')}</button>
+                <button type="button" className={`${styles.vatToggleBtn} ${purchaseVatIncluded ? styles.vatToggleActive : ''}`} onClick={() => handlePurchaseVatToggle(true)}>{t('products:form.vatIncluded')}</button>
               </div>
             </div>
             <div className={styles.priceField}>
               <Input
-                label={`Alış Fiyatı * ${purchaseVatIncluded ? '(KDV Dahil)' : '(KDV Hariç)'}`}
+                label={t('products:form.purchasePriceLabel', { vatStatus: vatStatusLabel(purchaseVatIncluded) })}
                 type="number"
                 step="any"
                 value={displayPurchasePrice}
@@ -358,15 +362,15 @@ export function ProductListPage() {
 
           <div className={styles.priceSection}>
             <div className={styles.priceSectionHeader}>
-              <span className={styles.priceSectionTitle}>Satış Fiyatları</span>
+              <span className={styles.priceSectionTitle}>{t('products:form.salePriceSection')}</span>
               <div className={styles.vatToggle}>
-                <button type="button" className={`${styles.vatToggleBtn} ${!saleVatIncluded ? styles.vatToggleActive : ''}`} onClick={() => handleSaleVatToggle(false)}>KDV Hariç</button>
-                <button type="button" className={`${styles.vatToggleBtn} ${saleVatIncluded ? styles.vatToggleActive : ''}`} onClick={() => handleSaleVatToggle(true)}>KDV Dahil</button>
+                <button type="button" className={`${styles.vatToggleBtn} ${!saleVatIncluded ? styles.vatToggleActive : ''}`} onClick={() => handleSaleVatToggle(false)}>{t('products:form.vatExcluded')}</button>
+                <button type="button" className={`${styles.vatToggleBtn} ${saleVatIncluded ? styles.vatToggleActive : ''}`} onClick={() => handleSaleVatToggle(true)}>{t('products:form.vatIncluded')}</button>
               </div>
             </div>
             <div className={styles.priceField}>
               <Input
-                label={`Satış Fiyatı * ${saleVatIncluded ? '(KDV Dahil)' : '(KDV Hariç)'}`}
+                label={t('products:form.salePriceLabel', { vatStatus: vatStatusLabel(saleVatIncluded) })}
                 type="number"
                 step="any"
                 value={displaySalePrice}
@@ -377,7 +381,7 @@ export function ProductListPage() {
             </div>
             <div className={styles.priceField}>
               <Input
-                label={`Toptan Satış Fiyatı ${saleVatIncluded ? '(KDV Dahil)' : '(KDV Hariç)'}`}
+                label={t('products:form.wholesalePriceLabel', { vatStatus: vatStatusLabel(saleVatIncluded) })}
                 type="number"
                 step="any"
                 value={displayWholesalePrice}
@@ -388,8 +392,8 @@ export function ProductListPage() {
             </div>
           </div>
 
-          <Input label="Stok Miktarı" type="number" step="any" value={formData.stock_quantity || 0} onChange={(e) => setFormData({ ...formData, stock_quantity: parseFloat(e.target.value) || 0 })} fullWidth />
-          <Input label="Kritik Stok Seviyesi" type="number" step="any" value={formData.min_stock_level || 5} onChange={(e) => setFormData({ ...formData, min_stock_level: parseFloat(e.target.value) || 0 })} fullWidth />
+          <Input label={t('products:form.stockQuantity')} type="number" step="any" value={formData.stock_quantity || 0} onChange={(e) => setFormData({ ...formData, stock_quantity: parseFloat(e.target.value) || 0 })} fullWidth />
+          <Input label={t('products:form.minStockLevel')} type="number" step="any" value={formData.min_stock_level || 5} onChange={(e) => setFormData({ ...formData, min_stock_level: parseFloat(e.target.value) || 0 })} fullWidth />
         </div>
       </Modal>
     </div>

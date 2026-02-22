@@ -1,0 +1,187 @@
+{
+  "title": "Depo Yönetimi",
+  "subtitle": {
+    "warehouses": "{{count}} depo",
+    "transfers": "{{count}} transfer",
+    "movements": "{{count}} hareket"
+  },
+  "newWarehouse": "+ Yeni Depo",
+  "tabs": {
+    "warehouses": "Depolar",
+    "transfers": "Transferler",
+    "stockMovements": "Stok Hareketleri"
+  },
+  "columns": {
+    "warehouse": "Depo",
+    "address": "Adres",
+    "manager": "Sorumlu",
+    "status": "Durum",
+    "transferNo": "Transfer No",
+    "source": "Kaynak",
+    "target": "Hedef",
+    "date": "Tarih",
+    "product": "Ürün",
+    "operation": "İşlem",
+    "quantity": "Miktar",
+    "stockAfter": "Sonraki Stok",
+    "direction": "Yön",
+    "otherWarehouse": "Diğer Depo",
+    "notes": "Not",
+    "barcode": "Barkod",
+    "minStock": "Min. Stok",
+    "movementType": "Hareket Tipi",
+    "sourceWarehouse": "Kaynak Depo",
+    "targetWarehouse": "Hedef Depo"
+  },
+  "badges": {
+    "default": "Varsayılan",
+    "active": "Aktif",
+    "inactive": "Pasif",
+    "lowStock": "Düşük Stok",
+    "normal": "Normal"
+  },
+  "transferStatus": {
+    "pending": "Bekliyor",
+    "in_transit": "Yolda",
+    "completed": "Tamamlandı",
+    "cancelled": "İptal"
+  },
+  "transferStatusAlt": {
+    "pending": "Beklemede",
+    "in_transit": "Transfer Ediliyor",
+    "completed": "Tamamlandı",
+    "cancelled": "İptal"
+  },
+  "movementTypes": {
+    "sale": "Satış",
+    "return": "İade",
+    "transfer_in": "Transfer Giriş",
+    "transfer_out": "Transfer Çıkış",
+    "adjustment": "Düzeltme",
+    "purchase": "Alış",
+    "initial": "Başlangıç",
+    "purchaseFull": "Satın Alma"
+  },
+  "buttons": {
+    "detail": "Detay",
+    "edit": "Düzenle",
+    "delete": "Sil",
+    "complete": "Tamamla",
+    "cancel": "İptal",
+    "filter": "Filtrele",
+    "reset": "Sıfırla",
+    "previous": "Önceki",
+    "next": "Sonraki",
+    "closeForm": "Formu Kapat",
+    "newTransfer": "+ Yeni Transfer",
+    "addProduct": "+ Ürün Ekle",
+    "createTransfer": "Transfer Oluştur",
+    "saving": "Kaydediliyor..."
+  },
+  "empty": {
+    "warehouses": "Depo bulunamadı",
+    "transfers": "Transfer bulunamadı",
+    "movements": "Hareket bulunamadı",
+    "stockMovements": "Stok hareketi bulunamadı",
+    "stocks": "Bu depoda stok bulunmuyor",
+    "detailMovements": "Henüz stok hareketi bulunmuyor",
+    "detailTransfers": "Henüz transfer bulunmuyor",
+    "noProducts": "Henüz ürün eklenmedi"
+  },
+  "toast": {
+    "loadError": "Depolar yüklenirken hata oluştu",
+    "transfersLoadError": "Transferler yüklenirken hata oluştu",
+    "movementsLoadError": "Hareketler yüklenirken hata oluştu",
+    "dataLoadError": "Veriler yüklenirken hata oluştu",
+    "deleteSuccess": "Depo başarıyla silindi",
+    "deleteFailed": "Silme işlemi başarısız",
+    "updateSuccess": "Depo başarıyla güncellendi",
+    "createSuccess": "Depo başarıyla eklendi",
+    "saveFailed": "Depo kaydedilemedi",
+    "completeSuccess": "Transfer tamamlandı",
+    "cancelSuccess": "Transfer iptal edildi",
+    "operationFailed": "İşlem başarısız",
+    "transferCreateSuccess": "Transfer oluşturuldu",
+    "transferCreateFailed": "Transfer oluşturulamadı",
+    "selectWarehousesError": "Kaynak ve hedef depo seçin",
+    "sameWarehouseError": "Kaynak ve hedef depo aynı olamaz",
+    "invalidItemsError": "Geçerli ürün ve miktar girin"
+  },
+  "confirm": {
+    "deleteWarehouse": "\"{{name}}\" deposunu silmek istediğinizden emin misiniz?",
+    "completeTransfer": "Transferi tamamlamak istediğinizden emin misiniz?",
+    "cancelTransfer": "Transferi iptal etmek istediğinizden emin misiniz?",
+    "completeTransferAlt": "Transferi tamamlamak istediğinize emin misiniz?",
+    "cancelTransferAlt": "Transferi iptal etmek istediğinize emin misiniz?"
+  },
+  "upgradePrompt": "Depo limitinize ulaştınız. Daha fazla depo eklemek için planınızı yükseltin.",
+  "filters": {
+    "allStatuses": "Tüm Durumlar",
+    "warehouse": "Depo",
+    "allWarehouses": "Tüm Depolar",
+    "product": "Ürün",
+    "allProducts": "Tüm Ürünler",
+    "movementType": "Hareket Tipi",
+    "allTypes": "Tüm Tipler",
+    "startDate": "Başlangıç Tarihi",
+    "endDate": "Bitiş Tarihi"
+  },
+  "detail": {
+    "back": "← Depolar",
+    "loading": "Yükleniyor...",
+    "notFound": "Depo bulunamadı",
+    "backButton": "Geri Dön",
+    "loadError": "Veri yüklenemedi",
+    "warehouseInfo": "Depo Bilgileri",
+    "address": "Adres",
+    "phone": "Telefon",
+    "manager": "Sorumlu",
+    "createdAt": "Oluşturma Tarihi",
+    "summary": "Özet",
+    "totalMovements": "Toplam Hareket",
+    "totalTransfers": "Toplam Transfer",
+    "pendingTransfers": "Bekleyen Transfer",
+    "productCount": "Ürün",
+    "totalStock": "Toplam Stok",
+    "lowStock": "Düşük Stok",
+    "stocksTab": "Stoklar ({{count}})",
+    "movementsTab": "Hareketler ({{count}})",
+    "transfersTab": "Transferler ({{count}})"
+  },
+  "transferDirection": {
+    "outgoing": "Çıkış",
+    "incoming": "Giriş"
+  },
+  "form": {
+    "editTitle": "Depo Düzenle",
+    "createTitle": "Yeni Depo",
+    "warehouseName": "Depo Adı *",
+    "warehouseCode": "Depo Kodu *",
+    "codePlaceholder": "Örnek: DEPO01",
+    "address": "Adres",
+    "phone": "Telefon",
+    "manager": "Sorumlu Kişi",
+    "setDefault": "Varsayılan depo olarak ayarla",
+    "cancel": "İptal",
+    "update": "Güncelle",
+    "create": "Oluştur"
+  },
+  "stockMovementsPage": {
+    "title": "Stok Hareketleri",
+    "subtitle": "Tüm depolardaki stok giriş ve çıkışları",
+    "page": "Sayfa {{current}} / {{total}}"
+  },
+  "stockTransferPage": {
+    "title": "Stok Transferleri",
+    "subtitle": "Depolar arası stok transfer işlemleri",
+    "newTransferTitle": "Yeni Transfer",
+    "sourceWarehouse": "Kaynak Depo *",
+    "targetWarehouse": "Hedef Depo *",
+    "selectWarehouse": "Depo Seçin",
+    "transferDate": "Transfer Tarihi",
+    "products": "Ürünler",
+    "selectProduct": "Ürün Seçin",
+    "notes": "Notlar",
+    "page": "Sayfa {{current}} / {{total}}"
+  }
+}

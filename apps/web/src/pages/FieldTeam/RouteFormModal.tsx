@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Modal, Input, Button } from '@stok/ui';
 import { fieldTeamApi, FieldRoute, CreateRouteInput } from '../../api/field-team.api';
 import { useToast } from '../../context/ToastContext';
@@ -11,6 +12,7 @@ interface Props {
 }
 
 export function RouteFormModal({ route, onClose, onSuccess }: Props) {
+  const { t } = useTranslation(['fieldteam', 'common']);
   const isEdit = !!route;
   const { showToast } = useToast();
   const [loading, setLoading] = useState(false);
@@ -33,24 +35,24 @@ export function RouteFormModal({ route, onClose, onSuccess }: Props) {
       }
       onSuccess();
     } catch (error) {
-      showToast('error', 'Rota kaydedilemedi');
+      showToast('error', t('fieldteam:toast.saveError'));
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <Modal isOpen={true} title={isEdit ? 'Rota Duzenle' : 'Yeni Rota'} onClose={onClose}>
+    <Modal isOpen={true} title={isEdit ? t('fieldteam:form.editTitle') : t('fieldteam:form.createTitle')} onClose={onClose}>
       <form onSubmit={handleSubmit} className={styles.form}>
         <Input
-          label="Rota Adi *"
+          label={t('fieldteam:form.routeNameLabel')}
           value={formData.name}
           onChange={(e) => setFormData({ ...formData, name: e.target.value })}
           required
         />
 
         <Input
-          label="Tarih *"
+          label={t('fieldteam:form.dateLabel')}
           type="date"
           value={formData.route_date}
           onChange={(e) => setFormData({ ...formData, route_date: e.target.value })}
@@ -58,7 +60,7 @@ export function RouteFormModal({ route, onClose, onSuccess }: Props) {
         />
 
         <Input
-          label="Tahmini Sure (dakika)"
+          label={t('fieldteam:form.estimatedDurationLabel')}
           type="number"
           value={formData.estimated_duration_minutes || ''}
           onChange={(e) =>
@@ -70,7 +72,7 @@ export function RouteFormModal({ route, onClose, onSuccess }: Props) {
         />
 
         <div className={styles.textareaGroup}>
-          <label className={styles.label}>Notlar</label>
+          <label className={styles.label}>{t('fieldteam:form.notesLabel')}</label>
           <textarea
             className={styles.textarea}
             value={formData.notes || ''}
@@ -81,10 +83,10 @@ export function RouteFormModal({ route, onClose, onSuccess }: Props) {
 
         <div className={styles.actions}>
           <Button type="button" variant="secondary" onClick={onClose}>
-            Iptal
+            {t('fieldteam:buttons.cancel')}
           </Button>
           <Button type="submit" disabled={loading}>
-            {loading ? 'Kaydediliyor...' : 'Kaydet'}
+            {loading ? t('fieldteam:buttons.saving') : t('fieldteam:buttons.save')}
           </Button>
         </div>
       </form>

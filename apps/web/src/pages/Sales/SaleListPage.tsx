@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Table, Button, Badge, Input, Pagination, type Column } from '@stok/ui';
 import { salesApi, Sale } from '../../api/sales.api';
 import { useToast } from '../../context/ToastContext';
 import { useConfirmDialog } from '../../context/ConfirmDialogContext';
 import { formatCurrency, formatDateTime } from '../../utils/formatters';
-import { PAYMENT_METHODS, SALE_STATUSES, SALE_TYPES } from '../../utils/constants';
 import styles from './SaleListPage.module.css';
 
 const icons = {
@@ -52,6 +52,7 @@ type SaleTypeFilter = 'all' | 'retail' | 'wholesale';
 
 export function SaleListPage() {
   const navigate = useNavigate();
+  const { t } = useTranslation(['sales', 'common']);
   const [sales, setSales] = useState<Sale[]>([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
@@ -94,7 +95,7 @@ export function SaleListPage() {
         noVatCount: allSales.filter(s => !s.include_vat).length,
       });
     } catch (err) {
-      showToast('error', 'Satışlar yüklenemedi');
+      showToast('error', t('sales:toast.loadError'));
     }
     setLoading(false);
   };
@@ -135,82 +136,82 @@ export function SaleListPage() {
   const handleToggleInvoice = async (sale: Sale) => {
     try {
       await salesApi.updateInvoiceIssued(sale.id, !sale.invoice_issued);
-      showToast('success', sale.invoice_issued ? 'Fatura durumu kaldırıldı' : 'Fatura kesildi olarak işaretlendi');
+      showToast('success', sale.invoice_issued ? t('sales:toast.invoiceRemoved') : t('sales:toast.invoiceMarked'));
       fetchSales();
     } catch (err) {
-      showToast('error', 'Fatura durumu güncellenemedi');
+      showToast('error', t('sales:toast.invoiceUpdateError'));
     }
   };
 
   const handleCancel = async (sale: Sale) => {
-    const confirmed = await confirm({ message: `${sale.invoice_number} numaralı satışı iptal etmek istediğinizden emin misiniz?`, variant: 'danger' });
+    const confirmed = await confirm({ message: t('sales:confirm.cancelSale', { invoiceNumber: sale.invoice_number }), variant: 'danger' });
     if (!confirmed) return;
     try {
       await salesApi.cancel(sale.id);
-      showToast('success', 'Satış iptal edildi');
+      showToast('success', t('sales:toast.cancelSuccess'));
       fetchSales();
     } catch (err) {
-      showToast('error', err instanceof Error ? err.message : 'İptal başarısız');
+      showToast('error', err instanceof Error ? err.message : t('sales:toast.cancelError'));
     }
   };
 
   const columns: Column<Sale>[] = [
     {
       key: 'invoice_number',
-      header: 'Fatura No',
+      header: t('sales:list.columns.invoiceNo'),
       render: (s) => (
         <button className={styles.invoiceLink} onClick={() => navigate(`/sales/${s.id}`)}>
           {s.invoice_number}
         </button>
       )
     },
-    { key: 'customer_name', header: 'Müşteri', render: (s) => s.customer_name || 'Perakende' },
+    { key: 'customer_name', header: t('sales:list.columns.customer'), render: (s) => s.customer_name || t('common:saleTypes.retail') },
     {
       key: 'sale_type',
-      header: 'Tip',
-      render: (s) => SALE_TYPES[s.sale_type as keyof typeof SALE_TYPES] || s.sale_type || 'Perakende'
+      header: t('sales:list.columns.type'),
+      render: (s) => t(`common:saleTypes.${s.sale_type === 'wholesale' ? 'wholesale' : 'retail'}`)
     },
-    { key: 'sale_date', header: 'Tarih', render: (s) => formatDateTime(s.sale_date) },
+    { key: 'sale_date', header: t('sales:list.columns.date'), render: (s) => formatDateTime(s.sale_date) },
     {
       key: 'grand_total',
-      header: 'Toplam',
+      header: t('sales:list.columns.total'),
       align: 'right',
       render: (s) => <span className={styles.total}>{formatCurrency(s.grand_total)}</span>
     },
     {
       key: 'payment_method',
-      header: 'Ödeme',
-      render: (s) => PAYMENT_METHODS[s.payment_method as keyof typeof PAYMENT_METHODS] || s.payment_method
+      header: t('sales:list.columns.payment'),
+      render: (s) => t(`common:paymentMethods.${s.payment_method}`, { defaultValue: s.payment_method })
     },
     {
       key: 'created_by_name',
-      header: 'Satisi Yapan',
+      header: t('sales:list.columns.createdBy'),
       render: (s) => s.created_by_name || '-'
     },
     {
       key: 'invoice_issued',
-      header: 'Fatura',
+      header: t('sales:list.columns.invoice'),
       render: (s) => (
         <button
           className={`${styles.invoiceToggle} ${s.invoice_issued ? styles.invoiceIssued : styles.invoiceNotIssued}`}
           onClick={(e) => { e.stopPropagation(); handleToggleInvoice(s); }}
-          title={s.invoice_issued ? 'Fatura kesildi - değiştirmek için tıklayın' : 'Fatura kesilmedi - değiştirmek için tıklayın'}
+          title={s.invoice_issued ? t('sales:list.invoiceToggle.issuedTooltip') : t('sales:list.invoiceToggle.notIssuedTooltip')}
         >
-          {s.invoice_issued ? 'Kesildi' : 'Kesilmedi'}
+          {s.invoice_issued ? t('sales:list.invoiceToggle.issued') : t('sales:list.invoiceToggle.notIssued')}
         </button>
       )
     },
     {
       key: 'include_vat',
-      header: 'KDV',
-      render: (s) => s.include_vat ? 'Dahil' : <span className={styles.noVatBadge}>KDV'siz</span>
+      header: t('sales:list.columns.vat'),
+      render: (s) => s.include_vat ? t('sales:list.vatIncluded') : <span className={styles.noVatBadge}>{t('sales:list.filters.noVat')}</span>
     },
     {
       key: 'status',
-      header: 'Durum',
+      header: t('sales:list.columns.status'),
       render: (s) => (
         <Badge variant={s.status === 'completed' ? 'success' : s.status === 'cancelled' ? 'danger' : 'warning'}>
-          {SALE_STATUSES[s.status as keyof typeof SALE_STATUSES] || s.status}
+          {t(`common:saleStatuses.${s.status}`, { defaultValue: s.status })}
         </Badge>
       )
     },
@@ -219,7 +220,7 @@ export function SaleListPage() {
       header: '',
       width: '80px',
       render: (s) => s.status === 'completed' && (
-        <Button size="sm" variant="danger" onClick={() => handleCancel(s)}>İptal</Button>
+        <Button size="sm" variant="danger" onClick={() => handleCancel(s)}>{t('common:buttons.cancel')}</Button>
       )
     },
   ];
@@ -230,16 +231,16 @@ export function SaleListPage() {
         <div className={styles.headerLeft}>
           <h1 className={styles.title}>
             <span className={styles.titleIcon}>{icons.sales}</span>
-            Satışlar
+            {t('sales:list.title')}
           </h1>
-          <p className={styles.subtitle}>Satış işlemleri ve fatura yönetimi</p>
+          <p className={styles.subtitle}>{t('sales:list.subtitle')}</p>
         </div>
         <div style={{ display: 'flex', gap: '8px' }}>
           <Button variant="secondary" onClick={() => navigate('/sales/import')}>
-            Fatura Yükle
+            {t('sales:list.uploadInvoice')}
           </Button>
           <Button onClick={() => navigate('/sales/new')}>
-            + Yeni Satış
+            {t('sales:list.newSale')}
           </Button>
         </div>
       </div>
@@ -249,28 +250,28 @@ export function SaleListPage() {
           <div className={`${styles.statIcon} ${styles.primary}`}>{icons.total}</div>
           <div className={styles.statContent}>
             <span className={styles.statValue}>{formatCurrency(stats.total)}</span>
-            <span className={styles.statLabel}>Toplam Ciro</span>
+            <span className={styles.statLabel}>{t('sales:list.stats.totalRevenue')}</span>
           </div>
         </div>
         <div className={styles.statCard}>
           <div className={`${styles.statIcon} ${styles.success}`}>{icons.count}</div>
           <div className={styles.statContent}>
             <span className={styles.statValue}>{stats.count}</span>
-            <span className={styles.statLabel}>Toplam Satış</span>
+            <span className={styles.statLabel}>{t('sales:list.stats.totalSales')}</span>
           </div>
         </div>
         <div className={styles.statCard}>
           <div className={`${styles.statIcon} ${styles.success}`}>{icons.completed}</div>
           <div className={styles.statContent}>
             <span className={styles.statValue}>{stats.completed}</span>
-            <span className={styles.statLabel}>Tamamlanan</span>
+            <span className={styles.statLabel}>{t('sales:list.stats.completed')}</span>
           </div>
         </div>
         <div className={styles.statCard}>
           <div className={`${styles.statIcon} ${styles.danger}`}>{icons.cancelled}</div>
           <div className={styles.statContent}>
             <span className={styles.statValue}>{stats.cancelled}</span>
-            <span className={styles.statLabel}>İptal Edilen</span>
+            <span className={styles.statLabel}>{t('sales:list.stats.cancelled')}</span>
           </div>
         </div>
       </div>
@@ -278,11 +279,11 @@ export function SaleListPage() {
       <div className={styles.searchBar}>
         <form onSubmit={handleSearch} className={styles.searchForm}>
           <Input
-            placeholder="Fatura no veya müşteri ara..."
+            placeholder={t('sales:list.searchPlaceholder')}
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
           />
-          <Button type="submit" variant="secondary">Ara</Button>
+          <Button type="submit" variant="secondary">{t('common:buttons.search')}</Button>
         </form>
         <div className={styles.dateFilters}>
           <Input type="date" value={startDate} onChange={handleStartDateChange} />
@@ -292,25 +293,25 @@ export function SaleListPage() {
 
       <div className={styles.filtersBar}>
         <div className={styles.filterGroup}>
-          <span className={styles.filterLabel}>KDV</span>
+          <span className={styles.filterLabel}>{t('sales:list.filters.vat')}</span>
           <div className={styles.tabs}>
             <button
               className={`${styles.tab} ${vatFilter === 'all' ? styles.tabActive : ''}`}
               onClick={() => handleVatFilterChange('all')}
             >
-              Tumu
+              {t('sales:list.filters.all')}
             </button>
             <button
               className={`${styles.tab} ${vatFilter === 'with_vat' ? styles.tabActive : ''}`}
               onClick={() => handleVatFilterChange('with_vat')}
             >
-              Dahil
+              {t('sales:list.filters.vatIncluded')}
             </button>
             <button
               className={`${styles.tab} ${vatFilter === 'without_vat' ? styles.tabActive : ''}`}
               onClick={() => handleVatFilterChange('without_vat')}
             >
-              KDV'siz
+              {t('sales:list.filters.noVat')}
               {stats.noVatCount > 0 && <span className={styles.tabBadge}>{stats.noVatCount}</span>}
             </button>
           </div>
@@ -319,25 +320,25 @@ export function SaleListPage() {
         <div className={styles.filterDivider} />
 
         <div className={styles.filterGroup}>
-          <span className={styles.filterLabel}>Tip</span>
+          <span className={styles.filterLabel}>{t('sales:list.filters.type')}</span>
           <div className={styles.tabs}>
             <button
               className={`${styles.tab} ${saleTypeFilter === 'all' ? styles.tabActive : ''}`}
               onClick={() => handleSaleTypeFilterChange('all')}
             >
-              Tumu
+              {t('sales:list.filters.all')}
             </button>
             <button
               className={`${styles.tab} ${saleTypeFilter === 'retail' ? styles.tabActive : ''}`}
               onClick={() => handleSaleTypeFilterChange('retail')}
             >
-              Perakende
+              {t('common:saleTypes.retail')}
             </button>
             <button
               className={`${styles.tab} ${saleTypeFilter === 'wholesale' ? styles.tabActive : ''}`}
               onClick={() => handleSaleTypeFilterChange('wholesale')}
             >
-              Toptan
+              {t('common:saleTypes.wholesale')}
             </button>
           </div>
         </div>
@@ -345,25 +346,25 @@ export function SaleListPage() {
         <div className={styles.filterDivider} />
 
         <div className={styles.filterGroup}>
-          <span className={styles.filterLabel}>Fatura</span>
+          <span className={styles.filterLabel}>{t('sales:list.filters.invoice')}</span>
           <div className={styles.tabs}>
             <button
               className={`${styles.tab} ${invoiceFilter === 'all' ? styles.tabActive : ''}`}
               onClick={() => handleInvoiceFilterChange('all')}
             >
-              Tumu
+              {t('sales:list.filters.all')}
             </button>
             <button
               className={`${styles.tab} ${invoiceFilter === 'issued' ? styles.tabActive : ''}`}
               onClick={() => handleInvoiceFilterChange('issued')}
             >
-              Kesildi
+              {t('sales:list.filters.issued')}
             </button>
             <button
               className={`${styles.tab} ${invoiceFilter === 'not_issued' ? styles.tabActive : ''}`}
               onClick={() => handleInvoiceFilterChange('not_issued')}
             >
-              Kesilmedi
+              {t('sales:list.filters.notIssued')}
             </button>
           </div>
         </div>
@@ -375,7 +376,7 @@ export function SaleListPage() {
           data={sales}
           keyExtractor={(s) => s.id}
           loading={loading}
-          emptyMessage="Satış bulunamadı"
+          emptyMessage={t('sales:list.emptyMessage')}
         />
         {totalPages > 1 && (
           <div className={styles.pagination}>

@@ -1,0 +1,237 @@
+{
+  "pageTitle": "Entegrasyonlar",
+  "newIntegration": "Yeni Entegrasyon",
+  "emptyMessage": "Entegrasyon bulunamad\u0131",
+  "types": {
+    "e_commerce": "E-Ticaret",
+    "bank": "Banka",
+    "payment": "\u00d6deme",
+    "crm": "CRM",
+    "other": "Di\u011fer"
+  },
+  "statuses": {
+    "active": "Aktif",
+    "inactive": "Pasif",
+    "error": "Hata"
+  },
+  "providers": {
+    "trendyol": "Trendyol",
+    "hepsiburada": "Hepsiburada",
+    "n11": "N11",
+    "amazon": "Amazon",
+    "gittigidiyor": "GittiGidiyor",
+    "akbank": "Akbank",
+    "isbank": "\u0130\u015f Bankas\u0131",
+    "garanti": "Garanti",
+    "yapikredi": "Yap\u0131 Kredi",
+    "ziraat": "Ziraat",
+    "iyzico": "iyzico",
+    "paytr": "PayTR",
+    "payu": "PayU",
+    "stripe": "Stripe",
+    "salesforce": "Salesforce",
+    "hubspot": "HubSpot",
+    "zoho": "Zoho",
+    "custom": "\u00d6zel"
+  },
+  "columns": {
+    "name": "Ad",
+    "type": "Tip",
+    "provider": "Sa\u011flay\u0131c\u0131",
+    "status": "Durum",
+    "lastSync": "Son Senk.",
+    "actions": "\u0130\u015flemler"
+  },
+  "actions": {
+    "detail": "Detay",
+    "test": "Test",
+    "testing": "Test...",
+    "sync": "Senk",
+    "syncing": "Senk...",
+    "edit": "D\u00fczenle",
+    "delete": "Sil"
+  },
+  "toast": {
+    "loadError": "Entegrasyonlar y\u00fcklenemedi",
+    "deleted": "Entegrasyon silindi",
+    "deleteFailed": "Entegrasyon silinemedi",
+    "connectionTestFailed": "Ba\u011flant\u0131 testi ba\u015far\u0131s\u0131z",
+    "ordersSynced": "{{count}} sipari\u015f senkronize edildi",
+    "syncFailed": "Senkronizasyon ba\u015far\u0131s\u0131z",
+    "saveFailed": "Entegrasyon kaydedilemedi",
+    "statusChangeFailed": "Durum de\u011fi\u015ftirilemedi",
+    "dataLoadError": "Veri y\u00fcklenemedi",
+    "connectionSuccess": "Ba\u011flant\u0131 ba\u015far\u0131l\u0131",
+    "connectionFailed": "Ba\u011flant\u0131 ba\u015far\u0131s\u0131z"
+  },
+  "confirm": {
+    "deleteMessage": "Bu entegrasyonu silmek istedi\u011finize emin misiniz?"
+  },
+  "detail": {
+    "backToList": "Entegrasyonlar",
+    "testConnection": "Ba\u011flant\u0131 Testi",
+    "testingConnection": "Test Ediliyor...",
+    "syncNow": "\u015eimdi Senkronize Et",
+    "syncing": "Senkronize Ediliyor...",
+    "deactivate": "Devre D\u0131\u015f\u0131 B\u0131rak",
+    "activate": "Etkinle\u015ftir",
+    "toggling": "De\u011fi\u015ftiriliyor...",
+    "lastError": "Son Hata:",
+    "integrationInfo": "Entegrasyon Bilgileri",
+    "name": "Ad",
+    "type": "Tip",
+    "provider": "Sa\u011flay\u0131c\u0131",
+    "status": "Durum",
+    "createdAt": "Olu\u015fturulma",
+    "lastSync": "Son Senkronizasyon",
+    "statistics": "\u0130statistikler",
+    "successfulSyncs": "Ba\u015far\u0131l\u0131 Senk.",
+    "errors": "Hata",
+    "syncedOrders": "Senk. Sipari\u015f",
+    "pending": "Bekleyen",
+    "withErrors": "Hatal\u0131",
+    "lastSuccessfulSync": "Son ba\u015far\u0131l\u0131 senk: {{date}}",
+    "syncHistory": "Senkronizasyon Ge\u00e7mi\u015fi",
+    "configuration": "Yap\u0131land\u0131rma",
+    "noLogs": "Hen\u00fcz log kayd\u0131 yok",
+    "noConfig": "Yap\u0131land\u0131rma bilgisi yok",
+    "notFound": "Entegrasyon bulunamad\u0131",
+    "goBack": "Geri D\u00f6n",
+    "loading": "Y\u00fckleniyor..."
+  },
+  "logStatuses": {
+    "started": "Ba\u015flad\u0131",
+    "success": "Ba\u015far\u0131l\u0131",
+    "failed": "Ba\u015far\u0131s\u0131z"
+  },
+  "logActions": {
+    "sync": "Senkronizasyon",
+    "push": "G\u00f6nderim",
+    "pull": "\u00c7ekme",
+    "webhook": "Webhook",
+    "error": "Hata"
+  },
+  "logColumns": {
+    "date": "Tarih",
+    "action": "\u0130\u015flem",
+    "status": "Durum",
+    "message": "Mesaj"
+  },
+  "form": {
+    "editTitle": "Entegrasyon D\u00fczenle",
+    "newTitle": "Yeni Entegrasyon",
+    "integrationName": "Entegrasyon Ad\u0131",
+    "type": "Tip",
+    "provider": "Sa\u011flay\u0131c\u0131",
+    "status": "Durum",
+    "credentials": "Kimlik Bilgileri",
+    "apiKey": "API Key",
+    "apiSecret": "API Secret",
+    "configuration": "Yap\u0131land\u0131rma",
+    "supplierId": "Sat\u0131c\u0131 ID",
+    "cancel": "\u0130ptal",
+    "saving": "Kaydediliyor...",
+    "save": "Kaydet"
+  },
+  "orders": {
+    "pageTitle": "e-Ticaret Sipari\u015fleri",
+    "subtitle": "Pazaryeri ve e-ticaret entegrasyonlar\u0131ndan gelen sipari\u015fler",
+    "emptyMessage": "Sipari\u015f bulunamad\u0131",
+    "loadError": "Sipari\u015fler y\u00fcklenirken hata olu\u015ftu",
+    "syncStatuses": {
+      "pending": "Bekliyor",
+      "synced": "Senkronize",
+      "error": "Hata",
+      "ignored": "Yoksay\u0131ld\u0131"
+    },
+    "columns": {
+      "orderNo": "Sipari\u015f No",
+      "platform": "Platform",
+      "date": "Tarih",
+      "customer": "M\u00fc\u015fteri",
+      "amount": "Tutar",
+      "status": "Durum",
+      "syncStatus": "Senkron",
+      "commission": "Komisyon",
+      "shipping": "Kargo"
+    },
+    "stats": {
+      "totalOrders": "Toplam Sipari\u015f",
+      "synced": "Senkronize",
+      "pending": "Bekleyen",
+      "withErrors": "Hatal\u0131"
+    },
+    "filters": {
+      "platform": "Platform",
+      "allPlatforms": "T\u00fcm Platformlar",
+      "syncStatus": "Senkron Durumu",
+      "allStatuses": "T\u00fcm Durumlar",
+      "startDate": "Ba\u015flang\u0131\u00e7",
+      "endDate": "Biti\u015f",
+      "filter": "Filtrele",
+      "reset": "S\u0131f\u0131rla"
+    },
+    "pagination": {
+      "previous": "\u00d6nceki",
+      "next": "Sonraki",
+      "pageOf": "Sayfa {{page}} / {{totalPages}}"
+    }
+  },
+  "bankStatements": {
+    "pageTitle": "Banka Ekstreleri",
+    "subtitle": "Banka entegrasyonlar\u0131ndan gelen hesap hareketleri",
+    "emptyMessage": "Ekstre bulunamad\u0131",
+    "loadError": "Ekstreler y\u00fcklenirken hata olu\u015ftu",
+    "matchStatuses": {
+      "unmatched": "E\u015fle\u015fmemi\u015f",
+      "matched": "E\u015fle\u015fmi\u015f",
+      "ignored": "Yoksay\u0131ld\u0131"
+    },
+    "transactionTypes": {
+      "credit": "Giri\u015f",
+      "debit": "\u00c7\u0131k\u0131\u015f"
+    },
+    "columns": {
+      "date": "Tarih",
+      "bank": "Banka",
+      "description": "A\u00e7\u0131klama",
+      "type": "Tip",
+      "amount": "Tutar",
+      "balance": "Bakiye",
+      "matching": "E\u015fleme"
+    },
+    "stats": {
+      "totalTransactions": "Toplam Hareket",
+      "unmatched": "E\u015fle\u015fmemi\u015f",
+      "totalCredits": "Toplam Giri\u015f",
+      "totalDebits": "Toplam \u00c7\u0131k\u0131\u015f"
+    },
+    "filters": {
+      "bank": "Banka",
+      "allBanks": "T\u00fcm Bankalar",
+      "matchStatus": "E\u015fleme Durumu",
+      "allStatuses": "T\u00fcm Durumlar",
+      "startDate": "Ba\u015flang\u0131\u00e7",
+      "endDate": "Biti\u015f",
+      "filter": "Filtrele",
+      "reset": "S\u0131f\u0131rla"
+    },
+    "actions": {
+      "match": "E\u015fle",
+      "ignore": "Yoksay",
+      "matchFeatureComingSoon": "E\u015fleme \u00f6zelli\u011fi yak\u0131n zamanda aktif olacakt\u0131r."
+    },
+    "toast": {
+      "ignored": "Hareket yoksay\u0131ld\u0131",
+      "operationFailed": "\u0130\u015flem ba\u015far\u0131s\u0131z"
+    },
+    "confirm": {
+      "ignoreMessage": "Bu hareketi yoksaymak istedi\u011finize emin misiniz?"
+    },
+    "pagination": {
+      "previous": "\u00d6nceki",
+      "next": "Sonraki",
+      "pageOf": "Sayfa {{page}} / {{totalPages}}"
+    }
+  }
+}

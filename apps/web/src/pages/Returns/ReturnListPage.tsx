@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Table, Button, Badge, Input, Select, Pagination, type Column } from '@stok/ui';
 import { apiClient } from '../../api/client';
 import { useToast } from '../../context/ToastContext';
@@ -27,6 +28,7 @@ interface Return {
 }
 
 export function ReturnListPage() {
+  const { t } = useTranslation(['returns', 'common']);
   const navigate = useNavigate();
   const [returns, setReturns] = useState<Return[]>([]);
   const [loading, setLoading] = useState(true);
@@ -51,7 +53,7 @@ export function ReturnListPage() {
         setTotalPages(response.meta?.totalPages || 1);
         setTotal(response.meta?.total || 0);
       } catch {
-        showToast('error', 'Iadeler yuklenemedi');
+        showToast('error', t('returns:toast.loadError'));
       }
       setLoading(false);
     })();
@@ -75,26 +77,26 @@ export function ReturnListPage() {
   const columns: Column<Return>[] = [
     {
       key: 'return_number',
-      header: 'Iade No',
+      header: t('returns:columns.returnNumber'),
       render: (r) => (
         <Link to={`/returns/${r.id}`} className={styles.returnNumber}>
           {r.return_number}
         </Link>
       )
     },
-    { key: 'customer_name', header: 'Musteri', render: (r) => r.customer_name || '-' },
-    { key: 'return_date', header: 'Tarih', render: (r) => formatDateTime(r.return_date) },
+    { key: 'customer_name', header: t('returns:columns.customer'), render: (r) => r.customer_name || '-' },
+    { key: 'return_date', header: t('returns:columns.date'), render: (r) => formatDateTime(r.return_date) },
     {
       key: 'total_amount',
-      header: 'Toplam',
+      header: t('returns:columns.total'),
       align: 'right',
       render: (r) => <span className={styles.total}>{formatCurrency(r.total_amount)}</span>
     },
-    { key: 'reason', header: 'Neden', render: (r) => r.reason || '-' },
-    { key: 'created_by_name', header: 'Kaydeden', render: (r) => r.created_by_name || '-' },
+    { key: 'reason', header: t('returns:columns.reason'), render: (r) => r.reason || '-' },
+    { key: 'created_by_name', header: t('returns:columns.createdBy'), render: (r) => r.created_by_name || '-' },
     {
       key: 'status',
-      header: 'Durum',
+      header: t('returns:columns.status'),
       render: (r) => <Badge variant="success">{r.status}</Badge>
     },
   ];
@@ -105,12 +107,12 @@ export function ReturnListPage() {
         <div className={styles.headerLeft}>
           <h1 className={styles.title}>
             <span className={styles.titleIcon}>{icons.returns}</span>
-            Iadeler
+            {t('returns:title')}
           </h1>
-          <p className={styles.subtitle}>Toplam {total} iade kaydi</p>
+          <p className={styles.subtitle}>{t('returns:subtitle', { total })}</p>
         </div>
         <Button onClick={() => navigate('/returns/new')}>
-          + Yeni Iade
+          {t('returns:newReturn')}
         </Button>
       </div>
 
@@ -118,10 +120,10 @@ export function ReturnListPage() {
         <div className={styles.toolbar}>
           <Select
             options={[
-              { value: '', label: 'Tüm Durumlar' },
-              { value: 'completed', label: 'Tamamlandi' },
-              { value: 'pending', label: 'Bekliyor' },
-              { value: 'cancelled', label: 'Iptal' },
+              { value: '', label: t('returns:filters.allStatuses') },
+              { value: 'completed', label: t('returns:filters.completed') },
+              { value: 'pending', label: t('returns:filters.pending') },
+              { value: 'cancelled', label: t('returns:filters.cancelled') },
             ]}
             value={statusFilter}
             onChange={handleStatusChange}
@@ -136,7 +138,7 @@ export function ReturnListPage() {
           data={returns}
           keyExtractor={(r) => r.id}
           loading={loading}
-          emptyMessage="Iade bulunamadi"
+          emptyMessage={t('returns:emptyMessage')}
         />
         {totalPages > 1 && (
           <div className={styles.pagination}>

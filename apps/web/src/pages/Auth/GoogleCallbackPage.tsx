@@ -1,10 +1,12 @@
 import { useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../hooks/useAuth';
 import { Spinner } from '@stok/ui';
 import styles from './AuthPages.module.css';
 
 export function GoogleCallbackPage() {
+  const { t } = useTranslation('auth');
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { setTokens } = useAuth();
@@ -37,7 +39,7 @@ export function GoogleCallbackPage() {
       <div className={styles.card}>
         <div className={styles.loading}>
           <Spinner size="lg" />
-          <p>Giris yapiliyor...</p>
+          <p>{t('googleCallback.loading')}</p>
         </div>
       </div>
     </div>

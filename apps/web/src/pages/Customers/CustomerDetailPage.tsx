@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Button, Badge, Card } from '@stok/ui';
 import { customersApi, CustomerDetail, CustomerSale, CustomerReturn, CustomerPayment, ProductPurchase } from '../../api/customers.api';
 import { formatCurrency, formatDate } from '../../utils/formatters';
@@ -8,6 +9,7 @@ import styles from './CustomerDetailPage.module.css';
 type TabType = 'sales' | 'returns' | 'payments' | 'products';
 
 export function CustomerDetailPage() {
+  const { t } = useTranslation(['customers', 'common']);
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [data, setData] = useState<CustomerDetail | null>(null);
@@ -24,7 +26,7 @@ export function CustomerDetailPage() {
         const response = await customersApi.getDetail(id);
         setData(response.data);
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Veri yüklenemedi');
+        setError(err instanceof Error ? err.message : t('customers:detail.loadError'));
       } finally {
         setLoading(false);
       }
@@ -36,7 +38,7 @@ export function CustomerDetailPage() {
   if (loading) {
     return (
       <div className={styles.page}>
-        <div className={styles.loading}>Yükleniyor...</div>
+        <div className={styles.loading}>{t('customers:detail.loading')}</div>
       </div>
     );
   }
@@ -44,51 +46,38 @@ export function CustomerDetailPage() {
   if (error || !data) {
     return (
       <div className={styles.page}>
-        <div className={styles.error}>{error || 'Müşteri bulunamadı'}</div>
-        <Button onClick={() => navigate('/customers')}>Geri Don</Button>
+        <div className={styles.error}>{error || t('customers:detail.notFound')}</div>
+        <Button onClick={() => navigate('/customers')}>{t('customers:detail.backButton')}</Button>
       </div>
     );
   }
 
   const { customer, sales, returns, payments, stats, productPurchases } = data;
 
-  const paymentMethodLabels: Record<string, string> = {
-    cash: 'Nakit',
-    credit_card: 'Kredi Karti',
-    bank_transfer: 'Havale/EFT',
-    credit: 'Veresiye',
-  };
-
-  const statusLabels: Record<string, string> = {
-    completed: 'Tamamlandi',
-    cancelled: 'Iptal Edildi',
-    pending: 'Beklemede',
-  };
-
   return (
     <div className={styles.page}>
       <div className={styles.header}>
         <div className={styles.headerLeft}>
           <Button variant="ghost" onClick={() => navigate('/customers')}>
-            ← Musteriler
+            {t('customers:detail.backToList')}
           </Button>
           <h1 className={styles.title}>{customer.name}</h1>
           <div className={styles.customerMeta}>
             {customer.phone && <span>{customer.phone}</span>}
             {customer.email && <span>{customer.email}</span>}
             <Badge variant={customer.is_active ? 'success' : 'default'}>
-              {customer.is_active ? 'Aktif' : 'Pasif'}
+              {customer.is_active ? t('customers:status.active') : t('customers:status.inactive')}
             </Badge>
           </div>
         </div>
         <div className={styles.headerRight}>
           <div className={styles.balanceCard}>
-            <span className={styles.balanceLabel}>Cari Bakiye</span>
+            <span className={styles.balanceLabel}>{t('customers:detail.currentBalance')}</span>
             <span className={`${styles.balanceValue} ${customer.balance < 0 ? styles.negative : customer.balance > 0 ? styles.positive : ''}`}>
               {formatCurrency(customer.balance)}
             </span>
-            {customer.balance < 0 && <span className={styles.balanceNote}>Borclu</span>}
-            {customer.balance > 0 && <span className={styles.balanceNote}>Alacakli</span>}
+            {customer.balance < 0 && <span className={styles.balanceNote}>{t('customers:detail.debtor')}</span>}
+            {customer.balance > 0 && <span className={styles.balanceNote}>{t('customers:detail.creditor')}</span>}
           </div>
         </div>
       </div>
@@ -96,35 +85,35 @@ export function CustomerDetailPage() {
       {/* Customer Info */}
       <div className={styles.infoGrid}>
         <Card className={styles.infoCard}>
-          <h3>Musteri Bilgileri</h3>
+          <h3>{t('customers:detail.info.title')}</h3>
           <div className={styles.infoList}>
             {customer.address && (
               <div className={styles.infoItem}>
-                <span className={styles.infoLabel}>Adres</span>
+                <span className={styles.infoLabel}>{t('customers:detail.info.address')}</span>
                 <span className={styles.infoValue}>{customer.address}</span>
               </div>
             )}
             {customer.tax_number && (
               <div className={styles.infoItem}>
-                <span className={styles.infoLabel}>Vergi No</span>
+                <span className={styles.infoLabel}>{t('customers:detail.info.taxNumber')}</span>
                 <span className={styles.infoValue}>{customer.tax_number}</span>
               </div>
             )}
             {customer.tax_office && (
               <div className={styles.infoItem}>
-                <span className={styles.infoLabel}>Vergi Dairesi</span>
+                <span className={styles.infoLabel}>{t('customers:detail.info.taxOffice')}</span>
                 <span className={styles.infoValue}>{customer.tax_office}</span>
               </div>
             )}
             {customer.notes && (
               <div className={styles.infoItem}>
-                <span className={styles.infoLabel}>Notlar</span>
+                <span className={styles.infoLabel}>{t('customers:detail.info.notes')}</span>
                 <span className={styles.infoValue}>{customer.notes}</span>
               </div>
             )}
             {customer.created_by_name && (
               <div className={styles.infoItem}>
-                <span className={styles.infoLabel}>Kaydeden</span>
+                <span className={styles.infoLabel}>{t('customers:detail.info.createdBy')}</span>
                 <span className={styles.infoValue}>{customer.created_by_name}</span>
               </div>
             )}
@@ -132,21 +121,21 @@ export function CustomerDetailPage() {
         </Card>
 
         <Card className={styles.statsCard}>
-          <h3>Istatistikler</h3>
+          <h3>{t('customers:detail.stats.title')}</h3>
           <div className={styles.statsGrid}>
             <div className={styles.statItem}>
               <span className={styles.statValue}>{stats.salesCount}</span>
-              <span className={styles.statLabel}>Satis</span>
+              <span className={styles.statLabel}>{t('customers:detail.stats.sales')}</span>
               <span className={styles.statTotal}>{formatCurrency(stats.totalSales)}</span>
             </div>
             <div className={styles.statItem}>
               <span className={styles.statValue}>{stats.returnsCount}</span>
-              <span className={styles.statLabel}>Iade</span>
+              <span className={styles.statLabel}>{t('customers:detail.stats.returns')}</span>
               <span className={styles.statTotal}>{formatCurrency(stats.totalReturns)}</span>
             </div>
             <div className={styles.statItem}>
               <span className={styles.statValue}>{stats.paymentsCount}</span>
-              <span className={styles.statLabel}>Odeme</span>
+              <span className={styles.statLabel}>{t('customers:detail.stats.payments')}</span>
               <span className={styles.statTotal}>{formatCurrency(stats.totalPayments)}</span>
             </div>
           </div>
@@ -160,25 +149,25 @@ export function CustomerDetailPage() {
             className={`${styles.tab} ${activeTab === 'products' ? styles.tabActive : ''}`}
             onClick={() => setActiveTab('products')}
           >
-            Urun Istatistikleri ({productPurchases?.length || 0})
+            {t('customers:detail.tabs.productStats', { count: productPurchases?.length || 0 })}
           </button>
           <button
             className={`${styles.tab} ${activeTab === 'sales' ? styles.tabActive : ''}`}
             onClick={() => setActiveTab('sales')}
           >
-            Satislar ({sales.length})
+            {t('customers:detail.tabs.sales', { count: sales.length })}
           </button>
           <button
             className={`${styles.tab} ${activeTab === 'returns' ? styles.tabActive : ''}`}
             onClick={() => setActiveTab('returns')}
           >
-            Iadeler ({returns.length})
+            {t('customers:detail.tabs.returns', { count: returns.length })}
           </button>
           <button
             className={`${styles.tab} ${activeTab === 'payments' ? styles.tabActive : ''}`}
             onClick={() => setActiveTab('payments')}
           >
-            Odemeler ({payments.length})
+            {t('customers:detail.tabs.payments', { count: payments.length })}
           </button>
         </div>
 
@@ -187,13 +176,13 @@ export function CustomerDetailPage() {
             <ProductsTab productPurchases={productPurchases || []} />
           )}
           {activeTab === 'sales' && (
-            <SalesTab sales={sales} paymentMethodLabels={paymentMethodLabels} statusLabels={statusLabels} />
+            <SalesTab sales={sales} />
           )}
           {activeTab === 'returns' && (
-            <ReturnsTab returns={returns} statusLabels={statusLabels} />
+            <ReturnsTab returns={returns} />
           )}
           {activeTab === 'payments' && (
-            <PaymentsTab payments={payments} paymentMethodLabels={paymentMethodLabels} />
+            <PaymentsTab payments={payments} />
           )}
         </div>
       </div>
@@ -201,11 +190,12 @@ export function CustomerDetailPage() {
   );
 }
 
-function SalesTab({ sales, paymentMethodLabels, statusLabels }: { sales: CustomerSale[]; paymentMethodLabels: Record<string, string>; statusLabels: Record<string, string> }) {
+function SalesTab({ sales }: { sales: CustomerSale[] }) {
+  const { t } = useTranslation(['customers']);
   const [expandedSale, setExpandedSale] = useState<string | null>(null);
 
   if (sales.length === 0) {
-    return <div className={styles.emptyState}>Henuz satis yapilmamis</div>;
+    return <div className={styles.emptyState}>{t('customers:detail.empty.sales')}</div>;
   }
 
   return (
@@ -222,9 +212,9 @@ function SalesTab({ sales, paymentMethodLabels, statusLabels }: { sales: Custome
             </div>
             <div className={styles.saleMeta}>
               <Badge variant={sale.status === 'completed' ? 'success' : sale.status === 'cancelled' ? 'danger' : 'warning'}>
-                {statusLabels[sale.status] || sale.status}
+                {t(`customers:detail.statusLabels.${sale.status}`, { defaultValue: sale.status })}
               </Badge>
-              <span className={styles.paymentMethod}>{paymentMethodLabels[sale.payment_method] || sale.payment_method}</span>
+              <span className={styles.paymentMethod}>{t(`customers:detail.paymentMethods.${sale.payment_method}`, { defaultValue: sale.payment_method })}</span>
               <span className={styles.saleTotal}>{formatCurrency(sale.grand_total)}</span>
               <span className={styles.expandIcon}>{expandedSale === sale.id ? '▼' : '▶'}</span>
             </div>
@@ -235,12 +225,12 @@ function SalesTab({ sales, paymentMethodLabels, statusLabels }: { sales: Custome
               <table className={styles.itemsTable}>
                 <thead>
                   <tr>
-                    <th>Urun</th>
-                    <th>Barkod</th>
-                    <th>Miktar</th>
-                    <th>Birim Fiyat</th>
-                    <th>KDV</th>
-                    <th>Toplam</th>
+                    <th>{t('customers:detail.table.product')}</th>
+                    <th>{t('customers:detail.table.barcode')}</th>
+                    <th>{t('customers:detail.table.quantity')}</th>
+                    <th>{t('customers:detail.table.unitPrice')}</th>
+                    <th>{t('customers:detail.table.vat')}</th>
+                    <th>{t('customers:detail.table.total')}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -257,21 +247,21 @@ function SalesTab({ sales, paymentMethodLabels, statusLabels }: { sales: Custome
                 </tbody>
                 <tfoot>
                   <tr>
-                    <td colSpan={5}>Ara Toplam</td>
+                    <td colSpan={5}>{t('customers:detail.table.subtotal')}</td>
                     <td>{formatCurrency(sale.subtotal)}</td>
                   </tr>
                   {sale.discount_amount > 0 && (
                     <tr>
-                      <td colSpan={5}>Iskonto</td>
+                      <td colSpan={5}>{t('customers:detail.table.discount')}</td>
                       <td>-{formatCurrency(sale.discount_amount)}</td>
                     </tr>
                   )}
                   <tr>
-                    <td colSpan={5}>KDV Toplam</td>
+                    <td colSpan={5}>{t('customers:detail.table.vatTotal')}</td>
                     <td>{formatCurrency(sale.vat_total)}</td>
                   </tr>
                   <tr className={styles.grandTotal}>
-                    <td colSpan={5}>Genel Toplam</td>
+                    <td colSpan={5}>{t('customers:detail.table.overallTotal')}</td>
                     <td>{formatCurrency(sale.grand_total)}</td>
                   </tr>
                 </tfoot>
@@ -284,11 +274,12 @@ function SalesTab({ sales, paymentMethodLabels, statusLabels }: { sales: Custome
   );
 }
 
-function ReturnsTab({ returns, statusLabels }: { returns: CustomerReturn[]; statusLabels: Record<string, string> }) {
+function ReturnsTab({ returns }: { returns: CustomerReturn[] }) {
+  const { t } = useTranslation(['customers']);
   const [expandedReturn, setExpandedReturn] = useState<string | null>(null);
 
   if (returns.length === 0) {
-    return <div className={styles.emptyState}>Henuz iade yapilmamis</div>;
+    return <div className={styles.emptyState}>{t('customers:detail.empty.returns')}</div>;
   }
 
   return (
@@ -305,7 +296,7 @@ function ReturnsTab({ returns, statusLabels }: { returns: CustomerReturn[]; stat
             </div>
             <div className={styles.saleMeta}>
               <Badge variant={ret.status === 'completed' ? 'success' : ret.status === 'cancelled' ? 'danger' : 'warning'}>
-                {statusLabels[ret.status] || ret.status}
+                {t(`customers:detail.statusLabels.${ret.status}`, { defaultValue: ret.status })}
               </Badge>
               {ret.reason && <span className={styles.returnReason}>{ret.reason}</span>}
               <span className={styles.saleTotal}>{formatCurrency(ret.total_amount)}</span>
@@ -318,12 +309,12 @@ function ReturnsTab({ returns, statusLabels }: { returns: CustomerReturn[]; stat
               <table className={styles.itemsTable}>
                 <thead>
                   <tr>
-                    <th>Urun</th>
-                    <th>Barkod</th>
-                    <th>Miktar</th>
-                    <th>Birim Fiyat</th>
-                    <th>KDV</th>
-                    <th>Toplam</th>
+                    <th>{t('customers:detail.table.product')}</th>
+                    <th>{t('customers:detail.table.barcode')}</th>
+                    <th>{t('customers:detail.table.quantity')}</th>
+                    <th>{t('customers:detail.table.unitPrice')}</th>
+                    <th>{t('customers:detail.table.vat')}</th>
+                    <th>{t('customers:detail.table.total')}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -348,8 +339,10 @@ function ReturnsTab({ returns, statusLabels }: { returns: CustomerReturn[]; stat
 }
 
 function ProductsTab({ productPurchases }: { productPurchases: ProductPurchase[] }) {
+  const { t } = useTranslation(['customers']);
+
   if (productPurchases.length === 0) {
-    return <div className={styles.emptyState}>Henuz urun satisi yapilmamis</div>;
+    return <div className={styles.emptyState}>{t('customers:detail.empty.products')}</div>;
   }
 
   const totalQuantity = productPurchases.reduce((sum, p) => sum + Number(p.total_quantity), 0);
@@ -360,10 +353,10 @@ function ProductsTab({ productPurchases }: { productPurchases: ProductPurchase[]
       <table className={styles.paymentsTable}>
         <thead>
           <tr>
-            <th>Urun</th>
-            <th>Barkod</th>
-            <th>Toplam Adet</th>
-            <th>Toplam Tutar</th>
+            <th>{t('customers:detail.table.product')}</th>
+            <th>{t('customers:detail.table.barcode')}</th>
+            <th>{t('customers:detail.table.totalQuantity')}</th>
+            <th>{t('customers:detail.table.totalAmount')}</th>
           </tr>
         </thead>
         <tbody>
@@ -378,7 +371,7 @@ function ProductsTab({ productPurchases }: { productPurchases: ProductPurchase[]
         </tbody>
         <tfoot>
           <tr className={styles.grandTotal}>
-            <td colSpan={2}>Toplam</td>
+            <td colSpan={2}>{t('customers:detail.table.grandTotal')}</td>
             <td><strong>{totalQuantity}</strong></td>
             <td>{formatCurrency(totalAmount)}</td>
           </tr>
@@ -388,9 +381,11 @@ function ProductsTab({ productPurchases }: { productPurchases: ProductPurchase[]
   );
 }
 
-function PaymentsTab({ payments, paymentMethodLabels }: { payments: CustomerPayment[]; paymentMethodLabels: Record<string, string> }) {
+function PaymentsTab({ payments }: { payments: CustomerPayment[] }) {
+  const { t } = useTranslation(['customers']);
+
   if (payments.length === 0) {
-    return <div className={styles.emptyState}>Henuz odeme yapilmamis</div>;
+    return <div className={styles.emptyState}>{t('customers:detail.empty.payments')}</div>;
   }
 
   return (
@@ -398,17 +393,17 @@ function PaymentsTab({ payments, paymentMethodLabels }: { payments: CustomerPaym
       <table className={styles.paymentsTable}>
         <thead>
           <tr>
-            <th>Tarih</th>
-            <th>Odeme Yontemi</th>
-            <th>Notlar</th>
-            <th>Tutar</th>
+            <th>{t('customers:detail.table.date')}</th>
+            <th>{t('customers:detail.table.paymentMethod')}</th>
+            <th>{t('customers:detail.table.notes')}</th>
+            <th>{t('customers:detail.table.amount')}</th>
           </tr>
         </thead>
         <tbody>
           {payments.map((payment) => (
             <tr key={payment.id}>
               <td>{formatDate(payment.payment_date)}</td>
-              <td>{paymentMethodLabels[payment.method] || payment.method}</td>
+              <td>{t(`customers:detail.paymentMethods.${payment.method}`, { defaultValue: payment.method })}</td>
               <td>{payment.notes || '-'}</td>
               <td className={styles.paymentAmount}>{formatCurrency(payment.amount)}</td>
             </tr>

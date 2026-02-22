@@ -1,14 +1,8 @@
+import { useTranslation } from 'react-i18next';
 import { Button, Card, Input, Select } from '@stok/ui';
 import { Warehouse } from '../../../api/warehouses.api';
 import { WizardFormData } from '../wizard.types';
 import styles from '../SaleFormPage.module.css';
-
-const PAYMENT_METHODS = [
-  { value: 'nakit', label: 'Nakit' },
-  { value: 'kredi_karti', label: 'Kredi Karti' },
-  { value: 'havale', label: 'Havale/EFT' },
-  { value: 'veresiye', label: 'Veresiye' },
-];
 
 interface StepSettingsProps {
   data: WizardFormData;
@@ -25,31 +19,40 @@ export function StepSettings({
   onOpenWarehouseModal,
   veresiyeWarning,
 }: StepSettingsProps) {
+  const { t } = useTranslation(['sales', 'common']);
+
+  const PAYMENT_METHODS = [
+    { value: 'nakit', label: t('sales:stepSettings.paymentMethods.nakit') },
+    { value: 'kredi_karti', label: t('sales:stepSettings.paymentMethods.kredi_karti') },
+    { value: 'havale', label: t('sales:stepSettings.paymentMethods.havale') },
+    { value: 'veresiye', label: t('sales:stepSettings.paymentMethods.veresiye') },
+  ];
+
   return (
     <div className={styles.stepContent}>
       <div className={styles.formGrid}>
         <Card className={styles.formCard}>
-          <h3>Depo & Odeme</h3>
+          <h3>{t('sales:stepSettings.warehousePayment')}</h3>
           <div className={styles.formRow}>
             <div className={styles.formGroup}>
-              <label className={styles.label}>Depo *</label>
+              <label className={styles.label}>{t('sales:stepSettings.warehouseLabel')}</label>
               <div className={styles.selectWithAction}>
                 <Select
                   value={data.warehouseId}
                   onChange={(e) => onDataChange({ warehouseId: e.target.value })}
                   options={[
-                    { value: '', label: 'Depo Secin' },
+                    { value: '', label: t('sales:stepSettings.selectWarehouse') },
                     ...warehouses.map(w => ({ value: w.id, label: w.name })),
                   ]}
                   fullWidth
                 />
                 <Button type="button" size="sm" variant="secondary" onClick={onOpenWarehouseModal}>
-                  + Yeni
+                  {t('sales:stepSettings.newWarehouse')}
                 </Button>
               </div>
             </div>
             <div className={styles.formGroup}>
-              <label className={styles.label}>Odeme Yontemi *</label>
+              <label className={styles.label}>{t('sales:stepSettings.paymentMethodLabel')}</label>
               <Select
                 value={data.paymentMethod}
                 onChange={(e) => onDataChange({ paymentMethod: e.target.value })}
@@ -62,7 +65,7 @@ export function StepSettings({
           {data.paymentMethod === 'veresiye' && (
             <div className={styles.formRow}>
               <div className={styles.formGroup}>
-                <label className={styles.label}>Vade Tarihi</label>
+                <label className={styles.label}>{t('sales:stepSettings.dueDateLabel')}</label>
                 <Input
                   type="date"
                   value={data.dueDate}
@@ -76,7 +79,7 @@ export function StepSettings({
 
           {veresiyeWarning && (
             <div className={styles.warningBox}>
-              Veresiye satis icin musteri secilmis olmalidir. Lutfen Adim 2'ye donerek musteri seciniz.
+              {t('sales:stepSettings.veresiyeWarning')}
             </div>
           )}
 
@@ -88,17 +91,17 @@ export function StepSettings({
                   checked={data.includeVat}
                   onChange={(e) => onDataChange({ includeVat: e.target.checked })}
                 />
-                KDV Dahil
+                {t('sales:stepSettings.vatIncluded')}
               </label>
             </div>
           </div>
         </Card>
 
         <Card className={styles.formCard}>
-          <h3>Iskonto</h3>
+          <h3>{t('sales:stepSettings.discount')}</h3>
           <div className={styles.formRow}>
             <div className={styles.formGroup}>
-              <label className={styles.label}>Iskonto Orani (%)</label>
+              <label className={styles.label}>{t('sales:stepSettings.discountRate')}</label>
               <Input
                 type="number"
                 min="0"
@@ -109,7 +112,7 @@ export function StepSettings({
               />
             </div>
             <div className={styles.formGroup}>
-              <label className={styles.label}>veya Iskonto Tutari</label>
+              <label className={styles.label}>{t('sales:stepSettings.orDiscountAmount')}</label>
               <Input
                 type="number"
                 min="0"
@@ -124,7 +127,7 @@ export function StepSettings({
 
       <Card className={styles.formCard}>
         <div className={styles.formGroup}>
-          <label className={styles.label}>Notlar</label>
+          <label className={styles.label}>{t('sales:stepSettings.notes')}</label>
           <textarea
             className={styles.textarea}
             value={data.notes}

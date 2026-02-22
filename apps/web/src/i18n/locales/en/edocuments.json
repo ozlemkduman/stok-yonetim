@@ -1,0 +1,158 @@
+{
+  "pageTitle": "e-Documents",
+  "totalDocuments": "Total {{count}} documents",
+  "newDocument": "+ New e-Document",
+  "emptyMessage": "No e-documents found",
+  "documentTypes": {
+    "e_fatura": "e-Invoice",
+    "e_arsiv": "e-Archive",
+    "e_ihracat": "e-Export",
+    "e_irsaliye": "e-Waybill",
+    "e_smm": "e-SMM"
+  },
+  "statuses": {
+    "draft": "Draft",
+    "pending": "Pending",
+    "sent": "Sent",
+    "approved": "Approved",
+    "rejected": "Rejected",
+    "cancelled": "Cancelled"
+  },
+  "typeFilter": {
+    "all": "All Documents"
+  },
+  "statusFilter": {
+    "all": "All Statuses"
+  },
+  "columns": {
+    "document": "Document",
+    "customer": "Customer",
+    "date": "Date",
+    "amount": "Amount",
+    "status": "Status"
+  },
+  "actions": {
+    "send": "Send",
+    "query": "Query",
+    "cancel": "Cancel"
+  },
+  "summary": {
+    "eFatura": "e-Invoice",
+    "eArsiv": "e-Archive",
+    "eIrsaliye": "e-Waybill",
+    "approved": "Approved",
+    "pending": "Pending"
+  },
+  "toast": {
+    "sentToGib": "Document sent to GIB",
+    "sendFailed": "Send failed",
+    "statusResult": "Status: {{status}}",
+    "statusQueryFailed": "Status query failed",
+    "cancelled": "Document cancelled",
+    "cancelFailed": "Cancel failed",
+    "loadError": "Error loading documents",
+    "summaryLoadError": "Failed to load summary",
+    "loadSingleError": "Failed to load document",
+    "created": "e-Document created",
+    "createFailed": "Failed to create e-document",
+    "referencesLoadError": "Failed to load references",
+    "popupBlocked": "Popup blocker is active. Please allow popups.",
+    "selectReference": "Please select a reference"
+  },
+  "confirm": {
+    "cancelMessage": "Are you sure you want to cancel this document?"
+  },
+  "detail": {
+    "backToList": "\u2190 e-Documents",
+    "totalAmount": "Total Amount",
+    "sending": "Sending...",
+    "sendToGib": "Send to GIB",
+    "querying": "Querying...",
+    "queryStatus": "Query Status",
+    "downloadPdf": "Download PDF",
+    "cancelling": "Cancelling...",
+    "cancelAction": "Cancel",
+    "documentInfo": "Document Information",
+    "documentType": "Document Type",
+    "documentNo": "Document No",
+    "issueDate": "Issue Date",
+    "reference": "Reference",
+    "status": "Status",
+    "customerInfo": "Customer Information",
+    "customer": "Customer",
+    "defaultCustomer": "General Customer",
+    "amountInfo": "Amount Information",
+    "subtotal": "Subtotal",
+    "vatTotal": "VAT Total",
+    "grandTotal": "Grand Total",
+    "gibInfo": "GIB Information",
+    "gibUuid": "GIB UUID",
+    "envelopeUuid": "Envelope UUID",
+    "responseCode": "Response Code",
+    "responseMessage": "Response Message",
+    "transactionHistory": "Transaction History",
+    "notFound": "Document not found",
+    "goBack": "Go Back",
+    "loading": "Loading..."
+  },
+  "actionLabels": {
+    "created": "Created",
+    "sent": "Sent",
+    "send_failed": "Send Failed",
+    "status_checked": "Status Checked",
+    "cancelled": "Cancelled"
+  },
+  "referenceTypes": {
+    "sale": "Sale",
+    "return": "Return",
+    "waybill": "Waybill"
+  },
+  "createModal": {
+    "title": "Create New e-Document",
+    "documentType": "Document Type *",
+    "referenceType": "Reference Type *",
+    "reference": "Reference *",
+    "selectReference": "Select Reference",
+    "unnamed": "Unnamed",
+    "documentNo": "Document No:",
+    "date": "Date:",
+    "customer": "Customer:",
+    "customerNotSpecified": "Not specified",
+    "amount": "Amount:",
+    "notes": "Notes",
+    "notesPlaceholder": "Optional notes...",
+    "cancel": "Cancel",
+    "creating": "Creating...",
+    "create": "Create e-Document",
+    "loading": "Loading...",
+    "documentTypeOptions": {
+      "e_fatura": "e-Invoice",
+      "e_arsiv": "e-Archive Invoice",
+      "e_ihracat": "e-Export Invoice",
+      "e_irsaliye": "e-Waybill",
+      "e_smm": "e-SMM"
+    },
+    "referenceTypeOptions": {
+      "sale": "Sale",
+      "return": "Return"
+    }
+  },
+  "pdf": {
+    "customerInfo": "Customer Information",
+    "defaultCustomer": "General Customer",
+    "documentDetails": "Document Details",
+    "documentType": "Document Type:",
+    "reference": "Reference:",
+    "issueDate": "Issue Date:",
+    "createdAt": "Created:",
+    "documentNo": "Document No:",
+    "date": "Date:",
+    "status": "Status:",
+    "subtotal": "Subtotal:",
+    "vatTotal": "VAT Total:",
+    "grandTotal": "GRAND TOTAL:",
+    "envelopeUuid": "Envelope UUID:",
+    "responseCode": "Response Code:",
+    "electronicDocument": "This document was created electronically."
+  }
+}

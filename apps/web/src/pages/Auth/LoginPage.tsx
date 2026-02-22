@@ -1,10 +1,12 @@
 import { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Button, Input } from '@stok/ui';
 import { useAuth } from '../../context/AuthContext';
 import styles from './AuthPages.module.css';
 
 export function LoginPage() {
+  const { t } = useTranslation('auth');
   const navigate = useNavigate();
   const location = useLocation();
   const { login } = useAuth();
@@ -32,7 +34,7 @@ export function LoginPage() {
         navigate(from, { replace: true });
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Giris basarisiz');
+      setError(err instanceof Error ? err.message : t('login.defaultError'));
     } finally {
       setIsLoading(false);
     }
@@ -40,26 +42,26 @@ export function LoginPage() {
 
   return (
     <div className={styles.page}>
-      <h2 className={styles.title}>Giris Yap</h2>
-      <p className={styles.subtitle}>Hesabiniza erisim saglayin</p>
+      <h2 className={styles.title}>{t('login.title')}</h2>
+      <p className={styles.subtitle}>{t('login.subtitle')}</p>
 
       {error && <div className={styles.error}>{error}</div>}
 
       <form onSubmit={handleSubmit} className={styles.form}>
         <div className={styles.field}>
-          <label htmlFor="email">E-posta</label>
+          <label htmlFor="email">{t('login.emailLabel')}</label>
           <Input
             id="email"
             type="email"
             value={formData.email}
             onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-            placeholder="ornek@sirket.com"
+            placeholder={t('login.emailPlaceholder')}
             required
           />
         </div>
 
         <div className={styles.field}>
-          <label htmlFor="password">Sifre</label>
+          <label htmlFor="password">{t('login.passwordLabel')}</label>
           <Input
             id="password"
             type="password"
@@ -71,17 +73,17 @@ export function LoginPage() {
         </div>
 
         <div className={styles.forgotPassword}>
-          <Link to="/forgot-password">Sifremi unuttum</Link>
+          <Link to="/forgot-password">{t('login.forgotPassword')}</Link>
         </div>
 
         <Button type="submit" variant="primary" fullWidth disabled={isLoading}>
-          {isLoading ? 'Giris yapiliyor...' : 'Giris Yap'}
+          {isLoading ? t('login.submitting') : t('login.submitButton')}
         </Button>
       </form>
 
       <div className={styles.footer}>
         <p>
-          Hesabiniz yok mu? Kayit icin davet linki gereklidir.
+          {t('login.noAccount')}
         </p>
       </div>
     </div>

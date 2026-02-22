@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Table, Button, Card, type Column } from '@stok/ui';
 import { integrationsApi, Integration } from '../../api/integrations.api';
 import { IntegrationFormModal } from './IntegrationFormModal';
@@ -7,42 +8,8 @@ import { useToast } from '../../context/ToastContext';
 import { useConfirmDialog } from '../../context/ConfirmDialogContext';
 import styles from './IntegrationListPage.module.css';
 
-const typeLabels: Record<string, string> = {
-  e_commerce: 'E-Ticaret',
-  bank: 'Banka',
-  payment: 'Odeme',
-  crm: 'CRM',
-  other: 'Diger',
-};
-
-const statusLabels: Record<string, string> = {
-  active: 'Aktif',
-  inactive: 'Pasif',
-  error: 'Hata',
-};
-
-const providerLabels: Record<string, string> = {
-  trendyol: 'Trendyol',
-  hepsiburada: 'Hepsiburada',
-  n11: 'N11',
-  amazon: 'Amazon',
-  gittigidiyor: 'GittiGidiyor',
-  akbank: 'Akbank',
-  isbank: 'Is Bankasi',
-  garanti: 'Garanti',
-  yapikredi: 'Yapi Kredi',
-  ziraat: 'Ziraat',
-  iyzico: 'iyzico',
-  paytr: 'PayTR',
-  payu: 'PayU',
-  stripe: 'Stripe',
-  salesforce: 'Salesforce',
-  hubspot: 'HubSpot',
-  zoho: 'Zoho',
-  custom: 'Ozel',
-};
-
 export function IntegrationListPage() {
+  const { t } = useTranslation(['integrations', 'common']);
   const navigate = useNavigate();
   const { showToast } = useToast();
   const { confirm } = useConfirmDialog();
@@ -58,7 +25,7 @@ export function IntegrationListPage() {
       const response = await integrationsApi.getIntegrations();
       setIntegrations(response.data);
     } catch (error) {
-      showToast('error', 'Entegrasyonlar yuklenemedi');
+      showToast('error', t('integrations:toast.loadError'));
     } finally {
       setLoading(false);
     }
@@ -79,14 +46,14 @@ export function IntegrationListPage() {
   };
 
   const handleDelete = async (id: string) => {
-    const confirmed = await confirm({ message: 'Bu entegrasyonu silmek istediginize emin misiniz?', variant: 'danger' });
+    const confirmed = await confirm({ message: t('integrations:confirm.deleteMessage'), variant: 'danger' });
     if (!confirmed) return;
     try {
       await integrationsApi.deleteIntegration(id);
-      showToast('success', 'Entegrasyon silindi');
+      showToast('success', t('integrations:toast.deleted'));
       fetchIntegrations();
     } catch (error) {
-      showToast('error', 'Entegrasyon silinemedi');
+      showToast('error', t('integrations:toast.deleteFailed'));
     }
   };
 
@@ -97,7 +64,7 @@ export function IntegrationListPage() {
       showToast('success', response.data.message);
       fetchIntegrations();
     } catch (error) {
-      showToast('error', 'Baglanti testi basarisiz');
+      showToast('error', t('integrations:toast.connectionTestFailed'));
     } finally {
       setTestingId(null);
     }
@@ -107,9 +74,9 @@ export function IntegrationListPage() {
     setSyncingId(id);
     try {
       const response = await integrationsApi.syncOrders(id);
-      showToast('success', `${response.data.syncedCount} siparis senkronize edildi`);
+      showToast('success', t('integrations:toast.ordersSynced', { count: response.data.syncedCount }));
     } catch (error) {
-      showToast('error', 'Senkronizasyon basarisiz');
+      showToast('error', t('integrations:toast.syncFailed'));
     } finally {
       setSyncingId(null);
     }
@@ -126,32 +93,32 @@ export function IntegrationListPage() {
   };
 
   const columns: Column<Integration>[] = [
-    { key: 'name', header: 'Ad', width: '20%' },
+    { key: 'name', header: t('integrations:columns.name'), width: '20%' },
     {
       key: 'type',
-      header: 'Tip',
+      header: t('integrations:columns.type'),
       width: '12%',
-      render: (item) => typeLabels[item.type] || item.type,
+      render: (item) => t(`integrations:types.${item.type}`, { defaultValue: item.type }),
     },
     {
       key: 'provider',
-      header: 'Saglayici',
+      header: t('integrations:columns.provider'),
       width: '15%',
-      render: (item) => providerLabels[item.provider] || item.provider,
+      render: (item) => t(`integrations:providers.${item.provider}`, { defaultValue: item.provider }),
     },
     {
       key: 'status',
-      header: 'Durum',
+      header: t('integrations:columns.status'),
       width: '10%',
       render: (item) => (
         <span className={`${styles.badge} ${styles[`badge_${item.status}`]}`}>
-          {statusLabels[item.status]}
+          {t(`integrations:statuses.${item.status}`)}
         </span>
       ),
     },
     {
       key: 'last_sync_at',
-      header: 'Son Senk.',
+      header: t('integrations:columns.lastSync'),
       width: '15%',
       render: (item) =>
         item.last_sync_at
@@ -166,26 +133,26 @@ export function IntegrationListPage() {
     },
     {
       key: 'actions',
-      header: 'Islemler',
+      header: t('integrations:columns.actions'),
       width: '32%',
       render: (item) => (
         <div className={styles.actions}>
           <Button size="sm" variant="secondary" onClick={() => navigate(`/integrations/${item.id}`)}>
-            Detay
+            {t('integrations:actions.detail')}
           </Button>
           <Button size="sm" variant="secondary" onClick={() => handleTestConnection(item.id)} disabled={testingId === item.id}>
-            {testingId === item.id ? 'Test...' : 'Test'}
+            {testingId === item.id ? t('integrations:actions.testing') : t('integrations:actions.test')}
           </Button>
           {item.type === 'e_commerce' && item.status === 'active' && (
             <Button size="sm" variant="secondary" onClick={() => handleSyncOrders(item.id)} disabled={syncingId === item.id}>
-              {syncingId === item.id ? 'Senk...' : 'Senk'}
+              {syncingId === item.id ? t('integrations:actions.syncing') : t('integrations:actions.sync')}
             </Button>
           )}
           <Button size="sm" variant="secondary" onClick={() => handleEdit(item)}>
-            Duzenle
+            {t('integrations:actions.edit')}
           </Button>
           <Button size="sm" variant="danger" onClick={() => handleDelete(item.id)}>
-            Sil
+            {t('integrations:actions.delete')}
           </Button>
         </div>
       ),
@@ -195,8 +162,8 @@ export function IntegrationListPage() {
   return (
     <div className={styles.container}>
       <div className={styles.header}>
-        <h1>Entegrasyonlar</h1>
-        <Button onClick={handleAdd}>Yeni Entegrasyon</Button>
+        <h1>{t('integrations:pageTitle')}</h1>
+        <Button onClick={handleAdd}>{t('integrations:newIntegration')}</Button>
       </div>
 
       <Card>
@@ -205,7 +172,7 @@ export function IntegrationListPage() {
           data={integrations}
           keyExtractor={(item) => item.id}
           loading={loading}
-          emptyMessage="Entegrasyon bulunamadi"
+          emptyMessage={t('integrations:emptyMessage')}
         />
       </Card>
 

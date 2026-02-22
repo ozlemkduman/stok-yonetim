@@ -1,0 +1,227 @@
+{
+  "nav": {
+    "features": "Özellikler",
+    "plans": "Planlar",
+    "demo": "Demo",
+    "contact": "İletişim",
+    "login": "Giriş Yap",
+    "freeTrial": "Ücretsiz Dene"
+  },
+  "hero": {
+    "badge": "Türkiye'nin Yeni Nesil Stok Yönetim Platformu",
+    "titleLine1": "İşletmenizi",
+    "titleHighlight": "Dijitale Taşıyoruz",
+    "subtitle": "Stok takibi, satış yönetimi, e-Fatura, raporlama ve CRM — hepsi tek platformda. Excel dosyalarına, dağılan bilgilere ve kayıp stoklara elveda deyin.",
+    "ctaPrimary": "45 Gün Ücretsiz Dene",
+    "ctaSecondary": "Nasıl Çalışır?",
+    "note": "Kredi kartı gerekmez \u00b7 Hemen başlayabilirsiniz"
+  },
+  "mockup": {
+    "totalProducts": "Toplam Ürün",
+    "monthlySales": "Aylık Satış",
+    "customers": "Müşteri"
+  },
+  "stats": {
+    "0": { "label": "Aktif İşletme" },
+    "1": { "label": "Aylık İşlem" },
+    "2": { "label": "Uptime" },
+    "3": { "label": "Destek" }
+  },
+  "scenarios": {
+    "title": "Size Tanıdık Geliyor mu?",
+    "subtitle": "İşletmelerin her gün yaşadığı sorunlara profesyonel çözümler",
+    "beforeLabel": "Öncesi",
+    "afterLabel": "Sonrası",
+    "0": {
+      "title": "Stokta Ne Kaldı?",
+      "before": "Depoya gidip tek tek sayıyorsunuz, Excel'e yazıyorsunuz, yine de rakamlar tutmuyor.",
+      "after": "Telefonunuzdan anlık stok durumunu görün. Kritik seviyeye düşen ürünler için otomatik uyarı alın."
+    },
+    "1": {
+      "title": "Fatura Takibi",
+      "before": "Faturalarınız başka portalde, satışlarınız başka yerde — eşleştirmek için saatler harcıyorsunuz.",
+      "after": "e-Fatura XML dosyanızı sisteme aktarın, satışlarla otomatik eşleşsin. Tüm belgeler tek ekranda."
+    },
+    "2": {
+      "title": "Kâr mı Ediyorum?",
+      "before": "Ay sonunda hesap makinesi ile topluyorsunuz, gerçek kârı bulmak imkânsız.",
+      "after": "Anlık kâr/zarar raporları, ürün bazlı kârlılık analizi — kararlarınızı veriye dayalı verin."
+    },
+    "3": {
+      "title": "Müşteri Kayboldu",
+      "before": "Müşteri bilgileri defterde, kim ne aldı hatırlamıyorsunuz, tekrar satış fırsatları kaçtı.",
+      "after": "Tüm müşteri geçmişi tek ekranda. Son alışveriş, ödeme durumu, notlar — her şey elinizin altında."
+    },
+    "4": {
+      "title": "Çoklu Depo Çilesi",
+      "before": "Hangi depoda ne var bilinmiyor, transferler kâğıt üzerinde, kayıplar artık normal.",
+      "after": "Depolar arası transfer tek tıkla. Her deponun stok durumunu anlık izleyin, fark varsa anında görün."
+    },
+    "5": {
+      "title": "Sahada Kopukluk",
+      "before": "Saha ekibi ofisi arasın mı, WhatsApp'tan resim mi göndersin — bilgi akışı kopuk.",
+      "after": "Saha ekibi mobilde sipariş girsin, rota planlama ile zaman kazansın, anlık senkronizasyon."
+    }
+  },
+  "features": {
+    "title": "Güçlü Özellikler",
+    "subtitle": "İşletmenizi büyütmek için ihtiyacınız olan tüm araçlar tek çatıda",
+    "0": { "title": "Stok Takibi", "desc": "Ürünlerinizi kategorilere ayırın, stok seviyelerini anlık takip edin. Kritik stok uyarıları ile hiçbir ürünü kaybetmeyin." },
+    "1": { "title": "Satış Yönetimi", "desc": "Satışlarınızı kaydedin, faturalayın ve tek ekranda tüm satış geçmişinizi görüntüleyin." },
+    "2": { "title": "e-Belge", "desc": "e-Fatura ve e-Arşiv belgelerinizi saniyeler içinde oluşturun, müşterilerinize gönderin." },
+    "3": { "title": "Raporlama", "desc": "Detaylı satış, stok ve kâr/zarar raporları ile işletmenizin nabzını tutun." },
+    "4": { "title": "CRM", "desc": "Müşterilerinizi yönetin, iletişim geçmişini takip edin, satış fırsatlarını kaçırmayın." },
+    "5": { "title": "Depo Yönetimi", "desc": "Birden fazla depo ile stok transferlerini ve hareketlerini kolayca yönetin." }
+  },
+  "steps": {
+    "title": "3 Adımda Başlayabilirsiniz",
+    "subtitle": "Kurulum yok, yükleme yok — hemen başlayabilirsiniz",
+    "0": { "title": "Formu Doldurun", "desc": "Ad, telefon ve işletme bilgilerinizi girin. 30 saniye sürer." },
+    "1": { "title": "Sizi Arayalım", "desc": "Ekibimiz sizinle iletişime geçip ihtiyaçlarınızı dinler." },
+    "2": { "title": "45 Gün Ücretsiz Deneyin", "desc": "Demo hesabınız açılsın, tüm özellikleri test edin." }
+  },
+  "testimonials": {
+    "title": "Müşterilerimiz Ne Diyor?",
+    "subtitle": "Binlerce işletme StokSayaç ile büyüyor",
+    "0": {
+      "name": "Ahmet Y.",
+      "role": "Market Sahibi",
+      "text": "Eskiden stok sayımı için 2 gün harcıyordum. Şimdi telefonumdan anında görebiliyorum. Hayat kurtaran bir sistem.",
+      "avatar": "AY"
+    },
+    "1": {
+      "name": "Fatma K.",
+      "role": "Toptan Gıda",
+      "text": "e-Fatura entegrasyonu muhteşem. Eskiden her fatura için 10 dakika harcıyordum, şimdi tek tıkla hazırlanıyor.",
+      "avatar": "FK"
+    },
+    "2": {
+      "name": "Mehmet S.",
+      "role": "Yedek Parça",
+      "text": "3 depomuz var ve transferler hep sorundu. StokSayaç ile hangi depoda ne var anında görüyoruz. Kayıplarımız sıfırlandı.",
+      "avatar": "MS"
+    }
+  },
+  "plans": {
+    "title": "Size Uygun Plan",
+    "subtitle": "Her büyüklükte işletme için esnek fiyatlandırma",
+    "popular": "En Popüler",
+    "perMonth": "/ay",
+    "cta": "Hemen Başla",
+    "basic": {
+      "users": "1 Kullanıcı / 200 Ürün / 100 Müşteri",
+      "features": {
+        "stockTracking": "Stok Takibi",
+        "salesReturn": "Satış & İade",
+        "storage5": "5 GB Depolama",
+        "quoteManagement": "Teklif Yönetimi",
+        "invoiceImport": "Fatura Import (XML)",
+        "eDocument": "e-Belge",
+        "multiWarehouse": "Çoklu Depo",
+        "integrations": "Entegrasyonlar",
+        "advancedReporting": "Gelişmiş Raporlama",
+        "crm": "CRM",
+        "fieldTeam": "Saha Ekibi",
+        "apiAccess": "API Erişimi"
+      }
+    },
+    "pro": {
+      "users": "5 Kullanıcı / 5.000 Ürün / 2.000 Müşteri",
+      "features": {
+        "stockTracking": "Stok Takibi",
+        "salesReturn": "Satış & İade",
+        "storage25": "25 GB Depolama",
+        "quoteManagement": "Teklif Yönetimi",
+        "invoiceImport": "Fatura Import (XML)",
+        "eDocument": "e-Belge",
+        "multiWarehouse": "Çoklu Depo (3 Depo)",
+        "integrations": "Entegrasyonlar (3 Adet)",
+        "advancedReporting": "Gelişmiş Raporlama",
+        "crm": "CRM",
+        "fieldTeam": "Saha Ekibi",
+        "apiAccess": "API Erişimi"
+      }
+    },
+    "plus": {
+      "users": "Sınırsız Kullanıcı, Ürün & Müşteri",
+      "features": {
+        "stockTracking": "Stok Takibi",
+        "salesReturn": "Satış & İade",
+        "storage100": "100 GB Depolama",
+        "quoteManagement": "Teklif Yönetimi",
+        "invoiceImport": "Fatura Import (XML)",
+        "eDocument": "e-Belge",
+        "unlimitedWarehouse": "Sınırsız Depo",
+        "unlimitedIntegrations": "Sınırsız Entegrasyon",
+        "advancedReporting": "Gelişmiş Raporlama",
+        "crm": "CRM",
+        "fieldTeam": "Saha Ekibi",
+        "apiAccess": "API Erişimi"
+      }
+    }
+  },
+  "demo": {
+    "title": "Ücretsiz Demo Başvurusu",
+    "subtitle": "Formu doldurun, 45 gün boyunca tüm özellikleri ücretsiz deneyin. Ekibimiz en kısa sürede sizinle iletişime geçecektir.",
+    "benefits": {
+      "0": "45 gün ücretsiz deneme süresi",
+      "1": "Kredi kartı gerekmez",
+      "2": "Tüm özellikler açık",
+      "3": "Ücretsiz kurulum desteği",
+      "4": "İstediğiniz zaman iptal edin"
+    },
+    "form": {
+      "nameLabel": "Ad Soyad *",
+      "namePlaceholder": "Adınız Soyadınız",
+      "phoneLabel": "Telefon *",
+      "phonePlaceholder": "05XX XXX XX XX",
+      "companyLabel": "İşletme Adı",
+      "companyPlaceholder": "İşletmenizin adı",
+      "sectorLabel": "Sektör",
+      "sectorPlaceholder": "Seçiniz",
+      "sectors": {
+        "retail": "Perakende",
+        "wholesale": "Toptan",
+        "food": "Gıda",
+        "textile": "Tekstil",
+        "spareParts": "Yedek Parça",
+        "electronics": "Elektronik",
+        "construction": "İnşaat / Yapı Malzemesi",
+        "cosmetics": "Kozmetik",
+        "other": "Diğer"
+      },
+      "noteLabel": "Notunuz",
+      "notePlaceholder": "Eklemek istediğiniz bir not varsa yazabilirsiniz...",
+      "submit": "Demo Başvurusu Gönder",
+      "formNote": "45 gün ücretsiz \u00b7 Kredi kartı gerekmez \u00b7 Hemen başlayın",
+      "whatsappMessage": "Merhaba, demo başvurusu yapmak istiyorum.",
+      "whatsappName": "Ad Soyad",
+      "whatsappPhone": "Telefon",
+      "whatsappCompany": "İşletme",
+      "whatsappSector": "Sektör",
+      "whatsappNote": "Not"
+    },
+    "success": {
+      "title": "Başvurunuz Alındı!",
+      "text1": "En kısa sürede sizinle iletişime geçeceğiz.",
+      "text2": "45 gün ücretsiz demo hesabınızı hazırlayacağız.",
+      "newApplication": "Yeni Başvuru"
+    }
+  },
+  "cta": {
+    "title": "İşletmenizi Dijitale Taşımanın Zamanı Geldi",
+    "text": "45 gün boyunca tüm özellikleri ücretsiz deneyin. Memnun kalmazsanız hiçbir ücret ödemezsiniz.",
+    "primary": "Ücretsiz Demo Başvurusu",
+    "whatsapp": "WhatsApp ile Bilgi Alın"
+  },
+  "footer": {
+    "about": "İşletmeniz için geliştirilmiş profesyonel stok ve satış yönetim platformu.",
+    "quickAccess": "Hızlı Erişim",
+    "login": "Giriş Yap",
+    "demoApplication": "Demo Başvurusu",
+    "plans": "Planlar",
+    "contact": "İletişim",
+    "copyright": "\u00a9 2026 Pancar Bilgi Teknolojileri ve Yazılım Hizmetleri Ltd. Şti. Tüm hakları saklıdır."
+  },
+  "whatsappAriaLabel": "WhatsApp ile iletişime geçin"
+}

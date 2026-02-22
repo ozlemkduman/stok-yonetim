@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Button, Card, Input, Select, Table, Badge, type Column } from '@stok/ui';
 import { BankStatement, integrationsApi, Integration } from '../../api/integrations.api';
 import { useToast } from '../../context/ToastContext';
@@ -6,13 +7,8 @@ import { useConfirmDialog } from '../../context/ConfirmDialogContext';
 import { formatCurrency, formatDate } from '../../utils/formatters';
 import styles from './BankStatementsPage.module.css';
 
-const MATCH_STATUS_LABELS: Record<string, string> = {
-  unmatched: 'Eslesmemis',
-  matched: 'Eslesmis',
-  ignored: 'Yoksayildi',
-};
-
 export function BankStatementsPage() {
+  const { t } = useTranslation(['integrations', 'common']);
   const { showToast } = useToast();
   const { confirm } = useConfirmDialog();
 
@@ -48,7 +44,7 @@ export function BankStatementsPage() {
         setTotalPages(statementsRes.meta.totalPages);
       }
     } catch (err) {
-      showToast('error', 'Ekstreler yuklenirken hata olustu');
+      showToast('error', t('bankStatements.loadError'));
     } finally {
       setLoading(false);
     }
@@ -73,33 +69,33 @@ export function BankStatementsPage() {
   };
 
   const handleIgnore = async (statement: BankStatement) => {
-    const confirmed = await confirm({ message: 'Bu hareketi yoksaymak istediginize emin misiniz?', variant: 'warning' });
+    const confirmed = await confirm({ message: t('bankStatements.confirm.ignoreMessage'), variant: 'warning' });
     if (!confirmed) return;
     try {
       await integrationsApi.ignoreBankStatement(statement.id);
-      showToast('success', 'Hareket yoksayildi');
+      showToast('success', t('bankStatements.toast.ignored'));
       loadData();
     } catch (err) {
-      showToast('error', err instanceof Error ? err.message : 'Islem basarisiz');
+      showToast('error', err instanceof Error ? err.message : t('bankStatements.toast.operationFailed'));
     }
   };
 
   const columns: Column<BankStatement>[] = [
     {
       key: 'transaction_date',
-      header: 'Tarih',
+      header: t('bankStatements.columns.date'),
       width: '10%',
       render: (s) => formatDate(s.transaction_date),
     },
     {
       key: 'integration_name',
-      header: 'Banka',
+      header: t('bankStatements.columns.bank'),
       width: '12%',
       render: (s) => s.integration_name || '-',
     },
     {
       key: 'description',
-      header: 'Aciklama',
+      header: t('bankStatements.columns.description'),
       width: '25%',
       render: (s) => (
         <span className={styles.description} title={s.description || ''}>
@@ -109,17 +105,17 @@ export function BankStatementsPage() {
     },
     {
       key: 'type',
-      header: 'Tip',
+      header: t('bankStatements.columns.type'),
       width: '8%',
       render: (s) => (
         <Badge variant={s.type === 'credit' ? 'success' : 'danger'}>
-          {s.type === 'credit' ? 'Giris' : 'Cikis'}
+          {t(`bankStatements.transactionTypes.${s.type}`)}
         </Badge>
       ),
     },
     {
       key: 'amount',
-      header: 'Tutar',
+      header: t('bankStatements.columns.amount'),
       align: 'right',
       width: '12%',
       render: (s) => (
@@ -130,21 +126,21 @@ export function BankStatementsPage() {
     },
     {
       key: 'balance',
-      header: 'Bakiye',
+      header: t('bankStatements.columns.balance'),
       align: 'right',
       width: '12%',
       render: (s) => s.balance ? formatCurrency(s.balance) : '-',
     },
     {
       key: 'match_status',
-      header: 'Esleme',
+      header: t('bankStatements.columns.matching'),
       width: '10%',
       render: (s) => (
         <Badge variant={
           s.match_status === 'matched' ? 'success' :
           s.match_status === 'ignored' ? 'default' : 'warning'
         }>
-          {MATCH_STATUS_LABELS[s.match_status] || s.match_status}
+          {t(`bankStatements.matchStatuses.${s.match_status}`)}
         </Badge>
       ),
     },
@@ -156,11 +152,11 @@ export function BankStatementsPage() {
         <div className={styles.actions}>
           {s.match_status === 'unmatched' && (
             <>
-              <Button size="sm" variant="ghost" onClick={() => showToast('info', 'Esleme ozelligi yakin zamanda aktif olacaktir.')}>
-                Esle
+              <Button size="sm" variant="ghost" onClick={() => showToast('info', t('bankStatements.actions.matchFeatureComingSoon'))}>
+                {t('bankStatements.actions.match')}
               </Button>
               <Button size="sm" variant="ghost" onClick={() => handleIgnore(s)}>
-                Yoksay
+                {t('bankStatements.actions.ignore')}
               </Button>
             </>
           )}
@@ -177,58 +173,58 @@ export function BankStatementsPage() {
     <div className={styles.page}>
       <div className={styles.header}>
         <div>
-          <h1 className={styles.title}>Banka Ekstreleri</h1>
-          <p className={styles.subtitle}>Banka entegrasyonlarindan gelen hesap hareketleri</p>
+          <h1 className={styles.title}>{t('bankStatements.pageTitle')}</h1>
+          <p className={styles.subtitle}>{t('bankStatements.subtitle')}</p>
         </div>
       </div>
 
       <div className={styles.statsGrid}>
         <Card className={styles.statCard}>
           <span className={styles.statValue}>{statements.length}</span>
-          <span className={styles.statLabel}>Toplam Hareket</span>
+          <span className={styles.statLabel}>{t('bankStatements.stats.totalTransactions')}</span>
         </Card>
         <Card className={`${styles.statCard} ${styles.warning}`}>
           <span className={styles.statValue}>{unmatchedCount}</span>
-          <span className={styles.statLabel}>Eslesmemis</span>
+          <span className={styles.statLabel}>{t('bankStatements.stats.unmatched')}</span>
         </Card>
         <Card className={`${styles.statCard} ${styles.success}`}>
           <span className={styles.statValue}>{formatCurrency(totalCredits)}</span>
-          <span className={styles.statLabel}>Toplam Giris</span>
+          <span className={styles.statLabel}>{t('bankStatements.stats.totalCredits')}</span>
         </Card>
         <Card className={`${styles.statCard} ${styles.danger}`}>
           <span className={styles.statValue}>{formatCurrency(totalDebits)}</span>
-          <span className={styles.statLabel}>Toplam Cikis</span>
+          <span className={styles.statLabel}>{t('bankStatements.stats.totalDebits')}</span>
         </Card>
       </div>
 
       <Card className={styles.filtersCard}>
         <div className={styles.filtersGrid}>
           <div className={styles.filterGroup}>
-            <label className={styles.label}>Banka</label>
+            <label className={styles.label}>{t('bankStatements.filters.bank')}</label>
             <Select
               value={integrationId}
               onChange={(e) => setIntegrationId(e.target.value)}
               options={[
-                { value: '', label: 'Tum Bankalar' },
+                { value: '', label: t('bankStatements.filters.allBanks') },
                 ...integrations.map(i => ({ value: i.id, label: i.name })),
               ]}
             />
           </div>
           <div className={styles.filterGroup}>
-            <label className={styles.label}>Esleme Durumu</label>
+            <label className={styles.label}>{t('bankStatements.filters.matchStatus')}</label>
             <Select
               value={matchStatus}
               onChange={(e) => setMatchStatus(e.target.value)}
               options={[
-                { value: '', label: 'Tum Durumlar' },
-                { value: 'unmatched', label: 'Eslesmemis' },
-                { value: 'matched', label: 'Eslesmis' },
-                { value: 'ignored', label: 'Yoksayildi' },
+                { value: '', label: t('bankStatements.filters.allStatuses') },
+                { value: 'unmatched', label: t('bankStatements.matchStatuses.unmatched') },
+                { value: 'matched', label: t('bankStatements.matchStatuses.matched') },
+                { value: 'ignored', label: t('bankStatements.matchStatuses.ignored') },
               ]}
             />
           </div>
           <div className={styles.filterGroup}>
-            <label className={styles.label}>Baslangic</label>
+            <label className={styles.label}>{t('bankStatements.filters.startDate')}</label>
             <Input
               type="date"
               value={startDate}
@@ -236,7 +232,7 @@ export function BankStatementsPage() {
             />
           </div>
           <div className={styles.filterGroup}>
-            <label className={styles.label}>Bitis</label>
+            <label className={styles.label}>{t('bankStatements.filters.endDate')}</label>
             <Input
               type="date"
               value={endDate}
@@ -244,8 +240,8 @@ export function BankStatementsPage() {
             />
           </div>
           <div className={styles.filterActions}>
-            <Button onClick={handleFilter}>Filtrele</Button>
-            <Button variant="ghost" onClick={handleReset}>Sifirla</Button>
+            <Button onClick={handleFilter}>{t('bankStatements.filters.filter')}</Button>
+            <Button variant="ghost" onClick={handleReset}>{t('bankStatements.filters.reset')}</Button>
           </div>
         </div>
       </Card>
@@ -256,17 +252,17 @@ export function BankStatementsPage() {
           data={statements}
           keyExtractor={(s) => s.id}
           loading={loading}
-          emptyMessage="Ekstre bulunamadi"
+          emptyMessage={t('bankStatements.emptyMessage')}
         />
 
         {totalPages > 1 && (
           <div className={styles.pagination}>
             <Button size="sm" variant="secondary" disabled={page === 1} onClick={() => setPage(page - 1)}>
-              Onceki
+              {t('bankStatements.pagination.previous')}
             </Button>
-            <span>Sayfa {page} / {totalPages}</span>
+            <span>{t('bankStatements.pagination.pageOf', { page, totalPages })}</span>
             <Button size="sm" variant="secondary" disabled={page === totalPages} onClick={() => setPage(page + 1)}>
-              Sonraki
+              {t('bankStatements.pagination.next')}
             </Button>
           </div>
         )}

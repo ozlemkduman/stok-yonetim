@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Button, Card, Input, Select } from '@stok/ui';
 import { returnsApi, CreateReturnData } from '../../api/returns.api';
 import { Sale, salesApi } from '../../api/sales.api';
@@ -22,16 +23,8 @@ interface ReturnFormItem {
   sale_item_id?: string;
 }
 
-const RETURN_REASONS = [
-  { value: '', label: 'Neden Secin' },
-  { value: 'kusurlu', label: 'Kusurlu Urun' },
-  { value: 'yanlis_urun', label: 'Yanlis Urun' },
-  { value: 'hasarli', label: 'Hasarli' },
-  { value: 'memnuniyetsizlik', label: 'Musteri Memnuniyetsizligi' },
-  { value: 'diger', label: 'Diger' },
-];
-
 export function ReturnFormPage() {
+  const { t } = useTranslation(['returns', 'common']);
   const navigate = useNavigate();
   const { showToast } = useToast();
 
@@ -49,6 +42,15 @@ export function ReturnFormPage() {
   const [reason, setReason] = useState<string>('');
   const [notes, setNotes] = useState('');
   const [items, setItems] = useState<ReturnFormItem[]>([]);
+
+  const RETURN_REASONS = [
+    { value: '', label: t('returns:reasons.selectReason') },
+    { value: 'kusurlu', label: t('returns:reasons.kusurlu') },
+    { value: 'yanlis_urun', label: t('returns:reasons.yanlis_urun') },
+    { value: 'hasarli', label: t('returns:reasons.hasarli') },
+    { value: 'memnuniyetsizlik', label: t('returns:reasons.memnuniyetsizlik') },
+    { value: 'diger', label: t('returns:reasons.diger') },
+  ];
 
   useEffect(() => {
     const loadData = async () => {
@@ -71,7 +73,7 @@ export function ReturnFormPage() {
           setWarehouseId(defaultWarehouse.id);
         }
       } catch (err) {
-        showToast('error', 'Veriler yuklenirken hata olustu');
+        showToast('error', t('returns:toast.dataLoadError'));
       } finally {
         setLoading(false);
       }
@@ -113,7 +115,7 @@ export function ReturnFormPage() {
         }));
       }
     } catch (err) {
-      showToast('error', 'Satis detaylari yuklenemedi');
+      showToast('error', t('returns:toast.saleLoadError'));
     }
   };
 
@@ -170,12 +172,12 @@ export function ReturnFormPage() {
     e.preventDefault();
 
     if (items.length === 0) {
-      showToast('error', 'En az bir urun ekleyin');
+      showToast('error', t('returns:form.addItemError'));
       return;
     }
 
     if (!reason) {
-      showToast('error', 'Iade nedeni secin');
+      showToast('error', t('returns:form.reasonError'));
       return;
     }
 
@@ -196,10 +198,10 @@ export function ReturnFormPage() {
       };
 
       await returnsApi.create(data);
-      showToast('success', 'Iade olusturuldu');
+      showToast('success', t('returns:toast.createSuccess'));
       navigate('/returns');
     } catch (err) {
-      showToast('error', err instanceof Error ? err.message : 'Iade olusturulamadi');
+      showToast('error', err instanceof Error ? err.message : t('returns:toast.createError'));
     } finally {
       setSaving(false);
     }
@@ -210,7 +212,7 @@ export function ReturnFormPage() {
   if (loading) {
     return (
       <div className={styles.page}>
-        <div className={styles.loading}>Yukleniyor...</div>
+        <div className={styles.loading}>{t('returns:form.loading')}</div>
       </div>
     );
   }
@@ -219,37 +221,37 @@ export function ReturnFormPage() {
     <div className={styles.page}>
       <div className={styles.header}>
         <Button variant="ghost" onClick={() => navigate('/returns')}>
-          ← Iadeler
+          {t('returns:form.backToList')}
         </Button>
-        <h1 className={styles.title}>Yeni Iade</h1>
+        <h1 className={styles.title}>{t('returns:form.title')}</h1>
       </div>
 
       <form onSubmit={handleSubmit}>
         <div className={styles.formGrid}>
           <Card className={styles.formCard}>
-            <h3>Iade Bilgileri</h3>
+            <h3>{t('returns:form.returnInfo')}</h3>
             <div className={styles.formRow}>
               <div className={styles.formGroup}>
-                <label className={styles.label}>Satistan Iade (Opsiyonel)</label>
+                <label className={styles.label}>{t('returns:form.saleReturn')}</label>
                 <Select
                   value={saleId}
                   onChange={(e) => handleSaleSelect(e.target.value)}
                   options={[
-                    { value: '', label: 'Satisiz Iade' },
+                    { value: '', label: t('returns:form.withoutSale') },
                     ...sales.map(s => ({
                       value: s.id,
-                      label: `${s.invoice_number} - ${s.customer_name || 'Perakende'} - ${formatCurrency(s.grand_total)}`
+                      label: `${s.invoice_number} - ${s.customer_name || t('returns:form.retail')} - ${formatCurrency(s.grand_total)}`
                     })),
                   ]}
                 />
               </div>
               <div className={styles.formGroup}>
-                <label className={styles.label}>Musteri</label>
+                <label className={styles.label}>{t('returns:form.customer')}</label>
                 <Select
                   value={customerId}
                   onChange={(e) => setCustomerId(e.target.value)}
                   options={[
-                    { value: '', label: 'Musteri Secin' },
+                    { value: '', label: t('returns:form.selectCustomer') },
                     ...customers.map(c => ({ value: c.id, label: c.name })),
                   ]}
                   disabled={!!saleId}
@@ -258,7 +260,7 @@ export function ReturnFormPage() {
             </div>
             <div className={styles.formRow}>
               <div className={styles.formGroup}>
-                <label className={styles.label}>Depo</label>
+                <label className={styles.label}>{t('returns:form.warehouse')}</label>
                 <Select
                   value={warehouseId}
                   onChange={(e) => setWarehouseId(e.target.value)}
@@ -266,7 +268,7 @@ export function ReturnFormPage() {
                 />
               </div>
               <div className={styles.formGroup}>
-                <label className={styles.label}>Iade Nedeni *</label>
+                <label className={styles.label}>{t('returns:form.returnReason')}</label>
                 <Select
                   value={reason}
                   onChange={(e) => setReason(e.target.value)}
@@ -275,13 +277,13 @@ export function ReturnFormPage() {
               </div>
             </div>
             <div className={styles.formGroup}>
-              <label className={styles.label}>Ek Aciklama</label>
+              <label className={styles.label}>{t('returns:form.additionalNotes')}</label>
               <textarea
                 className={styles.textarea}
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
                 rows={2}
-                placeholder="Iade ile ilgili ek aciklamalar..."
+                placeholder={t('returns:form.notesPlaceholder')}
               />
             </div>
           </Card>
@@ -289,10 +291,10 @@ export function ReturnFormPage() {
 
         <Card className={styles.itemsCard}>
           <div className={styles.itemsHeader}>
-            <h3>Iade Urunleri</h3>
+            <h3>{t('returns:form.returnItems')}</h3>
             {!saleId && (
               <Button type="button" size="sm" onClick={addItem}>
-                + Urun Ekle
+                {t('returns:form.addProduct')}
               </Button>
             )}
           </div>
@@ -300,19 +302,19 @@ export function ReturnFormPage() {
           {items.length === 0 ? (
             <div className={styles.emptyItems}>
               {saleId
-                ? 'Secilen satista urun bulunamadi'
-                : 'Henuz urun eklenmedi. "Urun Ekle" butonuna tiklayin veya bir satis secin.'}
+                ? t('returns:form.emptyItemsSale')
+                : t('returns:form.emptyItemsManual')}
             </div>
           ) : (
             <div className={styles.itemsTableContainer}>
               <table className={styles.itemsTable}>
                 <thead>
                   <tr>
-                    <th>Urun</th>
-                    <th className={styles.alignRight}>Miktar</th>
-                    <th className={styles.alignRight}>Birim Fiyat</th>
-                    <th className={styles.alignRight}>KDV</th>
-                    <th className={styles.alignRight}>Toplam</th>
+                    <th>{t('returns:form.product')}</th>
+                    <th className={styles.alignRight}>{t('returns:form.quantity')}</th>
+                    <th className={styles.alignRight}>{t('returns:form.unitPrice')}</th>
+                    <th className={styles.alignRight}>{t('returns:form.vat')}</th>
+                    <th className={styles.alignRight}>{t('returns:form.total')}</th>
                     <th></th>
                   </tr>
                 </thead>
@@ -327,7 +329,7 @@ export function ReturnFormPage() {
                             value={item.product_id}
                             onChange={(e) => updateItem(index, 'product_id', e.target.value)}
                             options={[
-                              { value: '', label: 'Urun Secin' },
+                              { value: '', label: t('returns:form.selectProduct') },
                               ...products.map(p => ({ value: p.id, label: p.name })),
                             ]}
                           />
@@ -365,7 +367,7 @@ export function ReturnFormPage() {
                           onClick={() => removeItem(index)}
                           className={styles.deleteButton}
                         >
-                          Sil
+                          {t('returns:form.delete')}
                         </Button>
                       </td>
                     </tr>
@@ -378,15 +380,15 @@ export function ReturnFormPage() {
           <div className={styles.totalsSection}>
             <div className={styles.totalsGrid}>
               <div className={styles.totalRow}>
-                <span>Ara Toplam:</span>
+                <span>{t('returns:form.subtotal')}</span>
                 <span>{formatCurrency(totals.subtotal)}</span>
               </div>
               <div className={styles.totalRow}>
-                <span>KDV Toplam:</span>
+                <span>{t('returns:form.vatTotal')}</span>
                 <span>{formatCurrency(totals.vatTotal)}</span>
               </div>
               <div className={`${styles.totalRow} ${styles.grandTotal}`}>
-                <span>Iade Tutari:</span>
+                <span>{t('returns:form.returnAmount')}</span>
                 <span>{formatCurrency(totals.grandTotal)}</span>
               </div>
             </div>
@@ -395,10 +397,10 @@ export function ReturnFormPage() {
 
         <div className={styles.formActions}>
           <Button type="button" variant="ghost" onClick={() => navigate('/returns')}>
-            Iptal
+            {t('returns:form.cancel')}
           </Button>
           <Button type="submit" disabled={saving}>
-            {saving ? 'Kaydediliyor...' : 'Iadeyi Tamamla'}
+            {saving ? t('returns:form.saving') : t('returns:form.submit')}
           </Button>
         </div>
       </form>

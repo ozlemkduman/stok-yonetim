@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Table, Button, Input, Badge, Pagination, type Column } from '@stok/ui';
 import { useCustomers } from '../../hooks/useCustomers';
 import { Customer, CreateCustomerData } from '../../api/customers.api';
@@ -23,6 +24,7 @@ const icons = {
 };
 
 export function CustomerListPage() {
+  const { t } = useTranslation(['customers', 'common']);
   const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingCustomer, setEditingCustomer] = useState<Customer | null>(null);
@@ -66,33 +68,33 @@ export function CustomerListPage() {
   };
 
   const handleDelete = async (customer: Customer) => {
-    const confirmed = await confirm({ message: `"${customer.name}" müşterisini silmek istediğinizden emin misiniz?`, variant: 'danger' });
+    const confirmed = await confirm({ message: t('customers:confirm.deleteMessage', { name: customer.name }), variant: 'danger' });
     if (!confirmed) {
       return;
     }
 
     try {
       await deleteCustomer(customer.id);
-      showToast('success', 'Müşteri başarıyla silindi');
+      showToast('success', t('customers:toast.deleteSuccess'));
     } catch (err) {
-      showToast('error', err instanceof Error ? err.message : 'Silme işlemi başarısız');
+      showToast('error', err instanceof Error ? err.message : t('customers:toast.deleteFailed'));
     }
   };
 
   const handleSubmit = async (data: CreateCustomerData) => {
     if (editingCustomer) {
       await updateCustomer(editingCustomer.id, data);
-      showToast('success', 'Müşteri başarıyla güncellendi');
+      showToast('success', t('customers:toast.updateSuccess'));
     } else {
       await createCustomer(data);
-      showToast('success', 'Müşteri başarıyla eklendi');
+      showToast('success', t('customers:toast.createSuccess'));
     }
   };
 
   const columns: Column<Customer>[] = [
     {
       key: 'name',
-      header: 'Müşteri Adı',
+      header: t('customers:columns.customerName'),
       render: (customer) => (
         <div className={styles.customerName}>
           <span className={styles.name}>{customer.name}</span>
@@ -102,12 +104,12 @@ export function CustomerListPage() {
     },
     {
       key: 'email',
-      header: 'E-posta',
+      header: t('customers:columns.email'),
       render: (customer) => customer.email || '-',
     },
     {
       key: 'balance',
-      header: 'Bakiye',
+      header: t('customers:columns.balance'),
       align: 'right',
       render: (customer) => (
         <span
@@ -125,16 +127,16 @@ export function CustomerListPage() {
     },
     {
       key: 'is_active',
-      header: 'Durum',
+      header: t('customers:columns.status'),
       render: (customer) => (
         <Badge variant={customer.is_active ? 'success' : 'default'}>
-          {customer.is_active ? 'Aktif' : 'Pasif'}
+          {customer.is_active ? t('customers:status.active') : t('customers:status.inactive')}
         </Badge>
       ),
     },
     {
       key: 'created_by_name',
-      header: 'Kaydeden',
+      header: t('customers:columns.createdBy'),
       render: (customer) => customer.created_by_name || '-',
     },
     {
@@ -144,17 +146,17 @@ export function CustomerListPage() {
       render: (customer) => (
         <div className={styles.actions}>
           <Button size="sm" variant="secondary" onClick={(e) => { e.stopPropagation(); handleRowClick(customer); }}>
-            Detay
+            {t('customers:actions.detail')}
           </Button>
           <Button size="sm" variant="primary" onClick={(e) => { e.stopPropagation(); handleEdit(customer); }}>
-            Düzenle
+            {t('customers:actions.edit')}
           </Button>
           <Button
             size="sm"
             variant="danger"
             onClick={(e) => { e.stopPropagation(); handleDelete(customer); }}
           >
-            Sil
+            {t('customers:actions.delete')}
           </Button>
         </div>
       ),
@@ -167,27 +169,27 @@ export function CustomerListPage() {
         <div className={styles.headerLeft}>
           <h1 className={styles.title}>
             <span className={styles.titleIcon}>{icons.customers}</span>
-            Müşteriler
+            {t('customers:title')}
           </h1>
-          <p className={styles.subtitle}>Toplam {total} müşteri kaydı</p>
+          <p className={styles.subtitle}>{t('customers:subtitle', { count: total })}</p>
         </div>
-        {canAddCustomer && <Button onClick={handleCreate}>+ Yeni Müşteri</Button>}
+        {canAddCustomer && <Button onClick={handleCreate}>{t('customers:addNew')}</Button>}
       </div>
 
       {!canAddCustomer && (
-        <UpgradePrompt variant="inline" message="Musteri limitinize ulastiniz. Daha fazla musteri eklemek icin planinizi yukseltin." />
+        <UpgradePrompt variant="inline" message={t('customers:upgradePrompt')} />
       )}
 
       <div className={styles.card}>
         <div className={styles.toolbar}>
           <form onSubmit={handleSearch} className={styles.searchForm}>
             <Input
-              placeholder="Müşteri ara..."
+              placeholder={t('customers:searchPlaceholder')}
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
             />
             <Button type="submit" variant="secondary">
-              Ara
+              {t('common:buttons.search')}
             </Button>
           </form>
         </div>
@@ -199,7 +201,7 @@ export function CustomerListPage() {
           data={customers}
           keyExtractor={(customer) => customer.id}
           loading={loading}
-          emptyMessage="Müşteri bulunamadı"
+          emptyMessage={t('customers:emptyMessage')}
           onRowClick={handleRowClick}
         />
 

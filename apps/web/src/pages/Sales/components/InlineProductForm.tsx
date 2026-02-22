@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Modal, Button, Input } from '@stok/ui';
 import { Product, CreateProductData, productsApi } from '../../../api/products.api';
 import { useToast } from '../../../context/ToastContext';
@@ -11,6 +12,7 @@ interface InlineProductFormProps {
 }
 
 export function InlineProductForm({ isOpen, onClose, onCreated }: InlineProductFormProps) {
+  const { t } = useTranslation(['sales', 'common']);
   const { showToast } = useToast();
   const [loading, setLoading] = useState(false);
   const [purchaseVatIncluded, setPurchaseVatIncluded] = useState(false);
@@ -91,17 +93,22 @@ export function InlineProductForm({ isOpen, onClose, onCreated }: InlineProductF
     const basePrice = formData[field] || 0;
     const vatInc = isVatIncludedForField(field);
     if (vatInc) {
-      return `KDV Haric: ${basePrice.toFixed(2)} TL`;
+      return t('sales:inlineProduct.vatIncludedInfo', { price: basePrice.toFixed(2) });
     } else {
-      return `KDV Dahil: ${(basePrice * vatMultiplier).toFixed(2)} TL`;
+      return t('sales:inlineProduct.vatExcludedInfo', { price: (basePrice * vatMultiplier).toFixed(2) });
     }
+  };
+
+  const getVatStatusLabel = (field: 'purchase_price' | 'sale_price' | 'wholesale_price') => {
+    const vatInc = isVatIncludedForField(field);
+    return vatInc ? t('sales:inlineProduct.vatIncluded') : t('sales:inlineProduct.vatExcluded');
   };
 
   const validate = (): boolean => {
     const newErrors: Record<string, string> = {};
-    if (!formData.name.trim()) newErrors.name = 'Urun adi zorunludur';
-    if (formData.purchase_price <= 0) newErrors.purchase_price = 'Alis fiyati giriniz';
-    if (formData.sale_price <= 0) newErrors.sale_price = 'Satis fiyati giriniz';
+    if (!formData.name.trim()) newErrors.name = t('sales:inlineProduct.errors.nameRequired');
+    if (formData.purchase_price <= 0) newErrors.purchase_price = t('sales:inlineProduct.errors.purchasePriceRequired');
+    if (formData.sale_price <= 0) newErrors.sale_price = t('sales:inlineProduct.errors.salePriceRequired');
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -114,11 +121,11 @@ export function InlineProductForm({ isOpen, onClose, onCreated }: InlineProductF
     try {
       const response = await productsApi.create(formData);
       const product = response.data ?? response as unknown as Product;
-      showToast('success', 'Urun olusturuldu');
+      showToast('success', t('sales:toast.productCreated'));
       onCreated(product);
       handleClose();
     } catch (err) {
-      setErrors({ form: err instanceof Error ? err.message : 'Hata olustu' });
+      setErrors({ form: err instanceof Error ? err.message : t('sales:toast.errorOccurred') });
     } finally {
       setLoading(false);
     }
@@ -128,37 +135,37 @@ export function InlineProductForm({ isOpen, onClose, onCreated }: InlineProductF
     <Modal
       isOpen={isOpen}
       onClose={handleClose}
-      title="Yeni Urun"
+      title={t('sales:inlineProduct.title')}
       size="lg"
       footer={
         <div className={styles.modalFooter}>
-          <Button variant="secondary" onClick={handleClose} disabled={loading}>Iptal</Button>
-          <Button onClick={handleSubmit} loading={loading}>Kaydet</Button>
+          <Button variant="secondary" onClick={handleClose} disabled={loading}>{t('sales:inlineProduct.cancel')}</Button>
+          <Button onClick={handleSubmit} loading={loading}>{t('sales:inlineProduct.save')}</Button>
         </div>
       }
     >
       <form onSubmit={handleSubmit} className={styles.inlineForm}>
         {errors.form && <div className={styles.formError}>{errors.form}</div>}
         <div className={styles.inlineFormGrid}>
-          <Input label="Urun Adi *" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} error={errors.name} fullWidth />
-          <Input label="Barkod" value={formData.barcode || ''} onChange={(e) => setFormData({ ...formData, barcode: e.target.value })} fullWidth />
-          <Input label="Kategori" value={formData.category || ''} onChange={(e) => setFormData({ ...formData, category: e.target.value })} fullWidth />
-          <Input label="Birim" value={formData.unit || 'adet'} onChange={(e) => setFormData({ ...formData, unit: e.target.value })} fullWidth />
+          <Input label={t('sales:inlineProduct.productName')} value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} error={errors.name} fullWidth />
+          <Input label={t('sales:inlineProduct.barcode')} value={formData.barcode || ''} onChange={(e) => setFormData({ ...formData, barcode: e.target.value })} fullWidth />
+          <Input label={t('sales:inlineProduct.category')} value={formData.category || ''} onChange={(e) => setFormData({ ...formData, category: e.target.value })} fullWidth />
+          <Input label={t('sales:inlineProduct.unit')} value={formData.unit || 'adet'} onChange={(e) => setFormData({ ...formData, unit: e.target.value })} fullWidth />
         </div>
 
-        <Input label="KDV Orani (%)" type="number" step="any" value={formData.vat_rate ?? 20} onChange={(e) => setFormData({ ...formData, vat_rate: parseFloat(e.target.value) || 0 })} fullWidth />
+        <Input label={t('sales:inlineProduct.vatRate')} type="number" step="any" value={formData.vat_rate ?? 20} onChange={(e) => setFormData({ ...formData, vat_rate: parseFloat(e.target.value) || 0 })} fullWidth />
 
         <div className={styles.priceSection}>
           <div className={styles.priceSectionHeader}>
-            <span className={styles.priceSectionTitle}>Alis Fiyati</span>
+            <span className={styles.priceSectionTitle}>{t('sales:inlineProduct.purchasePrice')}</span>
             <div className={styles.vatToggle}>
-              <button type="button" className={`${styles.vatToggleBtn} ${!purchaseVatIncluded ? styles.vatToggleActive : ''}`} onClick={() => handlePurchaseVatToggle(false)}>KDV Haric</button>
-              <button type="button" className={`${styles.vatToggleBtn} ${purchaseVatIncluded ? styles.vatToggleActive : ''}`} onClick={() => handlePurchaseVatToggle(true)}>KDV Dahil</button>
+              <button type="button" className={`${styles.vatToggleBtn} ${!purchaseVatIncluded ? styles.vatToggleActive : ''}`} onClick={() => handlePurchaseVatToggle(false)}>{t('sales:inlineProduct.vatExcluded')}</button>
+              <button type="button" className={`${styles.vatToggleBtn} ${purchaseVatIncluded ? styles.vatToggleActive : ''}`} onClick={() => handlePurchaseVatToggle(true)}>{t('sales:inlineProduct.vatIncluded')}</button>
             </div>
           </div>
           <div className={styles.priceField}>
             <Input
-              label={`Alis Fiyati * ${purchaseVatIncluded ? '(KDV Dahil)' : '(KDV Haric)'}`}
+              label={t('sales:inlineProduct.purchasePriceLabel', { vatStatus: getVatStatusLabel('purchase_price') })}
               type="number"
               step="any"
               value={displayPurchasePrice}
@@ -172,16 +179,16 @@ export function InlineProductForm({ isOpen, onClose, onCreated }: InlineProductF
 
         <div className={styles.priceSection}>
           <div className={styles.priceSectionHeader}>
-            <span className={styles.priceSectionTitle}>Satis Fiyatlari</span>
+            <span className={styles.priceSectionTitle}>{t('sales:inlineProduct.salePrices')}</span>
             <div className={styles.vatToggle}>
-              <button type="button" className={`${styles.vatToggleBtn} ${!saleVatIncluded ? styles.vatToggleActive : ''}`} onClick={() => handleSaleVatToggle(false)}>KDV Haric</button>
-              <button type="button" className={`${styles.vatToggleBtn} ${saleVatIncluded ? styles.vatToggleActive : ''}`} onClick={() => handleSaleVatToggle(true)}>KDV Dahil</button>
+              <button type="button" className={`${styles.vatToggleBtn} ${!saleVatIncluded ? styles.vatToggleActive : ''}`} onClick={() => handleSaleVatToggle(false)}>{t('sales:inlineProduct.vatExcluded')}</button>
+              <button type="button" className={`${styles.vatToggleBtn} ${saleVatIncluded ? styles.vatToggleActive : ''}`} onClick={() => handleSaleVatToggle(true)}>{t('sales:inlineProduct.vatIncluded')}</button>
             </div>
           </div>
           <div className={styles.inlineFormGrid}>
             <div className={styles.priceField}>
               <Input
-                label={`Satis Fiyati * ${saleVatIncluded ? '(KDV Dahil)' : '(KDV Haric)'}`}
+                label={t('sales:inlineProduct.salePriceLabel', { vatStatus: getVatStatusLabel('sale_price') })}
                 type="number"
                 step="any"
                 value={displaySalePrice}
@@ -193,7 +200,7 @@ export function InlineProductForm({ isOpen, onClose, onCreated }: InlineProductF
             </div>
             <div className={styles.priceField}>
               <Input
-                label={`Toptan Fiyati ${saleVatIncluded ? '(KDV Dahil)' : '(KDV Haric)'}`}
+                label={t('sales:inlineProduct.wholesalePriceLabel', { vatStatus: getVatStatusLabel('wholesale_price') })}
                 type="number"
                 step="any"
                 value={displayWholesalePrice}
@@ -206,8 +213,8 @@ export function InlineProductForm({ isOpen, onClose, onCreated }: InlineProductF
         </div>
 
         <div className={styles.inlineFormGrid}>
-          <Input label="Stok Miktari" type="number" step="any" value={formData.stock_quantity || 0} onChange={(e) => setFormData({ ...formData, stock_quantity: parseFloat(e.target.value) || 0 })} fullWidth />
-          <Input label="Kritik Stok Seviyesi" type="number" step="any" value={formData.min_stock_level || 5} onChange={(e) => setFormData({ ...formData, min_stock_level: parseFloat(e.target.value) || 0 })} fullWidth />
+          <Input label={t('sales:inlineProduct.stockQuantity')} type="number" step="any" value={formData.stock_quantity || 0} onChange={(e) => setFormData({ ...formData, stock_quantity: parseFloat(e.target.value) || 0 })} fullWidth />
+          <Input label={t('sales:inlineProduct.minStockLevel')} type="number" step="any" value={formData.min_stock_level || 5} onChange={(e) => setFormData({ ...formData, min_stock_level: parseFloat(e.target.value) || 0 })} fullWidth />
         </div>
       </form>
     </Modal>

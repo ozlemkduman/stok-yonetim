@@ -1,0 +1,55 @@
+{
+  "groups": {
+    "main": "Home",
+    "sales": "Sales Management",
+    "inventory": "Inventory",
+    "finance": "Finance",
+    "crm": "CRM & Field",
+    "reports": "Reports",
+    "settings": "Settings"
+  },
+  "items": {
+    "dashboard": "Dashboard",
+    "customers": "Customers",
+    "quotes": "Quotes",
+    "sales": "Sales",
+    "returns": "Returns",
+    "products": "Products",
+    "warehouses": "Warehouses",
+    "accounts": "Cash/Bank",
+    "expenses": "Expenses",
+    "edocuments": "e-Documents",
+    "crm": "CRM",
+    "fieldTeam": "Field Team",
+    "integrations": "Integrations",
+    "reports": "Reports",
+    "companySettings": "Company Settings",
+    "users": "Users",
+    "profile": "Profile"
+  },
+  "topbar": {
+    "search": "Search...",
+    "toggleMenu": "Toggle menu",
+    "help": "Page Help"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "empty": "No notifications",
+    "overdueTitle": "Overdue Payments",
+    "overdueMessage": "{{count}} overdue payments",
+    "lowStockTitle": "Low Stock",
+    "lowStockMessage": "{{count}} products have low stock",
+    "outOfStockTitle": "Out of Stock",
+    "outOfStockMessage": "{{count}} products are out of stock"
+  },
+  "userMenu": {
+    "profile": "Profile",
+    "settings": "Settings",
+    "logout": "Log Out",
+    "adminPanel": "Admin Panel"
+  },
+  "impersonation": {
+    "viewingAs": "Viewing as {{name}}",
+    "backToAdmin": "Back to Admin"
+  }
+}

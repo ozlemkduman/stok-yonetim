@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Card, Table, Pagination, type Column } from '@stok/ui';
 import { adminLogsApi, ActivityLog } from '../../api/admin/dashboard.api';
 import { useToast } from '../../context/ToastContext';
 import styles from './AdminPages.module.css';
 
 export function ActivityLogsPage() {
+  const { t } = useTranslation(['admin', 'common']);
   const { showToast } = useToast();
   const [logs, setLogs] = useState<ActivityLog[]>([]);
   const [actionTypes, setActionTypes] = useState<string[]>([]);
@@ -26,7 +28,7 @@ export function ActivityLogsPage() {
       const response = await adminLogsApi.getActionTypes();
       setActionTypes(response.data);
     } catch (error) {
-      showToast('error', 'Islem turleri yuklenemedi');
+      showToast('error', t('admin:activityLogs.actionTypesLoadFailed'));
     }
   };
 
@@ -42,7 +44,7 @@ export function ActivityLogsPage() {
       setLogs(response.data);
       setTotalPages(response.meta?.totalPages || 1);
     } catch (error) {
-      showToast('error', 'Aktivite kayitlari yuklenemedi');
+      showToast('error', t('admin:activityLogs.loadFailed'));
     } finally {
       setIsLoading(false);
     }
@@ -51,19 +53,19 @@ export function ActivityLogsPage() {
   const columns: Column<ActivityLog>[] = [
     {
       key: 'created_at',
-      header: 'Tarih',
+      header: t('admin:activityLogs.columnDate'),
       render: (log) => new Date(log.created_at).toLocaleString('tr-TR'),
     },
     {
       key: 'action',
-      header: 'Islem',
+      header: t('admin:activityLogs.columnAction'),
       render: (log) => (
         <span className={styles.actionBadge}>{log.action}</span>
       ),
     },
     {
       key: 'entity',
-      header: 'Nesne',
+      header: t('admin:activityLogs.columnEntity'),
       render: (log) => (
         <div>
           {log.entity_type && <span>{log.entity_type}</span>}
@@ -73,22 +75,22 @@ export function ActivityLogsPage() {
     },
     {
       key: 'user',
-      header: 'Kullanici',
+      header: t('admin:activityLogs.columnUser'),
       render: (log) => (
         <div>
-          <div>{log.user_name || 'Sistem'}</div>
+          <div>{log.user_name || t('admin:activityLogs.system')}</div>
           {log.user_email && <div className={styles.subText}>{log.user_email}</div>}
         </div>
       ),
     },
     {
       key: 'tenant',
-      header: 'Organizasyon',
+      header: t('admin:activityLogs.columnOrganization'),
       render: (log) => log.tenant_name || '-',
     },
     {
       key: 'ip',
-      header: 'IP',
+      header: t('admin:activityLogs.columnIP'),
       render: (log) => log.ip_address || '-',
     },
   ];
@@ -96,7 +98,7 @@ export function ActivityLogsPage() {
   return (
     <div className={styles.page}>
       <div className={styles.pageHeader}>
-        <h1 className={styles.pageTitle}>Aktivite Kayıtları</h1>
+        <h1 className={styles.pageTitle}>{t('admin:activityLogs.title')}</h1>
       </div>
 
       <Card className={styles.filters}>
@@ -106,7 +108,7 @@ export function ActivityLogsPage() {
             onChange={(e) => setActionFilter(e.target.value)}
             className={styles.select}
           >
-            <option value="">Tum Islemler</option>
+            <option value="">{t('admin:activityLogs.allActions')}</option>
             {actionTypes.map((action) => (
               <option key={action} value={action}>
                 {action}
@@ -122,7 +124,7 @@ export function ActivityLogsPage() {
           data={logs}
           keyExtractor={(log) => log.id}
           loading={isLoading}
-          emptyMessage="Kayit bulunamadi"
+          emptyMessage={t('admin:activityLogs.emptyMessage')}
         />
 
         {totalPages > 1 && (
