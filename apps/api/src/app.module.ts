@@ -25,6 +25,7 @@ import { IntegrationsModule } from './modules/integrations/integrations.module';
 import { CrmModule } from './modules/crm/crm.module';
 import { FieldTeamModule } from './modules/field-team/field-team.module';
 import { InvoiceImportModule } from './modules/invoice-import/invoice-import.module';
+import { ContactModule } from './modules/contact/contact.module';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { TransformInterceptor } from './common/interceptors/transform.interceptor';
 import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
@@ -57,6 +58,7 @@ import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
     CrmModule,
     FieldTeamModule,
     InvoiceImportModule,
+    ContactModule,
   ],
   controllers: [HealthController],
   providers: [

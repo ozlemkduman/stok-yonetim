@@ -193,6 +193,8 @@
       "noteLabel": "Your Note",
       "notePlaceholder": "If you have a note you'd like to add, you can write it here...",
       "submit": "Submit Demo Application",
+      "submitting": "Submitting...",
+      "submitError": "Failed to submit application. Please try again.",
       "formNote": "45 days free \u00b7 No credit card required \u00b7 Start now",
       "whatsappMessage": "Hello, I would like to apply for a demo.",
       "whatsappName": "Full Name",

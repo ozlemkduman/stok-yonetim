@@ -150,20 +150,35 @@ function DemoForm() {
   const { t } = useTranslation('landing');
   const [form, setForm] = useState({ name: '', phone: '', company: '', sector: '', note: '' });
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState('');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const message = [
-      t('demo.form.whatsappMessage'),
-      `${t('demo.form.whatsappName')}: ${form.name}`,
-      `${t('demo.form.whatsappPhone')}: ${form.phone}`,
-      form.company ? `${t('demo.form.whatsappCompany')}: ${form.company}` : '',
-      form.sector ? `${t('demo.form.whatsappSector')}: ${form.sector}` : '',
-      form.note ? `${t('demo.form.whatsappNote')}: ${form.note}` : '',
-    ].filter(Boolean).join('\n');
+    setSubmitting(true);
+    setError('');
 
-    window.open(`https://wa.me/905350739908?text=${encodeURIComponent(message)}`, '_blank');
-    setSubmitted(true);
+    try {
+      const apiBase = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001/api/v1';
+      const res = await fetch(`${apiBase}/contact/demo`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: form.name,
+          phone: form.phone,
+          company: form.company || undefined,
+          sector: form.sector || undefined,
+          note: form.note || undefined,
+        }),
+      });
+
+      if (!res.ok) throw new Error();
+      setSubmitted(true);
+    } catch {
+      setError(t('demo.form.submitError'));
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   if (submitted) {
@@ -252,8 +267,9 @@ function DemoForm() {
           onChange={(e) => setForm({ ...form, note: e.target.value })}
         />
       </div>
-      <button type="submit" className={`${styles.btnPrimary} ${styles.btnLarge} ${styles.btnGlow} ${styles.formSubmitBtn}`}>
-        {t('demo.form.submit')}
+      {error && <p style={{ color: '#ef4444', fontSize: '14px', margin: '0 0 12px' }}>{error}</p>}
+      <button type="submit" disabled={submitting} className={`${styles.btnPrimary} ${styles.btnLarge} ${styles.btnGlow} ${styles.formSubmitBtn}`}>
+        {submitting ? t('demo.form.submitting') : t('demo.form.submit')}
       </button>
       <p className={styles.formNote}>{t('demo.form.formNote')}</p>
     </form>

@@ -193,6 +193,8 @@
       "noteLabel": "Notunuz",
       "notePlaceholder": "Eklemek istediğiniz bir not varsa yazabilirsiniz...",
       "submit": "Demo Başvurusu Gönder",
+      "submitting": "Gönderiliyor...",
+      "submitError": "Başvuru gönderilemedi. Lütfen tekrar deneyin.",
       "formNote": "45 gün ücretsiz \u00b7 Kredi kartı gerekmez \u00b7 Hemen başlayın",
       "whatsappMessage": "Merhaba, demo başvurusu yapmak istiyorum.",
       "whatsappName": "Ad Soyad",
