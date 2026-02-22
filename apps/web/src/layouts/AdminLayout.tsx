@@ -104,7 +104,7 @@ export function AdminLayout() {
                 <div className={styles.profileDropdown}>
                   <div className={styles.dropdownHeader}>
                     <span className={styles.dropdownName}>{user?.name || 'Admin'}</span>
-                    <span className={styles.dropdownEmail}>{user?.email || 'admin@stokpro.com'}</span>
+                    <span className={styles.dropdownEmail}>{user?.email || 'admin@stoksayac.com'}</span>
                   </div>
                   <div className={styles.dropdownDivider}></div>
                   <button

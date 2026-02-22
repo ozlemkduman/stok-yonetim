@@ -52,7 +52,7 @@
     "slugPlaceholder": "abc-trading",
     "slugHint": "Unique identifier used in URL",
     "labelDomain": "Domain",
-    "domainPlaceholder": "abc-trading.stokpro.com",
+    "domainPlaceholder": "abc-trading.stoksayac.com",
     "labelBillingEmail": "Billing Email",
     "labelPlan": "Plan",
     "selectPlan": "Select Plan",

@@ -1,4 +1,4 @@
-import { Controller, Post, Body } from '@nestjs/common';
+import { Controller, Post, Body, InternalServerErrorException } from '@nestjs/common';
 import { Public } from '../../common/decorators/public.decorator';
 import { ContactService } from './contact.service';
 import { DemoApplicationDto } from './dto/demo-application.dto';
@@ -10,7 +10,10 @@ export class ContactController {
   @Public()
   @Post('demo')
   async submitDemo(@Body() dto: DemoApplicationDto) {
-    await this.contactService.submitDemoApplication(dto);
+    const sent = await this.contactService.submitDemoApplication(dto);
+    if (!sent) {
+      throw new InternalServerErrorException('E-posta gonderilemedi');
+    }
     return { message: 'Basvuru alindi' };
   }
 }

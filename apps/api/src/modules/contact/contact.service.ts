@@ -13,12 +13,12 @@ export class ContactService {
   ) {}
 
   async submitDemoApplication(dto: DemoApplicationDto): Promise<boolean> {
-    const recipient = this.configService.get<string>('DEMO_NOTIFY_EMAIL') || 'test@stokpro.com';
+    const recipient = this.configService.get<string>('DEMO_NOTIFY_EMAIL') || 'test@stoksayac.com';
 
     const html = `
       <div style="font-family: 'Segoe UI', Tahoma, sans-serif; max-width: 600px; margin: 0 auto; padding: 40px 20px;">
         <div style="text-align: center; margin-bottom: 32px;">
-          <h1 style="color: #1a1a2e; font-size: 28px; margin: 0;">StokPro</h1>
+          <h1 style="color: #1a1a2e; font-size: 28px; margin: 0;">StokSayaç</h1>
         </div>
         <div style="background: #ffffff; border-radius: 12px; padding: 32px; border: 1px solid #e5e7eb;">
           <h2 style="color: #1a1a2e; margin-top: 0;">Yeni Demo Basvurusu</h2>
@@ -49,14 +49,14 @@ export class ContactService {
           </table>
         </div>
         <p style="text-align: center; color: #9ca3af; font-size: 12px; margin-top: 24px;">
-          Bu e-posta StokPro demo basvuru formundan otomatik olarak gonderilmistir.
+          Bu e-posta StokSayaç demo basvuru formundan otomatik olarak gonderilmistir.
         </p>
       </div>
     `;
 
     const sent = await this.emailService.sendMail({
       to: recipient,
-      subject: `StokPro Demo Basvurusu - ${dto.name}`,
+      subject: `StokSayaç Demo Basvurusu - ${dto.name}`,
       html,
     });
 

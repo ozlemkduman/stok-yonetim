@@ -52,7 +52,7 @@
     "slugPlaceholder": "abc-ticaret",
     "slugHint": "URL'de kullanilacak benzersiz tanimlayici",
     "labelDomain": "Domain",
-    "domainPlaceholder": "abc-ticaret.stokpro.com",
+    "domainPlaceholder": "abc-ticaret.stoksayac.com",
     "labelBillingEmail": "Fatura E-posta",
     "labelPlan": "Plan",
     "selectPlan": "Plan Secin",

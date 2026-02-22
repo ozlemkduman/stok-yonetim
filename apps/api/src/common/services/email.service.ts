@@ -20,10 +20,11 @@ export class EmailService {
     const pass = this.configService.get<string>('SMTP_PASS');
 
     if (host && user && pass) {
+      const smtpPort = Number(port) || 587;
       this.transporter = nodemailer.createTransport({
         host,
-        port: port || 587,
-        secure: port === 465,
+        port: smtpPort,
+        secure: smtpPort === 465,
         auth: { user, pass },
       });
     } else {
@@ -34,7 +35,7 @@ export class EmailService {
   }
 
   private get fromAddress(): string {
-    return this.configService.get<string>('SMTP_FROM') || 'StokPro <noreply@stokpro.com>';
+    return this.configService.get<string>('SMTP_FROM') || 'StokSayaç <noreply@stoksayac.com>';
   }
 
   private get frontendUrl(): string {
@@ -64,7 +65,7 @@ export class EmailService {
       this.logger.log(`E-posta gonderildi: ${options.to}`);
       return true;
     } catch (error) {
-      this.logger.error(`E-posta gonderilemedi: ${options.to}`, error);
+      this.logger.error(`E-posta gonderilemedi: ${options.to}`, (error as Error).stack || error);
       return false;
     }
   }
@@ -75,17 +76,17 @@ export class EmailService {
 
     return this.sendMail({
       to: email,
-      subject: 'StokPro - Davet',
+      subject: 'StokSayaç - Davet',
       html: `
         <div style="font-family: 'Segoe UI', Tahoma, sans-serif; max-width: 600px; margin: 0 auto; padding: 40px 20px;">
           <div style="text-align: center; margin-bottom: 32px;">
-            <h1 style="color: #1a1a2e; font-size: 28px; margin: 0;">StokPro</h1>
+            <h1 style="color: #1a1a2e; font-size: 28px; margin: 0;">StokSayaç</h1>
           </div>
           <div style="background: #ffffff; border-radius: 12px; padding: 32px; border: 1px solid #e5e7eb;">
             <h2 style="color: #1a1a2e; margin-top: 0;">Davet Edildiniz!</h2>
             <p style="color: #4b5563; line-height: 1.6;">
               Merhaba,<br><br>
-              StokPro platformuna${orgText} katilmaniz icin davet edildiniz.
+              StokSayaç platformuna${orgText} katilmaniz icin davet edildiniz.
               Hesabinizi olusturmak icin asagidaki butona tiklayin.
             </p>
             <div style="text-align: center; margin: 32px 0;">
@@ -112,11 +113,11 @@ export class EmailService {
 
     return this.sendMail({
       to: email,
-      subject: 'StokPro - Sifre Sifirlama',
+      subject: 'StokSayaç - Sifre Sifirlama',
       html: `
         <div style="font-family: 'Segoe UI', Tahoma, sans-serif; max-width: 600px; margin: 0 auto; padding: 40px 20px;">
           <div style="text-align: center; margin-bottom: 32px;">
-            <h1 style="color: #1a1a2e; font-size: 28px; margin: 0;">StokPro</h1>
+            <h1 style="color: #1a1a2e; font-size: 28px; margin: 0;">StokSayaç</h1>
           </div>
           <div style="background: #ffffff; border-radius: 12px; padding: 32px; border: 1px solid #e5e7eb;">
             <h2 style="color: #1a1a2e; margin-top: 0;">Sifre Sifirlama</h2>
