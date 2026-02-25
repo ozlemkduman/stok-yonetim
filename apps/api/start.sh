@@ -6,10 +6,14 @@ echo "NODE_ENV: $NODE_ENV"
 echo "Waiting for database (10s)..."
 sleep 10
 
-# Run migrations
+# Run migrations - exit if fails to prevent app starting with broken DB
 echo "Running migrations..."
 npx knex migrate:latest --knexfile knexfile.js
-echo "Migrations completed."
+if [ $? -ne 0 ]; then
+  echo "ERROR: Migration failed! Aborting startup."
+  exit 1
+fi
+echo "Migrations completed successfully."
 
 echo "Starting application..."
 exec node dist/main.js

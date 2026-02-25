@@ -47,7 +47,7 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
       }
     }
 
-    // Auto-seed plans and super admin
+    // Ensure plans and super admin exist
     await this.ensurePlansAndAdmin();
   }
 
@@ -85,27 +85,29 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
       this.logger.error('Seed failed', error);
     }
 
-    // Assign orphan records (tenant_id IS NULL) to the oldest tenant
+    // Assign orphan records (tenant_id IS NULL) to the oldest tenant - wrapped in transaction
     try {
       const tenant = await this._knex('tenants')
         .orderBy('created_at', 'asc')
         .first();
       if (tenant) {
-        const tables = [
-          'products', 'customers', 'sales', 'sale_items', 'payments',
-          'expenses', 'returns', 'return_items', 'account_transactions',
-          'accounts', 'warehouses', 'quotes',
-        ];
-        for (const table of tables) {
-          const hasColumn = await this._knex.schema.hasColumn(table, 'tenant_id');
-          if (!hasColumn) continue;
-          const result = await this._knex(table)
-            .whereNull('tenant_id')
-            .update({ tenant_id: tenant.id });
-          if (result > 0) {
-            this.logger.log(`Assigned ${result} orphan records in ${table} to tenant ${tenant.name}`);
+        await this._knex.transaction(async (trx) => {
+          const tables = [
+            'products', 'customers', 'sales', 'sale_items', 'payments',
+            'expenses', 'returns', 'return_items', 'account_transactions',
+            'accounts', 'warehouses', 'quotes',
+          ];
+          for (const table of tables) {
+            const hasColumn = await trx.schema.hasColumn(table, 'tenant_id');
+            if (!hasColumn) continue;
+            const result = await trx(table)
+              .whereNull('tenant_id')
+              .update({ tenant_id: tenant.id });
+            if (result > 0) {
+              this.logger.log(`Assigned ${result} orphan records in ${table} to tenant ${tenant.name}`);
+            }
           }
-        }
+        });
       }
     } catch (error) {
       this.logger.error('Orphan data assignment failed', error);
