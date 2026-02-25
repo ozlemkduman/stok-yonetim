@@ -201,7 +201,7 @@ export function WarehouseListPage() {
     {
       key: 'name',
       header: t('warehouses:columns.warehouse'),
-      render: (wh) => (
+      render: (wh: Warehouse) => (
         <div className={styles.warehouseInfo}>
           <span className={styles.warehouseName}>{wh.name}</span>
           <span className={styles.warehouseCode}>{wh.code}</span>
@@ -211,17 +211,17 @@ export function WarehouseListPage() {
     {
       key: 'address',
       header: t('warehouses:columns.address'),
-      render: (wh) => wh.address || '-',
+      render: (wh: Warehouse) => wh.address || '-',
     },
     {
       key: 'manager_name',
       header: t('warehouses:columns.manager'),
-      render: (wh) => wh.manager_name || '-',
+      render: (wh: Warehouse) => wh.manager_name || '-',
     },
     {
       key: 'is_default',
       header: t('warehouses:columns.status'),
-      render: (wh) => (
+      render: (wh: Warehouse) => (
         wh.is_default ? <Badge variant="success">{t('warehouses:badges.default')}</Badge> : null
       ),
     },
@@ -229,11 +229,11 @@ export function WarehouseListPage() {
       key: 'actions',
       header: '',
       width: '150px',
-      render: (wh) => (
+      render: (wh: Warehouse) => (
         <div className={styles.actions}>
           <Button size="sm" variant="secondary" onClick={() => handleView(wh)}>{t('warehouses:buttons.detail')}</Button>
-          <Button size="sm" variant="primary" onClick={(e) => handleEdit(wh, e)}>{t('warehouses:buttons.edit')}</Button>
-          <Button size="sm" variant="danger" onClick={(e) => handleDelete(wh, e)}>{t('warehouses:buttons.delete')}</Button>
+          <Button size="sm" variant="primary" onClick={(e: React.MouseEvent) => handleEdit(wh, e)}>{t('warehouses:buttons.edit')}</Button>
+          <Button size="sm" variant="danger" onClick={(e: React.MouseEvent) => handleDelete(wh, e)}>{t('warehouses:buttons.delete')}</Button>
         </div>
       ),
     },
