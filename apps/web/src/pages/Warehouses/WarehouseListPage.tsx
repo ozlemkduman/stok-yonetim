@@ -243,27 +243,27 @@ export function WarehouseListPage() {
     {
       key: 'transfer_number',
       header: t('warehouses:columns.transferNo'),
-      render: (tr) => tr.transfer_number,
+      render: (tr: StockTransfer) => tr.transfer_number,
     },
     {
       key: 'from_warehouse',
       header: t('warehouses:columns.source'),
-      render: (tr) => tr.from_warehouse_name || '-',
+      render: (tr: StockTransfer) => tr.from_warehouse_name || '-',
     },
     {
       key: 'to_warehouse',
       header: t('warehouses:columns.target'),
-      render: (tr) => tr.to_warehouse_name || '-',
+      render: (tr: StockTransfer) => tr.to_warehouse_name || '-',
     },
     {
       key: 'transfer_date',
       header: t('warehouses:columns.date'),
-      render: (tr) => formatDate(tr.transfer_date),
+      render: (tr: StockTransfer) => formatDate(tr.transfer_date),
     },
     {
       key: 'status',
       header: t('warehouses:columns.status'),
-      render: (tr) => (
+      render: (tr: StockTransfer) => (
         <Badge variant={
           tr.status === 'completed' ? 'success' :
           tr.status === 'cancelled' ? 'danger' :
@@ -277,7 +277,7 @@ export function WarehouseListPage() {
       key: 'actions',
       header: '',
       width: '150px',
-      render: (tr) => (
+      render: (tr: StockTransfer) => (
         <div className={styles.actions}>
           {tr.status === 'pending' && (
             <>
@@ -294,28 +294,28 @@ export function WarehouseListPage() {
     {
       key: 'movement_date',
       header: t('warehouses:columns.date'),
-      render: (m) => formatDateTime(m.movement_date),
+      render: (m: StockMovement) => formatDateTime(m.movement_date),
     },
     {
       key: 'warehouse_name',
       header: t('warehouses:columns.warehouse'),
-      render: (m) => m.warehouse_name || '-',
+      render: (m: StockMovement) => m.warehouse_name || '-',
     },
     {
       key: 'product_name',
       header: t('warehouses:columns.product'),
-      render: (m) => m.product_name || '-',
+      render: (m: StockMovement) => m.product_name || '-',
     },
     {
       key: 'movement_type',
       header: t('warehouses:columns.operation'),
-      render: (m) => t(`warehouses:movementTypes.${m.movement_type}`),
+      render: (m: StockMovement) => t(`warehouses:movementTypes.${m.movement_type}`),
     },
     {
       key: 'quantity',
       header: t('warehouses:columns.quantity'),
       align: 'right',
-      render: (m) => (
+      render: (m: StockMovement) => (
         <span className={`${styles.movementQuantity} ${m.quantity > 0 ? styles.positive : styles.negative}`}>
           {m.quantity > 0 ? '+' : ''}{m.quantity}
         </span>
@@ -325,7 +325,7 @@ export function WarehouseListPage() {
       key: 'stock_after',
       header: t('warehouses:columns.stockAfter'),
       align: 'right',
-      render: (m) => m.stock_after,
+      render: (m: StockMovement) => m.stock_after,
     },
   ];
 
@@ -403,7 +403,7 @@ export function WarehouseListPage() {
           <Table
             columns={warehouseColumns}
             data={warehouses}
-            keyExtractor={(wh) => wh.id}
+            keyExtractor={(wh: Warehouse) => wh.id}
             loading={loading}
             emptyMessage={t('warehouses:empty.warehouses')}
             onRowClick={handleView}
@@ -414,7 +414,7 @@ export function WarehouseListPage() {
           <Table
             columns={transferColumns}
             data={transfers}
-            keyExtractor={(tr) => tr.id}
+            keyExtractor={(tr: StockTransfer) => tr.id}
             loading={loading}
             emptyMessage={t('warehouses:empty.transfers')}
           />
@@ -424,7 +424,7 @@ export function WarehouseListPage() {
           <Table
             columns={movementColumns}
             data={movements}
-            keyExtractor={(m) => m.id}
+            keyExtractor={(m: StockMovement) => m.id}
             loading={loading}
             emptyMessage={t('warehouses:empty.movements')}
           />
