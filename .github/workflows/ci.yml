@@ -29,6 +29,7 @@ jobs:
           node-version: 20
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @stok/ui build
       - run: pnpm -r typecheck
 
   build:

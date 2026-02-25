@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, type ChangeEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Modal, Input, Button } from '@stok/ui';
 import { Warehouse, CreateWarehouseData } from '../../api/warehouses.api';
@@ -80,7 +80,7 @@ export function WarehouseFormModal({ isOpen, onClose, onSubmit, warehouse }: War
           <Input
             label={t('warehouses:form.warehouseCode')}
             value={formData.code}
-            onChange={(e) => setFormData({ ...formData, code: e.target.value.toUpperCase() })}
+            onChange={(e: ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, code: e.target.value.toUpperCase() })}
             placeholder={t('warehouses:form.codePlaceholder')}
             required
             disabled={!!warehouse}
@@ -90,21 +90,21 @@ export function WarehouseFormModal({ isOpen, onClose, onSubmit, warehouse }: War
           <Input
             label={t('warehouses:form.address')}
             value={formData.address}
-            onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+            onChange={(e: ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, address: e.target.value })}
             fullWidth
           />
 
           <Input
             label={t('warehouses:form.phone')}
             value={formData.phone}
-            onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+            onChange={(e: ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, phone: e.target.value })}
             fullWidth
           />
 
           <Input
             label={t('warehouses:form.manager')}
             value={formData.manager_name}
-            onChange={(e) => setFormData({ ...formData, manager_name: e.target.value })}
+            onChange={(e: ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, manager_name: e.target.value })}
             fullWidth
           />
 
