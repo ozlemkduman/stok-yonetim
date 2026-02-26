@@ -13,8 +13,16 @@ async function bootstrap() {
 
   // CORS
   const corsOrigin = configService.get<string>('app.corsOrigin');
+  let origin: boolean | string | string[];
+  if (corsOrigin === '*') {
+    origin = true;
+  } else if (corsOrigin && corsOrigin.includes(',')) {
+    origin = corsOrigin.split(',').map((o) => o.trim());
+  } else {
+    origin = corsOrigin || true;
+  }
   app.enableCors({
-    origin: corsOrigin === '*' ? true : corsOrigin,
+    origin,
     credentials: true,
   });
 
