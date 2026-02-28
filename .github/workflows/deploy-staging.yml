@@ -1,9 +1,9 @@
-name: Build and Deploy
+name: Build and Deploy (Staging)
 
 on:
   push:
-    branches: [main]
-  workflow_dispatch:  # Manuel tetikleme icin
+    branches: [develop]
+  workflow_dispatch:
 
 env:
   REGISTRY: ghcr.io
@@ -32,10 +32,9 @@ jobs:
 
       - name: Get version tag
         id: version
-        run: echo "tag=$(date +'%Y%m%d%H%M%S')" >> $GITHUB_OUTPUT
+        run: echo "tag=staging-$(date +'%Y%m%d%H%M%S')" >> $GITHUB_OUTPUT
 
-      # API Image
-      - name: Build and push API image
+      - name: Build and push API image (staging)
         uses: docker/build-push-action@v5
         with:
           context: .
@@ -43,16 +42,15 @@ jobs:
           push: true
           platforms: linux/amd64
           tags: |
-            ${{ env.API_IMAGE }}:latest
-            ${{ env.API_IMAGE }}:production
+            ${{ env.API_IMAGE }}:staging
             ${{ env.API_IMAGE }}:${{ steps.version.outputs.tag }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
       - name: Summary
         run: |
-          echo "## Deploy Basarili! :rocket:" >> $GITHUB_STEP_SUMMARY
+          echo "## Staging Deploy Basarili! :test_tube:" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "**API Image:** \`${{ env.API_IMAGE }}:${{ steps.version.outputs.tag }}\`" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "Web uygulamasi Cloudflare Pages uzerinden otomatik deploy edilmektedir." >> $GITHUB_STEP_SUMMARY
+          echo "Staging web uygulamasi Cloudflare Pages branch deploy uzerinden otomatik deploy edilmektedir." >> $GITHUB_STEP_SUMMARY

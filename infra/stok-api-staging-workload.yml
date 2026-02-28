@@ -1,0 +1,47 @@
+kind: workload
+name: stok-api-staging
+description: Stok Sayac API - Staging Environment
+spec:
+  type: standard
+  containers:
+    - name: stok-api-staging
+      image: "ghcr.io/ozlemkduman/stok-api:staging"
+      port: 3000
+      cpu: "250m"
+      memory: 512Mi
+      readinessProbe:
+        httpGet:
+          path: /api/v1/health
+          port: 3000
+        initialDelaySeconds: 10
+        periodSeconds: 15
+      livenessProbe:
+        httpGet:
+          path: /api/v1/health
+          port: 3000
+        initialDelaySeconds: 30
+        periodSeconds: 30
+      env:
+        - name: NODE_ENV
+          value: "production"
+        - name: DATABASE_URL
+          value: "postgres://stok_user:StokSayac2026DB@postgres.default-gvc.cpln.local:5432/stok_staging_db"
+        - name: CORS_ORIGIN
+          value: "https://staging.stoksayac.com"
+        - name: FRONTEND_URL
+          value: "https://staging.stoksayac.com"
+        - name: GOOGLE_CALLBACK_URL
+          value: "https://staging.stoksayac.com/auth/google/callback"
+        - name: ADMIN_API_KEY
+          value: "STAGING_ADMIN_KEY_DEGISTIR"
+  defaultOptions:
+    autoscaling:
+      metric: concurrency
+      target: 100
+      maxScale: 2
+      minScale: 1
+    capacityAI: false
+  firewallConfig:
+    external:
+      inboundAllowCIDR:
+        - 0.0.0.0/0
