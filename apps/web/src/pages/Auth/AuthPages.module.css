@@ -25,6 +25,16 @@
   font-size: 0.875rem;
 }
 
+.success {
+  background: #dcfce7;
+  border: 1px solid #86efac;
+  color: #16a34a;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  font-size: 0.875rem;
+}
+
 .form {
   text-align: left;
 }

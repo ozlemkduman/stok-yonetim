@@ -50,6 +50,11 @@ services:
       SUPER_ADMIN_PASSWORD: StokSayac2026!
       FRONTEND_URL: ${FRONTEND_URL:-http://localhost}
       CORS_ORIGIN: ${CORS_ORIGIN:-*}
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-465}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASS: ${SMTP_PASS:-}
+      SMTP_FROM: ${SMTP_FROM:-}
     depends_on:
       postgres:
         condition: service_healthy

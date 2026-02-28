@@ -3,6 +3,7 @@ import {
   UnauthorizedException,
   BadRequestException,
   ConflictException,
+  InternalServerErrorException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
@@ -340,7 +341,10 @@ export class AuthService {
 
     await this.authRepository.createPasswordResetToken(user.id, tokenHash, expiresAt);
 
-    await this.emailService.sendPasswordReset(email, token);
+    const emailSent = await this.emailService.sendPasswordReset(email, token);
+    if (!emailSent) {
+      throw new InternalServerErrorException('E-posta gönderilemedi. Lütfen daha sonra tekrar deneyin.');
+    }
 
     return { message: 'Şifre sıfırlama bağlantısı e-posta adresinize gönderildi' };
   }

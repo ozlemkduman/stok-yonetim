@@ -46,6 +46,11 @@ export function ResetPasswordPage() {
       return;
     }
 
+    if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(formData.password)) {
+      setError(t('resetPassword.validation.passwordComplexity'));
+      return;
+    }
+
     setIsLoading(true);
 
     try {

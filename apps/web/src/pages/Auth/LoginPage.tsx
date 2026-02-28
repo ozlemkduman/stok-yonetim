@@ -19,6 +19,7 @@ export function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
 
   const from = location.state?.from?.pathname || '/dashboard';
+  const successMessage = location.state?.message as string | undefined;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -45,6 +46,7 @@ export function LoginPage() {
       <h2 className={styles.title}>{t('login.title')}</h2>
       <p className={styles.subtitle}>{t('login.subtitle')}</p>
 
+      {successMessage && <div className={styles.success}>{successMessage}</div>}
       {error && <div className={styles.error}>{error}</div>}
 
       <form onSubmit={handleSubmit} className={styles.form}>
