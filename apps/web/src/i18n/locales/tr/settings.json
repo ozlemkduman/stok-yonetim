@@ -76,6 +76,8 @@
     "labelPhone": "Telefon",
     "labelRole": "Rol",
     "cancel": "Iptal",
-    "create": "Olustur"
+    "create": "Olustur",
+    "passwordTooShort": "Sifre en az 8 karakter olmalidir",
+    "passwordComplexity": "Sifre en az bir buyuk harf, bir kucuk harf ve bir rakam icermelidir"
   }
 }

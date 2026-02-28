@@ -76,6 +76,8 @@
     "labelPhone": "Phone",
     "labelRole": "Role",
     "cancel": "Cancel",
-    "create": "Create"
+    "create": "Create",
+    "passwordTooShort": "Password must be at least 8 characters",
+    "passwordComplexity": "Password must contain at least one uppercase letter, one lowercase letter, and one digit"
   }
 }

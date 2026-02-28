@@ -71,6 +71,16 @@ export function UserManagementPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    if (formData.password.length < 8) {
+      showToast('error', t('settings:users.passwordTooShort'));
+      return;
+    }
+
+    if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(formData.password)) {
+      showToast('error', t('settings:users.passwordComplexity'));
+      return;
+    }
+
     try {
       await apiClient.post('/users', formData);
       setIsModalOpen(false);

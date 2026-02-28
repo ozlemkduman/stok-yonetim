@@ -86,8 +86,13 @@ export function UserFormPage() {
       return;
     }
 
-    if (!isEditing && formData.password.length < 6) {
+    if (!isEditing && formData.password.length < 8) {
       setError(t('admin:userForm.passwordTooShort'));
+      return;
+    }
+
+    if (!isEditing && !/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(formData.password)) {
+      setError(t('admin:userForm.passwordComplexity'));
       return;
     }
 
