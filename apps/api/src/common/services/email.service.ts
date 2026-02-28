@@ -1,5 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { Resend } from 'resend';
 import * as nodemailer from 'nodemailer';
 
 interface SendMailOptions {
@@ -11,37 +12,41 @@ interface SendMailOptions {
 @Injectable()
 export class EmailService {
   private readonly logger = new Logger(EmailService.name);
-  private transporter: nodemailer.Transporter;
+  private resend: Resend | null = null;
+  private transporter: nodemailer.Transporter | null = null;
 
   constructor(private readonly configService: ConfigService) {
-    const host = this.configService.get<string>('SMTP_HOST');
-    const port = this.configService.get<number>('SMTP_PORT');
-    const user = this.configService.get<string>('SMTP_USER');
-    const pass = this.configService.get<string>('SMTP_PASS');
+    const resendApiKey = this.configService.get<string>('RESEND_API_KEY');
 
-    this.logger.log(`SMTP Config: host=${host}, port=${port}, user=${user ? '***' : 'NOT SET'}, pass=${pass ? '***' : 'NOT SET'}`);
-
-    if (host && user && pass) {
-      const smtpPort = Number(port) || 587;
-      this.logger.log(`SMTP transporter olusturuluyor: ${host}:${smtpPort}, secure=${smtpPort === 465}`);
-      this.transporter = nodemailer.createTransport({
-        host,
-        port: smtpPort,
-        secure: smtpPort === 465,
-        auth: { user, pass },
-      });
+    if (resendApiKey) {
+      this.resend = new Resend(resendApiKey);
+      this.logger.log('Resend API ile e-posta gonderimi yapilandirildi');
     } else {
-      // Development: use Ethereal (fake SMTP) for testing
-      this.logger.warn('SMTP ayarlari bulunamadi. E-postalar konsola yazilacak.');
-      this.transporter = null as any;
+      // Fallback: SMTP (local development)
+      const host = this.configService.get<string>('SMTP_HOST');
+      const port = this.configService.get<number>('SMTP_PORT');
+      const user = this.configService.get<string>('SMTP_USER');
+      const pass = this.configService.get<string>('SMTP_PASS');
+
+      if (host && user && pass) {
+        const smtpPort = Number(port) || 587;
+        this.logger.log(`SMTP transporter olusturuluyor: ${host}:${smtpPort}`);
+        this.transporter = nodemailer.createTransport({
+          host,
+          port: smtpPort,
+          secure: smtpPort === 465,
+          auth: { user, pass },
+        });
+      } else {
+        this.logger.warn('E-posta ayarlari bulunamadi. E-postalar konsola yazilacak.');
+      }
     }
   }
 
   private get fromAddress(): string {
-    const from = this.configService.get<string>('SMTP_FROM');
-    const user = this.configService.get<string>('SMTP_USER');
-    // Fallback: if SMTP_FROM not set, use SMTP_USER directly
-    return from || user || 'noreply@stoksayac.com';
+    const from = this.configService.get<string>('EMAIL_FROM');
+    const smtpFrom = this.configService.get<string>('SMTP_FROM');
+    return from || smtpFrom || 'StokPro <noreply@stoksayac.com>';
   }
 
   private get frontendUrl(): string {
@@ -49,11 +54,10 @@ export class EmailService {
   }
 
   async sendMail(options: SendMailOptions): Promise<boolean> {
-    if (!this.transporter) {
+    // No provider configured: log to console (development)
+    if (!this.resend && !this.transporter) {
       this.logger.log(`[DEV E-POSTA] Kime: ${options.to}`);
       this.logger.log(`[DEV E-POSTA] Konu: ${options.subject}`);
-      this.logger.log(`[DEV E-POSTA] Link icerigi asagida:`);
-      // Extract link from HTML for easy dev access
       const linkMatch = options.html.match(/href="([^"]+)"/);
       if (linkMatch) {
         this.logger.log(`[DEV E-POSTA] Link: ${linkMatch[1]}`);
@@ -61,20 +65,45 @@ export class EmailService {
       return true;
     }
 
+    // Resend API (production)
+    if (this.resend) {
+      try {
+        const { error } = await this.resend.emails.send({
+          from: this.fromAddress,
+          to: options.to,
+          subject: options.subject,
+          html: options.html,
+        });
+
+        if (error) {
+          this.logger.error(`Resend hatasi: ${JSON.stringify(error)}`);
+          return false;
+        }
+
+        this.logger.log(`E-posta gonderildi (Resend): ${options.to}`);
+        return true;
+      } catch (error) {
+        const err = error as Error;
+        this.logger.error(`Resend e-posta gonderilemedi: ${options.to}`);
+        this.logger.error(`Hata: ${err.message}`);
+        return false;
+      }
+    }
+
+    // SMTP fallback (local development)
     try {
-      await this.transporter.sendMail({
+      await this.transporter!.sendMail({
         from: this.fromAddress,
         to: options.to,
         subject: options.subject,
         html: options.html,
       });
-      this.logger.log(`E-posta gonderildi: ${options.to}`);
+      this.logger.log(`E-posta gonderildi (SMTP): ${options.to}`);
       return true;
     } catch (error) {
       const err = error as Error;
-      this.logger.error(`E-posta gonderilemedi: ${options.to}`);
-      this.logger.error(`Hata mesaji: ${err.message}`);
-      this.logger.error(`Hata detay: ${err.stack || JSON.stringify(error)}`);
+      this.logger.error(`SMTP e-posta gonderilemedi: ${options.to}`);
+      this.logger.error(`Hata: ${err.message}`);
       return false;
     }
   }

@@ -1,9 +1,10 @@
 import {
   Injectable,
+  Logger,
   UnauthorizedException,
   BadRequestException,
   ConflictException,
-  InternalServerErrorException,
+  ServiceUnavailableException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
@@ -38,6 +39,8 @@ export interface LoginResponse {
 
 @Injectable()
 export class AuthService {
+  private readonly logger = new Logger(AuthService.name);
+
   constructor(
     private readonly authRepository: AuthRepository,
     private readonly jwtService: JwtService,
@@ -343,7 +346,8 @@ export class AuthService {
 
     const emailSent = await this.emailService.sendPasswordReset(email, token);
     if (!emailSent) {
-      throw new InternalServerErrorException('E-posta gönderilemedi. Lütfen daha sonra tekrar deneyin.');
+      this.logger.error(`Şifre sıfırlama e-postası gönderilemedi: ${email}`);
+      throw new ServiceUnavailableException('E-posta gönderilemedi. Lütfen daha sonra tekrar deneyin.');
     }
 
     return { message: 'Şifre sıfırlama bağlantısı e-posta adresinize gönderildi' };
