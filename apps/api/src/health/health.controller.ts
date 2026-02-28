@@ -1,16 +1,17 @@
-import { Controller, Get, Post, Body } from '@nestjs/common';
+import { Controller, Get, Post, Body, UseGuards, ForbiddenException } from '@nestjs/common';
 import { DatabaseService } from '../database/database.service';
 import { Public } from '../common/decorators/public.decorator';
+import { ApiKeyGuard } from '../common/guards/api-key.guard';
 import * as bcrypt from 'bcrypt';
 
 // Seed version: 2026-02-12-v2
 
 @Controller('health')
-@Public()
 export class HealthController {
   constructor(private readonly databaseService: DatabaseService) {}
 
   @Get()
+  @Public()
   async check() {
     let dbStatus = 'disconnected';
 
@@ -29,6 +30,8 @@ export class HealthController {
   }
 
   @Get('debug')
+  @Public()
+  @UseGuards(ApiKeyGuard)
   async debug() {
     const info: any = { timestamp: new Date().toISOString() };
 
@@ -65,6 +68,8 @@ export class HealthController {
   }
 
   @Post('restore')
+  @Public()
+  @UseGuards(ApiKeyGuard)
   async restore(@Body() body: { sql: string; clearFirst?: boolean }) {
     try {
       if (!body?.sql) {
@@ -116,6 +121,8 @@ export class HealthController {
   }
 
   @Post('reset-password')
+  @Public()
+  @UseGuards(ApiKeyGuard)
   async resetPassword(@Body() body: { email: string; newPassword: string }) {
     try {
       const hash = await bcrypt.hash(body.newPassword, 12);
@@ -129,6 +136,8 @@ export class HealthController {
   }
 
   @Post('run-migrations')
+  @Public()
+  @UseGuards(ApiKeyGuard)
   async runMigrations() {
     try {
       const knex = require('knex')({
@@ -158,7 +167,13 @@ export class HealthController {
   }
 
   @Post('seed')
+  @Public()
+  @UseGuards(ApiKeyGuard)
   async seed() {
+    if (process.env.NODE_ENV === 'production') {
+      throw new ForbiddenException('Seed is disabled in production');
+    }
+
     const knex = this.databaseService.knex;
 
     // Check if already seeded
@@ -171,7 +186,13 @@ export class HealthController {
   }
 
   @Post('reseed')
+  @Public()
+  @UseGuards(ApiKeyGuard)
   async reseed() {
+    if (process.env.NODE_ENV === 'production') {
+      throw new ForbiddenException('Reseed is disabled in production');
+    }
+
     try {
       const knex = this.databaseService.knex;
 

@@ -64,22 +64,29 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
         this.logger.log('Plans seeded');
       }
 
-      // Ensure super admin exists
-      const adminExists = await this._knex('users').where({ role: 'super_admin' }).first();
-      if (!adminExists) {
-        const email = process.env.SUPER_ADMIN_EMAIL || 'admin@stoksayac.com';
-        const password = process.env.SUPER_ADMIN_PASSWORD || 'StokSayac2026!';
-        const passwordHash = await bcrypt.hash(password, 12);
-        await this._knex('users').insert({
-          email,
-          password_hash: passwordHash,
-          name: 'Platform Admin',
-          role: 'super_admin',
-          permissions: JSON.stringify(['*']),
-          status: 'active',
-          email_verified_at: this._knex.fn.now(),
-        });
-        this.logger.log('Super admin created');
+      // Ensure super admin exists (only if env vars are set)
+      const adminEmail = process.env.SUPER_ADMIN_EMAIL;
+      const adminPassword = process.env.SUPER_ADMIN_PASSWORD;
+      if (adminEmail && adminPassword) {
+        const adminExists = await this._knex('users').where({ role: 'super_admin' }).first();
+        if (!adminExists) {
+          const passwordHash = await bcrypt.hash(adminPassword, 12);
+          await this._knex('users').insert({
+            email: adminEmail,
+            password_hash: passwordHash,
+            name: 'Platform Admin',
+            role: 'super_admin',
+            permissions: JSON.stringify(['*']),
+            status: 'active',
+            email_verified_at: this._knex.fn.now(),
+          });
+          this.logger.log('Super admin created');
+        }
+      } else {
+        const adminExists = await this._knex('users').where({ role: 'super_admin' }).first();
+        if (!adminExists) {
+          this.logger.warn('No super admin exists and SUPER_ADMIN_EMAIL/SUPER_ADMIN_PASSWORD env vars are not set. Skipping admin creation.');
+        }
       }
     } catch (error) {
       this.logger.error('Seed failed', error);

@@ -38,6 +38,9 @@ async function bootstrap() {
     }),
   );
 
+  // Graceful shutdown
+  app.enableShutdownHooks();
+
   const port = configService.get<number>('app.port', 3001);
   await app.listen(port);
 
