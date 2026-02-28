@@ -5,43 +5,98 @@ spec:
   type: standard
   containers:
     - name: stok-api-staging
-      image: "ghcr.io/ozlemkduman/stok-api:staging"
-      port: 3000
-      cpu: "250m"
+      cpu: 64m
+      minCpu: 50m
       memory: 512Mi
-      readinessProbe:
-        httpGet:
-          path: /api/v1/health
-          port: 3000
-        initialDelaySeconds: 10
-        periodSeconds: 15
-      livenessProbe:
-        httpGet:
-          path: /api/v1/health
-          port: 3000
-        initialDelaySeconds: 30
-        periodSeconds: 30
+      minMemory: 256Mi
+      image: ghcr.io/ozlemkduman/stok-api:staging
+      inheritEnv: false
       env:
         - name: NODE_ENV
-          value: "production"
+          value: production
+        - name: PORT
+          value: '3000'
         - name: DATABASE_URL
-          value: "postgres://stok_user:StokSayac2026DB@postgres.default-gvc.cpln.local:5432/stok_staging_db"
+          value: >-
+            postgres://stok_user:DEGISTIR_DB_PASSWORD@postgres.default-gvc.cpln.local:5432/stok_staging_db
         - name: CORS_ORIGIN
-          value: "https://staging.stoksayac.com"
+          value: https://staging.stoksayac.com
         - name: FRONTEND_URL
-          value: "https://staging.stoksayac.com"
+          value: https://staging.stoksayac.com
         - name: GOOGLE_CALLBACK_URL
-          value: "https://staging.stoksayac.com/auth/google/callback"
+          value: https://staging.stoksayac.com/api/v1/auth/google/callback
+        - name: GOOGLE_CLIENT_ID
+          value: >-
+            40781635339-06ce2ub1plchj4mualclajocfefngtec.apps.googleusercontent.com
+        - name: GOOGLE_CLIENT_SECRET
+          value: DEGISTIR_GOOGLE_CLIENT_SECRET
+        - name: JWT_SECRET
+          value: DEGISTIR_JWT_SECRET
+        - name: JWT_REFRESH_SECRET
+          value: DEGISTIR_JWT_REFRESH_SECRET
+        - name: RESEND_API_KEY
+          value: DEGISTIR_RESEND_API_KEY
+        - name: EMAIL_FROM
+          value: StokPro <noreply@stoksayac.com>
+        - name: SMTP_FROM
+          value: StokPro <iletisim@pancar.io>
+        - name: SMTP_HOST
+          value: smtp.purelymail.com
+        - name: SMTP_PASS
+          value: DEGISTIR_SMTP_PASS
+        - name: SMTP_PORT
+          value: '465'
+        - name: SMTP_USER
+          value: iletisim@pancar.io
+        - name: DEMO_NOTIFY_EMAIL
+          value: iletisim@pancar.io
         - name: ADMIN_API_KEY
-          value: "STAGING_ADMIN_KEY_DEGISTIR"
+          value: DEGISTIR_ADMIN_API_KEY
+        - name: SUPER_ADMIN_EMAIL
+          value: admin@stoksayac.com
+        - name: SUPER_ADMIN_PASSWORD
+          value: DEGISTIR_SUPER_ADMIN_PASSWORD
+      ports:
+        - number: 3000
+          protocol: http
+      readinessProbe:
+        failureThreshold: 3
+        httpGet:
+          path: /api/v1/health
+          port: 3000
+          scheme: HTTP
+        initialDelaySeconds: 15
+        periodSeconds: 10
+        successThreshold: 1
+        timeoutSeconds: 5
+      livenessProbe:
+        failureThreshold: 3
+        httpGet:
+          path: /api/v1/health
+          port: 3000
+          scheme: HTTP
+        initialDelaySeconds: 30
+        periodSeconds: 15
+        successThreshold: 1
+        timeoutSeconds: 5
+      volumes: []
   defaultOptions:
     autoscaling:
-      metric: concurrency
-      target: 100
-      maxScale: 2
+      maxConcurrency: 0
+      maxScale: 1
+      metric: disabled
       minScale: 1
-    capacityAI: false
+      scaleToZeroDelay: 300
+      target: 95
+    capacityAI: true
+    debug: false
+    suspend: false
+    timeoutSeconds: 30
   firewallConfig:
     external:
       inboundAllowCIDR:
         - 0.0.0.0/0
+      outboundAllowCIDR:
+        - 0.0.0.0/0
+    internal:
+      inboundAllowType: same-gvc
