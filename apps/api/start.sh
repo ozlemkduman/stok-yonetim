@@ -53,7 +53,7 @@ fi
 
 # Check for pending migrations before running
 echo "Checking for pending migrations..."
-PENDING=$(node -e "
+PENDING=$(node -r ts-node/register -e "
 const knex = require('knex')({
   client: 'pg',
   connection: process.env.DATABASE_URL,
@@ -72,7 +72,7 @@ else
 
   # Use advisory lock to prevent concurrent migrations from multiple replicas
   echo "Running migrations (with advisory lock)..."
-  node -e "
+  node -r ts-node/register -e "
 const knex = require('knex')({
   client: 'pg',
   connection: process.env.DATABASE_URL,
