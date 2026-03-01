@@ -19,6 +19,7 @@ const icons = {
 interface Return {
   id: string;
   return_number: string;
+  customer_id?: string;
   customer_name?: string;
   return_date: string;
   total_amount: number;
@@ -84,7 +85,15 @@ export function ReturnListPage() {
         </Link>
       )
     },
-    { key: 'customer_name', header: t('returns:columns.customer'), render: (r) => r.customer_name || '-' },
+    {
+      key: 'customer_name',
+      header: t('returns:columns.customer'),
+      render: (r) => r.customer_id ? (
+        <button className={styles.customerLink} onClick={(e) => { e.stopPropagation(); navigate(`/customers/${r.customer_id}`); }}>
+          {r.customer_name}
+        </button>
+      ) : (r.customer_name || '-')
+    },
     { key: 'return_date', header: t('returns:columns.date'), render: (r) => formatDateTime(r.return_date) },
     {
       key: 'total_amount',

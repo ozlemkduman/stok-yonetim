@@ -213,6 +213,67 @@
 .badgeWarning { background: var(--color-warning-light); color: var(--color-warning); }
 .badgeSuccess { background: var(--color-success-light); color: var(--color-success); }
 
+.customerLink {
+  color: var(--color-primary);
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font-size: inherit;
+  font-family: inherit;
+}
+.customerLink:hover { color: var(--color-primary-hover); text-decoration: underline; }
+
+/* Renewal Filters */
+.renewalFilters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-top: var(--space-4);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--color-border-light);
+}
+
+.renewalFilterBtn {
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.renewalFilterBtn:hover {
+  background: var(--color-bg-elevated);
+  color: var(--color-text-primary);
+}
+
+.renewalFilterBtnActive {
+  color: white;
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+.renewalFilterBtnRed.renewalFilterBtnActive {
+  background: var(--color-danger);
+  border-color: var(--color-danger);
+}
+
+.renewalFilterBtnYellow.renewalFilterBtnActive {
+  background: var(--color-warning);
+  border-color: var(--color-warning);
+  color: #000;
+}
+
+.renewalFilterBtnGreen.renewalFilterBtnActive {
+  background: var(--color-success);
+  border-color: var(--color-success);
+}
+
 /* Empty state */
 .emptyState {
   text-align: center;
@@ -351,6 +412,9 @@
   .accordionHeader { padding: var(--space-2) var(--space-3); flex-wrap: wrap; }
   .accordionMeta { gap: var(--space-2); }
   .accordionBody { padding: 0 var(--space-3) var(--space-2); }
+
+  .renewalFilters { gap: var(--space-1); }
+  .renewalFilterBtn { font-size: var(--font-size-xs); padding: var(--space-1) var(--space-2); }
 }
 
 /* Mobile Small */

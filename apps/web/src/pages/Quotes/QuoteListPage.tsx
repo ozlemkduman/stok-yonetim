@@ -168,7 +168,14 @@ export function QuoteListPage() {
       render: (q) => (
         <div className={styles.quoteInfo} onClick={() => navigate(`/quotes/${q.id}`)} style={{ cursor: 'pointer' }}>
           <span className={styles.quoteNumber}>{q.quote_number}</span>
-          {q.customer_name && <span className={styles.customerName}>{q.customer_name}</span>}
+          {q.customer_name && (
+            <span
+              className={`${styles.customerName} ${q.customer_id ? styles.customerLink : ''}`}
+              onClick={(e) => { if (q.customer_id) { e.stopPropagation(); navigate(`/customers/${q.customer_id}`); } }}
+            >
+              {q.customer_name}
+            </span>
+          )}
         </div>
       ),
     },

@@ -89,6 +89,8 @@
 .quoteInfo { display: flex; flex-direction: column; }
 .quoteNumber { font-weight: var(--font-weight-semibold); color: var(--color-primary); font-family: monospace; }
 .customerName { font-size: var(--font-size-xs); color: var(--color-text-muted); margin-top: 2px; }
+.customerLink { cursor: pointer; color: var(--color-primary); }
+.customerLink:hover { text-decoration: underline; color: var(--color-primary-hover); }
 
 .validUntil { font-size: var(--font-size-sm); }
 .validUntil.expired { color: var(--color-danger); font-weight: var(--font-weight-semibold); }

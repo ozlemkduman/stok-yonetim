@@ -6,6 +6,13 @@
   "emptyMessage": "No customers found",
   "upgradePrompt": "You have reached your customer limit. Upgrade your plan to add more customers.",
 
+  "filters": {
+    "all": "All",
+    "red": "Red",
+    "yellow": "Yellow",
+    "green": "Green"
+  },
+
   "columns": {
     "customerName": "Customer Name",
     "email": "Email",
@@ -52,7 +59,9 @@
       "taxNumber": "Tax Number",
       "taxOffice": "Tax Office",
       "notes": "Notes",
-      "createdBy": "Created By"
+      "createdBy": "Created By",
+      "renewalThresholds": "Renewal Thresholds",
+      "renewalThresholdsValue": "Red: {{red}} days, Yellow: {{yellow}} days"
     },
 
     "stats": {
@@ -130,11 +139,26 @@
     "taxOfficePlaceholder": "Kadikoy",
     "addressPlaceholder": "Full address",
     "notesPlaceholder": "Notes about the customer...",
+    "renewalSettings": "Renewal Thresholds",
+    "renewalSettingsHint": "Set color thresholds for this customer's sales renewal reminders.",
+    "renewalRedDays": "Red Threshold (days)",
+    "renewalRedDaysPlaceholder": "30",
+    "renewalYellowDays": "Yellow Threshold (days)",
+    "renewalYellowDaysPlaceholder": "60",
     "errors": {
       "nameRequired": "Customer name is required",
       "nameMinLength": "Customer name must be at least 2 characters",
       "emailInvalid": "Please enter a valid email address",
+      "redMustBeLessThanYellow": "Red threshold must be less than yellow threshold",
+      "minOneDays": "Must be at least 1 day",
       "generic": "An error occurred"
     }
+  },
+
+  "renewal": {
+    "expired": "Has expired renewal",
+    "urgent": "Renewal in {{days}} days",
+    "upcoming": "Renewal in {{days}} days",
+    "ok": "Renewal status is normal"
   }
 }

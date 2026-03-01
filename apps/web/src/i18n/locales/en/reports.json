@@ -125,5 +125,30 @@
     "invoiced": "Invoiced",
     "cancelled": "Cancelled",
     "avgSale": "Avg. Sale"
+  },
+  "renewals": {
+    "title": "Renewal Reminders",
+    "total": "Total",
+    "expired": "Expired",
+    "expiredLabel": "Expired",
+    "urgent": "Critical",
+    "urgentLabel": "Critical",
+    "upcoming": "Upcoming",
+    "upcomingLabel": "Upcoming",
+    "future": "Normal",
+    "futureLabel": "Normal",
+    "customer": "Customer",
+    "products": "Products",
+    "saleDate": "Sale Date",
+    "renewalDate": "Renewal Date",
+    "daysLeft": "Days Left",
+    "status": "Status",
+    "note": "Note",
+    "noData": "No renewal reminders found",
+    "filterAll": "All",
+    "filterExpired": "Expired",
+    "filterCritical": "Critical",
+    "filterUpcoming": "Upcoming",
+    "filterOk": "Normal"
   }
 }

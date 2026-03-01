@@ -131,12 +131,13 @@
     "title": "Yenileme Hatirlatmalari",
     "total": "Toplam",
     "expired": "Suresi Dolmus",
-    "urgent": "Acil",
-    "urgentLabel": "Acil (<=7 gun)",
+    "expiredLabel": "Suresi Dolmus",
+    "urgent": "Kritik",
+    "urgentLabel": "Kritik",
     "upcoming": "Yaklasan",
-    "upcomingLabel": "Yaklasan (<=30 gun)",
-    "future": "Gelecek",
-    "futureLabel": "Gelecek (>30 gun)",
+    "upcomingLabel": "Yaklasan",
+    "future": "Normal",
+    "futureLabel": "Normal",
     "customer": "Musteri",
     "products": "Urunler",
     "saleDate": "Satis Tarihi",
@@ -144,6 +145,11 @@
     "daysLeft": "Kalan Gun",
     "status": "Durum",
     "note": "Not",
-    "noData": "Yenileme hatirlatmasi bulunamadi"
+    "noData": "Yenileme hatirlatmasi bulunamadi",
+    "filterAll": "Tumu",
+    "filterExpired": "Suresi Dolmus",
+    "filterCritical": "Kritik",
+    "filterUpcoming": "Yaklasan",
+    "filterOk": "Normal"
   }
 }

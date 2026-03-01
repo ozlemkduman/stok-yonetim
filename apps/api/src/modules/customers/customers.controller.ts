@@ -22,9 +22,10 @@ export class CustomersController {
   constructor(private readonly customersService: CustomersService) {}
 
   @Get()
-  async findAll(@Query() query: PaginationDto & { isActive?: string }) {
+  async findAll(@Query() query: PaginationDto & { isActive?: string; renewalStatus?: string }) {
     const page = query.page || 1;
     const limit = query.limit || 20;
+    const validRenewalStatuses = ['red', 'yellow', 'green'];
     const params = {
       page,
       limit,
@@ -32,6 +33,9 @@ export class CustomersController {
       sortBy: validateSortColumn(query.sortBy || 'created_at', ALLOWED_SORT_COLUMNS, 'created_at'),
       sortOrder: query.sortOrder || 'desc',
       isActive: query.isActive === 'true' ? true : query.isActive === 'false' ? false : undefined,
+      renewalStatus: validRenewalStatuses.includes(query.renewalStatus as string)
+        ? (query.renewalStatus as 'red' | 'yellow' | 'green')
+        : undefined,
     };
 
     const result = await this.customersService.findAll(params);

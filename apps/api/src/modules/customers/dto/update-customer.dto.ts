@@ -2,6 +2,9 @@ import {
   IsString,
   IsEmail,
   IsOptional,
+  IsInt,
+  Min,
+  Max,
   MaxLength,
   MinLength,
   IsBoolean,
@@ -45,4 +48,16 @@ export class UpdateCustomerDto {
   @IsOptional()
   @IsBoolean()
   is_active?: boolean;
+
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  @Max(365)
+  renewal_red_days?: number;
+
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  @Max(365)
+  renewal_yellow_days?: number;
 }

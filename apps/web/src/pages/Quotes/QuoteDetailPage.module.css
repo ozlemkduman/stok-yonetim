@@ -42,6 +42,17 @@
   color: var(--color-text-secondary);
 }
 
+.customerLink {
+  color: var(--color-primary);
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font-size: inherit;
+  font-family: inherit;
+}
+.customerLink:hover { color: var(--color-primary-hover); text-decoration: underline; }
+
 .headerRight { display: flex; align-items: flex-start; }
 
 .totalCard {

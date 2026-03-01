@@ -6,6 +6,13 @@
   "emptyMessage": "Müşteri bulunamadı",
   "upgradePrompt": "Müşteri limitinize ulaştınız. Daha fazla müşteri eklemek için planınızı yükseltin.",
 
+  "filters": {
+    "all": "Tümü",
+    "red": "Kırmızı",
+    "yellow": "Sarı",
+    "green": "Yeşil"
+  },
+
   "columns": {
     "customerName": "Müşteri Adı",
     "email": "E-posta",
@@ -52,7 +59,9 @@
       "taxNumber": "Vergi No",
       "taxOffice": "Vergi Dairesi",
       "notes": "Notlar",
-      "createdBy": "Kaydeden"
+      "createdBy": "Kaydeden",
+      "renewalThresholds": "Yenileme Eşikleri",
+      "renewalThresholdsValue": "Kırmızı: {{red}} gün, Sarı: {{yellow}} gün"
     },
 
     "stats": {
@@ -130,11 +139,26 @@
     "taxOfficePlaceholder": "Kadıköy",
     "addressPlaceholder": "Tam adres",
     "notesPlaceholder": "Müşteri hakkında notlar...",
+    "renewalSettings": "Yenileme Eşikleri",
+    "renewalSettingsHint": "Bu müşterinin satış yenileme hatırlatmaları için renk eşiklerini belirleyin.",
+    "renewalRedDays": "Kırmızı Eşik (gün)",
+    "renewalRedDaysPlaceholder": "30",
+    "renewalYellowDays": "Sarı Eşik (gün)",
+    "renewalYellowDaysPlaceholder": "60",
     "errors": {
       "nameRequired": "Müşteri adı zorunludur",
       "nameMinLength": "Müşteri adı en az 2 karakter olmalıdır",
       "emailInvalid": "Geçerli bir e-posta adresi giriniz",
+      "redMustBeLessThanYellow": "Kırmızı eşik, sarı eşikten küçük olmalıdır",
+      "minOneDays": "En az 1 gün olmalıdır",
       "generic": "Bir hata oluştu"
     }
+  },
+
+  "renewal": {
+    "expired": "Süresi dolmuş yenileme var",
+    "urgent": "{{days}} gün içinde yenileme var",
+    "upcoming": "{{days}} gün içinde yenileme var",
+    "ok": "Yenileme durumu normal"
   }
 }

@@ -3,6 +3,7 @@ import {
   NotFoundException,
   ConflictException,
   ForbiddenException,
+  BadRequestException,
 } from '@nestjs/common';
 import { CustomersRepository, Customer, CustomerListParams } from './customers.repository';
 import { CreateCustomerDto, UpdateCustomerDto } from './dto';
@@ -43,6 +44,13 @@ export class CustomersService {
       }
     }
 
+    // Validate renewal thresholds
+    if (dto.renewal_red_days && dto.renewal_yellow_days) {
+      if (dto.renewal_red_days >= dto.renewal_yellow_days) {
+        throw new BadRequestException('Kirmizi esik, sari esikten kucuk olmalidir');
+      }
+    }
+
     return this.customersRepository.createCustomer(dto, userId);
   }
 
@@ -55,6 +63,13 @@ export class CustomersService {
       const existing = await this.customersRepository.findByEmail(dto.email);
       if (existing && existing.id !== id) {
         throw new ConflictException('Bu e-posta adresi zaten kullaniliyor');
+      }
+    }
+
+    // Validate renewal thresholds
+    if (dto.renewal_red_days && dto.renewal_yellow_days) {
+      if (dto.renewal_red_days >= dto.renewal_yellow_days) {
+        throw new BadRequestException('Kirmizi esik, sari esikten kucuk olmalidir');
       }
     }
 

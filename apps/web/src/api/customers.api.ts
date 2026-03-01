@@ -15,6 +15,9 @@ export interface Customer {
   created_by_name?: string | null;
   created_at: string;
   updated_at: string;
+  renewal_red_days: number;
+  renewal_yellow_days: number;
+  nearest_renewal_days?: number | null;
 }
 
 export interface CreateCustomerData {
@@ -25,6 +28,8 @@ export interface CreateCustomerData {
   tax_number?: string;
   tax_office?: string;
   notes?: string;
+  renewal_red_days?: number;
+  renewal_yellow_days?: number;
 }
 
 export interface UpdateCustomerData extends Partial<CreateCustomerData> {
@@ -38,6 +43,7 @@ export interface CustomerListParams {
   sortBy?: string;
   sortOrder?: 'asc' | 'desc';
   isActive?: boolean;
+  renewalStatus?: 'red' | 'yellow' | 'green';
 }
 
 export interface SaleItem {
@@ -133,6 +139,7 @@ export const customersApi = {
     if (params.sortBy) queryParams.sortBy = params.sortBy;
     if (params.sortOrder) queryParams.sortOrder = params.sortOrder;
     if (params.isActive !== undefined) queryParams.isActive = String(params.isActive);
+    if (params.renewalStatus) queryParams.renewalStatus = params.renewalStatus;
 
     return apiClient.get<Customer[]>('/customers', queryParams);
   },
