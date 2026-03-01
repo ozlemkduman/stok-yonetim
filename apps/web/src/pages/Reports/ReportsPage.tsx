@@ -108,6 +108,7 @@ export function ReportsPage() {
   const [expandedCustomer, setExpandedCustomer] = useState<string | null>(null);
   const [employeePerformance, setEmployeePerformance] = useState<EmployeePerformanceReport | null>(null);
   const [renewalsReport, setRenewalsReport] = useState<RenewalsReport | null>(null);
+  const [renewalFilter, setRenewalFilter] = useState<'all' | 'expired' | 'red' | 'yellow' | 'green'>('all');
 
   const fetchReports = useCallback(async () => {
     setLoading(true);
@@ -943,6 +944,10 @@ export function ReportsPage() {
 
     const { renewals, summary } = renewalsReport;
 
+    const filteredRenewals = renewalFilter === 'all'
+      ? renewals
+      : renewals.filter((item) => item.renewal_status === renewalFilter);
+
     const getStatusBadge = (item: RenewalItem) => {
       if (item.renewal_status === 'expired') return <span className={`${styles.badge} ${styles.badgeDanger}`}>{t('reports:renewals.expired')}</span>;
       if (item.renewal_status === 'red') return <span className={`${styles.badge} ${styles.badgeDanger}`}>{t('reports:renewals.urgent')}</span>;
@@ -980,10 +985,43 @@ export function ReportsPage() {
                 <div className={styles.summaryLabel}>{t('reports:renewals.futureLabel')}</div>
               </div>
             </div>
+
+            <div className={styles.renewalFilters}>
+              <button
+                className={`${styles.renewalFilterBtn} ${renewalFilter === 'all' ? styles.renewalFilterBtnActive : ''}`}
+                onClick={() => setRenewalFilter('all')}
+              >
+                {t('reports:renewals.filterAll')}
+              </button>
+              <button
+                className={`${styles.renewalFilterBtn} ${styles.renewalFilterBtnRed} ${renewalFilter === 'expired' ? styles.renewalFilterBtnActive : ''}`}
+                onClick={() => setRenewalFilter('expired')}
+              >
+                {t('reports:renewals.filterExpired')} ({summary.expiredCount})
+              </button>
+              <button
+                className={`${styles.renewalFilterBtn} ${styles.renewalFilterBtnRed} ${renewalFilter === 'red' ? styles.renewalFilterBtnActive : ''}`}
+                onClick={() => setRenewalFilter('red')}
+              >
+                {t('reports:renewals.filterCritical')} ({summary.urgentCount})
+              </button>
+              <button
+                className={`${styles.renewalFilterBtn} ${styles.renewalFilterBtnYellow} ${renewalFilter === 'yellow' ? styles.renewalFilterBtnActive : ''}`}
+                onClick={() => setRenewalFilter('yellow')}
+              >
+                {t('reports:renewals.filterUpcoming')} ({summary.upcomingCount})
+              </button>
+              <button
+                className={`${styles.renewalFilterBtn} ${styles.renewalFilterBtnGreen} ${renewalFilter === 'green' ? styles.renewalFilterBtnActive : ''}`}
+                onClick={() => setRenewalFilter('green')}
+              >
+                {t('reports:renewals.filterOk')} ({summary.futureCount})
+              </button>
+            </div>
           </div>
         </div>
 
-        {renewals.length > 0 ? (
+        {filteredRenewals.length > 0 ? (
           <div className={`${styles.reportCard} ${styles.fullWidthCard}`}>
             <div className={styles.reportCardBody}>
               <table className={styles.reportTable}>
@@ -999,7 +1037,7 @@ export function ReportsPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {renewals.map((item) => (
+                  {filteredRenewals.map((item) => (
                     <tr key={item.id}>
                       <td>
                         {item.customer_id ? (
