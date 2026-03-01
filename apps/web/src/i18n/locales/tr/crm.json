@@ -1,6 +1,6 @@
 {
-  "pageTitle": "CRM - Kisiler",
-  "newContact": "Yeni Kisi",
+  "pageTitle": "CRM - Kişiler",
+  "newContact": "Yeni Kişi",
   "searchPlaceholder": "Ara...",
   "search": "Ara",
   "columns": {
@@ -10,73 +10,73 @@
     "phone": "Telefon",
     "source": "Kaynak",
     "nextFollowUp": "Sonraki Takip",
-    "actions": "Islemler"
+    "actions": "İşlemler"
   },
   "buttons": {
     "detail": "Detay",
-    "edit": "Duzenle",
+    "edit": "Düzenle",
     "delete": "Sil",
-    "back": "Geri Don",
-    "backToContacts": "← Kisiler",
-    "cancel": "Iptal",
+    "back": "Geri Dön",
+    "backToContacts": "← Kişiler",
+    "cancel": "İptal",
     "save": "Kaydet",
     "saving": "Kaydediliyor...",
-    "convertToCustomer": "Musteriye Donustur",
-    "converting": "Donusturuluyor...",
-    "viewCustomer": "Musteriyi Gor"
+    "convertToCustomer": "Müşteriye Dönüştür",
+    "converting": "Dönüştürülüyor...",
+    "viewCustomer": "Müşteriyi Gör"
   },
   "status": {
     "lead": "Potansiyel",
     "prospect": "Aday",
-    "customer": "Musteri",
+    "customer": "Müşteri",
     "inactive": "Pasif"
   },
   "source": {
     "website": "Web Sitesi",
     "referral": "Referans",
     "social": "Sosyal Medya",
-    "cold_call": "Soguk Arama",
+    "cold_call": "Soğuk Arama",
     "event": "Etkinlik",
-    "other": "Diger"
+    "other": "Diğer"
   },
   "filter": {
-    "allStatuses": "Tum Durumlar"
+    "allStatuses": "Tüm Durumlar"
   },
   "pagination": {
-    "previous": "Onceki",
+    "previous": "Önceki",
     "next": "Sonraki",
     "pageOf": "Sayfa {{page}} / {{totalPages}}"
   },
-  "empty": "Kisi bulunamadi",
+  "empty": "Kişi bulunamadı",
   "toast": {
-    "loadError": "Kisiler yuklenemedi",
-    "deleteError": "Kisi silinemedi",
-    "saveError": "Kisi kaydedilemedi",
-    "alreadyLinked": "Bu kisi zaten bir musteriye baglidir.",
-    "convertSuccess": "Kisi basariyla musteriye donusturuldu!",
-    "convertError": "Donusturme islemi basarisiz oldu",
-    "dataLoadError": "Veri yuklenemedi"
+    "loadError": "Kişiler yüklenemedi",
+    "deleteError": "Kişi silinemedi",
+    "saveError": "Kişi kaydedilemedi",
+    "alreadyLinked": "Bu kişi zaten bir müşteriye bağlıdır.",
+    "convertSuccess": "Kişi başarıyla müşteriye dönüştürüldü!",
+    "convertError": "Dönüştürme işlemi başarısız oldu",
+    "dataLoadError": "Veri yüklenemedi"
   },
   "confirm": {
-    "delete": "Bu kisiyi silmek istediginize emin misiniz?",
-    "convert": "Bu kisiyi musteriye donusturmek istediginize emin misiniz?"
+    "delete": "Bu kişiyi silmek istediğinize emin misiniz?",
+    "convert": "Bu kişiyi müşteriye dönüştürmek istediğinize emin misiniz?"
   },
   "detail": {
-    "loading": "Yukleniyor...",
-    "notFound": "Kisi bulunamadi",
-    "customerLinked": "Musteri Bagli",
-    "contactInfo": "Kisi Bilgileri",
-    "activitySummary": "Aktivite Ozeti",
+    "loading": "Yükleniyor...",
+    "notFound": "Kişi bulunamadı",
+    "customerLinked": "Müşteri Bağlı",
+    "contactInfo": "Kişi Bilgileri",
+    "activitySummary": "Aktivite Özeti",
     "labels": {
       "name": "Ad Soyad",
       "email": "E-posta",
       "phone": "Telefon",
       "mobile": "Mobil",
-      "company": "Sirket",
+      "company": "Şirket",
       "position": "Pozisyon",
       "source": "Kaynak",
       "notes": "Notlar",
-      "lastContact": "Son Iletisim",
+      "lastContact": "Son İletişim",
       "nextFollowUp": "Sonraki Takip"
     },
     "stats": {
@@ -86,28 +86,28 @@
     },
     "tabs": {
       "callsEmails": "Aramalar / E-postalar ({{count}})",
-      "meetings": "Toplantilar ({{count}})",
-      "notesAndTasks": "Notlar / Gorevler ({{count}})"
+      "meetings": "Toplantılar ({{count}})",
+      "notesAndTasks": "Notlar / Görevler ({{count}})"
     },
-    "emptyActivities": "Henuz aktivite yok",
-    "completedAt": "Tamamlandi: {{date}}",
+    "emptyActivities": "Henüz aktivite yok",
+    "completedAt": "Tamamlandı: {{date}}",
     "durationMinutes": "{{minutes}} dk"
   },
   "activityType": {
     "call": "Arama",
     "email": "E-posta",
-    "meeting": "Toplanti",
+    "meeting": "Toplantı",
     "note": "Not",
-    "task": "Gorev"
+    "task": "Görev"
   },
   "activityStatus": {
-    "planned": "Planlandi",
-    "completed": "Tamamlandi",
-    "cancelled": "Iptal Edildi"
+    "planned": "Planlandı",
+    "completed": "Tamamlandı",
+    "cancelled": "İptal Edildi"
   },
   "form": {
-    "editTitle": "Kisi Duzenle",
-    "createTitle": "Yeni Kisi",
+    "editTitle": "Kişi Düzenle",
+    "createTitle": "Yeni Kişi",
     "nameLabel": "Ad Soyad *",
     "titleLabel": "Unvan",
     "emailLabel": "E-posta",
@@ -117,6 +117,6 @@
     "sourceLabel": "Kaynak",
     "nextFollowUpLabel": "Sonraki Takip",
     "notesLabel": "Notlar",
-    "sourceSelect": "Secin"
+    "sourceSelect": "Seçin"
   }
 }
