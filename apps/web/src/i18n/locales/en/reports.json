@@ -11,7 +11,8 @@
     "customerSales": "Customer Sales",
     "stock": "Stock Status",
     "expenses": "Expenses",
-    "staff": "Staff"
+    "staff": "Staff",
+    "renewals": "Renewals"
   },
   "general": {
     "salesSummary": "Sales Summary",

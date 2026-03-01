@@ -64,10 +64,10 @@
       "dueDate": "Vade Tarihi",
       "notes": "Notlar",
       "renewalDate": "Yenileme Tarihi",
-      "reminderDays": "Hatirlatma",
-      "reminderNote": "Hatirlatma Notu"
+      "reminderDays": "Hatırlatma",
+      "reminderNote": "Hatırlatma Notu"
     },
-    "reminderDaysValue": "{{days}} gun once",
+    "reminderDaysValue": "{{days}} gün önce",
     "retailSale": "Perakende Satış",
     "invoiceIssued": "Fatura Kesildi",
     "invoiceNotIssued": "Fatura Kesilmedi",
@@ -164,13 +164,13 @@
     "orDiscountAmount": "veya İskonto Tutarı",
     "notes": "Notlar",
     "renewal": {
-      "title": "Yenileme Hatirlatmasi",
-      "enable": "Yenileme hatirlatmasi ekle",
-      "dateLabel": "Yenileme / Bitis Tarihi",
-      "yearShortcut": "{{count}} Yil",
-      "reminderDaysLabel": "Kac gun once hatirlatsin",
-      "noteLabel": "Hatirlatma Notu",
-      "notePlaceholder": "Ornegin: E-imza yenileme, lisans uzatma..."
+      "title": "Yenileme Hatırlatması",
+      "enable": "Yenileme hatırlatması ekle",
+      "dateLabel": "Yenileme / Bitiş Tarihi",
+      "yearShortcut": "{{count}} Yıl",
+      "reminderDaysLabel": "Kaç gün önce hatırlatsın",
+      "noteLabel": "Hatırlatma Notu",
+      "notePlaceholder": "Örneğin: E-imza yenileme, lisans uzatma..."
     },
     "paymentMethods": {
       "nakit": "Nakit",
@@ -193,9 +193,9 @@
     "vatExcluded": "Hariç",
     "notes": "Notlar",
     "renewalDate": "Yenileme Tarihi",
-    "reminderDays": "Hatirlatma",
-    "reminderDaysValue": "{{days}} gun once",
-    "reminderNote": "Hatirlatma Notu",
+    "reminderDays": "Hatırlatma",
+    "reminderDaysValue": "{{days}} gün önce",
+    "reminderNote": "Hatırlatma Notu",
     "productsCount": "Ürünler ({{count}})",
     "columns": {
       "product": "Ürün",

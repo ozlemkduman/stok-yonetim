@@ -62,7 +62,10 @@
       "invoiceStatus": "Invoice Status",
       "createdBy": "Created By",
       "dueDate": "Due Date",
-      "notes": "Notes"
+      "notes": "Notes",
+      "renewalDate": "Renewal Date",
+      "reminderDays": "Reminder",
+      "reminderNote": "Reminder Note"
     },
     "retailSale": "Retail Sale",
     "invoiceIssued": "Invoice Issued",
@@ -95,6 +98,7 @@
     },
     "emptyPaymentCredit": "No payments made yet (Credit sale)",
     "emptyPaymentCash": "Payment received in cash",
+    "reminderDaysValue": "{{days}} days before",
     "notFound": "Sale not found",
     "goBack": "Go Back"
   },
@@ -164,6 +168,15 @@
       "kredi_karti": "Credit Card",
       "havale": "Bank Transfer/EFT",
       "veresiye": "Credit"
+    },
+    "renewal": {
+      "title": "Renewal Reminder",
+      "enable": "Add renewal reminder",
+      "dateLabel": "Renewal / Expiry Date",
+      "yearShortcut": "{{count}} Year",
+      "reminderDaysLabel": "Remind how many days before",
+      "noteLabel": "Reminder Note",
+      "notePlaceholder": "E.g.: E-signature renewal, license extension..."
     }
   },
   "stepSummary": {
@@ -190,7 +203,11 @@
     "subtotal": "Subtotal:",
     "discountLabel": "Discount:",
     "vatTotal": "VAT Total:",
-    "grandTotal": "Grand Total:"
+    "grandTotal": "Grand Total:",
+    "renewalDate": "Renewal Date",
+    "reminderDays": "Reminder",
+    "reminderDaysValue": "{{days}} days before",
+    "reminderNote": "Reminder Note"
   },
   "print": {
     "title": "Print",
