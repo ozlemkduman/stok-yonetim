@@ -213,6 +213,17 @@
 .badgeWarning { background: var(--color-warning-light); color: var(--color-warning); }
 .badgeSuccess { background: var(--color-success-light); color: var(--color-success); }
 
+.customerLink {
+  color: var(--color-primary);
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font-size: inherit;
+  font-family: inherit;
+}
+.customerLink:hover { color: var(--color-primary-hover); text-decoration: underline; }
+
 /* Empty state */
 .emptyState {
   text-align: center;

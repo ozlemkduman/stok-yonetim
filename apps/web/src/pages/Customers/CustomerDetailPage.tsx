@@ -117,6 +117,17 @@ export function CustomerDetailPage() {
                 <span className={styles.infoValue}>{customer.created_by_name}</span>
               </div>
             )}
+            {(customer.renewal_red_days || customer.renewal_yellow_days) && (
+              <div className={styles.infoItem}>
+                <span className={styles.infoLabel}>{t('customers:detail.info.renewalThresholds')}</span>
+                <span className={styles.infoValue}>
+                  {t('customers:detail.info.renewalThresholdsValue', {
+                    red: customer.renewal_red_days || 30,
+                    yellow: customer.renewal_yellow_days || 60,
+                  })}
+                </span>
+              </div>
+            )}
           </div>
         </Card>
 

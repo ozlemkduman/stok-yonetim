@@ -91,8 +91,63 @@
 }
 
 .customerName { display: flex; flex-direction: column; }
+.nameRow { display: flex; align-items: center; gap: var(--space-2); }
 .name { font-weight: var(--font-weight-semibold); color: var(--color-text-primary); }
 .phone { font-size: var(--font-size-xs); color: var(--color-text-muted); margin-top: 2px; }
+
+.renewalDot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+  flex-shrink: 0;
+}
+.renewalDotDanger { background-color: var(--color-danger); }
+.renewalDotWarning { background-color: var(--color-warning); }
+.renewalDotSuccess { background-color: var(--color-success); }
+
+.renewalFilters {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.filterBtn {
+  padding: var(--space-1) var(--space-3);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  background: var(--color-bg-elevated);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+}
+
+.filterBtn:hover { border-color: var(--color-border-hover); }
+
+.filterBtnActive {
+  color: white;
+  background: var(--color-text-secondary);
+  border-color: var(--color-text-secondary);
+}
+
+.filterBtnRed.filterBtnActive {
+  background: var(--color-danger);
+  border-color: var(--color-danger);
+}
+
+.filterBtnYellow.filterBtnActive {
+  background: var(--color-warning);
+  border-color: var(--color-warning);
+  color: #000;
+}
+
+.filterBtnGreen.filterBtnActive {
+  background: var(--color-success);
+  border-color: var(--color-success);
+}
 
 .positive { color: var(--color-success); font-weight: var(--font-weight-semibold); }
 .negative { color: var(--color-danger); font-weight: var(--font-weight-semibold); }
@@ -114,6 +169,7 @@
 
   .toolbar { flex-direction: column; align-items: stretch; padding: var(--space-3); gap: var(--space-3); }
   .searchForm { max-width: none; flex-direction: column; }
+  .renewalFilters { flex-wrap: wrap; }
 
   .pagination { padding: var(--space-3); }
 

@@ -189,7 +189,15 @@ export function QuoteDetailPage() {
             <Badge variant={getStatusBadgeVariant(quote.status)}>
               {t(`quotes:statuses.${quote.status}`, { defaultValue: quote.status })}
             </Badge>
-            {quote.customer_name && <span className={styles.customerName}>{quote.customer_name}</span>}
+            {quote.customer_name && (
+              quote.customer_id ? (
+                <button className={styles.customerLink} onClick={() => navigate(`/customers/${quote.customer_id}`)}>
+                  {quote.customer_name}
+                </button>
+              ) : (
+                <span className={styles.customerName}>{quote.customer_name}</span>
+              )
+            )}
           </div>
         </div>
         <div className={styles.headerRight}>
@@ -228,7 +236,13 @@ export function QuoteDetailPage() {
             </div>
             <div className={styles.infoItem}>
               <span className={styles.infoLabel}>{t('quotes:detail.customer')}</span>
-              <span className={styles.infoValue}>{quote.customer_name || t('quotes:detail.customerNotSpecified')}</span>
+              <span className={styles.infoValue}>
+                {quote.customer_id ? (
+                  <button className={styles.customerLink} onClick={() => navigate(`/customers/${quote.customer_id}`)}>
+                    {quote.customer_name}
+                  </button>
+                ) : (quote.customer_name || t('quotes:detail.customerNotSpecified'))}
+              </span>
             </div>
             <div className={styles.infoItem}>
               <span className={styles.infoLabel}>{t('quotes:detail.vatIncluded')}</span>

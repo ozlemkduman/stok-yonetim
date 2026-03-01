@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Table, Button, Select, Badge, Pagination, type Column } from '@stok/ui';
 import { EDocument, EDocumentSummary, eDocumentsApi } from '../../api/e-documents.api';
@@ -21,6 +21,7 @@ const icons = {
 
 export function EDocumentListPage() {
   const { t } = useTranslation(['edocuments', 'common']);
+  const navigate = useNavigate();
   const [documents, setDocuments] = useState<EDocument[]>([]);
   const [summary, setSummary] = useState<EDocumentSummary | null>(null);
   const [loading, setLoading] = useState(true);
@@ -140,7 +141,11 @@ export function EDocumentListPage() {
     {
       key: 'customer_name',
       header: t('edocuments:columns.customer'),
-      render: (d) => d.customer_name || '-',
+      render: (d) => d.customer_id ? (
+        <button className={styles.customerLink} onClick={(e) => { e.stopPropagation(); navigate(`/customers/${d.customer_id}`); }}>
+          {d.customer_name}
+        </button>
+      ) : (d.customer_name || '-'),
     },
     {
       key: 'issue_date',

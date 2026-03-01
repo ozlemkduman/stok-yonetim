@@ -19,6 +19,9 @@ export interface Customer {
   created_at: Date;
   updated_at: Date;
   created_by_name?: string;
+  renewal_red_days: number;
+  renewal_yellow_days: number;
+  nearest_renewal_days?: number | null;
 }
 
 export interface CustomerListParams {
@@ -28,6 +31,7 @@ export interface CustomerListParams {
   sortBy: string;
   sortOrder: 'asc' | 'desc';
   isActive?: boolean;
+  renewalStatus?: 'red' | 'yellow' | 'green';
 }
 
 @Injectable()
@@ -39,20 +43,54 @@ export class CustomersRepository extends BaseTenantRepository<Customer> {
   }
 
   async findCustomerById(id: string): Promise<Customer | null> {
+    const renewalSubquery = this.knex('sales')
+      .select('customer_id')
+      .min('renewal_date as nearest_renewal_date')
+      .where('has_renewal', true)
+      .where('status', 'completed')
+      .whereNotNull('renewal_date')
+      .groupBy('customer_id')
+      .as('renewals');
+
     return this.query.clone()
       .leftJoin('users', `${this.tableName}.created_by`, 'users.id')
-      .select(`${this.tableName}.*`, 'users.name as created_by_name')
+      .leftJoin(renewalSubquery, `${this.tableName}.id`, 'renewals.customer_id')
+      .select(
+        `${this.tableName}.*`,
+        'users.name as created_by_name',
+        this.knex.raw('(DATE(renewals.nearest_renewal_date) - CURRENT_DATE) as nearest_renewal_days'),
+      )
       .where(`${this.tableName}.id`, id)
       .first() || null;
   }
 
   async findAll(params: CustomerListParams): Promise<{ items: Customer[]; total: number }> {
-    const { page, limit, search, sortBy, sortOrder, isActive } = params;
+    const { page, limit, search, sortBy, sortOrder, isActive, renewalStatus } = params;
     const offset = (page - 1) * limit;
 
+    const renewalSubquery = this.knex('sales')
+      .select('customer_id')
+      .min('renewal_date as nearest_renewal_date')
+      .where('has_renewal', true)
+      .where('status', 'completed')
+      .whereNotNull('renewal_date')
+      .groupBy('customer_id')
+      .as('renewals');
+
+    const renewalSubqueryForCount = this.knex('sales')
+      .select('customer_id')
+      .min('renewal_date as nearest_renewal_date')
+      .where('has_renewal', true)
+      .where('status', 'completed')
+      .whereNotNull('renewal_date')
+      .groupBy('customer_id')
+      .as('renewals');
+
     let query = this.query.clone()
-      .leftJoin('users', `${this.tableName}.created_by`, 'users.id');
-    let countQuery = this.query.clone();
+      .leftJoin('users', `${this.tableName}.created_by`, 'users.id')
+      .leftJoin(renewalSubquery, `${this.tableName}.id`, 'renewals.customer_id');
+    let countQuery = this.query.clone()
+      .leftJoin(renewalSubqueryForCount, `${this.tableName}.id`, 'renewals.customer_id');
 
     // Filter by active status
     if (isActive !== undefined) {
@@ -77,12 +115,34 @@ export class CustomersRepository extends BaseTenantRepository<Customer> {
       });
     }
 
+    // Filter by renewal status
+    if (renewalStatus) {
+      const daysExpr = this.knex.raw('(DATE(renewals.nearest_renewal_date) - CURRENT_DATE)');
+      const applyRenewalFilter = (q: any) => {
+        q.whereNotNull('renewals.nearest_renewal_date');
+        if (renewalStatus === 'red') {
+          q.where(daysExpr, '<=', this.knex.raw(`COALESCE(${this.tableName}.renewal_red_days, 30)`));
+        } else if (renewalStatus === 'yellow') {
+          q.where(daysExpr, '>', this.knex.raw(`COALESCE(${this.tableName}.renewal_red_days, 30)`));
+          q.where(daysExpr, '<=', this.knex.raw(`COALESCE(${this.tableName}.renewal_yellow_days, 60)`));
+        } else if (renewalStatus === 'green') {
+          q.where(daysExpr, '>', this.knex.raw(`COALESCE(${this.tableName}.renewal_yellow_days, 60)`));
+        }
+      };
+      applyRenewalFilter(query);
+      applyRenewalFilter(countQuery);
+    }
+
     const [items, [{ count }]] = await Promise.all([
       query
         .orderBy(`${this.tableName}.${sortBy}`, sortOrder)
         .limit(limit)
         .offset(offset)
-        .select(`${this.tableName}.*`, 'users.name as created_by_name'),
+        .select(
+          `${this.tableName}.*`,
+          'users.name as created_by_name',
+          this.knex.raw('(DATE(renewals.nearest_renewal_date) - CURRENT_DATE) as nearest_renewal_days'),
+        ),
       countQuery.count(`${this.tableName}.id as count`),
     ]);
 

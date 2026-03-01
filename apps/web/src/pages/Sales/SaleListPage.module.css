@@ -116,6 +116,18 @@
   text-decoration: underline;
 }
 .invoiceLink:hover { color: var(--color-primary-hover); }
+
+.customerLink {
+  color: var(--color-primary);
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font-size: inherit;
+  font-family: inherit;
+}
+.customerLink:hover { color: var(--color-primary-hover); text-decoration: underline; }
+
 .total { font-weight: var(--font-weight-bold); color: var(--color-text-primary); }
 
 /* Search Bar */

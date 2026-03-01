@@ -165,7 +165,15 @@ export function SaleListPage() {
         </button>
       )
     },
-    { key: 'customer_name', header: t('sales:list.columns.customer'), render: (s) => s.customer_name || t('common:saleTypes.retail') },
+    {
+      key: 'customer_name',
+      header: t('sales:list.columns.customer'),
+      render: (s) => s.customer_id ? (
+        <button className={styles.customerLink} onClick={(e) => { e.stopPropagation(); navigate(`/customers/${s.customer_id}`); }}>
+          {s.customer_name}
+        </button>
+      ) : (s.customer_name || t('common:saleTypes.retail'))
+    },
     {
       key: 'sale_type',
       header: t('sales:list.columns.type'),

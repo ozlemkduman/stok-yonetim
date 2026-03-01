@@ -488,6 +488,8 @@ export class ReportsService {
         'customers.name as customer_name',
         'customers.phone as customer_phone',
         'customers.email as customer_email',
+        'customers.renewal_red_days',
+        'customers.renewal_yellow_days',
         this.db.knex.raw('(DATE(sales.renewal_date) - CURRENT_DATE) as days_remaining'),
       )
       .orderBy('sales.renewal_date', 'asc');
@@ -510,16 +512,34 @@ export class ReportsService {
       }
     }
 
-    const enriched = renewals.map((r: any) => ({
-      ...r,
-      days_remaining: parseInt(r.days_remaining || '0', 10),
-      product_names: productNames[r.id] || [],
-    }));
+    const enriched = renewals.map((r: any) => {
+      const daysRemaining = parseInt(r.days_remaining || '0', 10);
+      const redDays = r.renewal_red_days || 30;
+      const yellowDays = r.renewal_yellow_days || 60;
+      let renewalStatus: string;
+      if (daysRemaining < 0) {
+        renewalStatus = 'expired';
+      } else if (daysRemaining <= redDays) {
+        renewalStatus = 'red';
+      } else if (daysRemaining <= yellowDays) {
+        renewalStatus = 'yellow';
+      } else {
+        renewalStatus = 'green';
+      }
+      return {
+        ...r,
+        days_remaining: daysRemaining,
+        product_names: productNames[r.id] || [],
+        renewal_red_days: redDays,
+        renewal_yellow_days: yellowDays,
+        renewal_status: renewalStatus,
+      };
+    });
 
-    const expired = enriched.filter((r: any) => r.days_remaining < 0);
-    const urgent = enriched.filter((r: any) => r.days_remaining >= 0 && r.days_remaining <= 7);
-    const upcoming = enriched.filter((r: any) => r.days_remaining > 7 && r.days_remaining <= 30);
-    const future = enriched.filter((r: any) => r.days_remaining > 30);
+    const expired = enriched.filter((r: any) => r.renewal_status === 'expired');
+    const urgent = enriched.filter((r: any) => r.renewal_status === 'red');
+    const upcoming = enriched.filter((r: any) => r.renewal_status === 'yellow');
+    const future = enriched.filter((r: any) => r.renewal_status === 'green');
 
     return {
       renewals: enriched,

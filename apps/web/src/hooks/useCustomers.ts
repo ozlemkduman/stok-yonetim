@@ -72,6 +72,10 @@ export function useCustomers(initialParams: CustomerListParams = {}) {
     setParams((prev) => ({ ...prev, sortBy, sortOrder }));
   };
 
+  const setRenewalStatus = (renewalStatus?: 'red' | 'yellow' | 'green') => {
+    setParams((prev) => ({ ...prev, renewalStatus, page: 1 }));
+  };
+
   const createCustomer = async (data: CreateCustomerData) => {
     const response = await customersApi.create(data);
     await fetchCustomers();
@@ -95,6 +99,7 @@ export function useCustomers(initialParams: CustomerListParams = {}) {
     setPage,
     setSearch,
     setSort,
+    setRenewalStatus,
     refetch: fetchCustomers,
     createCustomer,
     updateCustomer,

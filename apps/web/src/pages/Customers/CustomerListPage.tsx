@@ -41,8 +41,10 @@ export function CustomerListPage() {
     page,
     totalPages,
     total,
+    params,
     setPage,
     setSearch,
+    setRenewalStatus,
     createCustomer,
     updateCustomer,
     deleteCustomer,
@@ -95,12 +97,40 @@ export function CustomerListPage() {
     {
       key: 'name',
       header: t('customers:columns.customerName'),
-      render: (customer) => (
-        <div className={styles.customerName}>
-          <span className={styles.name}>{customer.name}</span>
-          {customer.phone && <span className={styles.phone}>{customer.phone}</span>}
-        </div>
-      ),
+      render: (customer) => {
+        let renewalIndicator = null;
+        if (customer.nearest_renewal_days !== null && customer.nearest_renewal_days !== undefined) {
+          const redDays = customer.renewal_red_days || 30;
+          const yellowDays = customer.renewal_yellow_days || 60;
+          let dotClass = styles.renewalDotSuccess;
+          let tooltipText = t('customers:renewal.ok');
+
+          if (customer.nearest_renewal_days < 0) {
+            dotClass = styles.renewalDotDanger;
+            tooltipText = t('customers:renewal.expired');
+          } else if (customer.nearest_renewal_days <= redDays) {
+            dotClass = styles.renewalDotDanger;
+            tooltipText = t('customers:renewal.urgent', { days: customer.nearest_renewal_days });
+          } else if (customer.nearest_renewal_days <= yellowDays) {
+            dotClass = styles.renewalDotWarning;
+            tooltipText = t('customers:renewal.upcoming', { days: customer.nearest_renewal_days });
+          }
+
+          renewalIndicator = (
+            <span className={`${styles.renewalDot} ${dotClass}`} title={tooltipText} />
+          );
+        }
+
+        return (
+          <div className={styles.customerName}>
+            <div className={styles.nameRow}>
+              {renewalIndicator}
+              <span className={styles.name}>{customer.name}</span>
+            </div>
+            {customer.phone && <span className={styles.phone}>{customer.phone}</span>}
+          </div>
+        );
+      },
     },
     {
       key: 'email',
@@ -192,6 +222,32 @@ export function CustomerListPage() {
               {t('common:buttons.search')}
             </Button>
           </form>
+          <div className={styles.renewalFilters}>
+            <button
+              className={`${styles.filterBtn} ${!params.renewalStatus ? styles.filterBtnActive : ''}`}
+              onClick={() => setRenewalStatus(undefined)}
+            >
+              {t('customers:filters.all')}
+            </button>
+            <button
+              className={`${styles.filterBtn} ${styles.filterBtnRed} ${params.renewalStatus === 'red' ? styles.filterBtnActive : ''}`}
+              onClick={() => setRenewalStatus('red')}
+            >
+              {t('customers:filters.red')}
+            </button>
+            <button
+              className={`${styles.filterBtn} ${styles.filterBtnYellow} ${params.renewalStatus === 'yellow' ? styles.filterBtnActive : ''}`}
+              onClick={() => setRenewalStatus('yellow')}
+            >
+              {t('customers:filters.yellow')}
+            </button>
+            <button
+              className={`${styles.filterBtn} ${styles.filterBtnGreen} ${params.renewalStatus === 'green' ? styles.filterBtnActive : ''}`}
+              onClick={() => setRenewalStatus('green')}
+            >
+              {t('customers:filters.green')}
+            </button>
+          </div>
         </div>
 
         {error && <div className={styles.error}>{error}</div>}

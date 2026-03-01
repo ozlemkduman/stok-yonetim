@@ -119,6 +119,9 @@ export interface RenewalItem {
   customer_email: string | null;
   days_remaining: number;
   product_names: string[];
+  renewal_red_days: number;
+  renewal_yellow_days: number;
+  renewal_status: 'expired' | 'red' | 'yellow' | 'green';
 }
 
 export interface RenewalsReport {

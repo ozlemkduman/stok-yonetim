@@ -2,6 +2,9 @@ import {
   IsString,
   IsEmail,
   IsOptional,
+  IsInt,
+  Min,
+  Max,
   MaxLength,
   MinLength,
 } from 'class-validator';
@@ -39,4 +42,16 @@ export class CreateCustomerDto {
   @IsOptional()
   @IsString()
   notes?: string;
+
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  @Max(365)
+  renewal_red_days?: number;
+
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  @Max(365)
+  renewal_yellow_days?: number;
 }

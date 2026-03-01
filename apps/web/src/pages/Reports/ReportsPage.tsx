@@ -1,8 +1,9 @@
 import { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Button, Spinner } from '@stok/ui';
 import { useToast } from '../../context/ToastContext';
-import { reportsApi, TopProduct, TopCustomer, UpcomingPayment, OverduePayment, StockReportProduct, ExpenseByCategory, CustomerProductPurchase, CustomerSale, EmployeePerformanceReport, RenewalsReport } from '../../api/reports.api';
+import { reportsApi, TopProduct, TopCustomer, UpcomingPayment, OverduePayment, StockReportProduct, ExpenseByCategory, CustomerProductPurchase, CustomerSale, EmployeePerformanceReport, RenewalsReport, RenewalItem } from '../../api/reports.api';
 import { useAuth } from '../../hooks/useAuth';
 import { formatCurrency, formatDate } from '../../utils/formatters';
 import { EXPENSE_CATEGORIES, PAYMENT_METHODS } from '../../utils/constants';
@@ -79,6 +80,7 @@ type TabType = 'genel' | 'satis' | 'musteri' | 'musteriSatis' | 'stok' | 'gider'
 
 export function ReportsPage() {
   const { t } = useTranslation(['reports', 'common']);
+  const navigate = useNavigate();
   const { showToast } = useToast();
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState<TabType>('genel');
@@ -941,10 +943,10 @@ export function ReportsPage() {
 
     const { renewals, summary } = renewalsReport;
 
-    const getStatusBadge = (daysRemaining: number) => {
-      if (daysRemaining < 0) return <span className={`${styles.badge} ${styles.badgeDanger}`}>{t('reports:renewals.expired')}</span>;
-      if (daysRemaining <= 7) return <span className={`${styles.badge} ${styles.badgeDanger}`}>{t('reports:renewals.urgent')}</span>;
-      if (daysRemaining <= 30) return <span className={`${styles.badge} ${styles.badgeWarning}`}>{t('reports:renewals.upcoming')}</span>;
+    const getStatusBadge = (item: RenewalItem) => {
+      if (item.renewal_status === 'expired') return <span className={`${styles.badge} ${styles.badgeDanger}`}>{t('reports:renewals.expired')}</span>;
+      if (item.renewal_status === 'red') return <span className={`${styles.badge} ${styles.badgeDanger}`}>{t('reports:renewals.urgent')}</span>;
+      if (item.renewal_status === 'yellow') return <span className={`${styles.badge} ${styles.badgeWarning}`}>{t('reports:renewals.upcoming')}</span>;
       return <span className={`${styles.badge} ${styles.badgeSuccess}`}>{t('reports:renewals.future')}</span>;
     };
 
@@ -999,16 +1001,27 @@ export function ReportsPage() {
                 <tbody>
                   {renewals.map((item) => (
                     <tr key={item.id}>
-                      <td>{item.customer_name || '-'}</td>
+                      <td>
+                        {item.customer_id ? (
+                          <button className={styles.customerLink} onClick={() => navigate(`/customers/${item.customer_id}`)}>
+                            {item.customer_name}
+                          </button>
+                        ) : (item.customer_name || '-')}
+                      </td>
                       <td>{item.product_names?.join(', ') || '-'}</td>
                       <td>{formatDate(item.sale_date)}</td>
                       <td>{formatDate(item.renewal_date)}</td>
                       <td className={styles.alignRight}>
-                        <strong className={item.days_remaining < 0 ? styles.danger : item.days_remaining <= 30 ? styles.warning : styles.success}>
+                        <strong className={
+                          item.days_remaining < 0 ? styles.danger
+                          : item.days_remaining <= (item.renewal_red_days || 30) ? styles.danger
+                          : item.days_remaining <= (item.renewal_yellow_days || 60) ? styles.warning
+                          : styles.success
+                        }>
                           {item.days_remaining}
                         </strong>
                       </td>
-                      <td>{getStatusBadge(item.days_remaining)}</td>
+                      <td>{getStatusBadge(item)}</td>
                       <td>{item.reminder_note || '-'}</td>
                     </tr>
                   ))}
