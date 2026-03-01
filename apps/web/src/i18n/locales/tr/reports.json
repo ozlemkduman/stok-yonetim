@@ -11,7 +11,8 @@
     "customerSales": "Musteri Satislari",
     "stock": "Stok Durumu",
     "expenses": "Giderler",
-    "staff": "Personel"
+    "staff": "Personel",
+    "renewals": "Yenilemeler"
   },
   "general": {
     "salesSummary": "Satis Ozeti",
@@ -125,5 +126,24 @@
     "invoiced": "Faturali",
     "cancelled": "Iptal",
     "avgSale": "Ort. Satis"
+  },
+  "renewals": {
+    "title": "Yenileme Hatirlatmalari",
+    "total": "Toplam",
+    "expired": "Suresi Dolmus",
+    "urgent": "Acil",
+    "urgentLabel": "Acil (<=7 gun)",
+    "upcoming": "Yaklasan",
+    "upcomingLabel": "Yaklasan (<=30 gun)",
+    "future": "Gelecek",
+    "futureLabel": "Gelecek (>30 gun)",
+    "customer": "Musteri",
+    "products": "Urunler",
+    "saleDate": "Satis Tarihi",
+    "renewalDate": "Yenileme Tarihi",
+    "daysLeft": "Kalan Gun",
+    "status": "Durum",
+    "note": "Not",
+    "noData": "Yenileme hatirlatmasi bulunamadi"
   }
 }

@@ -105,6 +105,33 @@ export interface EmployeePerformanceReport {
   };
 }
 
+export interface RenewalItem {
+  id: string;
+  invoice_number: string;
+  sale_date: string;
+  renewal_date: string;
+  reminder_days_before: number;
+  reminder_note: string | null;
+  grand_total: number;
+  customer_id: string | null;
+  customer_name: string | null;
+  customer_phone: string | null;
+  customer_email: string | null;
+  days_remaining: number;
+  product_names: string[];
+}
+
+export interface RenewalsReport {
+  renewals: RenewalItem[];
+  summary: {
+    total: number;
+    expiredCount: number;
+    urgentCount: number;
+    upcomingCount: number;
+    futureCount: number;
+  };
+}
+
 export const reportsApi = {
   getSalesSummary: (startDate: string, endDate: string) =>
     apiClient.get<any>('/reports/sales-summary', { startDate, endDate }),
@@ -133,4 +160,6 @@ export const reportsApi = {
     apiClient.get<{ byCategory: ExpenseByCategory[]; summary: any; monthlyTrend: any[] }>('/reports/expenses-by-category', { startDate, endDate }),
   getEmployeePerformance: (startDate: string, endDate: string) =>
     apiClient.get<EmployeePerformanceReport>('/reports/employee-performance', { startDate, endDate }),
+  getRenewals: () =>
+    apiClient.get<RenewalsReport>('/reports/renewals'),
 };

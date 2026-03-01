@@ -59,6 +59,24 @@ export function StepSummary({ data, customers, warehouses, totals, onGoToStep }:
               <span>{data.notes}</span>
             </div>
           )}
+          {data.hasRenewal && (
+            <>
+              <div className={styles.summaryItem}>
+                <span className={styles.summaryLabel}>{t('sales:stepSummary.renewalDate')}</span>
+                <span>{data.renewalDate || '-'}</span>
+              </div>
+              <div className={styles.summaryItem}>
+                <span className={styles.summaryLabel}>{t('sales:stepSummary.reminderDays')}</span>
+                <span>{t('sales:stepSummary.reminderDaysValue', { days: data.reminderDaysBefore })}</span>
+              </div>
+              {data.reminderNote && (
+                <div className={styles.summaryItem}>
+                  <span className={styles.summaryLabel}>{t('sales:stepSummary.reminderNote')}</span>
+                  <span>{data.reminderNote}</span>
+                </div>
+              )}
+            </>
+          )}
         </div>
       </Card>
 

@@ -469,4 +469,67 @@ export class ReportsService {
       monthlyTrend,
     };
   }
+
+  async getRenewals(tenantId?: string | null) {
+    const renewals = await this.tenantQuery('sales', tenantId)
+      .leftJoin('customers', 'sales.customer_id', 'customers.id')
+      .where('sales.has_renewal', true)
+      .where('sales.status', 'completed')
+      .whereNotNull('sales.renewal_date')
+      .select(
+        'sales.id',
+        'sales.invoice_number',
+        'sales.sale_date',
+        'sales.renewal_date',
+        'sales.reminder_days_before',
+        'sales.reminder_note',
+        'sales.grand_total',
+        'customers.id as customer_id',
+        'customers.name as customer_name',
+        'customers.phone as customer_phone',
+        'customers.email as customer_email',
+        this.db.knex.raw('(DATE(sales.renewal_date) - CURRENT_DATE) as days_remaining'),
+      )
+      .orderBy('sales.renewal_date', 'asc');
+
+    const saleIds = renewals.map((r: any) => r.id);
+    const productNames: Record<string, string[]> = {};
+
+    if (saleIds.length > 0) {
+      let itemsQuery = this.db.knex('sale_items')
+        .join('products', 'sale_items.product_id', 'products.id')
+        .whereIn('sale_items.sale_id', saleIds)
+        .select('sale_items.sale_id', 'products.name as product_name');
+      if (tenantId) {
+        itemsQuery = itemsQuery.where('products.tenant_id', tenantId);
+      }
+      const items = await itemsQuery;
+      for (const item of items) {
+        if (!productNames[item.sale_id]) productNames[item.sale_id] = [];
+        productNames[item.sale_id].push(item.product_name);
+      }
+    }
+
+    const enriched = renewals.map((r: any) => ({
+      ...r,
+      days_remaining: parseInt(r.days_remaining || '0', 10),
+      product_names: productNames[r.id] || [],
+    }));
+
+    const expired = enriched.filter((r: any) => r.days_remaining < 0);
+    const urgent = enriched.filter((r: any) => r.days_remaining >= 0 && r.days_remaining <= 7);
+    const upcoming = enriched.filter((r: any) => r.days_remaining > 7 && r.days_remaining <= 30);
+    const future = enriched.filter((r: any) => r.days_remaining > 30);
+
+    return {
+      renewals: enriched,
+      summary: {
+        total: enriched.length,
+        expiredCount: expired.length,
+        urgentCount: urgent.length,
+        upcomingCount: upcoming.length,
+        futureCount: future.length,
+      },
+    };
+  }
 }

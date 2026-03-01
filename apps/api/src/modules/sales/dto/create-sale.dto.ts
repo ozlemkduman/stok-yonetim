@@ -63,4 +63,21 @@ export class CreateSaleDto {
   @IsOptional()
   @IsString()
   notes?: string;
+
+  @IsOptional()
+  @IsBoolean()
+  has_renewal?: boolean = false;
+
+  @IsOptional()
+  @IsDateString()
+  renewal_date?: string;
+
+  @IsOptional()
+  @IsNumber()
+  @Min(1)
+  reminder_days_before?: number = 30;
+
+  @IsOptional()
+  @IsString()
+  reminder_note?: string;
 }

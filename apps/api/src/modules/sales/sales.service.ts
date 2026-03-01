@@ -104,6 +104,10 @@ export class SalesService {
         due_date: dto.due_date ? new Date(dto.due_date) : null,
         status: 'completed',
         notes: dto.notes || null,
+        has_renewal: dto.has_renewal || false,
+        renewal_date: dto.has_renewal && dto.renewal_date ? new Date(dto.renewal_date) : null,
+        reminder_days_before: dto.reminder_days_before || 30,
+        reminder_note: dto.reminder_note || null,
         created_by: userId || null,
       }, saleItems, trx);
 

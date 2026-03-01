@@ -203,6 +203,24 @@ export function SaleDetailPage() {
                 <span className={styles.infoValue}>{data.notes}</span>
               </div>
             )}
+            {data.has_renewal && (
+              <>
+                <div className={styles.infoItem}>
+                  <span className={styles.infoLabel}>{t('sales:detail.labels.renewalDate')}</span>
+                  <span className={styles.infoValue}>{data.renewal_date ? formatDate(data.renewal_date) : '-'}</span>
+                </div>
+                <div className={styles.infoItem}>
+                  <span className={styles.infoLabel}>{t('sales:detail.labels.reminderDays')}</span>
+                  <span className={styles.infoValue}>{t('sales:detail.reminderDaysValue', { days: data.reminder_days_before })}</span>
+                </div>
+                {data.reminder_note && (
+                  <div className={styles.infoItem}>
+                    <span className={styles.infoLabel}>{t('sales:detail.labels.reminderNote')}</span>
+                    <span className={styles.infoValue}>{data.reminder_note}</span>
+                  </div>
+                )}
+              </>
+            )}
           </div>
         </Card>
 

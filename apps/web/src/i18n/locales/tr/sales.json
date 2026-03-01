@@ -62,8 +62,12 @@
       "invoiceStatus": "Fatura Durumu",
       "createdBy": "Satışı Yapan",
       "dueDate": "Vade Tarihi",
-      "notes": "Notlar"
+      "notes": "Notlar",
+      "renewalDate": "Yenileme Tarihi",
+      "reminderDays": "Hatirlatma",
+      "reminderNote": "Hatirlatma Notu"
     },
+    "reminderDaysValue": "{{days}} gun once",
     "retailSale": "Perakende Satış",
     "invoiceIssued": "Fatura Kesildi",
     "invoiceNotIssued": "Fatura Kesilmedi",
@@ -159,6 +163,15 @@
     "discountRate": "İskonto Oranı (%)",
     "orDiscountAmount": "veya İskonto Tutarı",
     "notes": "Notlar",
+    "renewal": {
+      "title": "Yenileme Hatirlatmasi",
+      "enable": "Yenileme hatirlatmasi ekle",
+      "dateLabel": "Yenileme / Bitis Tarihi",
+      "yearShortcut": "{{count}} Yil",
+      "reminderDaysLabel": "Kac gun once hatirlatsin",
+      "noteLabel": "Hatirlatma Notu",
+      "notePlaceholder": "Ornegin: E-imza yenileme, lisans uzatma..."
+    },
     "paymentMethods": {
       "nakit": "Nakit",
       "kredi_karti": "Kredi Kartı",
@@ -179,6 +192,10 @@
     "vatIncluded": "Dahil",
     "vatExcluded": "Hariç",
     "notes": "Notlar",
+    "renewalDate": "Yenileme Tarihi",
+    "reminderDays": "Hatirlatma",
+    "reminderDaysValue": "{{days}} gun once",
+    "reminderNote": "Hatirlatma Notu",
     "productsCount": "Ürünler ({{count}})",
     "columns": {
       "product": "Ürün",

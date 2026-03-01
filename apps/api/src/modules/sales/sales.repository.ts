@@ -21,6 +21,10 @@ export interface Sale {
   sale_type: string;
   status: string;
   notes: string | null;
+  has_renewal: boolean;
+  renewal_date: Date | null;
+  reminder_days_before: number;
+  reminder_note: string | null;
   created_by: string | null;
   created_at: Date;
   updated_at: Date;
