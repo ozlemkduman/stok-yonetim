@@ -939,19 +939,40 @@ export function ReportsPage() {
     );
   };
 
+  const computeRenewalStatus = (item: RenewalItem): 'expired' | 'red' | 'yellow' | 'green' => {
+    const days = item.days_remaining;
+    const redDays = item.renewal_red_days || 30;
+    const yellowDays = item.renewal_yellow_days || 60;
+    if (days < 0) return 'expired';
+    if (days <= redDays) return 'red';
+    if (days <= yellowDays) return 'yellow';
+    return 'green';
+  };
+
   const renderYenilemeTab = () => {
     if (!renewalsReport) return <div className={styles.emptyState}>{t('reports:noData')}</div>;
 
-    const { renewals, summary } = renewalsReport;
+    const { renewals } = renewalsReport;
+
+    // Client-side status hesaplama (backend'e bagimli olmadan)
+    const renewalsWithStatus = renewals.map((item) => ({
+      ...item,
+      computed_status: computeRenewalStatus(item),
+    }));
+
+    const expiredCount = renewalsWithStatus.filter((r) => r.computed_status === 'expired').length;
+    const criticalCount = renewalsWithStatus.filter((r) => r.computed_status === 'red').length;
+    const upcomingCount = renewalsWithStatus.filter((r) => r.computed_status === 'yellow').length;
+    const normalCount = renewalsWithStatus.filter((r) => r.computed_status === 'green').length;
 
     const filteredRenewals = renewalFilter === 'all'
-      ? renewals
-      : renewals.filter((item) => item.renewal_status === renewalFilter);
+      ? renewalsWithStatus
+      : renewalsWithStatus.filter((item) => item.computed_status === renewalFilter);
 
-    const getStatusBadge = (item: RenewalItem) => {
-      if (item.renewal_status === 'expired') return <span className={`${styles.badge} ${styles.badgeDanger}`}>{t('reports:renewals.expired')}</span>;
-      if (item.renewal_status === 'red') return <span className={`${styles.badge} ${styles.badgeDanger}`}>{t('reports:renewals.urgent')}</span>;
-      if (item.renewal_status === 'yellow') return <span className={`${styles.badge} ${styles.badgeWarning}`}>{t('reports:renewals.upcoming')}</span>;
+    const getStatusBadge = (status: string) => {
+      if (status === 'expired') return <span className={`${styles.badge} ${styles.badgeDanger}`}>{t('reports:renewals.expired')}</span>;
+      if (status === 'red') return <span className={`${styles.badge} ${styles.badgeDanger}`}>{t('reports:renewals.urgent')}</span>;
+      if (status === 'yellow') return <span className={`${styles.badge} ${styles.badgeWarning}`}>{t('reports:renewals.upcoming')}</span>;
       return <span className={`${styles.badge} ${styles.badgeSuccess}`}>{t('reports:renewals.future')}</span>;
     };
 
@@ -965,23 +986,23 @@ export function ReportsPage() {
           <div className={styles.reportCardBody}>
             <div className={styles.summaryGrid}>
               <div className={styles.summaryCard}>
-                <div className={styles.summaryValue}>{summary.total}</div>
+                <div className={styles.summaryValue}>{renewals.length}</div>
                 <div className={styles.summaryLabel}>{t('reports:renewals.total')}</div>
               </div>
               <div className={styles.summaryCard}>
-                <div className={`${styles.summaryValue} ${styles.danger}`}>{summary.expiredCount}</div>
-                <div className={styles.summaryLabel}>{t('reports:renewals.expired')}</div>
+                <div className={`${styles.summaryValue} ${styles.danger}`}>{expiredCount}</div>
+                <div className={styles.summaryLabel}>{t('reports:renewals.expiredLabel')}</div>
               </div>
               <div className={styles.summaryCard}>
-                <div className={`${styles.summaryValue} ${styles.danger}`}>{summary.urgentCount}</div>
+                <div className={`${styles.summaryValue} ${styles.danger}`}>{criticalCount}</div>
                 <div className={styles.summaryLabel}>{t('reports:renewals.urgentLabel')}</div>
               </div>
               <div className={styles.summaryCard}>
-                <div className={`${styles.summaryValue} ${styles.warning}`}>{summary.upcomingCount}</div>
+                <div className={`${styles.summaryValue} ${styles.warning}`}>{upcomingCount}</div>
                 <div className={styles.summaryLabel}>{t('reports:renewals.upcomingLabel')}</div>
               </div>
               <div className={styles.summaryCard}>
-                <div className={`${styles.summaryValue} ${styles.success}`}>{summary.futureCount}</div>
+                <div className={`${styles.summaryValue} ${styles.success}`}>{normalCount}</div>
                 <div className={styles.summaryLabel}>{t('reports:renewals.futureLabel')}</div>
               </div>
             </div>
@@ -991,31 +1012,33 @@ export function ReportsPage() {
                 className={`${styles.renewalFilterBtn} ${renewalFilter === 'all' ? styles.renewalFilterBtnActive : ''}`}
                 onClick={() => setRenewalFilter('all')}
               >
-                {t('reports:renewals.filterAll')}
+                {t('reports:renewals.filterAll')} ({renewals.length})
               </button>
-              <button
-                className={`${styles.renewalFilterBtn} ${styles.renewalFilterBtnRed} ${renewalFilter === 'expired' ? styles.renewalFilterBtnActive : ''}`}
-                onClick={() => setRenewalFilter('expired')}
-              >
-                {t('reports:renewals.filterExpired')} ({summary.expiredCount})
-              </button>
+              {expiredCount > 0 && (
+                <button
+                  className={`${styles.renewalFilterBtn} ${styles.renewalFilterBtnRed} ${renewalFilter === 'expired' ? styles.renewalFilterBtnActive : ''}`}
+                  onClick={() => setRenewalFilter('expired')}
+                >
+                  {t('reports:renewals.filterExpired')} ({expiredCount})
+                </button>
+              )}
               <button
                 className={`${styles.renewalFilterBtn} ${styles.renewalFilterBtnRed} ${renewalFilter === 'red' ? styles.renewalFilterBtnActive : ''}`}
                 onClick={() => setRenewalFilter('red')}
               >
-                {t('reports:renewals.filterCritical')} ({summary.urgentCount})
+                {t('reports:renewals.filterCritical')} ({criticalCount})
               </button>
               <button
                 className={`${styles.renewalFilterBtn} ${styles.renewalFilterBtnYellow} ${renewalFilter === 'yellow' ? styles.renewalFilterBtnActive : ''}`}
                 onClick={() => setRenewalFilter('yellow')}
               >
-                {t('reports:renewals.filterUpcoming')} ({summary.upcomingCount})
+                {t('reports:renewals.filterUpcoming')} ({upcomingCount})
               </button>
               <button
                 className={`${styles.renewalFilterBtn} ${styles.renewalFilterBtnGreen} ${renewalFilter === 'green' ? styles.renewalFilterBtnActive : ''}`}
                 onClick={() => setRenewalFilter('green')}
               >
-                {t('reports:renewals.filterOk')} ({summary.futureCount})
+                {t('reports:renewals.filterOk')} ({normalCount})
               </button>
             </div>
           </div>
@@ -1051,15 +1074,14 @@ export function ReportsPage() {
                       <td>{formatDate(item.renewal_date)}</td>
                       <td className={styles.alignRight}>
                         <strong className={
-                          item.days_remaining < 0 ? styles.danger
-                          : item.days_remaining <= (item.renewal_red_days || 30) ? styles.danger
-                          : item.days_remaining <= (item.renewal_yellow_days || 60) ? styles.warning
+                          item.computed_status === 'expired' || item.computed_status === 'red' ? styles.danger
+                          : item.computed_status === 'yellow' ? styles.warning
                           : styles.success
                         }>
                           {item.days_remaining}
                         </strong>
                       </td>
-                      <td>{getStatusBadge(item)}</td>
+                      <td>{getStatusBadge(item.computed_status)}</td>
                       <td>{item.reminder_note || '-'}</td>
                     </tr>
                   ))}

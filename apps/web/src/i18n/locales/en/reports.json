@@ -130,12 +130,13 @@
     "title": "Renewal Reminders",
     "total": "Total",
     "expired": "Expired",
+    "expiredLabel": "Expired",
     "urgent": "Critical",
     "urgentLabel": "Critical",
     "upcoming": "Upcoming",
     "upcomingLabel": "Upcoming",
-    "future": "Good",
-    "futureLabel": "Good",
+    "future": "Normal",
+    "futureLabel": "Normal",
     "customer": "Customer",
     "products": "Products",
     "saleDate": "Sale Date",
@@ -144,10 +145,10 @@
     "status": "Status",
     "note": "Note",
     "noData": "No renewal reminders found",
-    "filterAll": "Show All",
+    "filterAll": "All",
     "filterExpired": "Expired",
-    "filterCritical": "Show Critical",
-    "filterUpcoming": "Show Upcoming",
-    "filterOk": "Good"
+    "filterCritical": "Critical",
+    "filterUpcoming": "Upcoming",
+    "filterOk": "Normal"
   }
 }

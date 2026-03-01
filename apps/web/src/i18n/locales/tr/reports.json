@@ -131,12 +131,13 @@
     "title": "Yenileme Hatirlatmalari",
     "total": "Toplam",
     "expired": "Suresi Dolmus",
+    "expiredLabel": "Suresi Dolmus",
     "urgent": "Kritik",
     "urgentLabel": "Kritik",
     "upcoming": "Yaklasan",
     "upcomingLabel": "Yaklasan",
-    "future": "Iyi Durumda",
-    "futureLabel": "Iyi Durumda",
+    "future": "Normal",
+    "futureLabel": "Normal",
     "customer": "Musteri",
     "products": "Urunler",
     "saleDate": "Satis Tarihi",
@@ -145,10 +146,10 @@
     "status": "Durum",
     "note": "Not",
     "noData": "Yenileme hatirlatmasi bulunamadi",
-    "filterAll": "Tumunu Goster",
+    "filterAll": "Tumu",
     "filterExpired": "Suresi Dolmus",
-    "filterCritical": "Kritikleri Goster",
-    "filterUpcoming": "Yaklasanlari Goster",
-    "filterOk": "Iyi Durumda"
+    "filterCritical": "Kritik",
+    "filterUpcoming": "Yaklasan",
+    "filterOk": "Normal"
   }
 }
