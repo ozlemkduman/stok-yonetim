@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, Spinner } from '@stok/ui';
 import { useToast } from '../../context/ToastContext';
-import { reportsApi, TopProduct, TopCustomer, UpcomingPayment, OverduePayment, StockReportProduct, ExpenseByCategory, CustomerProductPurchase, CustomerSale, EmployeePerformanceReport } from '../../api/reports.api';
+import { reportsApi, TopProduct, TopCustomer, UpcomingPayment, OverduePayment, StockReportProduct, ExpenseByCategory, CustomerProductPurchase, CustomerSale, EmployeePerformanceReport, RenewalsReport } from '../../api/reports.api';
 import { useAuth } from '../../hooks/useAuth';
 import { formatCurrency, formatDate } from '../../utils/formatters';
 import { EXPENSE_CATEGORIES, PAYMENT_METHODS } from '../../utils/constants';
@@ -75,7 +75,7 @@ const icons = {
   ),
 };
 
-type TabType = 'genel' | 'satis' | 'musteri' | 'musteriSatis' | 'stok' | 'gider' | 'personel';
+type TabType = 'genel' | 'satis' | 'musteri' | 'musteriSatis' | 'stok' | 'gider' | 'personel' | 'yenileme';
 
 export function ReportsPage() {
   const { t } = useTranslation(['reports', 'common']);
@@ -105,11 +105,12 @@ export function ReportsPage() {
   const [customerSales, setCustomerSales] = useState<CustomerSale[]>([]);
   const [expandedCustomer, setExpandedCustomer] = useState<string | null>(null);
   const [employeePerformance, setEmployeePerformance] = useState<EmployeePerformanceReport | null>(null);
+  const [renewalsReport, setRenewalsReport] = useState<RenewalsReport | null>(null);
 
   const fetchReports = useCallback(async () => {
     setLoading(true);
     try {
-      const [sales, profit, debt, products, customers, upcoming, overdue, stock, returns, expenses, custProducts, custSales, empPerf] = await Promise.all([
+      const [sales, profit, debt, products, customers, upcoming, overdue, stock, returns, expenses, custProducts, custSales, empPerf, renewals] = await Promise.all([
         reportsApi.getSalesSummary(startDate, endDate),
         reportsApi.getProfitLoss(startDate, endDate),
         reportsApi.getDebtOverview(),
@@ -123,6 +124,7 @@ export function ReportsPage() {
         reportsApi.getCustomerProductPurchases(startDate, endDate),
         reportsApi.getCustomerSales(startDate, endDate),
         reportsApi.getEmployeePerformance(startDate, endDate),
+        reportsApi.getRenewals(),
       ]);
       setSalesSummary(sales.data);
       setProfitLoss(profit.data);
@@ -137,6 +139,7 @@ export function ReportsPage() {
       setCustomerProducts(custProducts.data);
       setCustomerSales(custSales.data);
       setEmployeePerformance(empPerf.data);
+      setRenewalsReport(renewals.data);
     } catch (err) {
       showToast('error', t('reports:loadFailed'));
     }
@@ -933,6 +936,95 @@ export function ReportsPage() {
     );
   };
 
+  const renderYenilemeTab = () => {
+    if (!renewalsReport) return <div className={styles.emptyState}>{t('reports:noData')}</div>;
+
+    const { renewals, summary } = renewalsReport;
+
+    const getStatusBadge = (daysRemaining: number) => {
+      if (daysRemaining < 0) return <span className={`${styles.badge} ${styles.badgeDanger}`}>{t('reports:renewals.expired')}</span>;
+      if (daysRemaining <= 7) return <span className={`${styles.badge} ${styles.badgeDanger}`}>{t('reports:renewals.urgent')}</span>;
+      if (daysRemaining <= 30) return <span className={`${styles.badge} ${styles.badgeWarning}`}>{t('reports:renewals.upcoming')}</span>;
+      return <span className={`${styles.badge} ${styles.badgeSuccess}`}>{t('reports:renewals.future')}</span>;
+    };
+
+    return (
+      <div className={styles.grid}>
+        <div className={`${styles.reportCard} ${styles.fullWidthCard}`}>
+          <div className={styles.reportCardHeader}>
+            {icons.calendar}
+            <h3 className={styles.reportCardTitle}>{t('reports:renewals.title')}</h3>
+          </div>
+          <div className={styles.reportCardBody}>
+            <div className={styles.summaryGrid}>
+              <div className={styles.summaryCard}>
+                <div className={styles.summaryValue}>{summary.total}</div>
+                <div className={styles.summaryLabel}>{t('reports:renewals.total')}</div>
+              </div>
+              <div className={styles.summaryCard}>
+                <div className={`${styles.summaryValue} ${styles.danger}`}>{summary.expiredCount}</div>
+                <div className={styles.summaryLabel}>{t('reports:renewals.expired')}</div>
+              </div>
+              <div className={styles.summaryCard}>
+                <div className={`${styles.summaryValue} ${styles.danger}`}>{summary.urgentCount}</div>
+                <div className={styles.summaryLabel}>{t('reports:renewals.urgentLabel')}</div>
+              </div>
+              <div className={styles.summaryCard}>
+                <div className={`${styles.summaryValue} ${styles.warning}`}>{summary.upcomingCount}</div>
+                <div className={styles.summaryLabel}>{t('reports:renewals.upcomingLabel')}</div>
+              </div>
+              <div className={styles.summaryCard}>
+                <div className={`${styles.summaryValue} ${styles.success}`}>{summary.futureCount}</div>
+                <div className={styles.summaryLabel}>{t('reports:renewals.futureLabel')}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {renewals.length > 0 ? (
+          <div className={`${styles.reportCard} ${styles.fullWidthCard}`}>
+            <div className={styles.reportCardBody}>
+              <table className={styles.reportTable}>
+                <thead>
+                  <tr>
+                    <th>{t('reports:renewals.customer')}</th>
+                    <th>{t('reports:renewals.products')}</th>
+                    <th>{t('reports:renewals.saleDate')}</th>
+                    <th>{t('reports:renewals.renewalDate')}</th>
+                    <th className={styles.alignRight}>{t('reports:renewals.daysLeft')}</th>
+                    <th>{t('reports:renewals.status')}</th>
+                    <th>{t('reports:renewals.note')}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {renewals.map((item) => (
+                    <tr key={item.id}>
+                      <td>{item.customer_name || '-'}</td>
+                      <td>{item.product_names?.join(', ') || '-'}</td>
+                      <td>{formatDate(item.sale_date)}</td>
+                      <td>{formatDate(item.renewal_date)}</td>
+                      <td className={styles.alignRight}>
+                        <strong className={item.days_remaining < 0 ? styles.danger : item.days_remaining <= 30 ? styles.warning : styles.success}>
+                          {item.days_remaining}
+                        </strong>
+                      </td>
+                      <td>{getStatusBadge(item.days_remaining)}</td>
+                      <td>{item.reminder_note || '-'}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        ) : (
+          <div className={`${styles.reportCard} ${styles.fullWidthCard}`}>
+            <div className={styles.emptyState}>{t('reports:renewals.noData')}</div>
+          </div>
+        )}
+      </div>
+    );
+  };
+
   return (
     <div className={styles.page}>
       <div className={styles.header}>
@@ -982,6 +1074,9 @@ export function ReportsPage() {
         <button className={`${styles.tab} ${activeTab === 'personel' ? styles.tabActive : ''}`} onClick={() => setActiveTab('personel')}>
           {t('reports:tabs.staff')}
         </button>
+        <button className={`${styles.tab} ${activeTab === 'yenileme' ? styles.tabActive : ''}`} onClick={() => setActiveTab('yenileme')}>
+          {t('reports:tabs.renewals')}
+        </button>
       </div>
 
       {loading ? (
@@ -995,6 +1090,7 @@ export function ReportsPage() {
           {activeTab === 'stok' && renderStokTab()}
           {activeTab === 'gider' && renderGiderTab()}
           {activeTab === 'personel' && renderPersonelTab()}
+          {activeTab === 'yenileme' && renderYenilemeTab()}
         </>
       )}
     </div>

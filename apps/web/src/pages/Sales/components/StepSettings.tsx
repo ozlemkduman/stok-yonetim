@@ -126,6 +126,77 @@ export function StepSettings({
       </div>
 
       <Card className={styles.formCard}>
+        <h3>{t('sales:stepSettings.renewal.title')}</h3>
+        <div className={styles.formRow}>
+          <div className={styles.formGroup}>
+            <label className={styles.checkboxLabel}>
+              <input
+                type="checkbox"
+                checked={data.hasRenewal}
+                onChange={(e) => onDataChange({ hasRenewal: e.target.checked })}
+              />
+              {t('sales:stepSettings.renewal.enable')}
+            </label>
+          </div>
+        </div>
+
+        {data.hasRenewal && (
+          <>
+            <div className={styles.formRow}>
+              <div className={styles.formGroup}>
+                <label className={styles.label}>{t('sales:stepSettings.renewal.dateLabel')}</label>
+                <Input
+                  type="date"
+                  value={data.renewalDate}
+                  onChange={(e) => onDataChange({ renewalDate: e.target.value })}
+                  fullWidth
+                />
+                <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
+                  {[1, 2, 3].map((years) => (
+                    <Button
+                      key={years}
+                      type="button"
+                      size="sm"
+                      variant="secondary"
+                      onClick={() => {
+                        const d = new Date();
+                        d.setFullYear(d.getFullYear() + years);
+                        onDataChange({ renewalDate: d.toISOString().split('T')[0] });
+                      }}
+                    >
+                      {t('sales:stepSettings.renewal.yearShortcut', { count: years })}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+              <div className={styles.formGroup}>
+                <label className={styles.label}>{t('sales:stepSettings.renewal.reminderDaysLabel')}</label>
+                <Input
+                  type="number"
+                  min="1"
+                  value={data.reminderDaysBefore}
+                  onChange={(e) => onDataChange({ reminderDaysBefore: Number(e.target.value) })}
+                  fullWidth
+                />
+              </div>
+            </div>
+            <div className={styles.formRow}>
+              <div className={styles.formGroup}>
+                <label className={styles.label}>{t('sales:stepSettings.renewal.noteLabel')}</label>
+                <textarea
+                  className={styles.textarea}
+                  value={data.reminderNote}
+                  onChange={(e) => onDataChange({ reminderNote: e.target.value })}
+                  rows={2}
+                  placeholder={t('sales:stepSettings.renewal.notePlaceholder')}
+                />
+              </div>
+            </div>
+          </>
+        )}
+      </Card>
+
+      <Card className={styles.formCard}>
         <div className={styles.formGroup}>
           <label className={styles.label}>{t('sales:stepSettings.notes')}</label>
           <textarea

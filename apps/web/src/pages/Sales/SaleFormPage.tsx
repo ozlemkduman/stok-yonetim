@@ -45,6 +45,10 @@ export function SaleFormPage() {
     discountRate: 0,
     discountAmount: 0,
     notes: '',
+    hasRenewal: false,
+    renewalDate: '',
+    reminderDaysBefore: 30,
+    reminderNote: '',
   });
 
   // Modal states
@@ -182,6 +186,10 @@ export function SaleFormPage() {
         payment_method: wizardData.paymentMethod,
         due_date: wizardData.dueDate || undefined,
         notes: wizardData.notes || undefined,
+        has_renewal: wizardData.hasRenewal || undefined,
+        renewal_date: wizardData.hasRenewal && wizardData.renewalDate ? wizardData.renewalDate : undefined,
+        reminder_days_before: wizardData.hasRenewal ? wizardData.reminderDaysBefore : undefined,
+        reminder_note: wizardData.hasRenewal && wizardData.reminderNote ? wizardData.reminderNote : undefined,
       };
 
       await salesApi.create(data);

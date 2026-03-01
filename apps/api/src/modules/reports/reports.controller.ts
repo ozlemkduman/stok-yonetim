@@ -85,6 +85,12 @@ export class ReportsController {
     return { success: true, data };
   }
 
+  @Get('renewals')
+  async getRenewals(@Req() req: any) {
+    const data = await this.reportsService.getRenewals(req.user?.tenantId);
+    return { success: true, data };
+  }
+
   @Get('expenses-by-category')
   async getExpensesByCategory(@Query('startDate') startDate: string, @Query('endDate') endDate: string, @Req() req: any) {
     const data = await this.reportsService.getExpensesByCategory(startDate, endDate, req.user?.tenantId);

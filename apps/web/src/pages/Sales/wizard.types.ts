@@ -27,6 +27,11 @@ export interface WizardFormData {
   discountRate: number;
   discountAmount: number;
   notes: string;
+  // Renewal reminder
+  hasRenewal: boolean;
+  renewalDate: string;
+  reminderDaysBefore: number;
+  reminderNote: string;
 }
 
 export interface WizardStepProps {
