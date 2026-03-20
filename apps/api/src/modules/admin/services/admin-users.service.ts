@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { AdminUsersRepository, UserWithTenant } from '../repositories/admin-users.repository';
 import { PaginationParams } from '../../../common/dto/pagination.dto';
-import * as bcrypt from 'bcrypt';
+import * as bcrypt from 'bcryptjs';
 
 export interface CreateUserDto {
   email: string;

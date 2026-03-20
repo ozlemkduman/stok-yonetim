@@ -1,5 +1,5 @@
 import { Knex } from 'knex';
-import * as bcrypt from 'bcrypt';
+import * as bcrypt from 'bcryptjs';
 
 export async function seed(knex: Knex): Promise<void> {
   const email = process.env.SUPER_ADMIN_EMAIL || 'admin@stoksayac.com';

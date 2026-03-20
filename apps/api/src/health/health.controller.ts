@@ -2,7 +2,7 @@ import { Controller, Get, Post, Body, UseGuards, ForbiddenException } from '@nes
 import { DatabaseService } from '../database/database.service';
 import { Public } from '../common/decorators/public.decorator';
 import { ApiKeyGuard } from '../common/guards/api-key.guard';
-import * as bcrypt from 'bcrypt';
+import * as bcrypt from 'bcryptjs';
 
 // Seed version: 2026-02-12-v2
 
