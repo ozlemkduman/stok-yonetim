@@ -1,11 +1,19 @@
 import { Controller, Get, Post, Body, UseGuards, ForbiddenException } from '@nestjs/common';
+import { SkipThrottle } from '@nestjs/throttler';
 import { DatabaseService } from '../database/database.service';
 import { Public } from '../common/decorators/public.decorator';
 import { ApiKeyGuard } from '../common/guards/api-key.guard';
-import * as bcrypt from 'bcrypt';
+import * as bcrypt from 'bcryptjs';
 
 // Seed version: 2026-02-12-v2
 
+function requireNonProduction() {
+  if (process.env.NODE_ENV === 'production') {
+    throw new ForbiddenException('This endpoint is disabled in production');
+  }
+}
+
+@SkipThrottle()
 @Controller('health')
 export class HealthController {
   constructor(private readonly databaseService: DatabaseService) {}
@@ -33,6 +41,7 @@ export class HealthController {
   @Public()
   @UseGuards(ApiKeyGuard)
   async debug() {
+    requireNonProduction();
     const info: any = { timestamp: new Date().toISOString() };
 
     try {
@@ -71,6 +80,7 @@ export class HealthController {
   @Public()
   @UseGuards(ApiKeyGuard)
   async restore(@Body() body: { sql: string; clearFirst?: boolean }) {
+    requireNonProduction();
     try {
       if (!body?.sql) {
         return { success: false, error: 'No SQL provided' };
@@ -124,6 +134,7 @@ export class HealthController {
   @Public()
   @UseGuards(ApiKeyGuard)
   async resetPassword(@Body() body: { email: string; newPassword: string }) {
+    requireNonProduction();
     try {
       const hash = await bcrypt.hash(body.newPassword, 12);
       const updated = await this.databaseService.knex('users')
@@ -139,6 +150,7 @@ export class HealthController {
   @Public()
   @UseGuards(ApiKeyGuard)
   async runMigrations() {
+    requireNonProduction();
     try {
       const knex = require('knex')({
         client: 'pg',

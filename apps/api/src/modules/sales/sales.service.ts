@@ -60,6 +60,7 @@ export class SalesService {
           .forUpdate()
           .first();
         if (!product) throw new BadRequestException(`Urun bulunamadi: ${item.product_id}`);
+        if (!product.is_active) throw new BadRequestException(`Urun pasif durumda: ${product.name}`);
         if (product.stock_quantity < item.quantity) {
           throw new BadRequestException(`Yetersiz stok: ${product.name}`);
         }
@@ -87,6 +88,9 @@ export class SalesService {
       }
 
       const discountAmount = dto.discount_amount || (subtotal * (dto.discount_rate || 0) / 100);
+      if (discountAmount > subtotal) {
+        throw new BadRequestException('Indirim tutari ara toplamdan buyuk olamaz');
+      }
       const grandTotal = subtotal - discountAmount + vatTotal;
 
       const sale = await this.salesRepository.createSale({

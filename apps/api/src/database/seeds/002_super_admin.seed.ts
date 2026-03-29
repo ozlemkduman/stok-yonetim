@@ -1,9 +1,13 @@
 import { Knex } from 'knex';
-import * as bcrypt from 'bcrypt';
+import * as bcrypt from 'bcryptjs';
 
 export async function seed(knex: Knex): Promise<void> {
-  const email = process.env.SUPER_ADMIN_EMAIL || 'admin@stoksayac.com';
-  const password = process.env.SUPER_ADMIN_PASSWORD || 'StokSayac2026!';
+  const email = process.env.SUPER_ADMIN_EMAIL;
+  const password = process.env.SUPER_ADMIN_PASSWORD;
+  if (!email || !password) {
+    console.log('SUPER_ADMIN_EMAIL and SUPER_ADMIN_PASSWORD must be set. Skipping admin seed.');
+    return;
+  }
   const passwordHash = await bcrypt.hash(password, 12);
 
   // Check if any super_admin exists

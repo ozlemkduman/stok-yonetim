@@ -165,7 +165,7 @@ export function MainLayout() {
 
         setNotifications(newNotifications);
       } catch (err) {
-        console.error('Failed to fetch notifications', err);
+        // Notification fetch failed silently - non-critical
       }
     };
 

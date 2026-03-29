@@ -21,7 +21,7 @@ export class ProductsController {
       category: query.category,
       sortBy: validateSortColumn(query.sortBy || 'created_at', ALLOWED_SORT_COLUMNS, 'created_at'),
       sortOrder: query.sortOrder || 'desc',
-      isActive: query.isActive === 'true' ? true : query.isActive === 'false' ? false : undefined,
+      isActive: query.isActive === 'false' ? false : true,
       lowStock: query.lowStock === 'true',
     });
     return {

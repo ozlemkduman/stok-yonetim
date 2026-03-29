@@ -4,7 +4,7 @@ import {
   BadRequestException,
   ConflictException,
 } from '@nestjs/common';
-import * as bcrypt from 'bcrypt';
+import * as bcrypt from 'bcryptjs';
 import { UsersRepository, User } from './users.repository';
 import { PaginationParams } from '../../common/dto/pagination.dto';
 import { getCurrentTenantId, getCurrentUserRole } from '../../common/context/tenant.context';
