@@ -3,12 +3,14 @@ import { ProductsRepository, Product, ProductListParams } from './products.repos
 import { CreateProductDto, UpdateProductDto } from './dto';
 import { createPaginatedResult, PaginatedResult } from '../../common/dto/pagination.dto';
 import { TenantSettingsService } from '../tenant-settings/tenant-settings.service';
+import { ActivityLogService } from '../../common/services/activity-log.service';
 
 @Injectable()
 export class ProductsService {
   constructor(
     private readonly productsRepository: ProductsRepository,
     private readonly tenantSettingsService: TenantSettingsService,
+    private readonly activityLog: ActivityLogService,
   ) {}
 
   async findAll(params: ProductListParams): Promise<PaginatedResult<Product>> {
@@ -32,7 +34,16 @@ export class ProductsService {
       const existing = await this.productsRepository.findByBarcode(dto.barcode);
       if (existing) throw new ConflictException('Bu barkod zaten kullaniliyor');
     }
-    return this.productsRepository.createProduct(dto, userId);
+    const product = await this.productsRepository.createProduct(dto, userId);
+
+    await this.activityLog.log({
+      action: 'product_created',
+      entityType: 'product',
+      entityId: product.id,
+      newValues: { name: product.name, barcode: product.barcode, sale_price: product.sale_price, stock_quantity: product.stock_quantity },
+    });
+
+    return product;
   }
 
   async update(id: string, dto: UpdateProductDto): Promise<Product> {
@@ -45,12 +56,26 @@ export class ProductsService {
     }
     const updated = await this.productsRepository.updateProduct(id, dto);
     if (!updated) throw new NotFoundException(`Urun bulunamadi: ${id}`);
+
+    await this.activityLog.log({
+      action: 'product_updated',
+      entityType: 'product',
+      entityId: id,
+      newValues: dto as Record<string, any>,
+    });
+
     return updated;
   }
 
   async delete(id: string): Promise<void> {
     await this.findById(id);
     await this.productsRepository.deleteProduct(id);
+
+    await this.activityLog.log({
+      action: 'product_deleted',
+      entityType: 'product',
+      entityId: id,
+    });
   }
 
   async getLowStockProducts(): Promise<Product[]> {

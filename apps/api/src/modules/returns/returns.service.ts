@@ -4,6 +4,7 @@ import { ProductsRepository } from '../products/products.repository';
 import { CreateReturnDto } from './dto';
 import { DatabaseService } from '../../database/database.service';
 import { createPaginatedResult } from '../../common/dto/pagination.dto';
+import { ActivityLogService } from '../../common/services/activity-log.service';
 
 @Injectable()
 export class ReturnsService {
@@ -11,6 +12,7 @@ export class ReturnsService {
     private readonly returnsRepository: ReturnsRepository,
     private readonly productsRepository: ProductsRepository,
     private readonly db: DatabaseService,
+    private readonly activityLog: ActivityLogService,
   ) {}
 
   async findAll(params: any) {
@@ -142,6 +144,13 @@ export class ReturnsService {
           transaction_date: new Date(),
         });
       }
+      await this.activityLog.log({
+        action: 'return_created',
+        entityType: 'return',
+        entityId: ret.id,
+        newValues: { return_number: ret.return_number, total_amount: grandTotal, items_count: dto.items.length },
+      });
+
       return ret;
     });
   }
