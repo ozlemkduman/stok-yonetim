@@ -5,6 +5,7 @@ import { CustomersRepository } from '../customers/customers.repository';
 import { CreateSaleDto } from './dto';
 import { DatabaseService } from '../../database/database.service';
 import { createPaginatedResult } from '../../common/dto/pagination.dto';
+import { ActivityLogService } from '../../common/services/activity-log.service';
 
 @Injectable()
 export class SalesService {
@@ -13,6 +14,7 @@ export class SalesService {
     private readonly productsRepository: ProductsRepository,
     private readonly customersRepository: CustomersRepository,
     private readonly db: DatabaseService,
+    private readonly activityLog: ActivityLogService,
   ) {}
 
   async findAll(params: any) {
@@ -131,6 +133,13 @@ export class SalesService {
         });
       }
 
+      await this.activityLog.log({
+        action: 'sale_created',
+        entityType: 'sale',
+        entityId: sale.id,
+        newValues: { invoice_number: sale.invoice_number, grand_total: grandTotal, payment_method: dto.payment_method, items_count: dto.items.length },
+      });
+
       return sale;
     });
   }
@@ -170,6 +179,13 @@ export class SalesService {
       }
 
       await trx('sales').where('id', id).update({ status: 'cancelled', updated_at: trx.fn.now() });
+
+      await this.activityLog.log({
+        action: 'sale_cancelled',
+        entityType: 'sale',
+        entityId: id,
+        oldValues: { status: sale.status, invoice_number: sale.invoice_number, grand_total: sale.grand_total },
+      });
     });
   }
 }

@@ -9,12 +9,14 @@ import { CustomersRepository, Customer, CustomerListParams } from './customers.r
 import { CreateCustomerDto, UpdateCustomerDto } from './dto';
 import { createPaginatedResult, PaginatedResult } from '../../common/dto/pagination.dto';
 import { TenantSettingsService } from '../tenant-settings/tenant-settings.service';
+import { ActivityLogService } from '../../common/services/activity-log.service';
 
 @Injectable()
 export class CustomersService {
   constructor(
     private readonly customersRepository: CustomersRepository,
     private readonly tenantSettingsService: TenantSettingsService,
+    private readonly activityLog: ActivityLogService,
   ) {}
 
   async findAll(params: CustomerListParams): Promise<PaginatedResult<Customer>> {
@@ -51,7 +53,16 @@ export class CustomersService {
       }
     }
 
-    return this.customersRepository.createCustomer(dto, userId);
+    const customer = await this.customersRepository.createCustomer(dto, userId);
+
+    await this.activityLog.log({
+      action: 'customer_created',
+      entityType: 'customer',
+      entityId: customer.id,
+      newValues: { name: customer.name, email: customer.email, phone: customer.phone },
+    });
+
+    return customer;
   }
 
   async update(id: string, dto: UpdateCustomerDto): Promise<Customer> {
@@ -78,6 +89,13 @@ export class CustomersService {
       throw new NotFoundException(`Musteri bulunamadi: ${id}`);
     }
 
+    await this.activityLog.log({
+      action: 'customer_updated',
+      entityType: 'customer',
+      entityId: id,
+      newValues: dto as Record<string, any>,
+    });
+
     return updated;
   }
 
@@ -88,6 +106,12 @@ export class CustomersService {
     if (!deleted) {
       throw new NotFoundException(`Musteri bulunamadi: ${id}`);
     }
+
+    await this.activityLog.log({
+      action: 'customer_deleted',
+      entityType: 'customer',
+      entityId: id,
+    });
   }
 
   async getCustomersWithDebt(): Promise<Customer[]> {

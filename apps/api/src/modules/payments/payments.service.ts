@@ -4,6 +4,7 @@ import { CustomersRepository } from '../customers/customers.repository';
 import { CreatePaymentDto } from './dto';
 import { DatabaseService } from '../../database/database.service';
 import { createPaginatedResult } from '../../common/dto/pagination.dto';
+import { ActivityLogService } from '../../common/services/activity-log.service';
 
 @Injectable()
 export class PaymentsService {
@@ -11,6 +12,7 @@ export class PaymentsService {
     private readonly paymentsRepository: PaymentsRepository,
     private readonly customersRepository: CustomersRepository,
     private readonly db: DatabaseService,
+    private readonly activityLog: ActivityLogService,
   ) {}
 
   async findAll(params: any) {
@@ -45,6 +47,13 @@ export class PaymentsService {
         reference_type: 'payment',
         reference_id: payment.id,
         transaction_date: new Date(),
+      });
+
+      await this.activityLog.log({
+        action: 'payment_created',
+        entityType: 'payment',
+        entityId: payment.id,
+        newValues: { customer_id: dto.customer_id, amount: dto.amount, method: dto.method },
       });
 
       return payment;
