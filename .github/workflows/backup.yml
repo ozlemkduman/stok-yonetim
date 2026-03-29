@@ -3,6 +3,7 @@ name: Database Backup
 on:
   schedule:
     - cron: '0 3 * * *' # Her gün saat 03:00 UTC
+    - cron: '0 4 * * 0' # Haftalık tam backup - Pazar 04:00 UTC
   workflow_dispatch: # Manuel tetikleme
 
 jobs:
@@ -27,19 +28,34 @@ jobs:
           FILESIZE=$(stat -c%s "$BACKUP_FILE" 2>/dev/null || stat -f%z "$BACKUP_FILE")
           echo "Backup created: $BACKUP_FILE (${FILESIZE} bytes)"
 
+          # Verify backup is not empty
+          if [ "$FILESIZE" -lt 100 ]; then
+            echo "::error::Backup file is suspiciously small (${FILESIZE} bytes). Possible failure."
+            exit 1
+          fi
+
           echo "BACKUP_FILE=$BACKUP_FILE" >> $GITHUB_ENV
           echo "TIMESTAMP=$TIMESTAMP" >> $GITHUB_ENV
+          echo "FILESIZE=$FILESIZE" >> $GITHUB_ENV
+
+      - name: Verify backup integrity
+        run: |
+          echo "Verifying backup integrity..."
+          gunzip -t "${{ env.BACKUP_FILE }}"
+          echo "Backup integrity check passed."
 
       - name: Upload backup artifact
         uses: actions/upload-artifact@v4
         with:
           name: db-backup-${{ env.TIMESTAMP }}
           path: ${{ env.BACKUP_FILE }}
-          retention-days: 30
+          retention-days: 90
 
       - name: Backup summary
         run: |
           echo "## Database Backup Complete" >> $GITHUB_STEP_SUMMARY
           echo "- **File:** ${{ env.BACKUP_FILE }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Size:** ${{ env.FILESIZE }} bytes" >> $GITHUB_STEP_SUMMARY
           echo "- **Date:** $(date -u)" >> $GITHUB_STEP_SUMMARY
-          echo "- **Retention:** 30 days" >> $GITHUB_STEP_SUMMARY
+          echo "- **Retention:** 90 days" >> $GITHUB_STEP_SUMMARY
+          echo "- **Integrity:** Verified" >> $GITHUB_STEP_SUMMARY

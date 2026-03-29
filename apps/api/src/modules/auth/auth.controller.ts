@@ -11,6 +11,7 @@ import {
   Param,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
+import { Throttle } from '@nestjs/throttler';
 import { Request } from 'express';
 import { ConfigService } from '@nestjs/config';
 import { AuthService, LoginResponse, AuthTokens } from './auth.service';
@@ -38,6 +39,7 @@ export class AuthController {
 
   @Public()
   @UseGuards(AuthGuard('local'))
+  @Throttle({ short: { ttl: 60000, limit: 5 } })
   @Post('login')
   @HttpCode(HttpStatus.OK)
   async login(
@@ -105,6 +107,7 @@ export class AuthController {
   }
 
   @Public()
+  @Throttle({ short: { ttl: 60000, limit: 3 } })
   @Post('forgot-password')
   @HttpCode(HttpStatus.OK)
   async forgotPassword(@Body() dto: ForgotPasswordDto): Promise<{ message: string }> {
@@ -112,6 +115,7 @@ export class AuthController {
   }
 
   @Public()
+  @Throttle({ short: { ttl: 60000, limit: 5 } })
   @Post('reset-password')
   @HttpCode(HttpStatus.OK)
   async resetPassword(@Body() dto: ResetPasswordDto): Promise<{ message: string }> {

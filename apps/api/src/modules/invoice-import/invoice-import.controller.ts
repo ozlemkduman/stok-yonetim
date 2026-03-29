@@ -33,18 +33,11 @@ export class InvoiceImportController {
 
   @Post('confirm')
   async confirm(@Req() req: any) {
-    const fs = require('fs');
-    try {
-      const data = req.body as ConfirmImportData;
-      fs.writeFileSync('/tmp/invoice-import-debug.log', `${new Date().toISOString()}\nBody type: ${typeof req.body}\nBody keys: ${JSON.stringify(Object.keys(req.body || {}))}\nHas customer: ${!!data?.customer}\nHas items: ${!!data?.items}\nHas invoice: ${!!data?.invoice}\n`);
-      if (!data?.customer || !data?.items || !data?.invoice) {
-        throw new BadRequestException('Geçersiz import verisi');
-      }
-      const result = await this.invoiceImportService.confirmImport(data, req.user?.sub);
-      return { success: true, data: result };
-    } catch (err: any) {
-      fs.writeFileSync('/tmp/invoice-import-error.log', `${new Date().toISOString()}\n${err?.stack || err?.message || JSON.stringify(err)}\n`);
-      throw err;
+    const data = req.body as ConfirmImportData;
+    if (!data?.customer || !data?.items || !data?.invoice) {
+      throw new BadRequestException('Geçersiz import verisi');
     }
+    const result = await this.invoiceImportService.confirmImport(data, req.user?.sub);
+    return { success: true, data: result };
   }
 }

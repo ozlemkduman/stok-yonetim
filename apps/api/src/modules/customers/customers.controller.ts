@@ -32,7 +32,7 @@ export class CustomersController {
       search: query.search,
       sortBy: validateSortColumn(query.sortBy || 'created_at', ALLOWED_SORT_COLUMNS, 'created_at'),
       sortOrder: query.sortOrder || 'desc',
-      isActive: query.isActive === 'true' ? true : query.isActive === 'false' ? false : undefined,
+      isActive: query.isActive === 'false' ? false : true,
       renewalStatus: validRenewalStatuses.includes(query.renewalStatus as string)
         ? (query.renewalStatus as 'red' | 'yellow' | 'green')
         : undefined,

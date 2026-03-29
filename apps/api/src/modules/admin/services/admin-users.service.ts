@@ -43,7 +43,7 @@ export class AdminUsersService {
     }
 
     // Hash password
-    const passwordHash = await bcrypt.hash(dto.password, 10);
+    const passwordHash = await bcrypt.hash(dto.password, 12);
 
     const user = await this.usersRepository.create({
       email: dto.email,

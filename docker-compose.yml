@@ -46,8 +46,10 @@ services:
       NODE_ENV: production
       DATABASE_URL: postgres://${DB_USER:-stok_user}:${DB_PASSWORD:-stok_pass}@postgres:5432/${DB_NAME:-stok_db}
       PORT: 3000
-      SUPER_ADMIN_EMAIL: admin@stoksayac.com
-      SUPER_ADMIN_PASSWORD: StokSayac2026!
+      SUPER_ADMIN_EMAIL: ${SUPER_ADMIN_EMAIL:-admin@stoksayac.com}
+      SUPER_ADMIN_PASSWORD: ${SUPER_ADMIN_PASSWORD:-changeme}
+      JWT_SECRET: ${JWT_SECRET:-dev-only-jwt-secret-do-not-use-in-production}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:-dev-only-refresh-secret-do-not-use-in-production}
       FRONTEND_URL: ${FRONTEND_URL:-http://localhost}
       CORS_ORIGIN: ${CORS_ORIGIN:-*}
       SMTP_HOST: ${SMTP_HOST:-}
