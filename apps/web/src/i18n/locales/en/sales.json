@@ -269,10 +269,12 @@
     "noVatNote": "* This receipt does not include VAT"
   },
   "import": {
-    "title": "Upload E-Invoice",
-    "subtitle": "Create a sales record from a UBL-TR XML file",
-    "selectFile": "Select XML File",
+    "title": "Import File",
+    "subtitle": "Create a sales record from an XML or CSV file",
+    "selectFile": "Select File",
     "fileDesc": "Upload the UBL-TR format XML file downloaded from BiFatura or other e-invoice portals.",
+    "fileDescMulti": "Upload your invoice file in UBL-TR XML or CSV format. You can download the CSV template below.",
+    "downloadCsvTemplate": "Download Sample CSV Template",
     "chooseFile": "Choose File",
     "analyzing": "Analyzing...",
     "analyze": "Analyze",
@@ -406,6 +408,7 @@
     "importSuccess": "Invoice imported successfully",
     "importError": "Import error",
     "xmlParseError": "XML parse error",
+    "fileParseError": "File parse error",
     "selectWarehouse": "Please select a warehouse",
     "creditCustomerRequired": "Customer information is required for credit sales",
     "stockInsufficient": "There are products with insufficient stock. Please check."

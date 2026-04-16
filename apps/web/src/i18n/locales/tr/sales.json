@@ -269,10 +269,12 @@
     "noVatNote": "* Bu fiş KDV içermemektedir"
   },
   "import": {
-    "title": "E-Fatura Yükle",
-    "subtitle": "UBL-TR XML dosyasından satış kaydı oluşturun",
-    "selectFile": "XML Dosyası Seçin",
+    "title": "Dosya İçeri Aktar",
+    "subtitle": "XML veya CSV dosyasından satış kaydı oluşturun",
+    "selectFile": "Dosya Seçin",
     "fileDesc": "BiFatura veya diğer e-fatura portallarından indirdiğiniz UBL-TR formatındaki XML dosyasını yükleyin.",
+    "fileDescMulti": "UBL-TR XML veya CSV formatında fatura dosyanızı yükleyin. CSV şablonunu aşağıdan indirebilirsiniz.",
+    "downloadCsvTemplate": "Örnek CSV Şablonu İndir",
     "chooseFile": "Dosya Seç",
     "analyzing": "Analiz ediliyor...",
     "analyze": "Analiz Et",
@@ -406,6 +408,7 @@
     "importSuccess": "Fatura başarıyla içeri aktarıldı",
     "importError": "İçeri aktarma hatası",
     "xmlParseError": "XML parse hatası",
+    "fileParseError": "Dosya analiz hatası",
     "selectWarehouse": "Lütfen bir depo seçin",
     "creditCustomerRequired": "Veresiye satış için müşteri bilgisi gerekli",
     "stockInsufficient": "Stok yetersiz olan ürünler var. Lütfen kontrol edin."

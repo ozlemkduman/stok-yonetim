@@ -102,6 +102,49 @@
   line-height: 1.5;
 }
 
+/* Format Badges */
+.formatBadges {
+  display: flex;
+  gap: var(--space-2);
+  justify-content: center;
+}
+
+.formatBadge {
+  padding: var(--space-1) var(--space-3);
+  background: var(--color-primary-light, #dbeafe);
+  color: var(--color-primary);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-xs);
+  font-weight: 500;
+}
+
+/* Template Download */
+.templateSection {
+  padding-top: var(--space-2);
+  border-top: 1px solid var(--color-border);
+  width: 100%;
+  text-align: center;
+}
+
+.templateLink {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  background: none;
+  border: none;
+  color: var(--color-primary);
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-sm);
+  transition: var(--transition-fast);
+}
+
+.templateLink:hover {
+  background: var(--color-primary-light, #dbeafe);
+  text-decoration: underline;
+}
+
 .fileInput {
   display: none;
 }
