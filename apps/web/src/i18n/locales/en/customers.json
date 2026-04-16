@@ -2,6 +2,7 @@
   "title": "Customers",
   "subtitle": "Total {{count}} customer records",
   "addNew": "+ New Customer",
+  "bulkImport": "Bulk Import",
   "searchPlaceholder": "Search customers...",
   "emptyMessage": "No customers found",
   "upgradePrompt": "You have reached your customer limit. Upgrade your plan to add more customers.",
@@ -160,5 +161,44 @@
     "urgent": "Renewal in {{days}} days",
     "upcoming": "Renewal in {{days}} days",
     "ok": "Renewal status is normal"
+  },
+
+  "import": {
+    "title": "Bulk Customer Import",
+    "subtitle": "Import customers from a CSV or Excel file",
+    "selectFile": "Select File",
+    "fileDesc": "Upload your CSV or Excel file containing customer information. You can download the template below.",
+    "chooseFile": "Choose File",
+    "analyzing": "Analyzing...",
+    "analyze": "Analyze",
+    "downloadTemplate": "Download Sample CSV Template",
+    "parseError": "File parse error",
+    "summary": "Summary",
+    "totalRows": "Total Rows",
+    "newCustomers": "New Customers",
+    "existingCustomers": "Existing Customers",
+    "skipExisting": "Skip existing customers (only add new ones)",
+    "customerList": "Customer List",
+    "cols": {
+      "status": "Status",
+      "name": "Customer Name",
+      "phone": "Phone",
+      "email": "Email",
+      "taxNumber": "Tax ID",
+      "taxOffice": "Tax Office"
+    },
+    "new": "New",
+    "existing": "Existing",
+    "back": "Back",
+    "importButton": "Import {{count}} Customers",
+    "importing": "Importing...",
+    "importingDesc": "Creating customers, please wait.",
+    "success": "Customers imported successfully",
+    "error": "Import error",
+    "doneTitle": "Import Completed",
+    "created": "Created",
+    "updated": "Updated",
+    "skipped": "Skipped",
+    "goToList": "Go to Customer List"
   }
 }

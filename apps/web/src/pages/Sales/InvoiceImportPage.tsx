@@ -9,7 +9,7 @@ import { formatCurrency, formatDate } from '../../utils/formatters';
 import styles from './InvoiceImportPage.module.css';
 
 type Step = 'upload' | 'preview' | 'importing';
-type FileType = 'xml' | 'csv';
+type FileType = 'xml' | 'csv' | 'xlsx';
 
 const CSV_TEMPLATE = `fatura_no;fatura_tarihi;musteri_adi;vergi_no;vergi_dairesi;adres;telefon;email;urun_adi;miktar;birim_fiyat;kdv_orani;birim
 FTR-001;15.04.2026;Örnek Müşteri A.Ş.;1234567890;Kadıköy VD;İstanbul, Kadıköy;0532 123 4567;ornek@firma.com;Ürün A;10;150,50;20;adet
@@ -60,7 +60,8 @@ export function InvoiceImportPage() {
     const selected = e.target.files?.[0] || null;
     setFile(selected);
     if (selected) {
-      const ext = selected.name.toLowerCase().endsWith('.csv') ? 'csv' : 'xml';
+      const name = selected.name.toLowerCase();
+      const ext = name.endsWith('.csv') ? 'csv' : (name.endsWith('.xlsx') || name.endsWith('.xls')) ? 'xlsx' : 'xml';
       setFileType(ext);
     }
   };
@@ -175,11 +176,12 @@ export function InvoiceImportPage() {
             <div className={styles.formatBadges}>
               <span className={styles.formatBadge}>XML (UBL-TR)</span>
               <span className={styles.formatBadge}>CSV</span>
+              <span className={styles.formatBadge}>Excel (XLSX)</span>
             </div>
             <input
               ref={fileInputRef}
               type="file"
-              accept=".xml,.csv"
+              accept=".xml,.csv,.xlsx,.xls"
               onChange={handleFileChange}
               className={styles.fileInput}
             />

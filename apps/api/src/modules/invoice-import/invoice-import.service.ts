@@ -5,6 +5,7 @@ import { ProductsRepository } from '../products/products.repository';
 import { SalesRepository } from '../sales/sales.repository';
 import { parseUblXml, ParsedUblInvoice } from './ubl-parser';
 import { parseCsv } from './csv-parser';
+import { parseXlsx } from './xlsx-parser';
 import { getCurrentTenantId } from '../../common/context/tenant.context';
 
 export interface PreviewMatch<T> {
@@ -47,20 +48,22 @@ export class InvoiceImportService {
     private readonly salesRepository: SalesRepository,
   ) {}
 
-  async parseAndPreview(fileBuffer: Buffer, fileType: 'xml' | 'csv' = 'xml'): Promise<ParsePreviewResponse> {
+  async parseAndPreview(fileBuffer: Buffer, fileType: 'xml' | 'csv' | 'xlsx' = 'xml'): Promise<ParsePreviewResponse> {
     let parsed: ParsedUblInvoice;
     try {
       if (fileType === 'csv') {
         parsed = parseCsv(fileBuffer);
+      } else if (fileType === 'xlsx') {
+        parsed = parseXlsx(fileBuffer);
       } else {
         parsed = await parseUblXml(fileBuffer);
       }
     } catch (err) {
-      const label = fileType === 'csv' ? 'CSV' : 'XML';
-      throw new BadRequestException(`${label} dosyası parse edilemedi: ` + (err instanceof Error ? err.message : 'Bilinmeyen hata'));
+      const labels = { csv: 'CSV', xlsx: 'Excel', xml: 'XML' };
+      throw new BadRequestException(`${labels[fileType]} dosyası parse edilemedi: ` + (err instanceof Error ? err.message : 'Bilinmeyen hata'));
     }
 
-    if (fileType === 'xml' && !parsed.customer.name && !parsed.customer.taxNumber) {
+    if (fileType !== 'csv' && fileType !== 'xlsx' && !parsed.customer.name && !parsed.customer.taxNumber) {
       throw new BadRequestException('Faturada müşteri bilgisi bulunamadı');
     }
     if (parsed.items.length === 0) {
@@ -134,7 +137,8 @@ export class InvoiceImportService {
         const existingSale = await trx('sales')
           .where((qb) => {
             qb.where('notes', 'like', `%E-Fatura import: ${data.invoice.id}%`)
-              .orWhere('notes', 'like', `%CSV import: ${data.invoice.id}%`);
+              .orWhere('notes', 'like', `%CSV import: ${data.invoice.id}%`)
+              .orWhere('notes', 'like', `%Excel import: ${data.invoice.id}%`);
           })
           .modify((qb) => {
             if (tenantId) qb.where('tenant_id', tenantId);
@@ -245,8 +249,12 @@ export class InvoiceImportService {
         status: 'completed',
         invoice_issued: true,
         notes: (() => {
-          const isCsv = data.invoice.id?.startsWith('CSV-');
-          const importLabel = isCsv ? `CSV import: ${data.invoice.id}` : `E-Fatura import: ${data.invoice.id}`;
+          const id = data.invoice.id || '';
+          const importLabel = id.startsWith('CSV-')
+            ? `CSV import: ${id}`
+            : id.startsWith('XLSX-')
+              ? `Excel import: ${id}`
+              : `E-Fatura import: ${id}`;
           return data.notes ? `${data.notes}\n${importLabel}` : importLabel;
         })(),
         created_by: userId || null,

@@ -270,10 +270,10 @@
   },
   "import": {
     "title": "Import File",
-    "subtitle": "Create a sales record from an XML or CSV file",
+    "subtitle": "Create a sales record from an XML, CSV or Excel file",
     "selectFile": "Select File",
     "fileDesc": "Upload the UBL-TR format XML file downloaded from BiFatura or other e-invoice portals.",
-    "fileDescMulti": "Upload your invoice file in UBL-TR XML or CSV format. You can download the CSV template below.",
+    "fileDescMulti": "Upload your invoice file in UBL-TR XML, CSV or Excel format. You can download the CSV template below.",
     "downloadCsvTemplate": "Download Sample CSV Template",
     "chooseFile": "Choose File",
     "analyzing": "Analyzing...",

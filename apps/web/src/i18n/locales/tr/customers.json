@@ -2,6 +2,7 @@
   "title": "Müşteriler",
   "subtitle": "Toplam {{count}} müşteri kaydı",
   "addNew": "+ Yeni Müşteri",
+  "bulkImport": "Toplu Yükle",
   "searchPlaceholder": "Müşteri ara...",
   "emptyMessage": "Müşteri bulunamadı",
   "upgradePrompt": "Müşteri limitinize ulaştınız. Daha fazla müşteri eklemek için planınızı yükseltin.",
@@ -160,5 +161,44 @@
     "urgent": "{{days}} gün içinde yenileme var",
     "upcoming": "{{days}} gün içinde yenileme var",
     "ok": "Yenileme durumu normal"
+  },
+
+  "import": {
+    "title": "Toplu Müşteri Yükle",
+    "subtitle": "CSV veya Excel dosyasından müşterileri içeri aktarın",
+    "selectFile": "Dosya Seçin",
+    "fileDesc": "Müşteri bilgilerini içeren CSV veya Excel dosyanızı yükleyin. Şablonu aşağıdan indirebilirsiniz.",
+    "chooseFile": "Dosya Seç",
+    "analyzing": "Analiz ediliyor...",
+    "analyze": "Analiz Et",
+    "downloadTemplate": "Örnek CSV Şablonu İndir",
+    "parseError": "Dosya analiz hatası",
+    "summary": "Özet",
+    "totalRows": "Toplam Satır",
+    "newCustomers": "Yeni Müşteri",
+    "existingCustomers": "Mevcut Müşteri",
+    "skipExisting": "Mevcut müşterileri atla (sadece yeni müşterileri ekle)",
+    "customerList": "Müşteri Listesi",
+    "cols": {
+      "status": "Durum",
+      "name": "Müşteri Adı",
+      "phone": "Telefon",
+      "email": "E-posta",
+      "taxNumber": "VKN/TCKN",
+      "taxOffice": "Vergi Dairesi"
+    },
+    "new": "Yeni",
+    "existing": "Mevcut",
+    "back": "Geri",
+    "importButton": "{{count}} Müşteri İçeri Aktar",
+    "importing": "İçeri aktarılıyor...",
+    "importingDesc": "Müşteriler oluşturuluyor, lütfen bekleyin.",
+    "success": "Müşteriler başarıyla içeri aktarıldı",
+    "error": "İçeri aktarma hatası",
+    "doneTitle": "İçeri Aktarma Tamamlandı",
+    "created": "Oluşturuldu",
+    "updated": "Güncellendi",
+    "skipped": "Atlandı",
+    "goToList": "Müşteri Listesine Dön"
   }
 }

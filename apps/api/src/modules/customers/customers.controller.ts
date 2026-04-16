@@ -9,17 +9,34 @@ import {
   Query,
   ParseUUIDPipe,
   Req,
+  UseInterceptors,
+  UploadedFile,
+  BadRequestException,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { CustomersService } from './customers.service';
 import { CreateCustomerDto, UpdateCustomerDto } from './dto';
 import { PaginationDto } from '../../common/dto/pagination.dto';
 import { validateSortColumn } from '../../common/utils/validate-sort';
+import { parseCustomerFile, ParsedCustomerRow } from './customer-import.parser';
+import { DatabaseService } from '../../database/database.service';
+import { getCurrentTenantId } from '../../common/context/tenant.context';
 
 const ALLOWED_SORT_COLUMNS = ['name', 'balance', 'phone', 'email', 'created_at'];
 
+export interface CustomerImportPreview {
+  parsed: ParsedCustomerRow;
+  isNew: boolean;
+  matchedId: string | null;
+  matchedName: string | null;
+}
+
 @Controller('customers')
 export class CustomersController {
-  constructor(private readonly customersService: CustomersService) {}
+  constructor(
+    private readonly customersService: CustomersService,
+    private readonly db: DatabaseService,
+  ) {}
 
   @Get()
   async findAll(@Query() query: PaginationDto & { isActive?: string; renewalStatus?: string }) {
@@ -118,5 +135,140 @@ export class CustomersController {
   async delete(@Param('id', ParseUUIDPipe) id: string) {
     await this.customersService.delete(id);
     return { success: true, message: 'Musteri basariyla silindi' };
+  }
+
+  // --- Bulk Import ---
+
+  @Post('import/parse')
+  @UseInterceptors(FileInterceptor('file', {
+    limits: { fileSize: 5 * 1024 * 1024 },
+    fileFilter: (_req, file, cb) => {
+      const name = file.originalname.toLowerCase();
+      if (!name.endsWith('.csv') && !name.endsWith('.xlsx') && !name.endsWith('.xls')) {
+        return cb(new BadRequestException('Sadece CSV ve Excel dosyaları kabul edilir'), false);
+      }
+      cb(null, true);
+    },
+  }))
+  async importParse(@UploadedFile() file: Express.Multer.File) {
+    if (!file) {
+      throw new BadRequestException('Dosya yüklenmedi');
+    }
+
+    const name = file.originalname.toLowerCase();
+    const fileType = name.endsWith('.csv') ? 'csv' as const : 'xlsx' as const;
+
+    let customers: ParsedCustomerRow[];
+    try {
+      customers = parseCustomerFile(file.buffer, fileType);
+    } catch (err) {
+      throw new BadRequestException(
+        'Dosya parse edilemedi: ' + (err instanceof Error ? err.message : 'Bilinmeyen hata'),
+      );
+    }
+
+    // Match by tax_number or name
+    const tenantId = getCurrentTenantId();
+    const previews: CustomerImportPreview[] = await Promise.all(
+      customers.map(async (c) => {
+        let existing: any = null;
+
+        // First try tax number match
+        if (c.taxNumber) {
+          existing = await this.db.knex('customers')
+            .where('tax_number', c.taxNumber)
+            .modify((qb) => { if (tenantId) qb.where('tenant_id', tenantId); })
+            .first();
+        }
+
+        // Then try exact name match
+        if (!existing) {
+          existing = await this.db.knex('customers')
+            .whereRaw('LOWER(name) = LOWER(?)', [c.name])
+            .modify((qb) => { if (tenantId) qb.where('tenant_id', tenantId); })
+            .first();
+        }
+
+        return {
+          parsed: c,
+          isNew: !existing,
+          matchedId: existing?.id || null,
+          matchedName: existing?.name || null,
+        };
+      }),
+    );
+
+    const newCount = previews.filter((p) => p.isNew).length;
+    const existingCount = previews.filter((p) => !p.isNew).length;
+
+    return {
+      success: true,
+      data: {
+        customers: previews,
+        summary: { total: previews.length, newCount, existingCount },
+      },
+    };
+  }
+
+  @Post('import/confirm')
+  async importConfirm(@Body() body: { customers: CustomerImportPreview[]; skipExisting?: boolean }, @Req() req: any) {
+    if (!body?.customers || body.customers.length === 0) {
+      throw new BadRequestException('Geçersiz import verisi');
+    }
+
+    const tenantId = getCurrentTenantId();
+    const skipExisting = body.skipExisting !== false; // default: skip existing
+
+    let created = 0;
+    let skipped = 0;
+    let updated = 0;
+
+    await this.db.transaction(async (trx) => {
+      for (const item of body.customers) {
+        if (!item.isNew && skipExisting) {
+          skipped++;
+          continue;
+        }
+
+        if (item.isNew) {
+          // Create new customer
+          const insertData: Record<string, unknown> = {
+            name: item.parsed.name,
+            phone: item.parsed.phone,
+            email: item.parsed.email,
+            address: item.parsed.address,
+            tax_number: item.parsed.taxNumber,
+            tax_office: item.parsed.taxOffice,
+            notes: item.parsed.notes,
+          };
+          if (tenantId) insertData.tenant_id = tenantId;
+
+          await trx('customers').insert(insertData);
+          created++;
+        } else {
+          // Update existing customer with non-empty fields
+          const updateData: Record<string, unknown> = {};
+          if (item.parsed.phone) updateData.phone = item.parsed.phone;
+          if (item.parsed.email) updateData.email = item.parsed.email;
+          if (item.parsed.address) updateData.address = item.parsed.address;
+          if (item.parsed.taxNumber) updateData.tax_number = item.parsed.taxNumber;
+          if (item.parsed.taxOffice) updateData.tax_office = item.parsed.taxOffice;
+          if (item.parsed.notes) updateData.notes = item.parsed.notes;
+
+          if (Object.keys(updateData).length > 0) {
+            updateData.updated_at = trx.fn.now();
+            await trx('customers').where('id', item.matchedId).update(updateData);
+            updated++;
+          } else {
+            skipped++;
+          }
+        }
+      }
+    });
+
+    return {
+      success: true,
+      data: { created, updated, skipped },
+    };
   }
 }

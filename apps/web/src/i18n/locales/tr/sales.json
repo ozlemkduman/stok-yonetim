@@ -270,10 +270,10 @@
   },
   "import": {
     "title": "Dosya İçeri Aktar",
-    "subtitle": "XML veya CSV dosyasından satış kaydı oluşturun",
+    "subtitle": "XML, CSV veya Excel dosyasından satış kaydı oluşturun",
     "selectFile": "Dosya Seçin",
     "fileDesc": "BiFatura veya diğer e-fatura portallarından indirdiğiniz UBL-TR formatındaki XML dosyasını yükleyin.",
-    "fileDescMulti": "UBL-TR XML veya CSV formatında fatura dosyanızı yükleyin. CSV şablonunu aşağıdan indirebilirsiniz.",
+    "fileDescMulti": "UBL-TR XML, CSV veya Excel formatında fatura dosyanızı yükleyin. CSV şablonunu aşağıdan indirebilirsiniz.",
     "downloadCsvTemplate": "Örnek CSV Şablonu İndir",
     "chooseFile": "Dosya Seç",
     "analyzing": "Analiz ediliyor...",

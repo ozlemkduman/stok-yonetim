@@ -18,8 +18,8 @@ export class InvoiceImportController {
     limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
     fileFilter: (_req, file, cb) => {
       const name = file.originalname.toLowerCase();
-      if (!name.endsWith('.xml') && !name.endsWith('.csv')) {
-        return cb(new BadRequestException('Sadece XML ve CSV dosyaları kabul edilir'), false);
+      if (!name.endsWith('.xml') && !name.endsWith('.csv') && !name.endsWith('.xlsx') && !name.endsWith('.xls')) {
+        return cb(new BadRequestException('Sadece XML, CSV ve Excel dosyaları kabul edilir'), false);
       }
       cb(null, true);
     },
@@ -28,7 +28,8 @@ export class InvoiceImportController {
     if (!file) {
       throw new BadRequestException('Dosya yüklenmedi');
     }
-    const fileType = file.originalname.toLowerCase().endsWith('.csv') ? 'csv' : 'xml';
+    const name = file.originalname.toLowerCase();
+    const fileType = name.endsWith('.csv') ? 'csv' : (name.endsWith('.xlsx') || name.endsWith('.xls')) ? 'xlsx' : 'xml';
     const preview = await this.invoiceImportService.parseAndPreview(file.buffer, fileType);
     return { success: true, data: preview };
   }

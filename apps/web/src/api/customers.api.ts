@@ -187,4 +187,45 @@ export const customersApi = {
   getStats: async (id: string) => {
     return apiClient.get<CustomerStats>(`/customers/${id}/stats`);
   },
+
+  importParse: (file: File) =>
+    apiClient.upload<CustomerImportParseResponse>('/customers/import/parse', file),
+
+  importConfirm: (data: CustomerImportConfirmData) =>
+    apiClient.post<CustomerImportConfirmResult>('/customers/import/confirm', data),
 };
+
+// --- Import types ---
+
+export interface ParsedCustomerRow {
+  name: string;
+  phone: string | null;
+  email: string | null;
+  address: string | null;
+  taxNumber: string | null;
+  taxOffice: string | null;
+  notes: string | null;
+}
+
+export interface CustomerImportPreview {
+  parsed: ParsedCustomerRow;
+  isNew: boolean;
+  matchedId: string | null;
+  matchedName: string | null;
+}
+
+export interface CustomerImportParseResponse {
+  customers: CustomerImportPreview[];
+  summary: { total: number; newCount: number; existingCount: number };
+}
+
+export interface CustomerImportConfirmData {
+  customers: CustomerImportPreview[];
+  skipExisting?: boolean;
+}
+
+export interface CustomerImportConfirmResult {
+  created: number;
+  updated: number;
+  skipped: number;
+}
