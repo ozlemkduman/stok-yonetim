@@ -36,8 +36,6 @@ const COLUMN_ALIASES: Record<string, string> = {
 // --- Contacts format column names ---
 const CONTACTS_COLUMNS = [
   'first name', 'last name', 'middle name',
-  'phonetic first name', 'phonetic last name', 'phonetic middle name',
-  'name prefix', 'name suffix', 'nickname',
 ];
 
 function normalizeColumn(name: string): string {
@@ -58,22 +56,55 @@ function toStr(val: unknown): string {
 }
 
 // =========================================================================
-// Contacts format: smart name extraction
+// Phone number formatting
 // =========================================================================
 
 /**
- * Extracts a clean customer name and notes from a messy contacts field.
- *
- * Input examples from "First Name":
- *   "E - İmza Emel Bal ✅ 05.01.2026"
- *   "E İmza 16 Haz Haftaya Ara"
- *   "E-İmza Ahmet Can Yılmaz ✅"
- *   "E-imza Ali Taner Bey ✅"
- *   "E-İmza Batu Bey ✅  01.10.2025"
- *
- * Input examples from "Last Name":
- *   "3yıllık", "3 Yıllık 07.07.25", "Avukat", "Almadı", "(Serdar Bey)"
+ * Fix phone numbers that Excel converted to scientific notation.
+ * "9.05378E+11" -> "905378000000" -> "0905378000000" or similar
+ * Also handles raw numbers like 905321644585
  */
+function formatPhoneNumber(value: string | null | undefined): string | null {
+  if (!value) return null;
+  let phone = String(value).trim();
+  if (!phone) return null;
+
+  // Handle scientific notation: "9.05378E+11", "9,05378E+11"
+  const sciMatch = phone.match(/^(\d+[.,]\d+)[eE]\+(\d+)$/);
+  if (sciMatch) {
+    const num = parseFloat(phone.replace(',', '.'));
+    if (!isNaN(num)) {
+      phone = Math.round(num).toString();
+    }
+  }
+
+  // If it's a pure number (no spaces, dashes, parens), format it
+  const digitsOnly = phone.replace(/\D/g, '');
+
+  // Turkish phone: starts with 90 and is 12 digits, or starts with 0 and is 11 digits
+  if (digitsOnly.length === 12 && digitsOnly.startsWith('90')) {
+    // 905321644585 -> 0532 164 45 85
+    const rest = digitsOnly.substring(2); // 5321644585
+    return `0${rest.substring(0, 3)} ${rest.substring(3, 6)} ${rest.substring(6, 8)} ${rest.substring(8, 10)}`;
+  }
+
+  if (digitsOnly.length === 11 && digitsOnly.startsWith('0')) {
+    // 05321644585 -> 0532 164 45 85
+    return `${digitsOnly.substring(0, 4)} ${digitsOnly.substring(4, 7)} ${digitsOnly.substring(7, 9)} ${digitsOnly.substring(9, 11)}`;
+  }
+
+  if (digitsOnly.length === 10 && digitsOnly.startsWith('5')) {
+    // 5321644585 -> 0532 164 45 85
+    return `0${digitsOnly.substring(0, 3)} ${digitsOnly.substring(3, 6)} ${digitsOnly.substring(6, 8)} ${digitsOnly.substring(8, 10)}`;
+  }
+
+  // Return as-is if already formatted (has spaces/parens/dashes)
+  return phone;
+}
+
+// =========================================================================
+// Contacts format: smart name extraction
+// =========================================================================
 
 // Prefixes to strip (case-insensitive)
 const PREFIX_PATTERNS = [
@@ -82,23 +113,25 @@ const PREFIX_PATTERNS = [
   /^e[-]?[iİ]mza\s*/i,            // "Eİmza", "E-imza"
 ];
 
-// Date patterns: DD.MM.YYYY, DD.MM.YY, DD/MM/YYYY, DD/MM/YY
-const DATE_PATTERN = /\b(\d{1,2})[./](\d{1,2})[./](\d{2,4})\b/g;
-
-// Duration patterns: "3yıllık", "3 yıllık", "1 yillik", "3 Yıllık"
-const DURATION_PATTERN = /\b(\d+)\s*[yY][iıİ]ll[iıİ]k\b/gi;
-
-// Month abbreviations (Turkish): "16 Haz", "11 Haz"
-const MONTH_PATTERN = /\b(\d{1,2})\s+(Oca|Şub|Mar|Nis|May|Haz|Tem|Ağu|Eyl|Eki|Kas|Ara)\b/gi;
-
 // Emoji pattern (checkmarks, etc.)
 const EMOJI_PATTERN = /[\u2705\u2611\u2714\u2716\u274C\u274E\u2B50\u{1F4E6}\u{1F4E5}\u{1F44D}\u{1F44E}]/gu;
 
-// Additional info keywords that should go to notes
-const INFO_KEYWORDS = [
-  'haftaya', 'almadı', 'almadi', 'başka yerden', 'baska yerden',
-  'kurye', 'hizmeti', 'askıda', 'askida',
+// Words/phrases that are NOT real names - should be moved to notes or filtered
+const NOT_A_NAME_WORDS = [
+  'müşteri', 'musteri', 'müşterisi', 'musterisi',
+  'haber ver', 'haber',
+  'ara', 'aranacak',
+  'haftaya', 'yarın', 'yarin', 'bugün', 'bugun',
+  'almadı', 'almadi', 'aldı', 'aldi', 'almaz',
+  'başka yerden', 'baska yerden',
+  'kurye', 'hizmeti', 'hizmet',
+  'askıda', 'askida',
+  'iptal', 'bitti', 'kapandı', 'kapandi',
+  'deneme', 'test',
 ];
+
+// Turkish month abbreviations
+const MONTH_NAMES = ['oca', 'şub', 'sub', 'mar', 'nis', 'may', 'haz', 'tem', 'ağu', 'agu', 'eyl', 'eki', 'kas', 'ara'];
 
 interface ExtractedContact {
   name: string;
@@ -108,82 +141,68 @@ interface ExtractedContact {
 function extractContactInfo(firstName: string, middleName: string, lastName: string): ExtractedContact {
   const notes: string[] = [];
 
+  // Use fresh regex instances to avoid lastIndex issues
+  const dateRe = () => /(\d{1,2})[./](\d{1,2})[./](\d{2,4})/g;
+  const durationRe = () => /(\d+)\s*[yY][iıİ]ll[iıİ][kK]/g;
+  const monthRe = () => /\b(\d{1,2})\s*(Oca|Şub|Şub|Sub|Mar|Nis|May|Haz|Tem|Ağu|Agu|Eyl|Eki|Kas|Ara)\b/gi;
+  const standaloneMonthRe = () => /^(\d{1,2})\s*(oca|şub|sub|mar|nis|may|haz|tem|ağu|agu|eyl|eki|kas|ara)$/i;
+
+  // --- Process a text field: extract dates, durations, notes ---
+  function extractMetadata(text: string): string {
+    let result = text;
+
+    // Remove emojis
+    result = result.replace(EMOJI_PATTERN, '');
+
+    // Extract dates
+    result = result.replace(dateRe(), (match) => {
+      notes.push(`Tarih: ${match}`);
+      return ' ';
+    });
+
+    // Extract durations
+    result = result.replace(durationRe(), (match) => {
+      notes.push(match.trim());
+      return ' ';
+    });
+
+    // Extract month references (e.g., "16 Haz", "11 Haz")
+    result = result.replace(monthRe(), (match) => {
+      notes.push(match.trim());
+      return ' ';
+    });
+
+    // Extract NOT_A_NAME phrases
+    for (const phrase of NOT_A_NAME_WORDS) {
+      const phraseRe = new RegExp(`\\b${escapeRegex(phrase)}\\b`, 'gi');
+      result = result.replace(phraseRe, (match) => {
+        notes.push(match.trim());
+        return ' ';
+      });
+    }
+
+    return result;
+  }
+
   // --- Process First Name ---
   let cleanFirst = firstName;
-
-  // Remove prefix (E İmza, E-İmza, etc.)
   for (const pattern of PREFIX_PATTERNS) {
     cleanFirst = cleanFirst.replace(pattern, '');
   }
-
-  // Remove emojis
-  cleanFirst = cleanFirst.replace(EMOJI_PATTERN, '');
-
-  // Extract dates from first name
-  const firstDates: string[] = [];
-  cleanFirst = cleanFirst.replace(DATE_PATTERN, (match) => {
-    firstDates.push(match);
-    return '';
-  });
-  if (firstDates.length > 0) {
-    notes.push(...firstDates.map(d => `Tarih: ${d}`));
-  }
-
-  // Extract durations from first name
-  cleanFirst = cleanFirst.replace(DURATION_PATTERN, (match) => {
-    notes.push(match.trim());
-    return '';
-  });
-
-  // Extract month references from first name
-  cleanFirst = cleanFirst.replace(MONTH_PATTERN, (match) => {
-    notes.push(match.trim());
-    return '';
-  });
-
-  // Check for info keywords in first name
-  const lowerFirst = cleanFirst.toLowerCase();
-  for (const keyword of INFO_KEYWORDS) {
-    if (lowerFirst.includes(keyword)) {
-      // Extract the keyword and surrounding words as a note
-      const keywordRegex = new RegExp(`\\b\\S*${keyword}\\S*(?:\\s+\\S+)?\\b`, 'gi');
-      cleanFirst = cleanFirst.replace(keywordRegex, (match) => {
-        notes.push(match.trim());
-        return '';
-      });
-    }
-  }
+  cleanFirst = extractMetadata(cleanFirst);
 
   // --- Process Last Name ---
-  let cleanLast = lastName;
-  cleanLast = cleanLast.replace(EMOJI_PATTERN, '');
+  let cleanLast = extractMetadata(lastName);
 
-  // Extract dates from last name
-  const lastDates: string[] = [];
-  cleanLast = cleanLast.replace(DATE_PATTERN, (match) => {
-    lastDates.push(match);
-    return '';
-  });
-  if (lastDates.length > 0) {
-    notes.push(...lastDates.map(d => `Tarih: ${d}`));
-  }
-
-  // Extract durations from last name
-  cleanLast = cleanLast.replace(DURATION_PATTERN, (match) => {
-    notes.push(match.trim());
-    return '';
-  });
-
-  // Check if last name is entirely a note (not a real surname)
-  const cleanLastTrimmed = cleanLast.trim();
-  const isNoteName = isLikelyNote(cleanLastTrimmed);
-  if (isNoteName && cleanLastTrimmed) {
+  // Check if remaining last name is still a note-like value
+  const cleanLastTrimmed = cleanLast.replace(/\s+/g, ' ').trim();
+  if (cleanLastTrimmed && isLikelyNote(cleanLastTrimmed)) {
     notes.push(cleanLastTrimmed);
     cleanLast = '';
   }
 
   // --- Process Middle Name ---
-  let cleanMiddle = (middleName || '').replace(EMOJI_PATTERN, '').trim();
+  let cleanMiddle = extractMetadata(middleName || '');
 
   // --- Build final name ---
   const nameParts = [cleanFirst, cleanMiddle, cleanLast]
@@ -204,33 +223,33 @@ function extractContactInfo(firstName: string, middleName: string, lastName: str
   };
 }
 
+function escapeRegex(str: string): string {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
 /**
  * Determines if a "Last Name" value is actually a note/metadata, not a real surname.
- * Real surnames are typically 1-2 Turkish words without numbers or special keywords.
  */
 function isLikelyNote(value: string): boolean {
   if (!value) return false;
-  const lower = value.toLowerCase();
+  const lower = value.toLowerCase().trim();
 
   // Contains a date
-  if (DATE_PATTERN.test(value)) {
-    DATE_PATTERN.lastIndex = 0;
-    return true;
-  }
+  if (/(\d{1,2})[./](\d{1,2})[./](\d{2,4})/.test(value)) return true;
 
   // Contains duration
-  if (DURATION_PATTERN.test(value)) {
-    DURATION_PATTERN.lastIndex = 0;
-    return true;
-  }
+  if (/(\d+)\s*[yY][iıİ]ll[iıİ][kK]/.test(value)) return true;
 
   // Known note keywords
   const noteKeywords = [
-    'almadı', 'almadi', 'avukat', 'doktor', 'mühendis', 'muhendis',
-    'öğretmen', 'ogretmen', 'üniversite', 'universite', 'araştırma', 'arastirma',
-    'görevli', 'gorevli', 'başka', 'baska', 'yerden', 'aldı', 'aldi',
-    'kurye', 'hizmet', 'müşteri', 'musteri', 'askıda', 'askida',
-    'ara', 'haftaya',
+    'almadı', 'almadi', 'aldı', 'aldi', 'almaz',
+    'avukat', 'doktor', 'mühendis', 'muhendis',
+    'öğretmen', 'ogretmen', 'üniversite', 'universite',
+    'araştırma', 'arastirma', 'görevli', 'gorevli',
+    'başka', 'baska', 'yerden',
+    'kurye', 'hizmet', 'müşteri', 'musteri',
+    'askıda', 'askida', 'iptal', 'bitti',
+    'ara', 'aranacak', 'haftaya',
   ];
 
   for (const keyword of noteKeywords) {
@@ -240,7 +259,40 @@ function isLikelyNote(value: string): boolean {
   // Starts with parentheses - it's a note: "(Serdar Bey)"
   if (value.startsWith('(')) return true;
 
+  // Pure number or month-like: "20.08.2025", "12.08.2025"
+  if (/^\d/.test(value)) return true;
+
   return false;
+}
+
+/**
+ * Check if a final extracted name is a valid person/company name.
+ * Filters out garbage results.
+ */
+function isValidName(name: string): boolean {
+  if (!name || name.length < 2) return false;
+
+  const lower = name.toLowerCase().trim();
+
+  // Too short single word (likely not a name)
+  const words = lower.split(/\s+/);
+  if (words.length === 1 && lower.length <= 3) return false;
+
+  // Is it just a month name? "Haz", "Ara", "Oca"
+  if (words.length === 1 && MONTH_NAMES.includes(lower)) return false;
+
+  // Is it just a number?
+  if (/^\d+$/.test(name)) return false;
+
+  // Is it a standalone month+number like "16haz"?
+  if (/^\d+\s*(oca|şub|sub|mar|nis|may|haz|tem|ağu|agu|eyl|eki|kas|ara)$/i.test(lower)) return false;
+
+  // Is it a NOT_A_NAME word?
+  for (const word of NOT_A_NAME_WORDS) {
+    if (lower === word) return false;
+  }
+
+  return true;
 }
 
 // =========================================================================
@@ -297,11 +349,16 @@ function getRawRows(buffer: Buffer, fileType: 'csv' | 'xlsx'): { headers: string
     }
     return { headers, rows };
   } else {
-    const workbook = XLSX.read(buffer, { type: 'buffer', cellDates: true });
+    const workbook = XLSX.read(buffer, { type: 'buffer', cellDates: true, cellText: false });
     const sheetName = workbook.SheetNames[0];
     if (!sheetName) throw new Error('Excel dosyasında sayfa bulunamadı');
     const sheet = workbook.Sheets[sheetName];
-    const rawRows = XLSX.utils.sheet_to_json<Record<string, unknown>>(sheet, { defval: '' });
+
+    // Use raw: false with specific formatting to preserve phone numbers
+    const rawRows = XLSX.utils.sheet_to_json<Record<string, unknown>>(sheet, {
+      defval: '',
+      raw: false, // Get formatted strings, not raw numbers
+    });
     if (rawRows.length === 0) throw new Error('Excel dosyasında veri satırı bulunamadı');
 
     const origKeys = Object.keys(rawRows[0]);
@@ -375,7 +432,7 @@ function parseStandardFormat(headers: string[], rows: Record<string, string>[]):
 
     customers.push({
       name,
-      phone: row['phone']?.trim() || null,
+      phone: formatPhoneNumber(row['phone']) || null,
       email: row['email']?.trim() || null,
       address: row['address']?.trim() || null,
       taxNumber: row['taxNumber']?.trim() || null,
@@ -436,7 +493,8 @@ function parseContactsFormat(rows: Record<string, string>[]): ParsedCustomerRow[
     // Extract clean name and notes
     const extracted = extractContactInfo(firstName, middleName, lastName);
 
-    if (!extracted.name || extracted.name.length < 2) continue;
+    // Validate name
+    if (!isValidName(extracted.name)) continue;
 
     // Get phone (first non-empty from candidate columns)
     let phone: string | null = null;
@@ -448,6 +506,7 @@ function parseContactsFormat(rows: Record<string, string>[]): ParsedCustomerRow[
         if (row[col]?.trim()) { phone = row[col].trim(); break; }
       }
     }
+    phone = formatPhoneNumber(phone);
 
     // Get email
     let email: string | null = null;
