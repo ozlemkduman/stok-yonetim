@@ -24,7 +24,7 @@ export function CustomerImportPage() {
   const [fileType, setFileType] = useState<'csv' | 'xlsx'>('csv');
   const [parsing, setParsing] = useState(false);
   const [preview, setPreview] = useState<CustomerImportParseResponse | null>(null);
-  const [skipExisting, setSkipExisting] = useState(true);
+  const [selected, setSelected] = useState<Set<number>>(new Set());
   const [importing, setImporting] = useState(false);
   const [result, setResult] = useState<{ created: number; updated: number; skipped: number } | null>(null);
 
@@ -53,6 +53,12 @@ export function CustomerImportPage() {
     try {
       const response = await customersApi.importParse(file);
       setPreview(response.data);
+      // Auto-select all new customers
+      const initialSelected = new Set<number>();
+      response.data.customers.forEach((c, idx) => {
+        if (c.isNew) initialSelected.add(idx);
+      });
+      setSelected(initialSelected);
       setStep('preview');
     } catch (err) {
       showToast('error', err instanceof Error ? err.message : t('customers:import.parseError'));
@@ -60,16 +66,33 @@ export function CustomerImportPage() {
     setParsing(false);
   };
 
-  const handleConfirm = async () => {
+  const toggleSelect = (idx: number) => {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(idx)) next.delete(idx);
+      else next.add(idx);
+      return next;
+    });
+  };
+
+  const toggleSelectAll = () => {
     if (!preview) return;
+    if (selected.size === preview.customers.length) {
+      setSelected(new Set());
+    } else {
+      setSelected(new Set(preview.customers.map((_, idx) => idx)));
+    }
+  };
+
+  const selectedCount = selected.size;
+
+  const handleConfirm = async () => {
+    if (!preview || selectedCount === 0) return;
     setImporting(true);
     setStep('importing');
     try {
       const data = {
-        customers: skipExisting
-          ? preview.customers.filter((c) => c.isNew)
-          : preview.customers,
-        skipExisting,
+        customers: preview.customers.filter((_, idx) => selected.has(idx)),
       };
       const response = await customersApi.importConfirm(data);
       setResult(response.data);
@@ -167,8 +190,8 @@ export function CustomerImportPage() {
                 <span className={styles.summaryLabel}>{t('customers:import.totalRows')}</span>
               </div>
               <div className={styles.summaryItem}>
-                <span className={`${styles.summaryNumber} ${styles.newColor}`}>{preview.summary.newCount}</span>
-                <span className={styles.summaryLabel}>{t('customers:import.newCustomers')}</span>
+                <span className={`${styles.summaryNumber} ${styles.selectedColor}`}>{selectedCount}</span>
+                <span className={styles.summaryLabel}>{t('customers:import.selected')}</span>
               </div>
               <div className={styles.summaryItem}>
                 <span className={`${styles.summaryNumber} ${styles.existingColor}`}>{preview.summary.existingCount}</span>
@@ -177,20 +200,6 @@ export function CustomerImportPage() {
             </div>
           </div>
 
-          {/* Options */}
-          {preview.summary.existingCount > 0 && (
-            <div className={styles.card}>
-              <label className={styles.checkboxLabel}>
-                <input
-                  type="checkbox"
-                  checked={skipExisting}
-                  onChange={(e) => setSkipExisting(e.target.checked)}
-                />
-                <span>{t('customers:import.skipExisting')}</span>
-              </label>
-            </div>
-          )}
-
           {/* Customer List */}
           <div className={styles.card}>
             <h3 className={styles.cardTitle}>{t('customers:import.customerList')}</h3>
@@ -198,6 +207,14 @@ export function CustomerImportPage() {
               <table className={styles.table}>
                 <thead>
                   <tr>
+                    <th className={styles.checkboxCol}>
+                      <input
+                        type="checkbox"
+                        checked={selected.size === preview.customers.length}
+                        onChange={toggleSelectAll}
+                        className={styles.checkbox}
+                      />
+                    </th>
                     <th>{t('customers:import.cols.status')}</th>
                     <th>{t('customers:import.cols.name')}</th>
                     <th>{t('customers:import.cols.phone')}</th>
@@ -209,7 +226,20 @@ export function CustomerImportPage() {
                 </thead>
                 <tbody>
                   {preview.customers.map((item: CustomerImportPreview, idx: number) => (
-                    <tr key={idx} className={!item.isNew && skipExisting ? styles.skippedRow : ''}>
+                    <tr
+                      key={idx}
+                      className={`${!selected.has(idx) ? styles.skippedRow : ''} ${styles.selectableRow}`}
+                      onClick={() => toggleSelect(idx)}
+                    >
+                      <td className={styles.checkboxCol}>
+                        <input
+                          type="checkbox"
+                          checked={selected.has(idx)}
+                          onChange={() => toggleSelect(idx)}
+                          onClick={(e) => e.stopPropagation()}
+                          className={styles.checkbox}
+                        />
+                      </td>
                       <td>
                         <Badge variant={item.isNew ? 'warning' : 'success'}>
                           {item.isNew ? t('customers:import.new') : t('customers:import.existing')}
@@ -238,9 +268,9 @@ export function CustomerImportPage() {
             <Button variant="secondary" onClick={() => { setStep('upload'); setPreview(null); setFile(null); }}>
               {t('customers:import.back')}
             </Button>
-            <Button onClick={handleConfirm} disabled={importing}>
+            <Button onClick={handleConfirm} disabled={importing || selectedCount === 0}>
               {t('customers:import.importButton', {
-                count: skipExisting ? preview.summary.newCount : preview.summary.total,
+                count: selectedCount,
               })}
             </Button>
           </div>

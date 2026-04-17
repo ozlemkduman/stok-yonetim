@@ -176,6 +176,7 @@
     "summary": "Özet",
     "totalRows": "Toplam Satır",
     "newCustomers": "Yeni Müşteri",
+    "selected": "Seçilen",
     "existingCustomers": "Mevcut Müşteri",
     "skipExisting": "Mevcut müşterileri atla (sadece yeni müşterileri ekle)",
     "customerList": "Müşteri Listesi",

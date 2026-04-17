@@ -176,6 +176,7 @@
     "summary": "Summary",
     "totalRows": "Total Rows",
     "newCustomers": "New Customers",
+    "selected": "Selected",
     "existingCustomers": "Existing Customers",
     "skipExisting": "Skip existing customers (only add new ones)",
     "customerList": "Customer List",
