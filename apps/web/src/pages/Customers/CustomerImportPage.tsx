@@ -202,6 +202,7 @@ export function CustomerImportPage() {
                     <th>{t('customers:import.cols.name')}</th>
                     <th>{t('customers:import.cols.phone')}</th>
                     <th>{t('customers:import.cols.email')}</th>
+                    <th>{t('customers:import.cols.notes')}</th>
                     <th>{t('customers:import.cols.taxNumber')}</th>
                     <th>{t('customers:import.cols.taxOffice')}</th>
                   </tr>
@@ -222,6 +223,7 @@ export function CustomerImportPage() {
                       </td>
                       <td>{item.parsed.phone || '-'}</td>
                       <td>{item.parsed.email || '-'}</td>
+                      <td className={styles.notesCell}>{item.parsed.notes || '-'}</td>
                       <td>{item.parsed.taxNumber || '-'}</td>
                       <td>{item.parsed.taxOffice || '-'}</td>
                     </tr>

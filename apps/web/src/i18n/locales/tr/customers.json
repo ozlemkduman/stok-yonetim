@@ -184,6 +184,7 @@
       "name": "Müşteri Adı",
       "phone": "Telefon",
       "email": "E-posta",
+      "notes": "Notlar",
       "taxNumber": "VKN/TCKN",
       "taxOffice": "Vergi Dairesi"
     },

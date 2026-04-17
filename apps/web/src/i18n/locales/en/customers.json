@@ -184,6 +184,7 @@
       "name": "Customer Name",
       "phone": "Phone",
       "email": "Email",
+      "notes": "Notes",
       "taxNumber": "Tax ID",
       "taxOffice": "Tax Office"
     },

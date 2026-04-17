@@ -262,6 +262,13 @@
   white-space: nowrap;
 }
 
+.notesCell {
+  max-width: 200px;
+  white-space: normal;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+}
+
 .skippedRow {
   opacity: 0.4;
 }
