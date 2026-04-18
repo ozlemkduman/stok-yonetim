@@ -332,7 +332,12 @@
     "saleTypeOptions": {
       "retail": "Perakende",
       "wholesale": "Toptan"
-    }
+    },
+    "addWarehouse": "Yeni Depo Ekle",
+    "createWarehouse": "Oluştur",
+    "warehouseName": "Depo Adı *",
+    "warehouseCreated": "Depo oluşturuldu",
+    "warehouseCreateError": "Depo oluşturulamadı"
   },
   "inlineProduct": {
     "title": "Yeni Ürün",

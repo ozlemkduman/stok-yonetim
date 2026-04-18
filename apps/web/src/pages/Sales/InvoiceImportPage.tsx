@@ -1,9 +1,9 @@
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Button, Badge, Select, Input } from '@stok/ui';
+import { Button, Badge, Select, Input, Modal } from '@stok/ui';
 import { invoiceImportApi, ParsePreviewResponse, ConfirmImportData } from '../../api/invoice-import.api';
-import { Warehouse, warehousesApi } from '../../api/warehouses.api';
+import { Warehouse, warehousesApi, CreateWarehouseData } from '../../api/warehouses.api';
 import { useToast } from '../../context/ToastContext';
 import { formatCurrency, formatDate } from '../../utils/formatters';
 import styles from './InvoiceImportPage.module.css';
@@ -35,6 +35,9 @@ export function InvoiceImportPage() {
   const [saleType, setSaleType] = useState('retail');
   const [dueDate, setDueDate] = useState('');
   const [notes, setNotes] = useState('');
+  const [showNewWarehouse, setShowNewWarehouse] = useState(false);
+  const [newWarehouseName, setNewWarehouseName] = useState('');
+  const [creatingWarehouse, setCreatingWarehouse] = useState(false);
 
   const PAYMENT_OPTIONS = [
     { value: 'nakit', label: t('sales:import.paymentOptions.nakit') },
@@ -64,6 +67,24 @@ export function InvoiceImportPage() {
       const ext = name.endsWith('.csv') ? 'csv' : (name.endsWith('.xlsx') || name.endsWith('.xls')) ? 'xlsx' : 'xml';
       setFileType(ext);
     }
+  };
+
+  const handleCreateWarehouse = async () => {
+    if (!newWarehouseName.trim()) return;
+    setCreatingWarehouse(true);
+    try {
+      const code = newWarehouseName.trim().toUpperCase().replace(/\s+/g, '-').slice(0, 10);
+      const data: CreateWarehouseData = { name: newWarehouseName.trim(), code };
+      const response = await warehousesApi.create(data);
+      setWarehouses((prev) => [...prev, response.data]);
+      setWarehouseId(response.data.id);
+      setShowNewWarehouse(false);
+      setNewWarehouseName('');
+      showToast('success', t('sales:import.warehouseCreated'));
+    } catch (err) {
+      showToast('error', err instanceof Error ? err.message : t('sales:import.warehouseCreateError'));
+    }
+    setCreatingWarehouse(false);
   };
 
   const handleDownloadTemplate = () => {
@@ -399,14 +420,24 @@ export function InvoiceImportPage() {
             <div className={styles.settingsGrid}>
               <div className={styles.settingsField}>
                 <label className={styles.infoLabel}>{t('sales:import.warehouseLabel')}</label>
-                <Select
-                  options={[
-                    { value: '', label: t('sales:import.selectWarehouse') },
-                    ...warehouses.map(w => ({ value: w.id, label: w.name })),
-                  ]}
-                  value={warehouseId}
-                  onChange={(e) => setWarehouseId(e.target.value)}
-                />
+                <div className={styles.warehouseRow}>
+                  <Select
+                    options={[
+                      { value: '', label: t('sales:import.selectWarehouse') },
+                      ...warehouses.map(w => ({ value: w.id, label: w.name })),
+                    ]}
+                    value={warehouseId}
+                    onChange={(e) => setWarehouseId(e.target.value)}
+                  />
+                  <button
+                    type="button"
+                    className={styles.addWarehouseBtn}
+                    onClick={() => setShowNewWarehouse(true)}
+                    title={t('sales:import.addWarehouse')}
+                  >
+                    +
+                  </button>
+                </div>
               </div>
               <div className={styles.settingsField}>
                 <label className={styles.infoLabel}>{t('sales:import.paymentMethodLabel')}</label>
@@ -470,6 +501,31 @@ export function InvoiceImportPage() {
           </div>
         </div>
       )}
+
+      {/* New Warehouse Modal */}
+      <Modal
+        isOpen={showNewWarehouse}
+        onClose={() => setShowNewWarehouse(false)}
+        title={t('sales:import.addWarehouse')}
+        footer={
+          <>
+            <Button variant="secondary" onClick={() => setShowNewWarehouse(false)}>
+              {t('sales:import.back')}
+            </Button>
+            <Button onClick={handleCreateWarehouse} disabled={creatingWarehouse || !newWarehouseName.trim()}>
+              {creatingWarehouse ? '...' : t('sales:import.createWarehouse')}
+            </Button>
+          </>
+        }
+      >
+        <Input
+          label={t('sales:import.warehouseName')}
+          value={newWarehouseName}
+          onChange={(e) => setNewWarehouseName(e.target.value)}
+          fullWidth
+          autoFocus
+        />
+      </Modal>
     </div>
   );
 }

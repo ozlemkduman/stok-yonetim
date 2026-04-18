@@ -332,7 +332,12 @@
     "saleTypeOptions": {
       "retail": "Retail",
       "wholesale": "Wholesale"
-    }
+    },
+    "addWarehouse": "Add New Warehouse",
+    "createWarehouse": "Create",
+    "warehouseName": "Warehouse Name *",
+    "warehouseCreated": "Warehouse created",
+    "warehouseCreateError": "Failed to create warehouse"
   },
   "inlineProduct": {
     "title": "New Product",
