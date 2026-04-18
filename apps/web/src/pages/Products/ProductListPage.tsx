@@ -102,22 +102,25 @@ export function ProductListPage() {
     setPurchaseVatIncluded(false);
     setSaleVatIncluded(false);
     if (product) {
+      const pp = Number(product.purchase_price) || 0;
+      const sp = Number(product.sale_price) || 0;
+      const wp = Number(product.wholesale_price) || 0;
       setFormData({
         name: product.name,
         barcode: product.barcode || '',
         category: product.category || '',
         unit: product.unit,
-        purchase_price: product.purchase_price,
-        sale_price: product.sale_price,
-        wholesale_price: product.wholesale_price || 0,
-        vat_rate: product.vat_rate,
-        stock_quantity: product.stock_quantity,
-        min_stock_level: product.min_stock_level,
+        purchase_price: pp,
+        sale_price: sp,
+        wholesale_price: wp,
+        vat_rate: Number(product.vat_rate) || 20,
+        stock_quantity: Number(product.stock_quantity) || 0,
+        min_stock_level: Number(product.min_stock_level) || 5,
         subscription_duration: product.subscription_duration,
       });
-      setDisplayPurchasePrice(String(product.purchase_price));
-      setDisplaySalePrice(String(product.sale_price));
-      setDisplayWholesalePrice(String(product.wholesale_price || 0));
+      setDisplayPurchasePrice(String(pp));
+      setDisplaySalePrice(String(sp));
+      setDisplayWholesalePrice(String(wp));
     } else {
       setFormData({ name: '', purchase_price: 0, sale_price: 0, wholesale_price: 0 });
       setDisplayPurchasePrice('0');
@@ -186,7 +189,7 @@ export function ProductListPage() {
   };
 
   const getPriceInfo = (field: 'purchase_price' | 'sale_price' | 'wholesale_price') => {
-    const basePrice = formData[field] || 0;
+    const basePrice = Number(formData[field]) || 0;
     const vatInc = isVatIncludedForField(field);
     if (vatInc) {
       return t('products:priceInfo.vatExcluded', { price: basePrice.toFixed(2) });
