@@ -34,6 +34,9 @@ export class ProductsService {
       const existing = await this.productsRepository.findByBarcode(dto.barcode);
       if (existing) throw new ConflictException('Bu barkod zaten kullaniliyor');
     }
+    // Normalize subscription_duration: empty string -> null
+    if (dto.subscription_duration === '') dto.subscription_duration = null;
+
     const product = await this.productsRepository.createProduct(dto, userId);
 
     await this.activityLog.log({
@@ -54,6 +57,9 @@ export class ProductsService {
         throw new ConflictException('Bu barkod zaten kullaniliyor');
       }
     }
+    // Normalize subscription_duration: empty string -> null
+    if (dto.subscription_duration === '') dto.subscription_duration = null;
+
     const updated = await this.productsRepository.updateProduct(id, dto);
     if (!updated) throw new NotFoundException(`Urun bulunamadi: ${id}`);
 

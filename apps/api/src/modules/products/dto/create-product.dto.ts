@@ -65,7 +65,6 @@ export class CreateProductDto {
   is_active?: boolean = true;
 
   @IsOptional()
-  @IsString()
-  @IsIn(['1_yillik', '2_yillik', '3_yillik', null])
+  @IsIn(['1_yillik', '2_yillik', '3_yillik', '', null])
   subscription_duration?: string | null;
 }
