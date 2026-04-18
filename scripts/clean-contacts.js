@@ -226,32 +226,65 @@ for (let i = 1; i < lines.length; i++) {
 
   if (!firstName && !middleName && !lastName) continue;
 
-  // Clean fields
-  const firstResult = cleanField(firstName);
-  const middleResult = cleanField(middleName);
-  const lastResult = cleanField(lastName);
+  // Detect if this is an e-imza entry
+  const isEimza = /^e\s*[-–—.]?\s*[iİ]mza/i.test(firstName);
 
-  const allNotes = [...firstResult.notes, ...middleResult.notes, ...lastResult.notes];
+  let name;
+  let renewalDate = '';
+  const allNotes = [];
 
-  // Check if last name remnant is a note
-  let cleanLast = lastResult.clean;
-  if (cleanLast && isLikelyNote(cleanLast)) {
-    allNotes.push(cleanLast);
-    cleanLast = '';
+  if (isEimza) {
+    // E-imza: orijinal ismi kullan, sadece tarihi ayır
+    const rawFull = [firstName, middleName, lastName].filter(Boolean).join(' ');
+
+    // Extract first date -> yenileme tarihi
+    const dateMatch = rawFull.match(/(\d{1,2})[./](\d{1,2})[./](\d{2,4})/);
+    if (dateMatch) {
+      renewalDate = dateMatch[0];
+    }
+
+    // Use original as name (with E-imza prefix, as user wants)
+    name = rawFull.replace(/\s+/g, ' ').trim();
+  } else {
+    // Non e-imza: clean normally
+    const firstResult = cleanField(firstName);
+    const middleResult = cleanField(middleName);
+    const lastResult = cleanField(lastName);
+
+    allNotes.push(...firstResult.notes, ...middleResult.notes, ...lastResult.notes);
+
+    // Extract renewal date from notes if present
+    const dateNote = allNotes.find(n => n.startsWith('Tarih: '));
+    if (dateNote) {
+      renewalDate = dateNote.replace('Tarih: ', '');
+    }
+
+    let cleanLast = lastResult.clean;
+    if (cleanLast && isLikelyNote(cleanLast)) {
+      allNotes.push(cleanLast);
+      cleanLast = '';
+    }
+
+    name = [firstResult.clean, middleResult.clean, cleanLast]
+      .filter(Boolean)
+      .join(' ')
+      .replace(/^[-–—\s]+|[-–—\s]+$/g, '')
+      .replace(/\s+/g, ' ')
+      .trim();
+
+    if (!isValidName(name)) {
+      skipped++;
+      continue;
+    }
   }
 
-  // Build name
-  const name = [firstResult.clean, middleResult.clean, cleanLast]
-    .filter(Boolean)
-    .join(' ')
-    .replace(/^[-–—\s]+|[-–—\s]+$/g, '')
-    .replace(/\s+/g, ' ')
-    .trim();
-
-  if (!isValidName(name)) {
+  if (!name || name.length < 1) {
     skipped++;
     continue;
   }
+
+  // Remove "Tarih: ..." from notes since it's now in renewalDate
+  const filteredNotes = isEimza ? [] : allNotes.filter(n => !n.startsWith('Tarih: '));
 
   // Phone - HAM OLARAK al
   let phone = phoneIdx >= 0 ? (values[phoneIdx] || '').trim() : '';
@@ -287,23 +320,28 @@ for (let i = 1; i < lines.length; i++) {
     allNotes.push(`Firma: ${values[orgIdx].trim()}`);
   }
 
-  // Deduplicate notes
-  const notes = [...new Set(allNotes.map(n => n.trim()).filter(Boolean))];
+  // Deduplicate notes (tarih notları artık renewalDate'te)
+  const notes = [...new Set(filteredNotes.map(n => n.trim()).filter(Boolean))];
+
+  // Original raw entry for reference
+  const originalParts = [firstName, middleName, lastName].filter(Boolean);
+  const original = originalParts.join(' | ');
 
   results.push({
     name,
     phone,
     email,
     notes: notes.join(', '),
+    renewalDate,
+    original,
   });
 }
 
 // --- Output ---
-const outputLines = ['musteri_adi;telefon;email;notlar'];
+const outputLines = ['musteri_adi;telefon;email;notlar;yenileme_tarihi;orijinal_kayit'];
 for (const r of results) {
-  // Escape semicolons in values
   const esc = (v) => v.includes(';') ? `"${v}"` : v;
-  outputLines.push(`${esc(r.name)};${esc(r.phone)};${esc(r.email)};${esc(r.notes)}`);
+  outputLines.push(`${esc(r.name)};${esc(r.phone)};${esc(r.email)};${esc(r.notes)};${r.renewalDate};${esc(r.original)}`);
 }
 
 fs.writeFileSync(outputFile, '\uFEFF' + outputLines.join('\n'), 'utf-8');

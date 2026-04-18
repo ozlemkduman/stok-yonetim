@@ -205,6 +205,7 @@ export interface ParsedCustomerRow {
   taxNumber: string | null;
   taxOffice: string | null;
   notes: string | null;
+  renewalDate: string | null;
 }
 
 export interface CustomerImportPreview {

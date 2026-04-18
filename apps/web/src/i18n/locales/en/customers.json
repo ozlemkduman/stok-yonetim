@@ -186,6 +186,7 @@
       "phone": "Phone",
       "email": "Email",
       "notes": "Notes",
+      "renewalDate": "Renewal Date",
       "taxNumber": "Tax ID",
       "taxOffice": "Tax Office"
     },

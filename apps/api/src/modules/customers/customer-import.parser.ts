@@ -8,6 +8,7 @@ export interface ParsedCustomerRow {
   taxNumber: string | null;
   taxOffice: string | null;
   notes: string | null;
+  renewalDate: string | null;
 }
 
 // --- Column alias mapping (standard format) ---
@@ -23,6 +24,7 @@ const COLUMN_ALIASES: Record<string, string> = {
   'vergi_numarasi': 'taxNumber', 'vkn': 'taxNumber', 'tckn': 'taxNumber',
   'vergi_dairesi': 'taxOffice', 'vergi dairesi': 'taxOffice',
   'not': 'notes', 'notlar': 'notes', 'aciklama': 'notes', 'açıklama': 'notes',
+  'yenileme_tarihi': 'renewalDate', 'yenileme tarihi': 'renewalDate',
   // English
   'name': 'name', 'customer_name': 'name', 'customer name': 'name', 'customer': 'name',
   'company': 'name', 'company_name': 'name', 'company name': 'name',
@@ -31,6 +33,7 @@ const COLUMN_ALIASES: Record<string, string> = {
   'tax_number': 'taxNumber', 'tax number': 'taxNumber', 'tax_id': 'taxNumber',
   'tax_office': 'taxOffice', 'tax office': 'taxOffice',
   'notes': 'notes', 'note': 'notes', 'description': 'notes',
+  'renewal_date': 'renewalDate', 'renewal date': 'renewalDate',
 };
 
 // --- Contacts format column names ---
@@ -438,6 +441,7 @@ function parseStandardFormat(headers: string[], rows: Record<string, string>[]):
       taxNumber: row['taxNumber']?.trim() || null,
       taxOffice: row['taxOffice']?.trim() || null,
       notes: row['notes']?.trim() || null,
+      renewalDate: row['renewalDate']?.trim() || null,
     });
   }
 
@@ -538,6 +542,7 @@ function parseContactsFormat(rows: Record<string, string>[]): ParsedCustomerRow[
       taxNumber: null,
       taxOffice: null,
       notes: extracted.notes.length > 0 ? extracted.notes.join(', ') : null,
+      renewalDate: null,
     });
   }
 

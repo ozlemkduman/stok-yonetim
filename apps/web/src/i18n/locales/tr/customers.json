@@ -186,6 +186,7 @@
       "phone": "Telefon",
       "email": "E-posta",
       "notes": "Notlar",
+      "renewalDate": "Yenileme Tarihi",
       "taxNumber": "VKN/TCKN",
       "taxOffice": "Vergi Dairesi"
     },
