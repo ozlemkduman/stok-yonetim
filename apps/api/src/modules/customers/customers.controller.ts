@@ -231,6 +231,13 @@ export class CustomersController {
         }
 
         if (item.isNew) {
+          // Build notes: combine notes + renewalDate
+          const noteParts = [
+            item.parsed.notes,
+            item.parsed.renewalDate ? `Yenileme: ${item.parsed.renewalDate}` : null,
+          ].filter(Boolean);
+          const combinedNotes = noteParts.length > 0 ? noteParts.join(', ') : null;
+
           // Create new customer
           const insertData: Record<string, unknown> = {
             name: item.parsed.name,
@@ -239,7 +246,7 @@ export class CustomersController {
             address: item.parsed.address,
             tax_number: item.parsed.taxNumber,
             tax_office: item.parsed.taxOffice,
-            notes: item.parsed.notes,
+            notes: combinedNotes,
           };
           if (tenantId) insertData.tenant_id = tenantId;
 
