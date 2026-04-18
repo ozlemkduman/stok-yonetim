@@ -52,7 +52,12 @@
     "salePriceLabel": "Satış Fiyatı * ({{vatStatus}})",
     "wholesalePriceLabel": "Toptan Satış Fiyatı ({{vatStatus}})",
     "stockQuantity": "Stok Miktarı",
-    "minStockLevel": "Kritik Stok Seviyesi"
+    "minStockLevel": "Kritik Stok Seviyesi",
+    "subscriptionDuration": "E-İmza Süresi",
+    "noSubscription": "Yok",
+    "duration1Year": "1 Yıllık",
+    "duration2Year": "2 Yıllık",
+    "duration3Year": "3 Yıllık"
   },
   "priceInfo": {
     "vatExcluded": "KDV Hariç: {{price}} ₺",

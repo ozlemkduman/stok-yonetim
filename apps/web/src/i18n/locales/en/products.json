@@ -52,7 +52,12 @@
     "salePriceLabel": "Sale Price * ({{vatStatus}})",
     "wholesalePriceLabel": "Wholesale Price ({{vatStatus}})",
     "stockQuantity": "Stock Quantity",
-    "minStockLevel": "Minimum Stock Level"
+    "minStockLevel": "Minimum Stock Level",
+    "subscriptionDuration": "E-Signature Duration",
+    "noSubscription": "None",
+    "duration1Year": "1 Year",
+    "duration2Year": "2 Years",
+    "duration3Year": "3 Years"
   },
   "priceInfo": {
     "vatExcluded": "Excl. VAT: {{price}} \u20ba",

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Modal, Button, Input } from '@stok/ui';
+import { Modal, Button, Input, Select } from '@stok/ui';
 import { Product, CreateProductData, productsApi } from '../../../api/products.api';
 import { useToast } from '../../../context/ToastContext';
 import styles from '../SaleFormPage.module.css';
@@ -150,6 +150,17 @@ export function InlineProductForm({ isOpen, onClose, onCreated }: InlineProductF
           <Input label={t('sales:inlineProduct.productName')} value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} error={errors.name} fullWidth />
           <Input label={t('sales:inlineProduct.barcode')} value={formData.barcode || ''} onChange={(e) => setFormData({ ...formData, barcode: e.target.value })} fullWidth />
           <Input label={t('sales:inlineProduct.category')} value={formData.category || ''} onChange={(e) => setFormData({ ...formData, category: e.target.value })} fullWidth />
+          <Select
+            label={t('products:form.subscriptionDuration')}
+            options={[
+              { value: '', label: t('products:form.noSubscription') },
+              { value: '1_yillik', label: t('products:form.duration1Year') },
+              { value: '2_yillik', label: t('products:form.duration2Year') },
+              { value: '3_yillik', label: t('products:form.duration3Year') },
+            ]}
+            value={formData.subscription_duration || ''}
+            onChange={(e) => setFormData({ ...formData, subscription_duration: e.target.value || null })}
+          />
           <Input label={t('sales:inlineProduct.unit')} value={formData.unit || 'adet'} onChange={(e) => setFormData({ ...formData, unit: e.target.value })} fullWidth />
         </div>
 

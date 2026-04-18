@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Table, Button, Input, Badge, Pagination, Modal, type Column } from '@stok/ui';
+import { Table, Button, Input, Badge, Pagination, Modal, Select, type Column } from '@stok/ui';
 import { productsApi, Product, CreateProductData } from '../../api/products.api';
 import { useToast } from '../../context/ToastContext';
 import { useConfirmDialog } from '../../context/ConfirmDialogContext';
@@ -112,7 +112,8 @@ export function ProductListPage() {
         wholesale_price: product.wholesale_price || 0,
         vat_rate: product.vat_rate,
         stock_quantity: product.stock_quantity,
-        min_stock_level: product.min_stock_level
+        min_stock_level: product.min_stock_level,
+        subscription_duration: product.subscription_duration,
       });
       setDisplayPurchasePrice(String(product.purchase_price));
       setDisplaySalePrice(String(product.sale_price));
@@ -334,6 +335,17 @@ export function ProductListPage() {
           <Input label={t('products:form.productName')} value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} fullWidth />
           <Input label={t('products:form.barcode')} value={formData.barcode || ''} onChange={(e) => setFormData({ ...formData, barcode: e.target.value })} fullWidth />
           <Input label={t('products:form.category')} value={formData.category || ''} onChange={(e) => setFormData({ ...formData, category: e.target.value })} fullWidth />
+          <Select
+            label={t('products:form.subscriptionDuration')}
+            options={[
+              { value: '', label: t('products:form.noSubscription') },
+              { value: '1_yillik', label: t('products:form.duration1Year') },
+              { value: '2_yillik', label: t('products:form.duration2Year') },
+              { value: '3_yillik', label: t('products:form.duration3Year') },
+            ]}
+            value={formData.subscription_duration || ''}
+            onChange={(e) => setFormData({ ...formData, subscription_duration: e.target.value || null })}
+          />
           <Input label={t('products:form.unit')} value={formData.unit || 'adet'} onChange={(e) => setFormData({ ...formData, unit: e.target.value })} fullWidth />
           <div className={styles.vatRateRow}>
             <Input label={t('products:form.vatRate')} type="number" step="any" value={formData.vat_rate ?? 20} onChange={(e) => handleVatRateChange(parseFloat(e.target.value) || 0)} fullWidth />

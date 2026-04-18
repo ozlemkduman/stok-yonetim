@@ -3,6 +3,7 @@ import {
   IsOptional,
   IsNumber,
   IsBoolean,
+  IsIn,
   MaxLength,
   MinLength,
   Min,
@@ -65,4 +66,9 @@ export class UpdateProductDto {
   @IsOptional()
   @IsBoolean()
   is_active?: boolean;
+
+  @IsOptional()
+  @IsString()
+  @IsIn(['1_yillik', '2_yillik', '3_yillik', null])
+  subscription_duration?: string | null;
 }
