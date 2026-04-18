@@ -2,7 +2,7 @@ import * as XLSX from 'xlsx';
 import { ParsedUblInvoice, ParsedInvoice, ParsedCustomer, ParsedItem, ParsedTotals } from './ubl-parser';
 
 /**
- * Excel kolon adları - CSV parser ile aynı alias mantığı
+ * Standard Excel kolon adları
  */
 const COLUMN_ALIASES: Record<string, string> = {
   // Turkish
@@ -36,6 +36,17 @@ const COLUMN_ALIASES: Record<string, string> = {
   'unit_price': 'unitPrice', 'unit price': 'unitPrice', 'price': 'unitPrice',
   'vat_rate': 'vatRate', 'vat rate': 'vatRate', 'vat': 'vatRate',
   'unit': 'unit',
+  // GİB e-fatura portal export kolonları
+  'alıcı unvan': 'customerName', 'alici unvan': 'customerName',
+  'vkn / tckn': 'taxNumber',
+  'ödenecek tutar': 'grandTotal', 'odenecek tutar': 'grandTotal',
+  'toplam tutar(vergiler hariç)': 'subtotal', 'toplam tutar(vergiler haric)': 'subtotal',
+  'vergiler toplamı': 'taxTotal', 'vergiler toplami': 'taxTotal',
+  'toplam iskonto tutarı': 'discountTotal', 'toplam iskonto tutari': 'discountTotal',
+  'mal hizmet adı': 'productName', 'mal hizmet adi': 'productName',
+  'para birimi': 'currencyCode',
+  'fatura tipi': 'invoiceType',
+  'belge tipi': 'documentType',
 };
 
 function normalizeColumn(name: string): string {
@@ -46,7 +57,6 @@ function normalizeColumn(name: string): string {
 function toStr(val: unknown): string {
   if (val == null) return '';
   if (val instanceof Date) {
-    // Excel date -> YYYY-MM-DD
     const d = val;
     const year = d.getFullYear();
     const month = String(d.getMonth() + 1).padStart(2, '0');
@@ -59,8 +69,105 @@ function toStr(val: unknown): string {
 function toNum(val: unknown, fallback = 0): number {
   if (val == null) return fallback;
   if (typeof val === 'number') return val;
-  const n = parseFloat(String(val).replace(',', '.'));
+  const n = parseFloat(String(val).replace(/\./g, '').replace(',', '.'));
   return isNaN(n) ? fallback : n;
+}
+
+/**
+ * Detect if this is a GİB e-fatura portal export
+ */
+function isGibFormat(headers: string[]): boolean {
+  const lower = headers.map(h => h.toLowerCase());
+  return lower.includes('alıcı unvan') || lower.includes('alici unvan') ||
+    (lower.includes('fatura no') && lower.includes('ödenecek tutar'));
+}
+
+/**
+ * Parse GİB e-fatura portal export format.
+ * Each row = one invoice (not one line item).
+ * We create one "sale" per row with a single product item.
+ */
+function parseGibFormat(rows: Record<string, unknown>[], columnMap: Record<string, string>): ParsedUblInvoice[] {
+  const results: ParsedUblInvoice[] = [];
+
+  for (let i = 0; i < rows.length; i++) {
+    const raw = rows[i];
+    const mapped: Record<string, unknown> = {};
+    for (const [origKey, normKey] of Object.entries(columnMap)) {
+      mapped[normKey] = raw[origKey];
+    }
+
+    const customerName = toStr(mapped['customerName']);
+    if (!customerName) continue;
+
+    const invoiceNo = toStr(mapped['invoiceNo']);
+    const invoiceDate = toStr(mapped['invoiceDate']);
+    const taxNumber = toStr(mapped['taxNumber']);
+    const grandTotal = toNum(mapped['grandTotal']);
+    const subtotal = toNum(mapped['subtotal']);
+    const taxTotal = toNum(mapped['taxTotal']);
+    const currencyCode = toStr(mapped['currencyCode']) || 'TRY';
+    const productName = toStr(mapped['productName']) || 'E-İmza Hizmeti';
+
+    // Determine VAT rate from KDV columns
+    let vatRate = 20;
+    // Check which KDV matrah is non-zero
+    for (const [key, val] of Object.entries(raw)) {
+      const keyLower = key.toLowerCase();
+      const matrahMatch = keyLower.match(/kdv\(%?\s*(\d+)\)\s*matrah/);
+      if (matrahMatch && toNum(val) > 0) {
+        vatRate = parseInt(matrahMatch[1], 10);
+        break;
+      }
+    }
+
+    // Parse date (DD.MM.YYYY -> YYYY-MM-DD)
+    let parsedDate = invoiceDate;
+    const dateMatch = invoiceDate.match(/^(\d{1,2})\.(\d{1,2})\.(\d{4})$/);
+    if (dateMatch) {
+      parsedDate = `${dateMatch[3]}-${dateMatch[2].padStart(2, '0')}-${dateMatch[1].padStart(2, '0')}`;
+    }
+
+    const invoice: ParsedInvoice = {
+      id: invoiceNo || `GIB-${Date.now()}-${i}`,
+      issueDate: parsedDate || new Date().toISOString().split('T')[0],
+      invoiceTypeCode: 'SATIS',
+      currencyCode,
+    };
+
+    const customer: ParsedCustomer = {
+      name: customerName,
+      taxNumber: taxNumber || null,
+      taxOffice: null,
+      address: null,
+      phone: null,
+      email: null,
+    };
+
+    const unitPrice = subtotal > 0 ? subtotal : (grandTotal > 0 ? grandTotal / (1 + vatRate / 100) : 0);
+    const vatAmount = taxTotal > 0 ? taxTotal : unitPrice * (vatRate / 100);
+
+    const items: ParsedItem[] = [{
+      name: productName,
+      quantity: 1,
+      unitPrice,
+      vatRate,
+      vatAmount,
+      lineTotal: grandTotal > 0 ? grandTotal : unitPrice + vatAmount,
+      unit: 'adet',
+    }];
+
+    const totals: ParsedTotals = {
+      lineExtensionAmount: subtotal > 0 ? subtotal : unitPrice,
+      taxInclusiveAmount: grandTotal > 0 ? grandTotal : unitPrice + vatAmount,
+      taxTotal: vatAmount,
+      payableAmount: grandTotal > 0 ? grandTotal : unitPrice + vatAmount,
+    };
+
+    results.push({ invoice, customer, items, totals });
+  }
+
+  return results;
 }
 
 export function parseXlsx(buffer: Buffer): ParsedUblInvoice {
@@ -85,7 +192,20 @@ export function parseXlsx(buffer: Buffer): ParsedUblInvoice {
     columnMap[key] = normalizeColumn(key);
   }
 
-  // Map rows
+  const origHeaders = Object.keys(firstRaw);
+
+  // Check if this is GİB format
+  if (isGibFormat(origHeaders)) {
+    const gibResults = parseGibFormat(rawRows, columnMap);
+    if (gibResults.length === 0) {
+      throw new Error('Excel dosyasında geçerli fatura satırı bulunamadı');
+    }
+    // Return first invoice; for multiple invoices we return the first one
+    // The rest can be imported one by one
+    return gibResults[0];
+  }
+
+  // --- Standard format ---
   const rows = rawRows.map((raw) => {
     const mapped: Record<string, unknown> = {};
     for (const [origKey, normKey] of Object.entries(columnMap)) {
@@ -94,7 +214,6 @@ export function parseXlsx(buffer: Buffer): ParsedUblInvoice {
     return mapped;
   });
 
-  // Validate required columns
   const normHeaders = Object.values(columnMap);
   if (!normHeaders.includes('productName')) {
     throw new Error('Excel dosyasında "urun_adi" veya "product_name" kolonu bulunamadı');
@@ -106,7 +225,6 @@ export function parseXlsx(buffer: Buffer): ParsedUblInvoice {
     throw new Error('Excel dosyasında "birim_fiyat" veya "unit_price" kolonu bulunamadı');
   }
 
-  // Parse items
   interface RowData {
     invoiceNo?: string;
     invoiceDate?: string;
@@ -161,7 +279,6 @@ export function parseXlsx(buffer: Buffer): ParsedUblInvoice {
     throw new Error('Excel dosyasında geçerli ürün satırı bulunamadı');
   }
 
-  // Invoice info from first row
   const first = parsedRows[0];
   const invoice: ParsedInvoice = {
     id: first.invoiceNo || `XLSX-${Date.now()}`,
@@ -170,7 +287,6 @@ export function parseXlsx(buffer: Buffer): ParsedUblInvoice {
     currencyCode: 'TRY',
   };
 
-  // Customer from first row
   const customer: ParsedCustomer = {
     name: first.customerName || '',
     taxNumber: first.taxNumber || null,
@@ -180,7 +296,6 @@ export function parseXlsx(buffer: Buffer): ParsedUblInvoice {
     email: first.email || null,
   };
 
-  // Items
   const items: ParsedItem[] = parsedRows.map((row) => {
     const lineSubtotal = row.unitPrice * row.quantity;
     const vatAmount = lineSubtotal * (row.vatRate / 100);
@@ -195,7 +310,6 @@ export function parseXlsx(buffer: Buffer): ParsedUblInvoice {
     };
   });
 
-  // Totals
   const lineExtensionAmount = items.reduce((s, i) => s + i.unitPrice * i.quantity, 0);
   const taxTotal = items.reduce((s, i) => s + i.vatAmount, 0);
   const totals: ParsedTotals = {
@@ -207,3 +321,6 @@ export function parseXlsx(buffer: Buffer): ParsedUblInvoice {
 
   return { invoice, customer, items, totals };
 }
+
+// Export for multi-invoice GİB imports
+export { parseGibFormat, isGibFormat };
