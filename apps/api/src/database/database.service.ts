@@ -30,21 +30,19 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
       throw error;
     }
 
-    // Auto-run migrations (skip in production - handled by start.sh)
-    if (process.env.NODE_ENV !== 'production') {
-      try {
-        const migrationsDir = path.resolve(__dirname, 'migrations');
-        const [batch, migrations] = await this._knex.migrate.latest({
-          directory: migrationsDir,
-        });
-        if (migrations.length > 0) {
-          this.logger.log(`Ran ${migrations.length} migrations (batch ${batch})`);
-        } else {
-          this.logger.log('Database schema is up to date');
-        }
-      } catch (error) {
-        this.logger.error('Migration failed', error);
+    // Auto-run migrations on startup
+    try {
+      const migrationsDir = path.resolve(__dirname, 'migrations');
+      const [batch, migrations] = await this._knex.migrate.latest({
+        directory: migrationsDir,
+      });
+      if (migrations.length > 0) {
+        this.logger.log(`Ran ${migrations.length} migrations (batch ${batch})`);
+      } else {
+        this.logger.log('Database schema is up to date');
       }
+    } catch (error) {
+      this.logger.error('Migration failed', error);
     }
 
     // Ensure plans and super admin exist
