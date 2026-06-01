@@ -241,8 +241,8 @@ export function InlineProductForm({ isOpen, onClose, onCreated }: InlineProductF
         </div>
 
         <div className={styles.inlineFormGrid}>
-          <Input label={t('sales:inlineProduct.stockQuantity')} type="number" step="any" value={formData.stock_quantity ?? ''} onChange={(e) => setFormData({ ...formData, stock_quantity: e.target.value === '' ? 0 : parseFloat(e.target.value) })} fullWidth />
-          <Input label={t('sales:inlineProduct.minStockLevel')} type="number" step="any" value={formData.min_stock_level ?? ''} onChange={(e) => setFormData({ ...formData, min_stock_level: e.target.value === '' ? 0 : parseFloat(e.target.value) })} fullWidth />
+          <Input label={t('sales:inlineProduct.stockQuantity')} type="number" step="any" value={formData.stock_quantity ?? ''} onChange={(e) => setFormData({ ...formData, stock_quantity: e.target.value === '' ? undefined : parseFloat(e.target.value) })} fullWidth />
+          <Input label={t('sales:inlineProduct.minStockLevel')} type="number" step="any" value={formData.min_stock_level ?? ''} onChange={(e) => setFormData({ ...formData, min_stock_level: e.target.value === '' ? undefined : parseFloat(e.target.value) })} fullWidth />
         </div>
       </form>
     </Modal>

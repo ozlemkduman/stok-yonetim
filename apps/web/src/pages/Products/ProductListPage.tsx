@@ -97,14 +97,16 @@ export function ProductListPage() {
     }
   };
 
+  const roundMoney = (v: number) => Math.round(v * 100) / 100;
+
   const openModal = (product?: Product) => {
     setEditingProduct(product || null);
-    setPurchaseVatIncluded(false);
-    setSaleVatIncluded(false);
     if (product) {
       const pp = Number(product.purchase_price) || 0;
       const sp = Number(product.sale_price) || 0;
       const wp = Number(product.wholesale_price) || 0;
+      const vr = Number(product.vat_rate) || 20;
+      const mult = 1 + vr / 100;
       setFormData({
         name: product.name,
         barcode: product.barcode || '',
@@ -113,15 +115,19 @@ export function ProductListPage() {
         purchase_price: pp,
         sale_price: sp,
         wholesale_price: wp,
-        vat_rate: Number(product.vat_rate) || 20,
+        vat_rate: vr,
         stock_quantity: Number(product.stock_quantity) || 0,
         min_stock_level: Number(product.min_stock_level) || 5,
         subscription_duration: product.subscription_duration,
       });
-      setDisplayPurchasePrice(String(pp));
-      setDisplaySalePrice(String(sp));
-      setDisplayWholesalePrice(String(wp));
+      setPurchaseVatIncluded(true);
+      setSaleVatIncluded(true);
+      setDisplayPurchasePrice(roundMoney(pp * mult).toString());
+      setDisplaySalePrice(roundMoney(sp * mult).toString());
+      setDisplayWholesalePrice(roundMoney(wp * mult).toString());
     } else {
+      setPurchaseVatIncluded(false);
+      setSaleVatIncluded(false);
       setFormData({ name: '', purchase_price: 0, sale_price: 0, wholesale_price: 0 });
       setDisplayPurchasePrice('0');
       setDisplaySalePrice('0');
@@ -146,7 +152,7 @@ export function ProductListPage() {
       return;
     }
     const vatInc = isVatIncludedForField(field);
-    const basePrice = vatInc ? parsed / vatMultiplier : parsed;
+    const basePrice = roundMoney(vatInc ? parsed / vatMultiplier : parsed);
     setFormData(prev => ({ ...prev, [field]: basePrice }));
   };
 
@@ -156,13 +162,13 @@ export function ProductListPage() {
       const updates: Partial<CreateProductData> = { vat_rate: newRate };
       if (purchaseVatIncluded) {
         const purchaseVal = parseFloat(displayPurchasePrice) || 0;
-        updates.purchase_price = purchaseVal / newMultiplier;
+        updates.purchase_price = roundMoney(purchaseVal / newMultiplier);
       }
       if (saleVatIncluded) {
         const saleVal = parseFloat(displaySalePrice) || 0;
         const wholesaleVal = parseFloat(displayWholesalePrice) || 0;
-        updates.sale_price = saleVal / newMultiplier;
-        updates.wholesale_price = wholesaleVal / newMultiplier;
+        updates.sale_price = roundMoney(saleVal / newMultiplier);
+        updates.wholesale_price = roundMoney(wholesaleVal / newMultiplier);
       }
       return { ...prev, ...updates };
     });
@@ -171,20 +177,20 @@ export function ProductListPage() {
   const handlePurchaseVatToggle = (included: boolean) => {
     setPurchaseVatIncluded(included);
     if (included) {
-      setDisplayPurchasePrice(String(formData.purchase_price * vatMultiplier));
+      setDisplayPurchasePrice(roundMoney(formData.purchase_price * vatMultiplier).toString());
     } else {
-      setDisplayPurchasePrice(String(formData.purchase_price));
+      setDisplayPurchasePrice(roundMoney(formData.purchase_price).toString());
     }
   };
 
   const handleSaleVatToggle = (included: boolean) => {
     setSaleVatIncluded(included);
     if (included) {
-      setDisplaySalePrice(String(formData.sale_price * vatMultiplier));
-      setDisplayWholesalePrice(String((formData.wholesale_price || 0) * vatMultiplier));
+      setDisplaySalePrice(roundMoney(formData.sale_price * vatMultiplier).toString());
+      setDisplayWholesalePrice(roundMoney((formData.wholesale_price || 0) * vatMultiplier).toString());
     } else {
-      setDisplaySalePrice(String(formData.sale_price));
-      setDisplayWholesalePrice(String(formData.wholesale_price || 0));
+      setDisplaySalePrice(roundMoney(formData.sale_price).toString());
+      setDisplayWholesalePrice(roundMoney(formData.wholesale_price || 0).toString());
     }
   };
 
@@ -424,8 +430,8 @@ export function ProductListPage() {
             </div>
           </div>
 
-          <Input label={t('products:form.stockQuantity')} type="number" step="any" value={formData.stock_quantity ?? ''} onChange={(e) => setFormData({ ...formData, stock_quantity: e.target.value === '' ? 0 : parseFloat(e.target.value) })} fullWidth />
-          <Input label={t('products:form.minStockLevel')} type="number" step="any" value={formData.min_stock_level ?? ''} onChange={(e) => setFormData({ ...formData, min_stock_level: e.target.value === '' ? 0 : parseFloat(e.target.value) })} fullWidth />
+          <Input label={t('products:form.stockQuantity')} type="number" step="any" value={formData.stock_quantity ?? ''} onChange={(e) => setFormData({ ...formData, stock_quantity: e.target.value === '' ? undefined : parseFloat(e.target.value) })} fullWidth />
+          <Input label={t('products:form.minStockLevel')} type="number" step="any" value={formData.min_stock_level ?? ''} onChange={(e) => setFormData({ ...formData, min_stock_level: e.target.value === '' ? undefined : parseFloat(e.target.value) })} fullWidth />
         </div>
       </Modal>
     </div>
