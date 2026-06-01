@@ -36,11 +36,16 @@ export class HttpExceptionFilter implements ExceptionFilter {
         message = exceptionResponse;
       } else if (typeof exceptionResponse === 'object') {
         const responseObj = exceptionResponse as Record<string, unknown>;
-        message = (responseObj.message as string) || message;
 
-        if (Array.isArray(responseObj.message)) {
-          errors = responseObj.message;
-          message = 'Validation failed';
+        // Validation error: prefer translated message + errors[] from translateValidationErrors
+        if (Array.isArray(responseObj.errors) && (responseObj.errors as unknown[]).every((e) => typeof e === 'string')) {
+          errors = responseObj.errors as string[];
+          message = (responseObj.message as string) || errors[0] || 'Geçersiz veri';
+        } else if (Array.isArray(responseObj.message)) {
+          errors = responseObj.message as string[];
+          message = errors[0] || 'Geçersiz veri';
+        } else {
+          message = (responseObj.message as string) || message;
         }
       }
     }
