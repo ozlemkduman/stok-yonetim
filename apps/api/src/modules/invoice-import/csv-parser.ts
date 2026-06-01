@@ -271,7 +271,7 @@ function parseDate(value: string | undefined): string | null {
   if (!value) return null;
 
   // Try common Turkish/European date formats: DD.MM.YYYY, DD/MM/YYYY, DD-MM-YYYY
-  const dmyMatch = value.match(/^(\d{1,2})[./\-](\d{1,2})[./\-](\d{4})$/);
+  const dmyMatch = value.match(/^(\d{1,2})[./-](\d{1,2})[./-](\d{4})$/);
   if (dmyMatch) {
     const [, day, month, year] = dmyMatch;
     return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
