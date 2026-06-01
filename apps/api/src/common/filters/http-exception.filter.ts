@@ -55,14 +55,6 @@ export class HttpExceptionFilter implements ExceptionFilter {
       } catch (_) {}
     }
 
-    // Log validation failures (400 with errors array) to stdout so they show up in cpln logs
-    if (status === 400 && errors) {
-      const request = ctx.getRequest();
-      console.error(`[ValidationError] ${request?.method} ${request?.url}`, {
-        errors,
-        body: request?.body,
-      });
-    }
 
     response.status(status).json({
       success: false,
