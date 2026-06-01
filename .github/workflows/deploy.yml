@@ -49,10 +49,22 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
+      - name: Install Control Plane CLI
+        run: npm install -g @controlplane/cli
+
+      - name: Force redeployment of stok-api workload
+        env:
+          CPLN_TOKEN: ${{ secrets.CPLN_TOKEN }}
+        run: |
+          cpln workload force-redeployment stok-api \
+            --org ozlemkduman-9f888d --gvc default-gvc \
+            --token "$CPLN_TOKEN"
+
       - name: Summary
         run: |
           echo "## Deploy Basarili! :rocket:" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "**API Image:** \`${{ env.API_IMAGE }}:${{ steps.version.outputs.tag }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "**Control Plane:** stok-api workload force-redeployed" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "Web uygulamasi Cloudflare Pages uzerinden otomatik deploy edilmektedir." >> $GITHUB_STEP_SUMMARY
