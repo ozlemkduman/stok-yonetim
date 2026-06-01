@@ -1,4 +1,4 @@
-import { forwardRef, type InputHTMLAttributes, type ReactNode } from 'react';
+import { forwardRef, type InputHTMLAttributes, type ReactNode, type WheelEvent, type KeyboardEvent } from 'react';
 import styles from './Input.module.css';
 
 export interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
@@ -21,11 +21,30 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
       fullWidth = false,
       className = '',
       id,
+      type,
+      onWheel,
+      onKeyDown,
       ...props
     },
     ref
   ) => {
     const inputId = id || props.name;
+    const isNumber = type === 'number';
+
+    const handleWheel = (e: WheelEvent<HTMLInputElement>) => {
+      if (isNumber) {
+        (e.target as HTMLInputElement).blur();
+        e.preventDefault();
+      }
+      onWheel?.(e);
+    };
+
+    const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+      if (isNumber && (e.key === 'ArrowUp' || e.key === 'ArrowDown')) {
+        e.preventDefault();
+      }
+      onKeyDown?.(e);
+    };
 
     return (
       <div
@@ -42,7 +61,10 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
           <input
             ref={ref}
             id={inputId}
+            type={type}
             className={`${styles.input} ${leftIcon ? styles.hasLeftIcon : ''} ${rightIcon ? styles.hasRightIcon : ''}`}
+            onWheel={handleWheel}
+            onKeyDown={handleKeyDown}
             {...props}
           />
           {rightIcon && <span className={styles.rightIcon}>{rightIcon}</span>}

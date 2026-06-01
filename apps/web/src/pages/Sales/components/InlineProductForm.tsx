@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Modal, Button, Input } from '@stok/ui';
+import { Modal, Button, Input, Select } from '@stok/ui';
 import { Product, CreateProductData, productsApi } from '../../../api/products.api';
 import { useToast } from '../../../context/ToastContext';
 import styles from '../SaleFormPage.module.css';
@@ -149,7 +149,35 @@ export function InlineProductForm({ isOpen, onClose, onCreated }: InlineProductF
         <div className={styles.inlineFormGrid}>
           <Input label={t('sales:inlineProduct.productName')} value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} error={errors.name} fullWidth />
           <Input label={t('sales:inlineProduct.barcode')} value={formData.barcode || ''} onChange={(e) => setFormData({ ...formData, barcode: e.target.value })} fullWidth />
-          <Input label={t('sales:inlineProduct.category')} value={formData.category || ''} onChange={(e) => setFormData({ ...formData, category: e.target.value })} fullWidth />
+          <Select
+            label={t('sales:inlineProduct.category')}
+            options={[
+              { value: '', label: t('products:form.selectCategory') },
+              { value: 'E-İmza', label: 'E-İmza' },
+              { value: 'Yazılım', label: t('products:form.categorySoftware') },
+              { value: 'Donanım', label: t('products:form.categoryHardware') },
+              { value: 'Hizmet', label: t('products:form.categoryService') },
+              { value: 'Diğer', label: t('products:form.categoryOther') },
+            ]}
+            value={formData.category || ''}
+            onChange={(e) => setFormData({
+              ...formData,
+              category: e.target.value || undefined,
+              subscription_duration: e.target.value === 'E-İmza' ? formData.subscription_duration : undefined,
+            })}
+          />
+          {formData.category === 'E-İmza' && (
+            <Select
+              label={t('products:form.subscriptionDuration')}
+              options={[
+                { value: '1_yillik', label: t('products:form.duration1Year') },
+                { value: '2_yillik', label: t('products:form.duration2Year') },
+                { value: '3_yillik', label: t('products:form.duration3Year') },
+              ]}
+              value={formData.subscription_duration || '1_yillik'}
+              onChange={(e) => setFormData({ ...formData, subscription_duration: e.target.value })}
+            />
+          )}
           <Input label={t('sales:inlineProduct.unit')} value={formData.unit || 'adet'} onChange={(e) => setFormData({ ...formData, unit: e.target.value })} fullWidth />
         </div>
 
@@ -213,8 +241,8 @@ export function InlineProductForm({ isOpen, onClose, onCreated }: InlineProductF
         </div>
 
         <div className={styles.inlineFormGrid}>
-          <Input label={t('sales:inlineProduct.stockQuantity')} type="number" step="any" value={formData.stock_quantity || 0} onChange={(e) => setFormData({ ...formData, stock_quantity: parseFloat(e.target.value) || 0 })} fullWidth />
-          <Input label={t('sales:inlineProduct.minStockLevel')} type="number" step="any" value={formData.min_stock_level || 5} onChange={(e) => setFormData({ ...formData, min_stock_level: parseFloat(e.target.value) || 0 })} fullWidth />
+          <Input label={t('sales:inlineProduct.stockQuantity')} type="number" step="any" value={formData.stock_quantity ?? ''} onChange={(e) => setFormData({ ...formData, stock_quantity: e.target.value === '' ? 0 : parseFloat(e.target.value) })} fullWidth />
+          <Input label={t('sales:inlineProduct.minStockLevel')} type="number" step="any" value={formData.min_stock_level ?? ''} onChange={(e) => setFormData({ ...formData, min_stock_level: e.target.value === '' ? 0 : parseFloat(e.target.value) })} fullWidth />
         </div>
       </form>
     </Modal>

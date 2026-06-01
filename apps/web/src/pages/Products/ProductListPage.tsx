@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Table, Button, Input, Badge, Pagination, Modal, type Column } from '@stok/ui';
+import { Table, Button, Input, Badge, Pagination, Modal, Select, type Column } from '@stok/ui';
 import { productsApi, Product, CreateProductData } from '../../api/products.api';
 import { useToast } from '../../context/ToastContext';
 import { useConfirmDialog } from '../../context/ConfirmDialogContext';
@@ -102,21 +102,25 @@ export function ProductListPage() {
     setPurchaseVatIncluded(false);
     setSaleVatIncluded(false);
     if (product) {
+      const pp = Number(product.purchase_price) || 0;
+      const sp = Number(product.sale_price) || 0;
+      const wp = Number(product.wholesale_price) || 0;
       setFormData({
         name: product.name,
         barcode: product.barcode || '',
         category: product.category || '',
         unit: product.unit,
-        purchase_price: product.purchase_price,
-        sale_price: product.sale_price,
-        wholesale_price: product.wholesale_price || 0,
-        vat_rate: product.vat_rate,
-        stock_quantity: product.stock_quantity,
-        min_stock_level: product.min_stock_level
+        purchase_price: pp,
+        sale_price: sp,
+        wholesale_price: wp,
+        vat_rate: Number(product.vat_rate) || 20,
+        stock_quantity: Number(product.stock_quantity) || 0,
+        min_stock_level: Number(product.min_stock_level) || 5,
+        subscription_duration: product.subscription_duration,
       });
-      setDisplayPurchasePrice(String(product.purchase_price));
-      setDisplaySalePrice(String(product.sale_price));
-      setDisplayWholesalePrice(String(product.wholesale_price || 0));
+      setDisplayPurchasePrice(String(pp));
+      setDisplaySalePrice(String(sp));
+      setDisplayWholesalePrice(String(wp));
     } else {
       setFormData({ name: '', purchase_price: 0, sale_price: 0, wholesale_price: 0 });
       setDisplayPurchasePrice('0');
@@ -185,7 +189,7 @@ export function ProductListPage() {
   };
 
   const getPriceInfo = (field: 'purchase_price' | 'sale_price' | 'wholesale_price') => {
-    const basePrice = formData[field] || 0;
+    const basePrice = Number(formData[field]) || 0;
     const vatInc = isVatIncludedForField(field);
     if (vatInc) {
       return t('products:priceInfo.vatExcluded', { price: basePrice.toFixed(2) });
@@ -333,7 +337,35 @@ export function ProductListPage() {
         <div className={styles.form}>
           <Input label={t('products:form.productName')} value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} fullWidth />
           <Input label={t('products:form.barcode')} value={formData.barcode || ''} onChange={(e) => setFormData({ ...formData, barcode: e.target.value })} fullWidth />
-          <Input label={t('products:form.category')} value={formData.category || ''} onChange={(e) => setFormData({ ...formData, category: e.target.value })} fullWidth />
+          <Select
+            label={t('products:form.category')}
+            options={[
+              { value: '', label: t('products:form.selectCategory') },
+              { value: 'E-İmza', label: 'E-İmza' },
+              { value: 'Yazılım', label: t('products:form.categorySoftware') },
+              { value: 'Donanım', label: t('products:form.categoryHardware') },
+              { value: 'Hizmet', label: t('products:form.categoryService') },
+              { value: 'Diğer', label: t('products:form.categoryOther') },
+            ]}
+            value={formData.category || ''}
+            onChange={(e) => setFormData({
+              ...formData,
+              category: e.target.value || undefined,
+              subscription_duration: e.target.value === 'E-İmza' ? formData.subscription_duration : undefined,
+            })}
+          />
+          {formData.category === 'E-İmza' && (
+            <Select
+              label={t('products:form.subscriptionDuration')}
+              options={[
+                { value: '1_yillik', label: t('products:form.duration1Year') },
+                { value: '2_yillik', label: t('products:form.duration2Year') },
+                { value: '3_yillik', label: t('products:form.duration3Year') },
+              ]}
+              value={formData.subscription_duration || '1_yillik'}
+              onChange={(e) => setFormData({ ...formData, subscription_duration: e.target.value })}
+            />
+          )}
           <Input label={t('products:form.unit')} value={formData.unit || 'adet'} onChange={(e) => setFormData({ ...formData, unit: e.target.value })} fullWidth />
           <div className={styles.vatRateRow}>
             <Input label={t('products:form.vatRate')} type="number" step="any" value={formData.vat_rate ?? 20} onChange={(e) => handleVatRateChange(parseFloat(e.target.value) || 0)} fullWidth />
@@ -392,8 +424,8 @@ export function ProductListPage() {
             </div>
           </div>
 
-          <Input label={t('products:form.stockQuantity')} type="number" step="any" value={formData.stock_quantity || 0} onChange={(e) => setFormData({ ...formData, stock_quantity: parseFloat(e.target.value) || 0 })} fullWidth />
-          <Input label={t('products:form.minStockLevel')} type="number" step="any" value={formData.min_stock_level || 5} onChange={(e) => setFormData({ ...formData, min_stock_level: parseFloat(e.target.value) || 0 })} fullWidth />
+          <Input label={t('products:form.stockQuantity')} type="number" step="any" value={formData.stock_quantity ?? ''} onChange={(e) => setFormData({ ...formData, stock_quantity: e.target.value === '' ? 0 : parseFloat(e.target.value) })} fullWidth />
+          <Input label={t('products:form.minStockLevel')} type="number" step="any" value={formData.min_stock_level ?? ''} onChange={(e) => setFormData({ ...formData, min_stock_level: e.target.value === '' ? 0 : parseFloat(e.target.value) })} fullWidth />
         </div>
       </Modal>
     </div>

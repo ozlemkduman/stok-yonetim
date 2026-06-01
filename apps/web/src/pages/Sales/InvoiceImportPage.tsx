@@ -1,14 +1,20 @@
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Button, Badge, Select, Input } from '@stok/ui';
+import { Button, Badge, Select, Input, Modal } from '@stok/ui';
 import { invoiceImportApi, ParsePreviewResponse, ConfirmImportData } from '../../api/invoice-import.api';
-import { Warehouse, warehousesApi } from '../../api/warehouses.api';
+import { Warehouse, warehousesApi, CreateWarehouseData } from '../../api/warehouses.api';
 import { useToast } from '../../context/ToastContext';
 import { formatCurrency, formatDate } from '../../utils/formatters';
 import styles from './InvoiceImportPage.module.css';
 
 type Step = 'upload' | 'preview' | 'importing';
+type FileType = 'xml' | 'csv' | 'xlsx';
+
+const CSV_TEMPLATE = `fatura_no;fatura_tarihi;musteri_adi;vergi_no;vergi_dairesi;adres;telefon;email;urun_adi;miktar;birim_fiyat;kdv_orani;birim
+FTR-001;15.04.2026;Örnek Müşteri A.Ş.;1234567890;Kadıköy VD;İstanbul, Kadıköy;0532 123 4567;ornek@firma.com;Ürün A;10;150,50;20;adet
+FTR-001;15.04.2026;Örnek Müşteri A.Ş.;1234567890;Kadıköy VD;İstanbul, Kadıköy;0532 123 4567;ornek@firma.com;Ürün B;5;200;18;adet
+FTR-001;15.04.2026;Örnek Müşteri A.Ş.;1234567890;Kadıköy VD;İstanbul, Kadıköy;0532 123 4567;ornek@firma.com;Ürün C;2;500;10;kg`;
 
 export function InvoiceImportPage() {
   const navigate = useNavigate();
@@ -18,6 +24,7 @@ export function InvoiceImportPage() {
 
   const [step, setStep] = useState<Step>('upload');
   const [file, setFile] = useState<File | null>(null);
+  const [fileType, setFileType] = useState<FileType>('xml');
   const [parsing, setParsing] = useState(false);
   const [preview, setPreview] = useState<ParsePreviewResponse | null>(null);
   const [purchasePrices, setPurchasePrices] = useState<Record<number, number>>({});
@@ -28,6 +35,9 @@ export function InvoiceImportPage() {
   const [saleType, setSaleType] = useState('retail');
   const [dueDate, setDueDate] = useState('');
   const [notes, setNotes] = useState('');
+  const [showNewWarehouse, setShowNewWarehouse] = useState(false);
+  const [newWarehouseName, setNewWarehouseName] = useState('');
+  const [creatingWarehouse, setCreatingWarehouse] = useState(false);
 
   const PAYMENT_OPTIONS = [
     { value: 'nakit', label: t('sales:import.paymentOptions.nakit') },
@@ -52,6 +62,39 @@ export function InvoiceImportPage() {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selected = e.target.files?.[0] || null;
     setFile(selected);
+    if (selected) {
+      const name = selected.name.toLowerCase();
+      const ext = name.endsWith('.csv') ? 'csv' : (name.endsWith('.xlsx') || name.endsWith('.xls')) ? 'xlsx' : 'xml';
+      setFileType(ext);
+    }
+  };
+
+  const handleCreateWarehouse = async () => {
+    if (!newWarehouseName.trim()) return;
+    setCreatingWarehouse(true);
+    try {
+      const code = newWarehouseName.trim().toUpperCase().replace(/\s+/g, '-').slice(0, 10);
+      const data: CreateWarehouseData = { name: newWarehouseName.trim(), code };
+      const response = await warehousesApi.create(data);
+      setWarehouses((prev) => [...prev, response.data]);
+      setWarehouseId(response.data.id);
+      setShowNewWarehouse(false);
+      setNewWarehouseName('');
+      showToast('success', t('sales:import.warehouseCreated'));
+    } catch (err) {
+      showToast('error', err instanceof Error ? err.message : t('sales:import.warehouseCreateError'));
+    }
+    setCreatingWarehouse(false);
+  };
+
+  const handleDownloadTemplate = () => {
+    const blob = new Blob([CSV_TEMPLATE], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'fatura-sablonu.csv';
+    link.click();
+    URL.revokeObjectURL(url);
   };
 
   const handleParse = async () => {
@@ -68,7 +111,7 @@ export function InvoiceImportPage() {
       setPurchasePrices(prices);
       setStep('preview');
     } catch (err) {
-      showToast('error', err instanceof Error ? err.message : t('sales:toast.xmlParseError'));
+      showToast('error', err instanceof Error ? err.message : t('sales:toast.fileParseError'));
     }
     setParsing(false);
   };
@@ -149,12 +192,17 @@ export function InvoiceImportPage() {
             </div>
             <h2 className={styles.uploadTitle}>{t('sales:import.selectFile')}</h2>
             <p className={styles.uploadDesc}>
-              {t('sales:import.fileDesc')}
+              {t('sales:import.fileDescMulti')}
             </p>
+            <div className={styles.formatBadges}>
+              <span className={styles.formatBadge}>XML (UBL-TR)</span>
+              <span className={styles.formatBadge}>CSV</span>
+              <span className={styles.formatBadge}>Excel (XLSX)</span>
+            </div>
             <input
               ref={fileInputRef}
               type="file"
-              accept=".xml"
+              accept=".xml,.csv,.xlsx,.xls"
               onChange={handleFileChange}
               className={styles.fileInput}
             />
@@ -165,13 +213,30 @@ export function InvoiceImportPage() {
               >
                 {t('sales:import.chooseFile')}
               </Button>
-              {file && <span className={styles.fileName}>{file.name}</span>}
+              {file && (
+                <span className={styles.fileName}>
+                  {file.name}
+                  <Badge variant={fileType === 'csv' ? 'info' : 'default'}>
+                    {fileType.toUpperCase()}
+                  </Badge>
+                </span>
+              )}
             </div>
             {file && (
               <Button onClick={handleParse} disabled={parsing}>
                 {parsing ? t('sales:import.analyzing') : t('sales:import.analyze')}
               </Button>
             )}
+            <div className={styles.templateSection}>
+              <button className={styles.templateLink} onClick={handleDownloadTemplate}>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="14" height="14">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                  <polyline points="7 10 12 15 17 10" />
+                  <line x1="12" y1="15" x2="12" y2="3" />
+                </svg>
+                {t('sales:import.downloadCsvTemplate')}
+              </button>
+            </div>
           </div>
         </div>
       )}
@@ -355,14 +420,24 @@ export function InvoiceImportPage() {
             <div className={styles.settingsGrid}>
               <div className={styles.settingsField}>
                 <label className={styles.infoLabel}>{t('sales:import.warehouseLabel')}</label>
-                <Select
-                  options={[
-                    { value: '', label: t('sales:import.selectWarehouse') },
-                    ...warehouses.map(w => ({ value: w.id, label: w.name })),
-                  ]}
-                  value={warehouseId}
-                  onChange={(e) => setWarehouseId(e.target.value)}
-                />
+                <div className={styles.warehouseRow}>
+                  <Select
+                    options={[
+                      { value: '', label: t('sales:import.selectWarehouse') },
+                      ...warehouses.map(w => ({ value: w.id, label: w.name })),
+                    ]}
+                    value={warehouseId}
+                    onChange={(e) => setWarehouseId(e.target.value)}
+                  />
+                  <button
+                    type="button"
+                    className={styles.addWarehouseBtn}
+                    onClick={() => setShowNewWarehouse(true)}
+                    title={t('sales:import.addWarehouse')}
+                  >
+                    +
+                  </button>
+                </div>
               </div>
               <div className={styles.settingsField}>
                 <label className={styles.infoLabel}>{t('sales:import.paymentMethodLabel')}</label>
@@ -426,6 +501,31 @@ export function InvoiceImportPage() {
           </div>
         </div>
       )}
+
+      {/* New Warehouse Modal */}
+      <Modal
+        isOpen={showNewWarehouse}
+        onClose={() => setShowNewWarehouse(false)}
+        title={t('sales:import.addWarehouse')}
+        footer={
+          <>
+            <Button variant="secondary" onClick={() => setShowNewWarehouse(false)}>
+              {t('sales:import.back')}
+            </Button>
+            <Button onClick={handleCreateWarehouse} disabled={creatingWarehouse || !newWarehouseName.trim()}>
+              {creatingWarehouse ? '...' : t('sales:import.createWarehouse')}
+            </Button>
+          </>
+        }
+      >
+        <Input
+          label={t('sales:import.warehouseName')}
+          value={newWarehouseName}
+          onChange={(e) => setNewWarehouseName(e.target.value)}
+          fullWidth
+          autoFocus
+        />
+      </Modal>
     </div>
   );
 }

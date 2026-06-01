@@ -203,7 +203,14 @@ export function CustomerListPage() {
           </h1>
           <p className={styles.subtitle}>{t('customers:subtitle', { count: total })}</p>
         </div>
-        {canAddCustomer && <Button onClick={handleCreate}>{t('customers:addNew')}</Button>}
+        <div style={{ display: 'flex', gap: '8px' }}>
+          {canAddCustomer && (
+            <Button variant="secondary" onClick={() => navigate('/customers/import')}>
+              {t('customers:bulkImport')}
+            </Button>
+          )}
+          {canAddCustomer && <Button onClick={handleCreate}>{t('customers:addNew')}</Button>}
+        </div>
       </div>
 
       {!canAddCustomer && (

@@ -16,6 +16,7 @@ export interface Product {
   vat_rate: number;
   stock_quantity: number;
   min_stock_level: number;
+  subscription_duration: string | null;
   is_active: boolean;
   created_by: string | null;
   created_at: Date;

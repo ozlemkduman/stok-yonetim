@@ -32,7 +32,7 @@ import { TenantSettingsPage, UserManagementPage, ProfilePage } from './pages/Set
 
 // Main App Pages
 import { DashboardPage } from './pages/Dashboard';
-import { CustomerListPage, CustomerDetailPage } from './pages/Customers';
+import { CustomerListPage, CustomerDetailPage, CustomerImportPage } from './pages/Customers';
 import { ProductListPage, ProductDetailPage } from './pages/Products';
 import { SaleListPage, SaleDetailPage, SaleFormPage, InvoiceImportPage } from './pages/Sales';
 import { ReturnListPage, ReturnDetailPage, ReturnFormPage } from './pages/Returns';
@@ -103,6 +103,7 @@ export function AppRouter() {
 
         {/* Customers */}
         <Route path="customers" element={<CustomerListPage />} />
+        <Route path="customers/import" element={<CustomerImportPage />} />
         <Route path="customers/:id" element={<CustomerDetailPage />} />
 
         {/* Products */}
