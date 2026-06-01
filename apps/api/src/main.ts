@@ -1,8 +1,9 @@
 import { NestFactory } from '@nestjs/core';
-import { Logger, ValidationPipe } from '@nestjs/common';
+import { BadRequestException, Logger, ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import helmet from 'helmet';
 import { AppModule } from './app.module';
+import { translateValidationErrors } from './common/validation/translate-errors';
 
 const logger = new Logger('Bootstrap');
 
@@ -54,6 +55,10 @@ async function bootstrap() {
       transform: true,
       transformOptions: {
         enableImplicitConversion: true,
+      },
+      exceptionFactory: (errors) => {
+        const { message, errors: translated } = translateValidationErrors(errors);
+        return new BadRequestException({ message, errors: translated });
       },
     }),
   );
