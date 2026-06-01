@@ -10,8 +10,8 @@
     "category": "Kategori",
     "totalSold": "Satılan",
     "stock": "Stok",
-    "purchasePrice": "Alış Fiyatı",
-    "salePrice": "Satış Fiyatı",
+    "purchasePrice": "Alış Fiyatı (KDV dahil)",
+    "salePrice": "Satış Fiyatı (KDV dahil)",
     "createdBy": "Kaydeden"
   },
   "actions": {
@@ -85,9 +85,9 @@
     "currentStock": "Mevcut Stok",
     "minStock": "Min: {{value}} {{unit}}",
     "productInfo": "Ürün Bilgileri",
-    "salePrice": "Satış Fiyatı",
-    "wholesalePrice": "Toptan Satış Fiyatı",
-    "purchasePrice": "Alış Fiyatı",
+    "salePrice": "Satış Fiyatı (KDV dahil)",
+    "wholesalePrice": "Toptan Satış Fiyatı (KDV dahil)",
+    "purchasePrice": "Alış Fiyatı (KDV dahil)",
     "vatRate": "KDV Oranı",
     "unit": "Birim",
     "createdAt": "Oluşturulma",

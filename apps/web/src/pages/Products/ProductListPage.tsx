@@ -236,8 +236,8 @@ export function ProductListPage() {
         </Badge>
       )
     },
-    { key: 'purchase_price', header: t('products:columns.purchasePrice'), align: 'right', render: (p) => formatCurrency(p.purchase_price) },
-    { key: 'sale_price', header: t('products:columns.salePrice'), align: 'right', render: (p) => formatCurrency(p.sale_price) },
+    { key: 'purchase_price', header: t('products:columns.purchasePrice'), align: 'right', render: (p) => formatCurrency(Number(p.purchase_price) * (1 + Number(p.vat_rate) / 100)) },
+    { key: 'sale_price', header: t('products:columns.salePrice'), align: 'right', render: (p) => formatCurrency(Number(p.sale_price) * (1 + Number(p.vat_rate) / 100)) },
     { key: 'created_by_name', header: t('products:columns.createdBy'), render: (p) => p.created_by_name || '-' },
     {
       key: 'actions',
