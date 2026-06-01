@@ -103,9 +103,6 @@ export class ProductsRepository extends BaseTenantRepository<Product> {
       countQuery.count(`${this.tableName}.id as count`),
     ]);
 
-    console.error(`[FindAllProducts] isActive=${isActive} total=${count} items=${items.length} sample=`,
-      items.slice(0, 3).map((i: any) => ({ id: i.id, name: i.name, is_active: i.is_active })));
-
     return { items, total: parseInt(count as string, 10) };
   }
 
@@ -145,10 +142,9 @@ export class ProductsRepository extends BaseTenantRepository<Product> {
   }
 
   async deleteProduct(id: string): Promise<boolean> {
-    const q = this.query.where(`${this.tableName}.id`, id);
-    console.error(`[DeleteProduct] SQL:`, q.clone().update({ is_active: false }).toString());
-    const result = await q.update({ is_active: false, updated_at: this.knex.fn.now() });
-    console.error(`[DeleteProduct] id=${id} rows_affected=${result}`);
+    const result = await this.query
+      .where(`${this.tableName}.id`, id)
+      .update({ is_active: false, updated_at: this.knex.fn.now() });
     return result > 0;
   }
 

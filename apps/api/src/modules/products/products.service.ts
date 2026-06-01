@@ -30,12 +30,14 @@ export class ProductsService {
       throw new ForbiddenException(`Urun limitinize ulastiniz (${limitCheck.current}/${limitCheck.limit}). Planinizi yukseltin.`);
     }
 
+    // Normalize empty strings to null (avoid unique constraint conflicts on barcode)
+    if (dto.barcode === '') dto.barcode = null as any;
+    if (dto.subscription_duration === '') dto.subscription_duration = null;
+
     if (dto.barcode) {
       const existing = await this.productsRepository.findByBarcode(dto.barcode);
       if (existing) throw new ConflictException('Bu barkod zaten kullaniliyor');
     }
-    // Normalize subscription_duration: empty string -> null
-    if (dto.subscription_duration === '') dto.subscription_duration = null;
 
     const product = await this.productsRepository.createProduct(dto, userId);
 
@@ -51,14 +53,16 @@ export class ProductsService {
 
   async update(id: string, dto: UpdateProductDto): Promise<Product> {
     await this.findById(id);
+    // Normalize empty strings to null (avoid unique constraint conflicts on barcode)
+    if (dto.barcode === '') dto.barcode = null as any;
+    if (dto.subscription_duration === '') dto.subscription_duration = null;
+
     if (dto.barcode) {
       const existing = await this.productsRepository.findByBarcode(dto.barcode);
       if (existing && existing.id !== id) {
         throw new ConflictException('Bu barkod zaten kullaniliyor');
       }
     }
-    // Normalize subscription_duration: empty string -> null
-    if (dto.subscription_duration === '') dto.subscription_duration = null;
 
     const updated = await this.productsRepository.updateProduct(id, dto);
     if (!updated) throw new NotFoundException(`Urun bulunamadi: ${id}`);
