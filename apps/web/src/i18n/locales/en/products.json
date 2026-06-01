@@ -10,8 +10,8 @@
     "category": "Category",
     "totalSold": "Sold",
     "stock": "Stock",
-    "purchasePrice": "Purchase Price",
-    "salePrice": "Sale Price",
+    "purchasePrice": "Purchase Price (VAT incl.)",
+    "salePrice": "Sale Price (VAT incl.)",
     "createdBy": "Created By"
   },
   "actions": {
@@ -85,9 +85,9 @@
     "currentStock": "Current Stock",
     "minStock": "Min: {{value}} {{unit}}",
     "productInfo": "Product Information",
-    "salePrice": "Sale Price",
-    "wholesalePrice": "Wholesale Price",
-    "purchasePrice": "Purchase Price",
+    "salePrice": "Sale Price (VAT incl.)",
+    "wholesalePrice": "Wholesale Price (VAT incl.)",
+    "purchasePrice": "Purchase Price (VAT incl.)",
     "vatRate": "VAT Rate",
     "unit": "Unit",
     "createdAt": "Created At",

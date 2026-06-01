@@ -93,15 +93,15 @@ export function ProductDetailPage() {
           <div className={styles.infoList}>
             <div className={styles.infoItem}>
               <span className={styles.infoLabel}>{t('products:detail.salePrice')}</span>
-              <span className={styles.infoValue}>{formatCurrency(product.sale_price)}</span>
+              <span className={styles.infoValue}>{formatCurrency(Number(product.sale_price) * (1 + Number(product.vat_rate) / 100))}</span>
             </div>
             <div className={styles.infoItem}>
               <span className={styles.infoLabel}>{t('products:detail.wholesalePrice')}</span>
-              <span className={styles.infoValue}>{formatCurrency(product.wholesale_price)}</span>
+              <span className={styles.infoValue}>{formatCurrency(Number(product.wholesale_price) * (1 + Number(product.vat_rate) / 100))}</span>
             </div>
             <div className={styles.infoItem}>
               <span className={styles.infoLabel}>{t('products:detail.purchasePrice')}</span>
-              <span className={styles.infoValue}>{formatCurrency(product.purchase_price)}</span>
+              <span className={styles.infoValue}>{formatCurrency(Number(product.purchase_price) * (1 + Number(product.vat_rate) / 100))}</span>
             </div>
             <div className={styles.infoItem}>
               <span className={styles.infoLabel}>{t('products:detail.vatRate')}</span>
