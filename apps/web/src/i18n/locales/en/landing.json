@@ -118,7 +118,6 @@
         "basicReports": "Basic Reports (Sales, Debt, Stock)",
         "storage5": "5 GB Storage",
         "quoteManagement": "Quote Management",
-        "eDocument": "e-Invoice / e-Archive",
         "multiWarehouse": "Multi-Warehouse",
         "invoiceImport": "Invoice Import (CSV/XML/Excel)",
         "integrations": "Integrations",
@@ -126,7 +125,7 @@
         "renewalTracking": "Subscription / Renewal Tracking",
         "crm": "CRM",
         "fieldTeam": "Field Team",
-        "apiAccess": "API Access"
+        "apiAccessSoon": "API Access (Coming Soon)"
       }
     },
     "pro": {
@@ -139,7 +138,6 @@
         "basicReports": "Basic Reports",
         "storage25": "25 GB Storage",
         "quoteManagement": "Quote Management",
-        "eDocument": "e-Invoice / e-Archive",
         "multiWarehouse": "Multi-Warehouse (3 Warehouses)",
         "invoiceImport": "Invoice Import (CSV/XML/Excel)",
         "integrations": "Integrations (3 Units)",
@@ -147,7 +145,7 @@
         "renewalTracking": "Subscription / Renewal Tracking",
         "crm": "CRM",
         "fieldTeam": "Field Team",
-        "apiAccess": "API Access"
+        "apiAccessSoon": "API Access (Coming Soon)"
       }
     },
     "plus": {
@@ -160,7 +158,6 @@
         "basicReports": "Basic Reports",
         "storage100": "100 GB Storage",
         "quoteManagement": "Quote Management",
-        "eDocument": "e-Invoice / e-Archive",
         "unlimitedWarehouse": "Unlimited Warehouses",
         "invoiceImport": "Invoice Import (CSV/XML/Excel)",
         "unlimitedIntegrations": "Unlimited Integrations",
@@ -168,7 +165,7 @@
         "renewalTracking": "Subscription / Renewal Tracking",
         "crm": "CRM",
         "fieldTeam": "Field Team",
-        "apiAccess": "API Access"
+        "apiAccessSoon": "API Access (Coming Soon)"
       }
     }
   },

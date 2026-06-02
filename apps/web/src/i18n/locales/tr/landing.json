@@ -118,7 +118,6 @@
         "basicReports": "Temel Raporlar (Satış, Borç, Stok)",
         "storage5": "5 GB Depolama",
         "quoteManagement": "Teklif Yönetimi",
-        "eDocument": "e-Fatura / e-Arşiv",
         "multiWarehouse": "Çoklu Depo",
         "invoiceImport": "Fatura Import (CSV/XML/Excel)",
         "integrations": "Entegrasyonlar",
@@ -126,7 +125,7 @@
         "renewalTracking": "Abonelik / Yenileme Takibi",
         "crm": "CRM",
         "fieldTeam": "Saha Ekibi",
-        "apiAccess": "API Erişimi"
+        "apiAccessSoon": "API Erişimi (Yakında)"
       }
     },
     "pro": {
@@ -139,7 +138,6 @@
         "basicReports": "Temel Raporlar",
         "storage25": "25 GB Depolama",
         "quoteManagement": "Teklif Yönetimi",
-        "eDocument": "e-Fatura / e-Arşiv",
         "multiWarehouse": "Çoklu Depo (3 Depo)",
         "invoiceImport": "Fatura Import (CSV/XML/Excel)",
         "integrations": "Entegrasyonlar (3 Adet)",
@@ -147,7 +145,7 @@
         "renewalTracking": "Abonelik / Yenileme Takibi",
         "crm": "CRM",
         "fieldTeam": "Saha Ekibi",
-        "apiAccess": "API Erişimi"
+        "apiAccessSoon": "API Erişimi (Yakında)"
       }
     },
     "plus": {
@@ -160,7 +158,6 @@
         "basicReports": "Temel Raporlar",
         "storage100": "100 GB Depolama",
         "quoteManagement": "Teklif Yönetimi",
-        "eDocument": "e-Fatura / e-Arşiv",
         "unlimitedWarehouse": "Sınırsız Depo",
         "invoiceImport": "Fatura Import (CSV/XML/Excel)",
         "unlimitedIntegrations": "Sınırsız Entegrasyon",
@@ -168,7 +165,7 @@
         "renewalTracking": "Abonelik / Yenileme Takibi",
         "crm": "CRM",
         "fieldTeam": "Saha Ekibi",
-        "apiAccess": "API Erişimi"
+        "apiAccessSoon": "API Erişimi (Yakında)"
       }
     }
   },

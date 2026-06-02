@@ -9,8 +9,8 @@ const NEXT_TIER_FEATURES: Record<string, { title: string; items: string[]; targe
     targetPlan: 'Pro',
     title: 'Pro plana yükseltin',
     items: [
-      'Teklif yönetimi & E-Fatura/E-Arşiv',
-      'Çoklu depo & fatura import',
+      'Teklif yönetimi & çoklu depo',
+      'Fatura import & entegrasyonlar',
       'Gelişmiş raporlar (Kar/Zarar, KDV, Personel)',
     ],
   },
@@ -20,7 +20,7 @@ const NEXT_TIER_FEATURES: Record<string, { title: string; items: string[]; targe
     items: [
       'CRM (müşteri ilişkileri)',
       'Saha ekibi ve rota yönetimi',
-      'API erişimi & sınırsız her şey',
+      'Sınırsız kullanıcı/ürün/depo',
     ],
   },
 };
