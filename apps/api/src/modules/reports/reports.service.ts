@@ -19,10 +19,16 @@ export class ReportsService {
     return query;
   }
 
+  // endDate'in TÜM gününü dahil et: "2026-06-02" → "2026-06-02 23:59:59.999"
+  // Aksi halde timestamp kolonlarda o günün saatleri filtre dışı kalır.
+  private toEndOfDay(endDate: string): string {
+    return endDate.includes(' ') ? endDate : `${endDate} 23:59:59.999`;
+  }
+
   async getSalesSummary(startDate: string, endDate: string, tenantId?: string | null) {
     const [rawSummary] = await this.tenantQuery('sales', tenantId)
       .where('status', 'completed')
-      .whereBetween('sale_date', [startDate, endDate])
+      .whereBetween('sale_date', [startDate, this.toEndOfDay(endDate)])
       .select(
         this.db.knex.raw('COUNT(*) as sale_count'),
         this.db.knex.raw('COALESCE(SUM(subtotal), 0) as subtotal'),
@@ -42,7 +48,7 @@ export class ReportsService {
 
     const byPaymentMethodRaw = await this.tenantQuery('sales', tenantId)
       .where('status', 'completed')
-      .whereBetween('sale_date', [startDate, endDate])
+      .whereBetween('sale_date', [startDate, this.toEndOfDay(endDate)])
       .select('payment_method')
       .sum('grand_total as total')
       .count('id as count')
@@ -55,7 +61,7 @@ export class ReportsService {
 
     const dailySalesRaw = await this.tenantQuery('sales', tenantId)
       .where('status', 'completed')
-      .whereBetween('sale_date', [startDate, endDate])
+      .whereBetween('sale_date', [startDate, this.toEndOfDay(endDate)])
       .select(this.db.knex.raw('DATE(sale_date) as date'))
       .sum('grand_total as total')
       .count('id as count')
@@ -100,7 +106,7 @@ export class ReportsService {
     let salesVatQuery = this.db.knex('sale_items')
       .join('sales', 'sale_items.sale_id', 'sales.id')
       .where('sales.status', 'completed')
-      .whereBetween('sales.sale_date', [startDate, endDate]);
+      .whereBetween('sales.sale_date', [startDate, this.toEndOfDay(endDate)]);
     if (tenantId) salesVatQuery = salesVatQuery.where('sales.tenant_id', tenantId);
 
     const salesVat = await salesVatQuery
@@ -112,7 +118,7 @@ export class ReportsService {
     let returnsVatQuery = this.db.knex('return_items')
       .join('returns', 'return_items.return_id', 'returns.id')
       .where('returns.status', 'completed')
-      .whereBetween('returns.return_date', [startDate, endDate]);
+      .whereBetween('returns.return_date', [startDate, this.toEndOfDay(endDate)]);
     if (tenantId) returnsVatQuery = returnsVatQuery.where('returns.tenant_id', tenantId);
 
     const returnsVat = await returnsVatQuery
@@ -128,27 +134,27 @@ export class ReportsService {
     // cost (alış fiyatı, KDV hariç) ile aynı zeminde karşılaştırmak için KDV'siz değerler kullanılır.
     const [salesTotal] = await this.tenantQuery('sales', tenantId)
       .where('status', 'completed')
-      .whereBetween('sale_date', [startDate, endDate])
+      .whereBetween('sale_date', [startDate, this.toEndOfDay(endDate)])
       .select(this.db.knex.raw('COALESCE(SUM(grand_total - vat_total), 0) as revenue'));
 
     let costQuery = this.db.knex('sale_items')
       .join('sales', 'sale_items.sale_id', 'sales.id')
       .join('products', 'sale_items.product_id', 'products.id')
       .where('sales.status', 'completed')
-      .whereBetween('sales.sale_date', [startDate, endDate]);
+      .whereBetween('sales.sale_date', [startDate, this.toEndOfDay(endDate)]);
     if (tenantId) costQuery = costQuery.where('sales.tenant_id', tenantId);
 
     const [costOfGoods] = await costQuery
       .select(this.db.knex.raw('COALESCE(SUM(sale_items.quantity * products.purchase_price), 0) as cost'));
 
     const [expensesTotal] = await this.tenantQuery('expenses', tenantId)
-      .whereBetween('expense_date', [startDate, endDate])
+      .whereBetween('expense_date', [startDate, this.toEndOfDay(endDate)])
       .sum('amount as total');
 
     // İade net tutarı (KDV hariç) = total_amount - vat_total
     const [returnsTotal] = await this.tenantQuery('returns', tenantId)
       .where('status', 'completed')
-      .whereBetween('return_date', [startDate, endDate])
+      .whereBetween('return_date', [startDate, this.toEndOfDay(endDate)])
       .select(this.db.knex.raw('COALESCE(SUM(total_amount - vat_total), 0) as total'));
 
     const revenue = parseFloat((salesTotal as any)?.revenue || '0');
@@ -166,7 +172,7 @@ export class ReportsService {
       .join('sales', 'sale_items.sale_id', 'sales.id')
       .join('products', 'sale_items.product_id', 'products.id')
       .where('sales.status', 'completed')
-      .whereBetween('sales.sale_date', [startDate, endDate]);
+      .whereBetween('sales.sale_date', [startDate, this.toEndOfDay(endDate)]);
     if (tenantId) query = query.where('sales.tenant_id', tenantId);
 
     const rows = await query
@@ -188,7 +194,7 @@ export class ReportsService {
     const rows = await this.tenantQuery('sales', tenantId)
       .join('customers', 'sales.customer_id', 'customers.id')
       .where('sales.status', 'completed')
-      .whereBetween('sales.sale_date', [startDate, endDate])
+      .whereBetween('sales.sale_date', [startDate, this.toEndOfDay(endDate)])
       .select('customers.id', 'customers.name', 'customers.phone')
       .sum('sales.grand_total as total_amount')
       .count('sales.id as sale_count')
@@ -309,7 +315,7 @@ export class ReportsService {
     const returns = await this.tenantQuery('returns', tenantId)
       .leftJoin('customers', 'returns.customer_id', 'customers.id')
       .where('returns.status', 'completed')
-      .whereBetween('returns.return_date', [startDate, endDate])
+      .whereBetween('returns.return_date', [startDate, this.toEndOfDay(endDate)])
       .select(
         'returns.id',
         'returns.return_number',
@@ -322,7 +328,7 @@ export class ReportsService {
 
     const [summary] = await this.tenantQuery('returns', tenantId)
       .where('status', 'completed')
-      .whereBetween('return_date', [startDate, endDate])
+      .whereBetween('return_date', [startDate, this.toEndOfDay(endDate)])
       .select(
         this.db.knex.raw('COUNT(*) as count'),
         this.db.knex.raw('COALESCE(SUM(total_amount), 0) as total')
@@ -330,7 +336,7 @@ export class ReportsService {
 
     const byReason = await this.tenantQuery('returns', tenantId)
       .where('status', 'completed')
-      .whereBetween('return_date', [startDate, endDate])
+      .whereBetween('return_date', [startDate, this.toEndOfDay(endDate)])
       .select('reason')
       .count('id as count')
       .sum('total_amount as total')
@@ -340,7 +346,7 @@ export class ReportsService {
       .join('returns', 'return_items.return_id', 'returns.id')
       .join('products', 'return_items.product_id', 'products.id')
       .where('returns.status', 'completed')
-      .whereBetween('returns.return_date', [startDate, endDate]);
+      .whereBetween('returns.return_date', [startDate, this.toEndOfDay(endDate)]);
     if (tenantId) topReturnedQuery = topReturnedQuery.where('returns.tenant_id', tenantId);
 
     const topReturnedProducts = await topReturnedQuery
@@ -366,7 +372,7 @@ export class ReportsService {
     let query = this.db.knex('sales')
       .join('customers', 'sales.customer_id', 'customers.id')
       .where('sales.status', 'completed')
-      .whereBetween('sales.sale_date', [startDate, endDate]);
+      .whereBetween('sales.sale_date', [startDate, this.toEndOfDay(endDate)]);
     if (tenantId) query = query.where('sales.tenant_id', tenantId);
 
     const sales = await query
@@ -416,7 +422,7 @@ export class ReportsService {
       .join('products', 'sale_items.product_id', 'products.id')
       .join('customers', 'sales.customer_id', 'customers.id')
       .where('sales.status', 'completed')
-      .whereBetween('sales.sale_date', [startDate, endDate]);
+      .whereBetween('sales.sale_date', [startDate, this.toEndOfDay(endDate)]);
     if (tenantId) query = query.where('sales.tenant_id', tenantId);
 
     return query
@@ -491,7 +497,7 @@ export class ReportsService {
 
   async getExpensesByCategory(startDate: string, endDate: string, tenantId?: string | null) {
     const byCategory = await this.tenantQuery('expenses', tenantId)
-      .whereBetween('expense_date', [startDate, endDate])
+      .whereBetween('expense_date', [startDate, this.toEndOfDay(endDate)])
       .select('category')
       .sum('amount as total')
       .count('id as count')
@@ -499,14 +505,14 @@ export class ReportsService {
       .orderBy('total', 'desc');
 
     const [totals] = await this.tenantQuery('expenses', tenantId)
-      .whereBetween('expense_date', [startDate, endDate])
+      .whereBetween('expense_date', [startDate, this.toEndOfDay(endDate)])
       .select(
         this.db.knex.raw('COUNT(*) as count'),
         this.db.knex.raw('COALESCE(SUM(amount), 0) as total')
       );
 
     const monthlyTrend = await this.tenantQuery('expenses', tenantId)
-      .whereBetween('expense_date', [startDate, endDate])
+      .whereBetween('expense_date', [startDate, this.toEndOfDay(endDate)])
       .select(this.db.knex.raw("TO_CHAR(expense_date, 'YYYY-MM') as month"))
       .sum('amount as total')
       .groupBy(this.db.knex.raw("TO_CHAR(expense_date, 'YYYY-MM')"))
