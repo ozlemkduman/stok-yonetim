@@ -1,8 +1,10 @@
 import { Controller, Get, Post, Patch, Delete, Body, Param, Query, Req } from '@nestjs/common';
 import { QuotesService } from './quotes.service';
 import { CreateQuoteDto, UpdateQuoteDto, ConvertToSaleDto } from './dto';
+import { RequireFeature } from '../../common/decorators/require-feature.decorator';
 
 @Controller('quotes')
+@RequireFeature('quotes')
 export class QuotesController {
   constructor(private readonly service: QuotesService) {}
 

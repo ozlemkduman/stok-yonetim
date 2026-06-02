@@ -1,8 +1,10 @@
 import { Controller, Get, Post, Body, Param, Query } from '@nestjs/common';
 import { EDocumentsService } from './e-documents.service';
 import { CreateEDocumentDto } from './dto';
+import { RequireFeature } from '../../common/decorators/require-feature.decorator';
 
 @Controller('e-documents')
+@RequireFeature('eDocuments')
 export class EDocumentsController {
   constructor(private readonly service: EDocumentsService) {}
 

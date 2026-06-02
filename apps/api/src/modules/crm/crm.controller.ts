@@ -2,8 +2,10 @@ import { Controller, Get, Post, Patch, Delete, Body, Param, Query } from '@nestj
 import { CrmService } from './crm.service';
 import { CreateContactDto } from './dto/create-contact.dto';
 import { CreateActivityDto } from './dto/create-activity.dto';
+import { RequireFeature } from '../../common/decorators/require-feature.decorator';
 
 @Controller('crm')
+@RequireFeature('crm')
 export class CrmController {
   constructor(private readonly service: CrmService) {}
 

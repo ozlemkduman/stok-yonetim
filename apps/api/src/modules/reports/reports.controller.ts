@@ -1,6 +1,7 @@
 import { Controller, Get, Query, Req } from '@nestjs/common';
 import { ReportsService } from './reports.service';
 import { getCurrentTenantId } from '../../common/context/tenant.context';
+import { RequireFeature } from '../../common/decorators/require-feature.decorator';
 
 // Diğer modüller gibi TenantInterceptor'ın AsyncLocalStorage context'ini kullanır
 // (impersonate-safe). req.user.tenantId'ye fallback.
@@ -25,12 +26,14 @@ export class ReportsController {
   }
 
   @Get('vat')
+  @RequireFeature('advancedReports')
   async getVatReport(@Query('startDate') startDate: string, @Query('endDate') endDate: string, @Req() req: any) {
     const data = await this.reportsService.getVatReport(startDate, endDate, resolveTenantId(req));
     return { success: true, data };
   }
 
   @Get('profit-loss')
+  @RequireFeature('advancedReports')
   async getProfitLoss(@Query('startDate') startDate: string, @Query('endDate') endDate: string, @Req() req: any) {
     const data = await this.reportsService.getProfitLoss(startDate, endDate, resolveTenantId(req));
     return { success: true, data };
@@ -79,12 +82,14 @@ export class ReportsController {
   }
 
   @Get('customer-product-purchases')
+  @RequireFeature('advancedReports')
   async getCustomerProductPurchases(@Query('startDate') startDate: string, @Query('endDate') endDate: string, @Req() req: any) {
     const data = await this.reportsService.getCustomerProductPurchases(startDate, endDate, resolveTenantId(req));
     return { success: true, data };
   }
 
   @Get('employee-performance')
+  @RequireFeature('advancedReports')
   async getEmployeePerformance(@Query('startDate') startDate: string, @Query('endDate') endDate: string, @Req() req: any) {
     const data = await this.reportsService.getEmployeePerformance(
       startDate, endDate, resolveTenantId(req), req.user?.sub, req.user?.role,
@@ -93,12 +98,14 @@ export class ReportsController {
   }
 
   @Get('renewals')
+  @RequireFeature('advancedReports')
   async getRenewals(@Req() req: any) {
     const data = await this.reportsService.getRenewals(resolveTenantId(req));
     return { success: true, data };
   }
 
   @Get('expenses-by-category')
+  @RequireFeature('advancedReports')
   async getExpensesByCategory(@Query('startDate') startDate: string, @Query('endDate') endDate: string, @Req() req: any) {
     const data = await this.reportsService.getExpensesByCategory(startDate, endDate, resolveTenantId(req));
     return { success: true, data };

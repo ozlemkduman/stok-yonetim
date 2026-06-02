@@ -8,8 +8,10 @@ import {
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { InvoiceImportService, ConfirmImportData } from './invoice-import.service';
+import { RequireFeature } from '../../common/decorators/require-feature.decorator';
 
 @Controller('invoice-import')
+@RequireFeature('invoiceImport')
 export class InvoiceImportController {
   constructor(private readonly invoiceImportService: InvoiceImportService) {}
 
