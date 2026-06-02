@@ -140,8 +140,14 @@ export class TenantSettingsService {
     };
   }
 
-  async checkFeature(feature: string): Promise<boolean> {
-    const tenantId = getCurrentTenantId();
+  /**
+   * Tenant'ın plan'ında belirtilen feature açık mı?
+   * @param feature - kontrol edilecek feature key
+   * @param providedTenantId - opsiyonel; verilirse AsyncLocalStorage'dan okumaz
+   *   (Guard'lar TenantInterceptor'dan önce çalıştığı için onlar bu paramı geçer)
+   */
+  async checkFeature(feature: string, providedTenantId?: string): Promise<boolean> {
+    const tenantId = providedTenantId || getCurrentTenantId();
     if (!tenantId) {
       return false;
     }
