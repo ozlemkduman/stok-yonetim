@@ -5,6 +5,7 @@ import { Table, Badge, Spinner, type Column } from '@stok/ui';
 import { useToast } from '../../context/ToastContext';
 import { dashboardApi, DashboardSummary, LowStockProduct, TopDebtor } from '../../api/dashboard.api';
 import { formatCurrency } from '../../utils/formatters';
+import { UpgradeCard } from '../../components/UpgradeCard';
 import styles from './DashboardPage.module.css';
 
 // Map i18n language codes to date locale strings
@@ -207,6 +208,8 @@ export function DashboardPage() {
           </button>
         </div>
       </div>
+
+      <UpgradeCard />
 
       {/* Primary Stats */}
       <div className={styles.statsGrid}>

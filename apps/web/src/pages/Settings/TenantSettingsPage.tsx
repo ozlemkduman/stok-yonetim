@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Card, Button, Input, Spinner } from '@stok/ui';
 import { useTenant } from '../../context/TenantContext';
 import { apiClient } from '../../api/client';
+import { PlanComparison } from '../../components/PlanComparison';
 import styles from './SettingsPages.module.css';
 
 export function TenantSettingsPage() {
@@ -208,6 +209,16 @@ export function TenantSettingsPage() {
             </div>
           )}
         </Card>
+
+        {settings?.plan_code !== 'plus' && (
+          <Card className={styles.section}>
+            <h2 className={styles.sectionTitle}>Planları Karşılaştır</h2>
+            <p style={{ color: 'var(--color-text-muted)', marginBottom: 'var(--space-4)' }}>
+              Daha fazla özellik ve sınırsız limitler için planınızı yükseltin.
+            </p>
+            <PlanComparison />
+          </Card>
+        )}
       </div>
     </div>
   );
