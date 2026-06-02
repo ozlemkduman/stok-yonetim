@@ -130,36 +130,36 @@ export function MainLayout() {
 
         const newNotifications: Notification[] = [];
 
-        // Overdue payments
+        // Overdue payments → genel sekmesi, vadesi geçmiş kartına scroll
         if (overdueRes.data.totalCount > 0) {
           newNotifications.push({
             id: 'overdue',
             type: 'danger',
             title: t('notifications.overdueTitle'),
             message: t('notifications.overdueMessage', { count: overdueRes.data.totalCount }),
-            link: '/reports',
+            link: '/reports?focus=overdue-payments',
           });
         }
 
-        // Low stock
+        // Low stock → stok sekmesi
         if (stockRes.data.summary.lowStockCount > 0) {
           newNotifications.push({
             id: 'lowstock',
             type: 'warning',
             title: t('notifications.lowStockTitle'),
             message: t('notifications.lowStockMessage', { count: stockRes.data.summary.lowStockCount }),
-            link: '/reports',
+            link: '/reports?tab=stok',
           });
         }
 
-        // Out of stock
+        // Out of stock → stok sekmesi
         if (stockRes.data.summary.outOfStockCount > 0) {
           newNotifications.push({
             id: 'outofstock',
             type: 'danger',
             title: t('notifications.outOfStockTitle'),
             message: t('notifications.outOfStockMessage', { count: stockRes.data.summary.outOfStockCount }),
-            link: '/products',
+            link: '/reports?tab=stok',
           });
         }
 
