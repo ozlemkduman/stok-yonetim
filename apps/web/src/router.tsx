@@ -138,7 +138,7 @@ export function AppRouter() {
         {/* Warehouses */}
         <Route path="warehouses" element={<FeatureGate feature="warehouses"><WarehouseListPage /></FeatureGate>} />
         <Route path="warehouses/transfers" element={<FeatureGate feature="warehouses"><StockTransferPage /></FeatureGate>} />
-        <Route path="warehouses/movements" element={<FeatureGate feature="warehouses"><StockMovementsPage /></FeatureGate>} />
+        <Route path="warehouses/movements" element={<StockMovementsPage />} />
         <Route path="warehouses/:id" element={<FeatureGate feature="warehouses"><WarehouseDetailPage /></FeatureGate>} />
 
         {/* E-Documents */}

@@ -15,6 +15,7 @@
     "sales": "Sales",
     "returns": "Returns",
     "products": "Products",
+    "stockMovements": "Stock Movements",
     "warehouses": "Warehouses",
     "accounts": "Cash/Bank",
     "expenses": "Expenses",
