@@ -108,6 +108,7 @@ export function MainLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(!isCompact);
   const [expandedGroups, setExpandedGroups] = useState<string[]>([]);
   const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [dismissedIds, setDismissedIds] = useState<Set<string>>(new Set());
   const [showNotifications, setShowNotifications] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const notificationRef = useRef<HTMLDivElement>(null);
@@ -163,7 +164,7 @@ export function MainLayout() {
           });
         }
 
-        setNotifications(newNotifications);
+        setNotifications(newNotifications.filter((n) => !dismissedIds.has(n.id)));
       } catch (err) {
         // Notification fetch failed silently - non-critical
       }
@@ -172,7 +173,7 @@ export function MainLayout() {
     fetchNotifications();
     const interval = setInterval(fetchNotifications, 60000); // Refresh every minute
     return () => clearInterval(interval);
-  }, [t]);
+  }, [t, dismissedIds]);
 
   // Close dropdowns when clicking outside
   useEffect(() => {
@@ -189,10 +190,16 @@ export function MainLayout() {
   }, []);
 
   const handleNotificationClick = (notification: Notification) => {
+    setDismissedIds((prev) => {
+      const next = new Set(prev);
+      next.add(notification.id);
+      return next;
+    });
+    setNotifications((prev) => prev.filter((n) => n.id !== notification.id));
+    setShowNotifications(false);
     if (notification.link) {
       navigate(notification.link);
     }
-    setShowNotifications(false);
   };
 
   // Sync sidebar state with viewport size
