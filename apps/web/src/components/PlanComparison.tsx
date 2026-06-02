@@ -24,7 +24,6 @@ const ROWS: PlanRow[] = [
   { label: 'Temel raporlar', basic: true, pro: true, plus: true },
   // Pro
   { label: 'Teklif yönetimi', basic: false, pro: true, plus: true },
-  { label: 'E-Fatura / E-Arşiv', basic: false, pro: true, plus: true },
   { label: 'Çoklu depo', basic: false, pro: true, plus: true },
   { label: 'Fatura import', basic: false, pro: true, plus: true },
   { label: 'Entegrasyonlar', basic: false, pro: true, plus: true },
@@ -32,7 +31,7 @@ const ROWS: PlanRow[] = [
   // Plus
   { label: 'CRM', basic: false, pro: false, plus: true },
   { label: 'Saha ekibi', basic: false, pro: false, plus: true },
-  { label: 'API erişimi', basic: false, pro: false, plus: true },
+  { label: 'API erişimi (yakında)', basic: false, pro: false, plus: true },
 ];
 
 const PLAN_PRICES = { basic: '199 ₺/ay', pro: '449 ₺/ay', plus: '799 ₺/ay' };

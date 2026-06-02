@@ -58,9 +58,11 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
           name: 'Basic', code: 'basic', price: 199, billing_period: 'monthly',
           features: JSON.stringify({
             sales: true, returns: true,
-            quotes: false, eDocuments: false, warehouses: false, integrations: false,
+            quotes: false, warehouses: false, integrations: false,
             crm: false, fieldTeam: false, invoiceImport: false, advancedReports: false,
             multiWarehouse: false, apiAccess: false,
+            // eDocuments: gerçek GİB entegrasyonu yok (sadece mock). Hiçbir planda açık değil.
+            eDocuments: false,
           }),
           limits: JSON.stringify({ maxUsers: 1, maxProducts: 200, maxCustomers: 100, maxWarehouses: 1, maxIntegrations: 0, storageGb: 5 }),
           is_active: true, sort_order: 1,
@@ -69,9 +71,10 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
           name: 'Pro', code: 'pro', price: 449, billing_period: 'monthly',
           features: JSON.stringify({
             sales: true, returns: true,
-            quotes: true, eDocuments: true, warehouses: true, integrations: true,
+            quotes: true, warehouses: true, integrations: true,
             crm: false, fieldTeam: false, invoiceImport: true, advancedReports: true,
             multiWarehouse: true, apiAccess: false,
+            eDocuments: false,
           }),
           limits: JSON.stringify({ maxUsers: 5, maxProducts: 5000, maxCustomers: 2000, maxWarehouses: 3, maxIntegrations: 3, storageGb: 25 }),
           is_active: true, sort_order: 2,
@@ -80,9 +83,10 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
           name: 'Plus', code: 'plus', price: 799, billing_period: 'monthly',
           features: JSON.stringify({
             sales: true, returns: true,
-            quotes: true, eDocuments: true, warehouses: true, integrations: true,
+            quotes: true, warehouses: true, integrations: true,
             crm: true, fieldTeam: true, invoiceImport: true, advancedReports: true,
             multiWarehouse: true, apiAccess: true,
+            eDocuments: false,
           }),
           limits: JSON.stringify({ maxUsers: -1, maxProducts: -1, maxCustomers: -1, maxWarehouses: -1, maxIntegrations: -1, storageGb: 100 }),
           is_active: true, sort_order: 3,
