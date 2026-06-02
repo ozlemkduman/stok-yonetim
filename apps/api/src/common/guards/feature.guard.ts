@@ -17,11 +17,26 @@ export class FeatureGuard implements CanActivate {
     ]);
     if (!required) return true;
 
-    // Super admin tüm özelliklere erişebilir
     const request = context.switchToHttp().getRequest();
-    if (request.user?.role === 'super_admin') return true;
+    const user = request.user;
 
-    const allowed = await this.tenantSettings.checkFeature(required);
+    // Super admin tüm özelliklere erişebilir
+    if (user?.role === 'super_admin') return true;
+
+    // NestJS pipeline'ında Guard'lar Interceptor'lardan önce çalışır,
+    // bu yüzden TenantInterceptor henüz AsyncLocalStorage'a tenant_id koymamış olur.
+    // tenant_id'yi doğrudan request.user'dan (+impersonate header) okuyoruz.
+    let tenantId = user?.tenantId;
+    const impersonateTenantId = request.headers['x-impersonate-tenant'] as string;
+    if (impersonateTenantId && user?.role === 'super_admin') {
+      tenantId = impersonateTenantId;
+    }
+
+    if (!tenantId) {
+      throw new ForbiddenException('Tenant bilgisi bulunamadı.');
+    }
+
+    const allowed = await this.tenantSettings.checkFeature(required, tenantId);
     if (!allowed) {
       throw new ForbiddenException(
         'Bu özellik mevcut planınızda bulunmuyor. Planınızı yükseltin.',
