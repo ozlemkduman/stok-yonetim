@@ -68,10 +68,21 @@ export class AccountsService {
     const account = await this.findById(id);
 
     if (dto.is_default === true) {
-      await this.repository.setDefault(id, account.account_type);
+      await this.repository.setDefault(id, dto.account_type || account.account_type);
     }
 
-    return this.repository.updateAccount(id, dto);
+    // opening_balance değişirse current_balance'ı delta kadar kaydır (hareketleri koru)
+    const updateData: Partial<Account> = { ...dto };
+    if (dto.opening_balance !== undefined) {
+      const oldOpening = Number(account.opening_balance) || 0;
+      const newOpening = Number(dto.opening_balance) || 0;
+      const delta = newOpening - oldOpening;
+      if (delta !== 0) {
+        updateData.current_balance = (Number(account.current_balance) || 0) + delta;
+      }
+    }
+
+    return this.repository.updateAccount(id, updateData);
   }
 
   async delete(id: string): Promise<void> {

@@ -1,4 +1,4 @@
-import { IsString, IsOptional, IsBoolean, MaxLength, MinLength } from 'class-validator';
+import { IsString, IsOptional, IsBoolean, IsNumber, IsIn, MaxLength, MinLength, Min } from 'class-validator';
 
 export class UpdateAccountDto {
   @IsOptional()
@@ -6,6 +6,10 @@ export class UpdateAccountDto {
   @MinLength(2)
   @MaxLength(100)
   name?: string;
+
+  @IsOptional()
+  @IsIn(['kasa', 'banka'])
+  account_type?: string;
 
   @IsOptional()
   @IsString()
@@ -26,6 +30,16 @@ export class UpdateAccountDto {
   @IsString()
   @MaxLength(100)
   branch_name?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(3)
+  currency?: string;
+
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
+  opening_balance?: number;
 
   @IsOptional()
   @IsBoolean()
