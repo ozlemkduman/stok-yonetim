@@ -1,15 +1,20 @@
 import { Injectable } from '@nestjs/common';
 import { DatabaseService } from '../../database/database.service';
 import { Knex } from 'knex';
+import { getCurrentTenantId } from '../../common/context/tenant.context';
 
 @Injectable()
 export class ReportsService {
   constructor(private readonly db: DatabaseService) {}
 
+  // Reports use the same tenant context as the rest of the app (TenantInterceptor +
+  // AsyncLocalStorage). The explicit tenantId argument is kept for backwards
+  // compatibility with the controller but is overridden by the context when present.
   private tenantQuery(table: string, tenantId?: string | null): Knex.QueryBuilder {
+    const effectiveTenantId = getCurrentTenantId() ?? tenantId;
     const query = this.db.knex(table);
-    if (tenantId) {
-      return query.where(`${table}.tenant_id`, tenantId);
+    if (effectiveTenantId) {
+      return query.where(`${table}.tenant_id`, effectiveTenantId);
     }
     return query;
   }
