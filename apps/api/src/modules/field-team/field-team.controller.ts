@@ -2,8 +2,10 @@ import { Controller, Get, Post, Patch, Delete, Body, Param, Query } from '@nestj
 import { FieldTeamService } from './field-team.service';
 import { CreateRouteDto } from './dto/create-route.dto';
 import { UpdateVisitDto } from './dto/update-visit.dto';
+import { RequireFeature } from '../../common/decorators/require-feature.decorator';
 
 @Controller('field-team')
+@RequireFeature('fieldTeam')
 export class FieldTeamController {
   constructor(private readonly service: FieldTeamService) {}
 

@@ -3,11 +3,13 @@ import {
   NotFoundException,
   BadRequestException,
   ConflictException,
+  ForbiddenException,
 } from '@nestjs/common';
 import * as bcrypt from 'bcryptjs';
 import { UsersRepository, User } from './users.repository';
 import { PaginationParams } from '../../common/dto/pagination.dto';
 import { getCurrentTenantId, getCurrentUserRole } from '../../common/context/tenant.context';
+import { TenantSettingsService } from '../tenant-settings/tenant-settings.service';
 
 export interface CreateUserDto {
   email: string;
@@ -29,7 +31,10 @@ export interface UpdateUserDto {
 
 @Injectable()
 export class UsersService {
-  constructor(private readonly usersRepository: UsersRepository) {}
+  constructor(
+    private readonly usersRepository: UsersRepository,
+    private readonly tenantSettings: TenantSettingsService,
+  ) {}
 
   async findAll(params: PaginationParams & { role?: string; status?: string; search?: string }) {
     return this.usersRepository.findAll(params);
@@ -47,6 +52,14 @@ export class UsersService {
     const tenantId = getCurrentTenantId();
     if (!tenantId) {
       throw new BadRequestException('Tenant bilgisi bulunamadı');
+    }
+
+    // Plan kullanıcı sayısı limiti
+    const limitCheck = await this.tenantSettings.checkLimit('users');
+    if (!limitCheck.allowed) {
+      throw new ForbiddenException(
+        `Kullanıcı limitinize ulaştınız (${limitCheck.current}/${limitCheck.limit}). Planınızı yükseltin.`,
+      );
     }
 
     // Check if email exists

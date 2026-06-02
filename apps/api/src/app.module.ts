@@ -30,6 +30,7 @@ import { ContactModule } from './modules/contact/contact.module';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { TransformInterceptor } from './common/interceptors/transform.interceptor';
 import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
+import { FeatureGuard } from './common/guards/feature.guard';
 
 @Module({
   imports: [
@@ -95,6 +96,10 @@ import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
     {
       provide: APP_GUARD,
       useClass: ThrottlerGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: FeatureGuard,
     },
     {
       provide: APP_INTERCEPTOR,

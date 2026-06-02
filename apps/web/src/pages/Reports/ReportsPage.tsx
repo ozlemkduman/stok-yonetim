@@ -5,6 +5,7 @@ import { Button, Spinner } from '@stok/ui';
 import { useToast } from '../../context/ToastContext';
 import { reportsApi, TopProduct, TopCustomer, UpcomingPayment, OverduePayment, StockReportProduct, ExpenseByCategory, CustomerProductPurchase, CustomerSale, EmployeePerformanceReport, RenewalsReport, RenewalItem } from '../../api/reports.api';
 import { useAuth } from '../../hooks/useAuth';
+import { useTenant } from '../../context/TenantContext';
 import { formatCurrency, formatDate } from '../../utils/formatters';
 import { EXPENSE_CATEGORIES, PAYMENT_METHODS } from '../../utils/constants';
 import styles from './ReportsPage.module.css';
@@ -79,12 +80,14 @@ const icons = {
 type TabType = 'genel' | 'satis' | 'musteri' | 'musteriSatis' | 'stok' | 'gider' | 'personel' | 'yenileme';
 
 const VALID_TABS: TabType[] = ['genel', 'satis', 'musteri', 'musteriSatis', 'stok', 'gider', 'personel', 'yenileme'];
+const ADVANCED_TABS: TabType[] = ['musteriSatis', 'gider', 'personel', 'yenileme'];
 
 export function ReportsPage() {
   const { t } = useTranslation(['reports', 'common']);
   const navigate = useNavigate();
   const { showToast } = useToast();
   const { user } = useAuth();
+  const { hasFeature } = useTenant();
   const [searchParams, setSearchParams] = useSearchParams();
   const initialTab = (VALID_TABS.includes(searchParams.get('tab') as TabType) ? searchParams.get('tab') : 'genel') as TabType;
   const [activeTab, setActiveTabState] = useState<TabType>(initialTab);
@@ -129,44 +132,54 @@ export function ReportsPage() {
 
   const fetchReports = useCallback(async () => {
     setLoading(true);
+    // Bir endpoint başarısız olursa diğerleri etkilenmesin (örn. Basic'te gelişmiş raporlar 403 döner).
+    const safe = <T,>(p: Promise<T>): Promise<T | null> => p.catch(() => null);
+    const isAdvanced = hasFeature('advancedReports');
     try {
       const [sales, profit, debt, products, customers, upcoming, overdue, stock, returns, expenses, custProducts, custSales, empPerf, renewals] = await Promise.all([
-        reportsApi.getSalesSummary(startDate, endDate),
-        reportsApi.getProfitLoss(startDate, endDate),
-        reportsApi.getDebtOverview(),
-        reportsApi.getTopProducts(startDate, endDate, 10),
-        reportsApi.getTopCustomers(startDate, endDate, 10),
-        reportsApi.getUpcomingPayments(30),
-        reportsApi.getOverduePayments(),
-        reportsApi.getStockReport(),
-        reportsApi.getReturnsReport(startDate, endDate),
-        reportsApi.getExpensesByCategory(startDate, endDate),
-        reportsApi.getCustomerProductPurchases(startDate, endDate),
-        reportsApi.getCustomerSales(startDate, endDate),
-        reportsApi.getEmployeePerformance(startDate, endDate),
-        reportsApi.getRenewals(),
+        safe(reportsApi.getSalesSummary(startDate, endDate)),
+        isAdvanced ? safe(reportsApi.getProfitLoss(startDate, endDate)) : Promise.resolve(null),
+        safe(reportsApi.getDebtOverview()),
+        safe(reportsApi.getTopProducts(startDate, endDate, 10)),
+        safe(reportsApi.getTopCustomers(startDate, endDate, 10)),
+        safe(reportsApi.getUpcomingPayments(30)),
+        safe(reportsApi.getOverduePayments()),
+        safe(reportsApi.getStockReport()),
+        safe(reportsApi.getReturnsReport(startDate, endDate)),
+        isAdvanced ? safe(reportsApi.getExpensesByCategory(startDate, endDate)) : Promise.resolve(null),
+        isAdvanced ? safe(reportsApi.getCustomerProductPurchases(startDate, endDate)) : Promise.resolve(null),
+        safe(reportsApi.getCustomerSales(startDate, endDate)),
+        isAdvanced ? safe(reportsApi.getEmployeePerformance(startDate, endDate)) : Promise.resolve(null),
+        isAdvanced ? safe(reportsApi.getRenewals()) : Promise.resolve(null),
       ]);
-      setSalesSummary(sales.data);
-      setProfitLoss(profit.data);
-      setDebtOverview(debt.data);
-      setTopProducts(products.data);
-      setTopCustomers(customers.data);
-      setUpcomingPayments(upcoming.data);
-      setOverduePayments(overdue.data);
-      setStockReport(stock.data);
-      setReturnsReport(returns.data);
-      setExpensesReport(expenses.data);
-      setCustomerProducts(custProducts.data);
-      setCustomerSales(custSales.data);
-      setEmployeePerformance(empPerf.data);
-      setRenewalsReport(renewals.data);
+      if (sales) setSalesSummary(sales.data);
+      if (profit) setProfitLoss(profit.data);
+      if (debt) setDebtOverview(debt.data);
+      if (products) setTopProducts(products.data);
+      if (customers) setTopCustomers(customers.data);
+      if (upcoming) setUpcomingPayments(upcoming.data);
+      if (overdue) setOverduePayments(overdue.data);
+      if (stock) setStockReport(stock.data);
+      if (returns) setReturnsReport(returns.data);
+      if (expenses) setExpensesReport(expenses.data);
+      if (custProducts) setCustomerProducts(custProducts.data);
+      if (custSales) setCustomerSales(custSales.data);
+      if (empPerf) setEmployeePerformance(empPerf.data);
+      if (renewals) setRenewalsReport(renewals.data);
     } catch (err) {
       showToast('error', t('reports:loadFailed'));
     }
     setLoading(false);
-  }, [startDate, endDate]);
+  }, [startDate, endDate, hasFeature]);
 
   useEffect(() => { fetchReports(); }, [fetchReports]);
+
+  // Plan'da advancedReports yoksa o sekmelerden ana sekmeye düş
+  useEffect(() => {
+    if (ADVANCED_TABS.includes(activeTab) && !hasFeature('advancedReports')) {
+      setActiveTabState('genel');
+    }
+  }, [activeTab, hasFeature]);
 
   // Aynı sayfada URL'deki tab değiştiğinde state'i senkronize et (bildirim tıklamasıyla)
   useEffect(() => {
@@ -232,45 +245,47 @@ export function ReportsPage() {
         </div>
       </div>
 
-      {/* Profit/Loss */}
-      <div className={styles.reportCard}>
-        <div className={styles.reportCardHeader}>
-          {icons.profit}
-          <h3 className={styles.reportCardTitle}>{t('reports:general.profitLoss')}</h3>
+      {/* Profit/Loss — gelişmiş rapor */}
+      {hasFeature('advancedReports') && (
+        <div className={styles.reportCard}>
+          <div className={styles.reportCardHeader}>
+            {icons.profit}
+            <h3 className={styles.reportCardTitle}>{t('reports:general.profitLoss')}</h3>
+          </div>
+          <div className={styles.reportCardBody}>
+            {profitLoss && (
+              <div className={styles.reportGrid}>
+                <div className={styles.reportItem}>
+                  <span>{t('reports:general.totalRevenue')}</span>
+                  <strong className={styles.success}>{formatCurrency(profitLoss.revenue)}</strong>
+                </div>
+                <div className={styles.reportItem}>
+                  <span>{t('reports:general.costOfGoods')}</span>
+                  <strong>{formatCurrency(profitLoss.costOfGoods)}</strong>
+                </div>
+                <div className={styles.reportItem}>
+                  <span>{t('reports:general.returnAmount')}</span>
+                  <strong>{formatCurrency(profitLoss.returns)}</strong>
+                </div>
+                <div className={styles.reportItem}>
+                  <span>{t('reports:general.grossProfit')}</span>
+                  <strong>{formatCurrency(profitLoss.grossProfit)}</strong>
+                </div>
+                <div className={styles.reportItem}>
+                  <span>{t('reports:general.totalExpenses')}</span>
+                  <strong className={styles.danger}>{formatCurrency(profitLoss.expenses)}</strong>
+                </div>
+                <div className={styles.reportItem}>
+                  <span>{t('reports:general.netProfit')}</span>
+                  <strong className={profitLoss.netProfit >= 0 ? styles.success : styles.danger}>
+                    {formatCurrency(profitLoss.netProfit)}
+                  </strong>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
-        <div className={styles.reportCardBody}>
-          {profitLoss && (
-            <div className={styles.reportGrid}>
-              <div className={styles.reportItem}>
-                <span>{t('reports:general.totalRevenue')}</span>
-                <strong className={styles.success}>{formatCurrency(profitLoss.revenue)}</strong>
-              </div>
-              <div className={styles.reportItem}>
-                <span>{t('reports:general.costOfGoods')}</span>
-                <strong>{formatCurrency(profitLoss.costOfGoods)}</strong>
-              </div>
-              <div className={styles.reportItem}>
-                <span>{t('reports:general.returnAmount')}</span>
-                <strong>{formatCurrency(profitLoss.returns)}</strong>
-              </div>
-              <div className={styles.reportItem}>
-                <span>{t('reports:general.grossProfit')}</span>
-                <strong>{formatCurrency(profitLoss.grossProfit)}</strong>
-              </div>
-              <div className={styles.reportItem}>
-                <span>{t('reports:general.totalExpenses')}</span>
-                <strong className={styles.danger}>{formatCurrency(profitLoss.expenses)}</strong>
-              </div>
-              <div className={styles.reportItem}>
-                <span>{t('reports:general.netProfit')}</span>
-                <strong className={profitLoss.netProfit >= 0 ? styles.success : styles.danger}>
-                  {formatCurrency(profitLoss.netProfit)}
-                </strong>
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
+      )}
 
       {/* Debt Overview */}
       <div className={styles.reportCard}>
@@ -1180,21 +1195,29 @@ export function ReportsPage() {
         <button className={`${styles.tab} ${activeTab === 'musteri' ? styles.tabActive : ''}`} onClick={() => setActiveTab('musteri')}>
           {t('reports:tabs.customers')}
         </button>
-        <button className={`${styles.tab} ${activeTab === 'musteriSatis' ? styles.tabActive : ''}`} onClick={() => setActiveTab('musteriSatis')}>
-          {t('reports:tabs.customerSales')}
-        </button>
+        {hasFeature('advancedReports') && (
+          <button className={`${styles.tab} ${activeTab === 'musteriSatis' ? styles.tabActive : ''}`} onClick={() => setActiveTab('musteriSatis')}>
+            {t('reports:tabs.customerSales')}
+          </button>
+        )}
         <button className={`${styles.tab} ${activeTab === 'stok' ? styles.tabActive : ''}`} onClick={() => setActiveTab('stok')}>
           {t('reports:tabs.stock')}
         </button>
-        <button className={`${styles.tab} ${activeTab === 'gider' ? styles.tabActive : ''}`} onClick={() => setActiveTab('gider')}>
-          {t('reports:tabs.expenses')}
-        </button>
-        <button className={`${styles.tab} ${activeTab === 'personel' ? styles.tabActive : ''}`} onClick={() => setActiveTab('personel')}>
-          {t('reports:tabs.staff')}
-        </button>
-        <button className={`${styles.tab} ${activeTab === 'yenileme' ? styles.tabActive : ''}`} onClick={() => setActiveTab('yenileme')}>
-          {t('reports:tabs.renewals')}
-        </button>
+        {hasFeature('advancedReports') && (
+          <button className={`${styles.tab} ${activeTab === 'gider' ? styles.tabActive : ''}`} onClick={() => setActiveTab('gider')}>
+            {t('reports:tabs.expenses')}
+          </button>
+        )}
+        {hasFeature('advancedReports') && (
+          <button className={`${styles.tab} ${activeTab === 'personel' ? styles.tabActive : ''}`} onClick={() => setActiveTab('personel')}>
+            {t('reports:tabs.staff')}
+          </button>
+        )}
+        {hasFeature('advancedReports') && (
+          <button className={`${styles.tab} ${activeTab === 'yenileme' ? styles.tabActive : ''}`} onClick={() => setActiveTab('yenileme')}>
+            {t('reports:tabs.renewals')}
+          </button>
+        )}
       </div>
 
       {loading ? (
