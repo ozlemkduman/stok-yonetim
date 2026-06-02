@@ -51,21 +51,27 @@ export class GibMockService {
     totalAmount: number;
     vatAmount: number;
   }): string {
+    const money = (v: unknown): string => (Number(v) || 0).toFixed(2);
+    const totalAmount = Number(data.totalAmount) || 0;
+    const vatAmount = Number(data.vatAmount) || 0;
+
     const itemsXml = data.items
-      .map(
-        (item, i) => `
+      .map((item, i) => {
+        const qty = Number(item.quantity) || 0;
+        const price = Number(item.unitPrice) || 0;
+        return `
         <cac:InvoiceLine>
           <cbc:ID>${i + 1}</cbc:ID>
-          <cbc:InvoicedQuantity>${item.quantity}</cbc:InvoicedQuantity>
-          <cbc:LineExtensionAmount>${(item.quantity * item.unitPrice).toFixed(2)}</cbc:LineExtensionAmount>
+          <cbc:InvoicedQuantity>${qty}</cbc:InvoicedQuantity>
+          <cbc:LineExtensionAmount>${money(qty * price)}</cbc:LineExtensionAmount>
           <cac:Item>
             <cbc:Name>${item.name}</cbc:Name>
           </cac:Item>
           <cac:Price>
-            <cbc:PriceAmount>${item.unitPrice.toFixed(2)}</cbc:PriceAmount>
+            <cbc:PriceAmount>${money(price)}</cbc:PriceAmount>
           </cac:Price>
-        </cac:InvoiceLine>`
-      )
+        </cac:InvoiceLine>`;
+      })
       .join('');
 
     return `<?xml version="1.0" encoding="UTF-8"?>
@@ -89,12 +95,12 @@ export class GibMockService {
     </cac:Party>
   </cac:AccountingCustomerParty>
   <cac:TaxTotal>
-    <cbc:TaxAmount>${data.vatAmount.toFixed(2)}</cbc:TaxAmount>
+    <cbc:TaxAmount>${money(vatAmount)}</cbc:TaxAmount>
   </cac:TaxTotal>
   <cac:LegalMonetaryTotal>
-    <cbc:TaxExclusiveAmount>${(data.totalAmount - data.vatAmount).toFixed(2)}</cbc:TaxExclusiveAmount>
-    <cbc:TaxInclusiveAmount>${data.totalAmount.toFixed(2)}</cbc:TaxInclusiveAmount>
-    <cbc:PayableAmount>${data.totalAmount.toFixed(2)}</cbc:PayableAmount>
+    <cbc:TaxExclusiveAmount>${money(totalAmount - vatAmount)}</cbc:TaxExclusiveAmount>
+    <cbc:TaxInclusiveAmount>${money(totalAmount)}</cbc:TaxInclusiveAmount>
+    <cbc:PayableAmount>${money(totalAmount)}</cbc:PayableAmount>
   </cac:LegalMonetaryTotal>
   ${itemsXml}
 </Invoice>`;
