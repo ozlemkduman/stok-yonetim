@@ -1,5 +1,5 @@
-import { useState, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Button, Spinner } from '@stok/ui';
 import { useToast } from '../../context/ToastContext';
@@ -78,12 +78,29 @@ const icons = {
 
 type TabType = 'genel' | 'satis' | 'musteri' | 'musteriSatis' | 'stok' | 'gider' | 'personel' | 'yenileme';
 
+const VALID_TABS: TabType[] = ['genel', 'satis', 'musteri', 'musteriSatis', 'stok', 'gider', 'personel', 'yenileme'];
+
 export function ReportsPage() {
   const { t } = useTranslation(['reports', 'common']);
   const navigate = useNavigate();
   const { showToast } = useToast();
   const { user } = useAuth();
-  const [activeTab, setActiveTab] = useState<TabType>('genel');
+  const [searchParams, setSearchParams] = useSearchParams();
+  const initialTab = (VALID_TABS.includes(searchParams.get('tab') as TabType) ? searchParams.get('tab') : 'genel') as TabType;
+  const [activeTab, setActiveTabState] = useState<TabType>(initialTab);
+  const focusRef = useRef<string | null>(searchParams.get('focus'));
+
+  const setActiveTab = (tab: TabType) => {
+    setActiveTabState(tab);
+    const params = new URLSearchParams(searchParams);
+    if (tab === 'genel') {
+      params.delete('tab');
+    } else {
+      params.set('tab', tab);
+    }
+    params.delete('focus');
+    setSearchParams(params, { replace: true });
+  };
   const [startDate, setStartDate] = useState(() => {
     const d = new Date();
     d.setMonth(d.getMonth() - 1);
@@ -150,6 +167,34 @@ export function ReportsPage() {
   }, [startDate, endDate]);
 
   useEffect(() => { fetchReports(); }, [fetchReports]);
+
+  // Aynı sayfada URL'deki tab değiştiğinde state'i senkronize et (bildirim tıklamasıyla)
+  useEffect(() => {
+    const urlTab = searchParams.get('tab');
+    if (urlTab && VALID_TABS.includes(urlTab as TabType) && urlTab !== activeTab) {
+      setActiveTabState(urlTab as TabType);
+    }
+    const urlFocus = searchParams.get('focus');
+    if (urlFocus) focusRef.current = urlFocus;
+  }, [searchParams]);
+
+  // Yüklemeden sonra ?focus=<id> varsa ilgili karta scroll
+  useEffect(() => {
+    if (!loading && focusRef.current) {
+      const target = focusRef.current;
+      // Kısa gecikme: tab değişimi sonrası DOM'un render olmasını bekle
+      const timer = setTimeout(() => {
+        const el = document.getElementById(target);
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          el.classList.add(styles.flashHighlight);
+          setTimeout(() => el.classList.remove(styles.flashHighlight), 2000);
+        }
+      }, 100);
+      focusRef.current = null;
+      return () => clearTimeout(timer);
+    }
+  }, [loading, activeTab]);
 
   const renderGenelTab = () => (
     <div className={styles.grid}>
@@ -256,7 +301,7 @@ export function ReportsPage() {
       </div>
 
       {/* Overdue Payments */}
-      <div className={`${styles.reportCard} ${styles.fullWidthCard}`}>
+      <div id="overdue-payments" className={`${styles.reportCard} ${styles.fullWidthCard}`}>
         <div className={styles.reportCardHeader}>
           {icons.alert}
           <h3 className={styles.reportCardTitle}>{t('reports:general.overduePayments')}</h3>
