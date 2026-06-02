@@ -15,7 +15,7 @@ export class ReportsService {
   }
 
   async getSalesSummary(startDate: string, endDate: string, tenantId?: string | null) {
-    const [summary] = await this.tenantQuery('sales', tenantId)
+    const [rawSummary] = await this.tenantQuery('sales', tenantId)
       .where('status', 'completed')
       .whereBetween('sale_date', [startDate, endDate])
       .select(
@@ -26,15 +26,29 @@ export class ReportsService {
         this.db.knex.raw('COALESCE(SUM(grand_total), 0) as grand_total'),
       );
 
-    const byPaymentMethod = await this.tenantQuery('sales', tenantId)
+    const r = rawSummary as any;
+    const summary = {
+      sale_count: parseInt(r?.sale_count || '0', 10),
+      subtotal: parseFloat(r?.subtotal || '0'),
+      discount_total: parseFloat(r?.discount_total || '0'),
+      vat_total: parseFloat(r?.vat_total || '0'),
+      grand_total: parseFloat(r?.grand_total || '0'),
+    };
+
+    const byPaymentMethodRaw = await this.tenantQuery('sales', tenantId)
       .where('status', 'completed')
       .whereBetween('sale_date', [startDate, endDate])
       .select('payment_method')
       .sum('grand_total as total')
       .count('id as count')
       .groupBy('payment_method');
+    const byPaymentMethod = byPaymentMethodRaw.map((row: any) => ({
+      payment_method: row.payment_method,
+      total: parseFloat(row.total || '0'),
+      count: parseInt(row.count || '0', 10),
+    }));
 
-    const dailySales = await this.tenantQuery('sales', tenantId)
+    const dailySalesRaw = await this.tenantQuery('sales', tenantId)
       .where('status', 'completed')
       .whereBetween('sale_date', [startDate, endDate])
       .select(this.db.knex.raw('DATE(sale_date) as date'))
@@ -42,16 +56,25 @@ export class ReportsService {
       .count('id as count')
       .groupBy(this.db.knex.raw('DATE(sale_date)'))
       .orderBy('date');
+    const dailySales = dailySalesRaw.map((row: any) => ({
+      date: row.date,
+      total: parseFloat(row.total || '0'),
+      count: parseInt(row.count || '0', 10),
+    }));
 
     return { summary, byPaymentMethod, dailySales };
   }
 
   async getDebtOverview(tenantId?: string | null) {
-    const customers = await this.tenantQuery('customers', tenantId)
+    const rawCustomers = await this.tenantQuery('customers', tenantId)
       .where('is_active', true)
       .whereNot('balance', 0)
       .orderBy('balance', 'asc')
       .select('id', 'name', 'phone', 'balance');
+    const customers = rawCustomers.map((c: any) => ({
+      ...c,
+      balance: parseFloat(c.balance || '0'),
+    }));
 
     const [totals] = await this.tenantQuery('customers', tenantId)
       .where('is_active', true)
@@ -96,10 +119,12 @@ export class ReportsService {
   }
 
   async getProfitLoss(startDate: string, endDate: string, tenantId?: string | null) {
+    // Net satış geliri (KDV hariç) = grand_total - vat_total
+    // cost (alış fiyatı, KDV hariç) ile aynı zeminde karşılaştırmak için KDV'siz değerler kullanılır.
     const [salesTotal] = await this.tenantQuery('sales', tenantId)
       .where('status', 'completed')
       .whereBetween('sale_date', [startDate, endDate])
-      .sum('grand_total as revenue');
+      .select(this.db.knex.raw('COALESCE(SUM(grand_total - vat_total), 0) as revenue'));
 
     let costQuery = this.db.knex('sale_items')
       .join('sales', 'sale_items.sale_id', 'sales.id')
@@ -115,15 +140,16 @@ export class ReportsService {
       .whereBetween('expense_date', [startDate, endDate])
       .sum('amount as total');
 
+    // İade net tutarı (KDV hariç) = total_amount - vat_total
     const [returnsTotal] = await this.tenantQuery('returns', tenantId)
       .where('status', 'completed')
       .whereBetween('return_date', [startDate, endDate])
-      .sum('total_amount as total');
+      .select(this.db.knex.raw('COALESCE(SUM(total_amount - vat_total), 0) as total'));
 
     const revenue = parseFloat((salesTotal as any)?.revenue || '0');
     const cost = parseFloat((costOfGoods as any)?.cost || '0');
     const expenses = parseFloat(expensesTotal?.total || '0');
-    const returns = parseFloat(returnsTotal?.total || '0');
+    const returns = parseFloat((returnsTotal as any)?.total || '0');
     const grossProfit = revenue - cost - returns;
     const netProfit = grossProfit - expenses;
 
@@ -138,17 +164,23 @@ export class ReportsService {
       .whereBetween('sales.sale_date', [startDate, endDate]);
     if (tenantId) query = query.where('sales.tenant_id', tenantId);
 
-    return query
+    const rows = await query
       .select('products.id', 'products.name')
       .sum('sale_items.quantity as total_quantity')
       .sum('sale_items.line_total as total_revenue')
       .groupBy('products.id', 'products.name')
       .orderBy('total_quantity', 'desc')
       .limit(limit);
+    return rows.map((r: any) => ({
+      id: r.id,
+      name: r.name,
+      total_quantity: parseFloat(r.total_quantity || '0'),
+      total_revenue: parseFloat(r.total_revenue || '0'),
+    }));
   }
 
   async getTopCustomers(startDate: string, endDate: string, limit: number = 10, tenantId?: string | null) {
-    return this.tenantQuery('sales', tenantId)
+    const rows = await this.tenantQuery('sales', tenantId)
       .join('customers', 'sales.customer_id', 'customers.id')
       .where('sales.status', 'completed')
       .whereBetween('sales.sale_date', [startDate, endDate])
@@ -158,6 +190,13 @@ export class ReportsService {
       .groupBy('customers.id', 'customers.name', 'customers.phone')
       .orderBy('total_amount', 'desc')
       .limit(limit);
+    return rows.map((r: any) => ({
+      id: r.id,
+      name: r.name,
+      phone: r.phone,
+      total_amount: parseFloat(r.total_amount || '0'),
+      sale_count: parseInt(r.sale_count || '0', 10),
+    }));
   }
 
   async getUpcomingPayments(days: number = 30, tenantId?: string | null) {
@@ -222,7 +261,7 @@ export class ReportsService {
   }
 
   async getStockReport(tenantId?: string | null) {
-    const products = await this.tenantQuery('products', tenantId)
+    const rawProducts = await this.tenantQuery('products', tenantId)
       .where('is_active', true)
       .select(
         'id',
@@ -235,10 +274,18 @@ export class ReportsService {
       )
       .orderBy('stock_quantity', 'asc');
 
-    const lowStock = products.filter(p => p.stock_quantity <= p.min_stock_level);
-    const outOfStock = products.filter(p => p.stock_quantity === 0);
-    const totalStockValue = products.reduce((sum, p) => sum + (p.stock_quantity * p.purchase_price), 0);
-    const totalSaleValue = products.reduce((sum, p) => sum + (p.stock_quantity * p.sale_price), 0);
+    const products = rawProducts.map((p: any) => ({
+      ...p,
+      stock_quantity: Number(p.stock_quantity) || 0,
+      min_stock_level: Number(p.min_stock_level) || 0,
+      purchase_price: Number(p.purchase_price) || 0,
+      sale_price: Number(p.sale_price) || 0,
+    }));
+
+    const lowStock = products.filter((p) => p.stock_quantity > 0 && p.stock_quantity <= p.min_stock_level);
+    const outOfStock = products.filter((p) => p.stock_quantity === 0);
+    const totalStockValue = products.reduce((sum, p) => sum + p.stock_quantity * p.purchase_price, 0);
+    const totalSaleValue = products.reduce((sum, p) => sum + p.stock_quantity * p.sale_price, 0);
 
     return {
       products,
@@ -246,9 +293,9 @@ export class ReportsService {
         totalProducts: products.length,
         lowStockCount: lowStock.length,
         outOfStockCount: outOfStock.length,
-        totalStockValue,
-        totalSaleValue,
-        potentialProfit: totalSaleValue - totalStockValue,
+        totalStockValue: Math.round(totalStockValue * 100) / 100,
+        totalSaleValue: Math.round(totalSaleValue * 100) / 100,
+        potentialProfit: Math.round((totalSaleValue - totalStockValue) * 100) / 100,
       },
     };
   }
