@@ -360,3 +360,25 @@
     flex-direction: column;
   }
 }
+
+/* Tenant detayında kalan süre vurgusu */
+.remainingHighlight {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-bg-subtle, rgba(0, 0, 0, 0.03));
+  border-radius: var(--radius-md, 8px);
+  margin-bottom: var(--space-4);
+}
+
+.remainingLabel {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  font-weight: 600;
+}
+
+.remainingValue {
+  font-size: var(--font-size-sm);
+}

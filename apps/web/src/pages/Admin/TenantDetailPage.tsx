@@ -34,6 +34,30 @@ export function TenantDetailPage() {
     cancelled: t('admin:tenantDetail.statusCancelled'),
   };
 
+  /**
+   * Verilen bitiş tarihinden bugüne kadar olan gün farkını ve uygun
+   * renkli rozeti döndürür. null/boş tarihler için null döner.
+   */
+  const renderRemainingBadge = (endsAt: string | Date | null | undefined) => {
+    if (!endsAt) return null;
+    const end = new Date(endsAt);
+    if (isNaN(end.getTime())) return null;
+    const today = new Date();
+    // Saat farklarını gözardı et — sadece tarih farkı
+    const startOfToday = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    const startOfEnd = new Date(end.getFullYear(), end.getMonth(), end.getDate());
+    const days = Math.round((startOfEnd.getTime() - startOfToday.getTime()) / (1000 * 60 * 60 * 24));
+
+    if (days < 0) {
+      return <Badge variant="danger">{t('admin:tenantDetail.expired', { count: Math.abs(days) })}</Badge>;
+    }
+    if (days === 0) {
+      return <Badge variant="danger">{t('admin:tenantDetail.expiresToday')}</Badge>;
+    }
+    const variant: 'success' | 'warning' | 'danger' = days <= 7 ? 'danger' : days <= 30 ? 'warning' : 'success';
+    return <Badge variant={variant}>{t('admin:tenantDetail.daysRemaining', { count: days })}</Badge>;
+  };
+
   // Davet modal state
   const [showInviteModal, setShowInviteModal] = useState(false);
   const [inviteEmail, setInviteEmail] = useState('');
@@ -276,12 +300,34 @@ export function TenantDetailPage() {
 
         <Card className={styles.section}>
           <h2 className={styles.sectionTitle}>{t('admin:tenantDetail.subscriptionInfo')}</h2>
+
+          {/* Aktif kalan süre vurgusu: tenant trial ise trial_ends_at, değilse subscription_ends_at */}
+          {(() => {
+            const activeEnd = tenant.status === 'trial' ? tenant.trial_ends_at : tenant.subscription_ends_at;
+            const badge = renderRemainingBadge(activeEnd);
+            if (!badge) {
+              return (
+                <div className={styles.remainingHighlight}>
+                  <span className={styles.remainingLabel}>{t('admin:tenantDetail.remainingTime')}</span>
+                  <span className={styles.remainingValue}>{t('admin:tenantDetail.unlimited')}</span>
+                </div>
+              );
+            }
+            return (
+              <div className={styles.remainingHighlight}>
+                <span className={styles.remainingLabel}>{t('admin:tenantDetail.remainingTime')}</span>
+                <span className={styles.remainingValue}>{badge}</span>
+              </div>
+            );
+          })()}
+
           <dl className={styles.detailList}>
             <dt>{t('admin:tenantDetail.trialEnd')}</dt>
-            <dd>
+            <dd style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
               {tenant.trial_ends_at
                 ? new Date(tenant.trial_ends_at).toLocaleDateString('tr-TR')
                 : '-'}
+              {tenant.trial_ends_at && renderRemainingBadge(tenant.trial_ends_at)}
             </dd>
 
             <dt>{t('admin:tenantDetail.subscriptionStart')}</dt>
@@ -292,10 +338,11 @@ export function TenantDetailPage() {
             </dd>
 
             <dt>{t('admin:tenantDetail.subscriptionEnd')}</dt>
-            <dd>
+            <dd style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
               {tenant.subscription_ends_at
                 ? new Date(tenant.subscription_ends_at).toLocaleDateString('tr-TR')
                 : '-'}
+              {tenant.subscription_ends_at && renderRemainingBadge(tenant.subscription_ends_at)}
             </dd>
           </dl>
         </Card>
