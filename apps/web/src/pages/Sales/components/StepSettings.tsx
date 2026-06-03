@@ -62,8 +62,20 @@ export function StepSettings({
             </div>
           </div>
 
-          {data.paymentMethod === 'veresiye' && (
-            <div className={styles.formRow}>
+          <div className={styles.formRow}>
+            <div className={styles.formGroup}>
+              <label className={styles.label}>{t('sales:stepSettings.saleDateLabel')}</label>
+              <Input
+                type="date"
+                value={data.saleDate}
+                onChange={(e) => onDataChange({ saleDate: e.target.value })}
+                fullWidth
+              />
+              <small style={{ color: 'var(--color-text-muted)', fontSize: 'var(--font-size-xs)' }}>
+                {t('sales:stepSettings.saleDateHint')}
+              </small>
+            </div>
+            {data.paymentMethod === 'veresiye' ? (
               <div className={styles.formGroup}>
                 <label className={styles.label}>{t('sales:stepSettings.dueDateLabel')}</label>
                 <Input
@@ -73,9 +85,10 @@ export function StepSettings({
                   fullWidth
                 />
               </div>
+            ) : (
               <div className={styles.formGroup} />
-            </div>
-          )}
+            )}
+          </div>
 
           {veresiyeWarning && (
             <div className={styles.warningBox}>
@@ -151,7 +164,7 @@ export function StepSettings({
                   onChange={(e) => onDataChange({ renewalDate: e.target.value })}
                   fullWidth
                 />
-                <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
+                <div style={{ display: 'flex', gap: 8, marginTop: 8, flexWrap: 'wrap' }}>
                   {[1, 2, 3].map((years) => (
                     <Button
                       key={years}
@@ -159,15 +172,20 @@ export function StepSettings({
                       size="sm"
                       variant="secondary"
                       onClick={() => {
-                        const d = new Date();
-                        d.setFullYear(d.getFullYear() + years);
-                        onDataChange({ renewalDate: d.toISOString().split('T')[0] });
+                        // Satış tarihinden itibaren hesapla; sale_date yoksa bugün
+                        const base = data.saleDate ? new Date(data.saleDate) : new Date();
+                        if (isNaN(base.getTime())) return;
+                        base.setFullYear(base.getFullYear() + years);
+                        onDataChange({ renewalDate: base.toISOString().split('T')[0] });
                       }}
                     >
                       {t('sales:stepSettings.renewal.yearShortcut', { count: years })}
                     </Button>
                   ))}
                 </div>
+                <small style={{ color: 'var(--color-text-muted)', fontSize: 'var(--font-size-xs)', display: 'block', marginTop: 4 }}>
+                  {t('sales:stepSettings.renewal.shortcutHint')}
+                </small>
               </div>
               <div className={styles.formGroup}>
                 <label className={styles.label}>{t('sales:stepSettings.renewal.reminderDaysLabel')}</label>

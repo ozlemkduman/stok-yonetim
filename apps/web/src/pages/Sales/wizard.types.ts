@@ -22,6 +22,7 @@ export interface WizardFormData {
   // Step 3: Settings
   warehouseId: string;
   paymentMethod: string;
+  saleDate: string; // YYYY-MM-DD; default bugün
   dueDate: string;
   includeVat: boolean;
   discountRate: number;

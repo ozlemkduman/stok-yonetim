@@ -156,6 +156,8 @@
     "selectWarehouse": "Select Warehouse",
     "newWarehouse": "+ New",
     "paymentMethodLabel": "Payment Method *",
+    "saleDateLabel": "Sale Date",
+    "saleDateHint": "Leave empty to use today. Renewal reminder is calculated from this date.",
     "dueDateLabel": "Due Date",
     "veresiyeWarning": "A customer must be selected for credit sales. Please go back to Step 2 to select a customer.",
     "vatIncluded": "VAT Included",
@@ -174,6 +176,7 @@
       "enable": "Add renewal reminder",
       "dateLabel": "Renewal / Expiry Date",
       "yearShortcut": "{{count}} Year",
+      "shortcutHint": "Shortcuts are calculated from the sale date",
       "reminderDaysLabel": "Remind how many days before",
       "noteLabel": "Reminder Note",
       "notePlaceholder": "E.g.: E-signature renewal, license extension..."

@@ -64,6 +64,7 @@ export interface CreateSaleData {
   discount_rate?: number;
   include_vat?: boolean;
   payment_method: string;
+  sale_date?: string;
   due_date?: string;
   sale_type?: string;
   notes?: string;
