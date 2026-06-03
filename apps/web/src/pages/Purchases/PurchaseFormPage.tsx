@@ -42,19 +42,25 @@ export function PurchaseFormPage() {
 
   useEffect(() => {
     (async () => {
-      try {
-        const [s, p, w] = await Promise.all([
-          suppliersApi.getAll({ limit: 1000, isActive: 'true' }),
-          productsApi.getAll({ limit: 1000, isActive: 'true' }),
-          warehousesApi.getAll({ isActive: true }),
-        ]);
-        setSuppliers(s.data);
-        setProducts(p.data);
-        setWarehouses(w.data);
-        const def = w.data.find((wh) => wh.is_default);
-        if (def) setWarehouseId(def.id);
-      } catch (err) {
+      // Promise.allSettled: bir endpoint 403 olsa bile diğerleri yüklensin
+      const [sRes, pRes, wRes] = await Promise.allSettled([
+        suppliersApi.getAll({ limit: 1000, isActive: 'true' }),
+        productsApi.getAll({ limit: 1000, isActive: 'true' }),
+        warehousesApi.getAll({ isActive: true }),
+      ]);
+      if (sRes.status === 'fulfilled') setSuppliers(sRes.value.data);
+      if (pRes.status === 'fulfilled') {
+        setProducts(pRes.value.data);
+        if (pRes.value.data.length === 0) {
+          showToast('error', t('purchases:toast.noProducts'));
+        }
+      } else {
         showToast('error', t('purchases:toast.dataLoadError'));
+      }
+      if (wRes.status === 'fulfilled') {
+        setWarehouses(wRes.value.data);
+        const def = wRes.value.data.find((wh) => wh.is_default);
+        if (def) setWarehouseId(def.id);
       }
       setLoading(false);
     })();
@@ -241,54 +247,57 @@ export function PurchaseFormPage() {
           <Button size="sm" onClick={addItem}>+ {t('purchases:form.addItem')}</Button>
         </div>
 
+        {products.length === 0 && (
+          <div className={styles.warningBox}>
+            {t('purchases:form.noProductsWarning')}
+          </div>
+        )}
+
         {items.length === 0 ? (
           <div className={styles.emptyItems}>{t('purchases:form.emptyItems')}</div>
         ) : (
-          <table className={styles.itemsTable}>
-            <thead>
-              <tr>
-                <th>{t('purchases:form.product')}</th>
-                <th style={{ width: 100 }}>{t('purchases:form.quantity')}</th>
-                <th style={{ width: 120 }}>{t('purchases:form.unitPrice')}</th>
-                <th style={{ width: 80 }}>{t('purchases:form.vatRate')}</th>
-                <th style={{ width: 100, textAlign: 'right' }}>{t('purchases:form.lineTotal')}</th>
-                <th style={{ width: 40 }}></th>
-              </tr>
-            </thead>
-            <tbody>
-              {items.map((it, idx) => {
-                const lineSub = it.quantity * it.unit_price;
-                const lineAfterDisc = lineSub * (1 - it.discount_rate / 100);
-                const vat = includeVat ? lineAfterDisc * (it.vat_rate / 100) : 0;
-                const lineTotal = lineAfterDisc + vat;
-                return (
-                  <tr key={idx}>
-                    <td>
+          <div className={styles.itemsList}>
+            {items.map((it, idx) => {
+              const lineSub = it.quantity * it.unit_price;
+              const lineAfterDisc = lineSub * (1 - it.discount_rate / 100);
+              const vat = includeVat ? lineAfterDisc * (it.vat_rate / 100) : 0;
+              const lineTotal = lineAfterDisc + vat;
+              return (
+                <div key={idx} className={styles.itemCard}>
+                  <div className={styles.itemHeader}>
+                    <span className={styles.itemNumber}>#{idx + 1}</span>
+                    <strong className={styles.itemTotal}>{formatCurrency(lineTotal)}</strong>
+                    <Button size="xs" variant="danger" onClick={() => removeItem(idx)} aria-label={t('common:buttons.delete')}>×</Button>
+                  </div>
+                  <div className={styles.itemBody}>
+                    <div className={styles.itemFieldFull}>
+                      <label>{t('purchases:form.product')}</label>
                       <Select
                         value={it.product_id}
                         onChange={(e) => handleProductChange(idx, e.target.value)}
                         options={[{ value: '', label: t('purchases:form.selectProduct') }, ...products.map((p) => ({ value: p.id, label: p.name }))]}
                         fullWidth
                       />
-                    </td>
-                    <td>
-                      <Input type="number" step="any" min="0" value={it.quantity} onChange={(e) => updateItem(idx, { quantity: parseFloat(e.target.value) || 0 })} fullWidth />
-                    </td>
-                    <td>
-                      <Input type="number" step="0.01" min="0" value={it.unit_price} onChange={(e) => updateItem(idx, { unit_price: parseFloat(e.target.value) || 0 })} fullWidth />
-                    </td>
-                    <td>
-                      <Input type="number" step="any" min="0" max="100" value={it.vat_rate} onChange={(e) => updateItem(idx, { vat_rate: parseFloat(e.target.value) || 0 })} fullWidth />
-                    </td>
-                    <td style={{ textAlign: 'right' }}><strong>{formatCurrency(lineTotal)}</strong></td>
-                    <td>
-                      <Button size="xs" variant="danger" onClick={() => removeItem(idx)}>×</Button>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+                    </div>
+                    <div className={styles.itemFieldGrid}>
+                      <div className={styles.itemField}>
+                        <label>{t('purchases:form.quantity')}</label>
+                        <Input type="number" step="any" min="0" value={it.quantity} onChange={(e) => updateItem(idx, { quantity: parseFloat(e.target.value) || 0 })} fullWidth />
+                      </div>
+                      <div className={styles.itemField}>
+                        <label>{t('purchases:form.unitPrice')}</label>
+                        <Input type="number" step="0.01" min="0" value={it.unit_price} onChange={(e) => updateItem(idx, { unit_price: parseFloat(e.target.value) || 0 })} fullWidth />
+                      </div>
+                      <div className={styles.itemField}>
+                        <label>{t('purchases:form.vatRate')} (%)</label>
+                        <Input type="number" step="any" min="0" max="100" value={it.vat_rate} onChange={(e) => updateItem(idx, { vat_rate: parseFloat(e.target.value) || 0 })} fullWidth />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         )}
       </div>
 

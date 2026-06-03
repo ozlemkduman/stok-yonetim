@@ -48,6 +48,7 @@
     "items": "Alış Kalemleri",
     "addItem": "Kalem Ekle",
     "emptyItems": "Henüz kalem eklenmedi. \"Kalem Ekle\" butonuna tıklayın.",
+    "noProductsWarning": "Henüz ürün eklenmemiş. Önce 'Ürünler' sayfasından en az bir ürün eklemelisiniz, ardından bu ürünleri alış kalemine seçebilirsiniz.",
     "product": "Ürün",
     "selectProduct": "Ürün seçin",
     "quantity": "Adet",
@@ -70,6 +71,7 @@
   "toast": {
     "loadError": "Alışlar yüklenemedi",
     "dataLoadError": "Veriler yüklenemedi",
+    "noProducts": "Ürün listesi boş — alış yapmak için önce ürün eklemelisiniz",
     "created": "Alış kaydı oluşturuldu",
     "cancelled": "Alış iptal edildi",
     "saveError": "Kayıt başarısız",
