@@ -54,6 +54,7 @@
     "wholesalePriceLabel": "Wholesale Price ({{vatStatus}})",
     "stockQuantity": "Stock Quantity",
     "minStockLevel": "Minimum Stock Level",
+    "stockSourceHint": "Stock is increased automatically when a purchase is recorded, and decreased on sales/returns. Use the 'Stock Movements' page for manual adjustments.",
     "selectCategory": "Select category...",
     "categorySoftware": "Software",
     "categoryHardware": "Hardware",
