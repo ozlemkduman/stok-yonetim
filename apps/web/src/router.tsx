@@ -41,7 +41,6 @@ import { ReportsPage } from './pages/Reports';
 import { AccountListPage, AccountDetailPage } from './pages/Accounts';
 import { WarehouseListPage, WarehouseDetailPage, StockTransferPage, StockMovementsPage } from './pages/Warehouses';
 import { QuoteListPage, QuoteDetailPage, QuoteFormPage, QuotePrintView } from './pages/Quotes';
-import { EDocumentListPage, EDocumentDetailPage } from './pages/EDocuments';
 import { IntegrationListPage, IntegrationDetailPage, ECommerceOrdersPage, BankStatementsPage } from './pages/Integrations';
 import { ContactListPage, ContactDetailPage } from './pages/CRM';
 import { RouteListPage, RouteDetailPage, RoutePlannerPage } from './pages/FieldTeam';
@@ -140,10 +139,6 @@ export function AppRouter() {
         <Route path="warehouses/transfers" element={<FeatureGate feature="warehouses"><StockTransferPage /></FeatureGate>} />
         <Route path="warehouses/movements" element={<StockMovementsPage />} />
         <Route path="warehouses/:id" element={<FeatureGate feature="warehouses"><WarehouseDetailPage /></FeatureGate>} />
-
-        {/* E-Documents */}
-        <Route path="e-documents" element={<FeatureGate feature="eDocuments"><EDocumentListPage /></FeatureGate>} />
-        <Route path="e-documents/:id" element={<FeatureGate feature="eDocuments"><EDocumentDetailPage /></FeatureGate>} />
 
         {/* Integrations */}
         <Route path="integrations" element={<FeatureGate feature="integrations"><IntegrationListPage /></FeatureGate>} />
