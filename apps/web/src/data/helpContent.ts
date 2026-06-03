@@ -69,6 +69,16 @@ export const helpContent: Record<string, HelpItem> = {
       'Her deponun anlık stok durumunu depo detay sayfasından görebilirsiniz.',
     ],
   },
+  '/warehouses/movements': {
+    title: 'Stok Hareketleri',
+    items: [
+      'Tüm ürünlerin stok giriş/çıkış geçmişini kronolojik olarak görürsünüz.',
+      'Hareket türleri: satış (-), iade (+), transfer (depolar arası), satın alma (+), sayım (manuel düzeltme).',
+      'Filtreler: ürün, hareket türü, tarih aralığı ve depo (Pro+ planlar için).',
+      'Her satırda hareket sonrası kalan stok miktarı (kümülatif) gösterilir.',
+      'Tek bir ürün için detay görmek isterseniz, ürün listesinden o ürünün detay sayfasındaki "Hareketler" sekmesine bakabilirsiniz.',
+    ],
+  },
   '/accounts': {
     title: 'Kasa / Banka Hesapları',
     items: [
@@ -85,15 +95,6 @@ export const helpContent: Record<string, HelpItem> = {
       'Gider eklerken ilgili kasa/banka hesabını seçin.',
       'Tekrarlayan giderler için not ekleyerek takibinizi kolaylaştırın.',
       'Raporlar sayfasından gider dağılımınızı grafiklerle analiz edebilirsiniz.',
-    ],
-  },
-  '/e-documents': {
-    title: 'e-Belgeler',
-    items: [
-      'e-Fatura ve e-Arşiv fatura oluşturma ve yönetimi bu sayfadan yapılır.',
-      'Satış detayından tek tıkla e-belge oluşturabilirsiniz.',
-      'GİB (Gelir İdaresi Başkanlığı) entegrasyonu ile belgeleriniz otomatik iletilir.',
-      'Belge durumlarını (gönderildi, kabul edildi, reddedildi) takip edin.',
     ],
   },
   '/crm': {
