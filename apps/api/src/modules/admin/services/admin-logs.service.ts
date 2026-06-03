@@ -85,7 +85,8 @@ export class AdminLogsService {
       query = query.where('tenant_activity_logs.created_at', '<=', endDate);
     }
 
-    const countQuery = query.clone().count('* as count').first();
+    // count query: SELECT alanlarını temizle, sadece COUNT(*) seç (yoksa PG GROUP BY hatası verir)
+    const countQuery = query.clone().clearSelect().count('tenant_activity_logs.id as count').first();
     const dataQuery = query
       .clone()
       .orderBy(`tenant_activity_logs.${sortBy}`, sortOrder)
