@@ -54,6 +54,7 @@
     "wholesalePriceLabel": "Toptan Satış Fiyatı ({{vatStatus}})",
     "stockQuantity": "Stok Miktarı",
     "minStockLevel": "Kritik Stok Seviyesi",
+    "stockSourceHint": "Stok miktarı alış kaydedildikçe otomatik artar, satış/iade ile değişir. Manuel düzenleme için 'Stok Hareketleri' sayfasını kullanın.",
     "selectCategory": "Kategori seçin...",
     "categorySoftware": "Yazılım",
     "categoryHardware": "Donanım",

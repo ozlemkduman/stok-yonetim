@@ -399,8 +399,8 @@ export function ProductListPage() {
             </div>
           </div>
 
-          <Input label={t('products:form.stockQuantity')} type="number" step="any" value={formData.stock_quantity ?? ''} onChange={(e) => setFormData({ ...formData, stock_quantity: e.target.value === '' ? undefined : parseFloat(e.target.value) })} fullWidth />
           <Input label={t('products:form.minStockLevel')} type="number" step="any" value={formData.min_stock_level ?? ''} onChange={(e) => setFormData({ ...formData, min_stock_level: e.target.value === '' ? undefined : parseFloat(e.target.value) })} fullWidth />
+          <p className={styles.priceHint}>{t('products:form.stockSourceHint')}</p>
         </div>
       </Modal>
     </div>
