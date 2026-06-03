@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Button, Badge, Card } from '@stok/ui';
+import { Button, Badge, Card, Modal, Input, Select } from '@stok/ui';
 import { salesApi, SaleDetail } from '../../api/sales.api';
+import { paymentsApi } from '../../api/payments.api';
 import { formatCurrency, formatDate, formatDateTime } from '../../utils/formatters';
 import { useToast } from '../../context/ToastContext';
 import { useConfirmDialog } from '../../context/ConfirmDialogContext';
@@ -21,6 +22,11 @@ export function SaleDetailPage() {
   const [cancelling, setCancelling] = useState(false);
   const [showPrintModal, setShowPrintModal] = useState(false);
   const [togglingInvoice, setTogglingInvoice] = useState(false);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [paymentAmount, setPaymentAmount] = useState<string>('');
+  const [paymentMethod, setPaymentMethod] = useState<'nakit' | 'kredi_karti' | 'havale'>('nakit');
+  const [paymentNotes, setPaymentNotes] = useState('');
+  const [savingPayment, setSavingPayment] = useState(false);
 
   useEffect(() => {
     if (!id) return;
@@ -56,6 +62,40 @@ export function SaleDetailPage() {
       showToast('error', err instanceof Error ? err.message : t('sales:toast.cancelError'));
     } finally {
       setCancelling(false);
+    }
+  };
+
+  const handleAddPayment = async () => {
+    if (!data || !id) return;
+    const amount = parseFloat(paymentAmount);
+    if (isNaN(amount) || amount <= 0) {
+      showToast('error', t('sales:payment.amountInvalid'));
+      return;
+    }
+    if (!data.customer_id) {
+      showToast('error', t('sales:payment.noCustomer'));
+      return;
+    }
+    setSavingPayment(true);
+    try {
+      await paymentsApi.create({
+        customer_id: data.customer_id,
+        sale_id: id,
+        amount,
+        method: paymentMethod,
+        notes: paymentNotes || undefined,
+      });
+      showToast('success', t('sales:payment.success'));
+      setShowPaymentModal(false);
+      setPaymentAmount('');
+      setPaymentNotes('');
+      setPaymentMethod('nakit');
+      const response = await salesApi.getDetail(id);
+      setData(response.data);
+    } catch (err) {
+      showToast('error', err instanceof Error ? err.message : t('sales:payment.error'));
+    } finally {
+      setSavingPayment(false);
     }
   };
 
@@ -119,6 +159,16 @@ export function SaleDetailPage() {
             </svg>
             {t('sales:detail.print')}
           </Button>
+          {data.status === 'completed' && data.payment_method === 'veresiye' && data.customer_id && (
+            <Button variant="primary" onClick={() => setShowPaymentModal(true)}>
+              {t('sales:detail.addPayment')}
+            </Button>
+          )}
+          {data.status === 'completed' && (
+            <Button variant="secondary" onClick={() => navigate(`/returns/new?saleId=${data.id}`)}>
+              {t('sales:detail.createReturn')}
+            </Button>
+          )}
           {canCancel && (
             <Button variant="danger" onClick={handleCancel} disabled={cancelling}>
               {cancelling ? t('sales:detail.cancelling') : t('sales:detail.cancelSale')}
@@ -366,6 +416,67 @@ export function SaleDetailPage() {
         onClose={() => setShowPrintModal(false)}
         data={data}
       />
+
+      {/* Tahsilat Ekle Modal */}
+      <Modal
+        isOpen={showPaymentModal}
+        onClose={() => setShowPaymentModal(false)}
+        title={t('sales:payment.title')}
+        size="md"
+      >
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          <div>
+            <label style={{ display: 'block', marginBottom: 6, fontSize: 14 }}>
+              {t('sales:payment.amountLabel')}
+            </label>
+            <Input
+              type="number"
+              step="0.01"
+              min="0.01"
+              value={paymentAmount}
+              onChange={(e) => setPaymentAmount(e.target.value)}
+              placeholder={data.grand_total ? String(data.grand_total) : '0'}
+              fullWidth
+              autoFocus
+            />
+          </div>
+          <div>
+            <label style={{ display: 'block', marginBottom: 6, fontSize: 14 }}>
+              {t('sales:payment.methodLabel')}
+            </label>
+            <Select
+              value={paymentMethod}
+              onChange={(e) => setPaymentMethod(e.target.value as 'nakit' | 'kredi_karti' | 'havale')}
+              options={[
+                { value: 'nakit', label: t('sales:stepSettings.paymentMethods.nakit') },
+                { value: 'kredi_karti', label: t('sales:stepSettings.paymentMethods.kredi_karti') },
+                { value: 'havale', label: t('sales:stepSettings.paymentMethods.havale') },
+              ]}
+              fullWidth
+            />
+          </div>
+          <div>
+            <label style={{ display: 'block', marginBottom: 6, fontSize: 14 }}>
+              {t('sales:payment.notesLabel')}
+            </label>
+            <Input
+              type="text"
+              value={paymentNotes}
+              onChange={(e) => setPaymentNotes(e.target.value)}
+              placeholder={t('sales:payment.notesPlaceholder')}
+              fullWidth
+            />
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, marginTop: 8 }}>
+            <Button variant="ghost" onClick={() => setShowPaymentModal(false)} disabled={savingPayment}>
+              {t('common:buttons.cancel')}
+            </Button>
+            <Button variant="primary" onClick={handleAddPayment} disabled={savingPayment}>
+              {savingPayment ? t('sales:payment.saving') : t('sales:payment.save')}
+            </Button>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 }

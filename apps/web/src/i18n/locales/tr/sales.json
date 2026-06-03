@@ -48,6 +48,8 @@
   "detail": {
     "backToSales": "Satışlar",
     "print": "Yazdır",
+    "createReturn": "Bu Satıştan İade",
+    "addPayment": "Tahsilat Ekle",
     "cancelSale": "Satışı İptal Et",
     "cancelling": "İptal Ediliyor...",
     "saleInfo": "Satış Bilgileri",
@@ -435,5 +437,18 @@
   },
   "confirm": {
     "cancelSale": "{{invoiceNumber}} numaralı satışı iptal etmek istediğinizden emin misiniz?"
+  },
+  "payment": {
+    "title": "Tahsilat Ekle",
+    "amountLabel": "Tutar (₺) *",
+    "methodLabel": "Ödeme Yöntemi *",
+    "notesLabel": "Açıklama",
+    "notesPlaceholder": "Örn: kısmi tahsilat, dekont no...",
+    "save": "Tahsilatı Kaydet",
+    "saving": "Kaydediliyor...",
+    "success": "Tahsilat kaydedildi",
+    "error": "Tahsilat kaydedilemedi",
+    "amountInvalid": "Geçerli bir tutar girin",
+    "noCustomer": "Bu satışta müşteri yok, tahsilat eklenemez"
   }
 }

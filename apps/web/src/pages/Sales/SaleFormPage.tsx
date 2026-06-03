@@ -172,6 +172,16 @@ export function SaleFormPage() {
 
     setSaving(true);
     try {
+      // Veresiye için vade tarihi boşsa default 30 gün sonra (satış tarihinden itibaren)
+      let effectiveDueDate = wizardData.dueDate;
+      if (wizardData.paymentMethod === 'veresiye' && !effectiveDueDate) {
+        const base = wizardData.saleDate ? new Date(wizardData.saleDate) : new Date();
+        if (!isNaN(base.getTime())) {
+          base.setDate(base.getDate() + 30);
+          effectiveDueDate = base.toISOString().split('T')[0];
+        }
+      }
+
       const data: CreateSaleData = {
         customer_id: wizardData.customerId || undefined,
         items: wizardData.items.map(item => ({
@@ -186,7 +196,7 @@ export function SaleFormPage() {
         sale_type: wizardData.saleType,
         payment_method: wizardData.paymentMethod,
         sale_date: wizardData.saleDate || undefined,
-        due_date: wizardData.dueDate || undefined,
+        due_date: effectiveDueDate || undefined,
         notes: wizardData.notes || undefined,
         has_renewal: wizardData.hasRenewal || undefined,
         renewal_date: wizardData.hasRenewal && wizardData.renewalDate ? wizardData.renewalDate : undefined,

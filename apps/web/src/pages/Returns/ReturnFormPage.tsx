@@ -27,6 +27,7 @@ export function ReturnFormPage() {
   const { t } = useTranslation(['returns', 'common']);
   const navigate = useNavigate();
   const { showToast } = useToast();
+  const initialSaleId = new URLSearchParams(window.location.search).get('saleId') || '';
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -81,6 +82,14 @@ export function ReturnFormPage() {
 
     loadData();
   }, []);
+
+  // URL'de ?saleId=X varsa, satışlar yüklendikten sonra o satışı otomatik seç
+  useEffect(() => {
+    if (!loading && initialSaleId && !saleId) {
+      handleSaleSelect(initialSaleId);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loading]);
 
   const handleSaleSelect = async (selectedSaleId: string) => {
     setSaleId(selectedSaleId);

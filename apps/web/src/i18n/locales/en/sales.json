@@ -48,6 +48,8 @@
   "detail": {
     "backToSales": "Sales",
     "print": "Print",
+    "createReturn": "Return from this Sale",
+    "addPayment": "Add Payment",
     "cancelSale": "Cancel Sale",
     "cancelling": "Cancelling...",
     "saleInfo": "Sale Information",
@@ -435,5 +437,18 @@
   },
   "confirm": {
     "cancelSale": "Are you sure you want to cancel sale {{invoiceNumber}}?"
+  },
+  "payment": {
+    "title": "Add Payment",
+    "amountLabel": "Amount (₺) *",
+    "methodLabel": "Payment Method *",
+    "notesLabel": "Notes",
+    "notesPlaceholder": "E.g.: partial payment, receipt no...",
+    "save": "Save Payment",
+    "saving": "Saving...",
+    "success": "Payment saved",
+    "error": "Could not save payment",
+    "amountInvalid": "Enter a valid amount",
+    "noCustomer": "This sale has no customer, cannot add payment"
   }
 }

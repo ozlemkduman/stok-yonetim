@@ -21,6 +21,8 @@ function accountTypeForPayment(method: string): 'kasa' | 'banka' | null {
  * "gelir" hareketi ekler ve bakiyeyi günceller.
  * Hiç uygun hesap yoksa sessizce atlanır (satışı bloklamamalı).
  * direction: +1 satış, -1 satış iptali (ters hareket).
+ * movementDate: hareketin işlendiği tarih (geri tarihli satışta sale_date,
+ *   iptalde bugünün tarihi olabilir).
  */
 async function recordSaleAccountMovement(
   trx: Knex.Transaction,
@@ -30,6 +32,7 @@ async function recordSaleAccountMovement(
   saleId: string,
   invoiceNumber: string,
   direction: 1 | -1,
+  movementDate: Date,
 ): Promise<void> {
   const accountType = accountTypeForPayment(paymentMethod);
   if (!accountType) return;
@@ -59,7 +62,7 @@ async function recordSaleAccountMovement(
     description: direction === 1 ? `Satış: ${invoiceNumber}` : `Satış iptali: ${invoiceNumber}`,
     reference_type: 'sale',
     reference_id: saleId,
-    movement_date: new Date(),
+    movement_date: movementDate,
   });
 
   await trx('accounts').where('id', account.id).update({
@@ -81,6 +84,10 @@ export class SalesService {
   async findAll(params: any) {
     const { items, total } = await this.salesRepository.findAll(params);
     return createPaginatedResult(items, total, params.page, params.limit);
+  }
+
+  async getStats(params: { search?: string; customerId?: string; status?: string; startDate?: string; endDate?: string; includeVat?: string; invoiceIssued?: string; saleType?: string }) {
+    return this.salesRepository.getStats(params);
   }
 
   async findById(id: string): Promise<Sale & { items: SaleItem[] }> {
@@ -204,6 +211,7 @@ export class SalesService {
             sale.id,
             invoiceNumber,
             1,
+            dto.sale_date ? new Date(dto.sale_date) : new Date(),
           );
         }
       }
@@ -252,7 +260,7 @@ export class SalesService {
           transaction_date: new Date(),
         });
       } else {
-        // Peşin/kart/havale satış iptalinde: hesaba ters hareket (gider)
+        // Peşin/kart/havale satış iptalinde: hesaba ters hareket (gider) — iptal bugün
         const tenantId = getCurrentTenantId();
         if (tenantId) {
           await recordSaleAccountMovement(
@@ -263,6 +271,7 @@ export class SalesService {
             sale.id,
             sale.invoice_number,
             -1,
+            new Date(),
           );
         }
       }

@@ -74,8 +74,16 @@ export interface CreateSaleData {
   reminder_note?: string;
 }
 
+export interface SalesStats {
+  count: number;
+  total: number;
+  cancelledCount: number;
+  cancelledTotal: number;
+}
+
 export const salesApi = {
   getAll: (params: Record<string, string | number> = {}) => apiClient.get<Sale[]>('/sales', params),
+  getStats: (params: Record<string, string | number> = {}) => apiClient.get<SalesStats>('/sales/stats', params),
   getById: (id: string) => apiClient.get<Sale>(`/sales/${id}`),
   getDetail: (id: string) => apiClient.get<SaleDetail>(`/sales/${id}/detail`),
   create: (data: CreateSaleData) => apiClient.post<Sale>('/sales', data),
