@@ -40,6 +40,7 @@ export function SaleFormPage() {
     customerId: '',
     warehouseId: '',
     paymentMethod: 'nakit',
+    saleDate: new Date().toISOString().split('T')[0], // default: bugün (YYYY-MM-DD)
     dueDate: '',
     includeVat: true,
     discountRate: 0,
@@ -184,6 +185,7 @@ export function SaleFormPage() {
         include_vat: wizardData.includeVat,
         sale_type: wizardData.saleType,
         payment_method: wizardData.paymentMethod,
+        sale_date: wizardData.saleDate || undefined,
         due_date: wizardData.dueDate || undefined,
         notes: wizardData.notes || undefined,
         has_renewal: wizardData.hasRenewal || undefined,

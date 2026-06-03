@@ -156,6 +156,8 @@
     "selectWarehouse": "Depo Seçin",
     "newWarehouse": "+ Yeni",
     "paymentMethodLabel": "Ödeme Yöntemi *",
+    "saleDateLabel": "Satış Tarihi",
+    "saleDateHint": "Boş bırakırsanız bugün olarak kaydedilir. Yenileme hatırlatması bu tarihten itibaren hesaplanır.",
     "dueDateLabel": "Vade Tarihi",
     "veresiyeWarning": "Veresiye satış için müşteri seçilmiş olmalıdır. Lütfen Adım 2'ye dönerek müşteri seçiniz.",
     "vatIncluded": "KDV Dahil",
@@ -168,6 +170,7 @@
       "enable": "Yenileme hatırlatması ekle",
       "dateLabel": "Yenileme / Bitiş Tarihi",
       "yearShortcut": "{{count}} Yıl",
+      "shortcutHint": "Kısayollar satış tarihinden itibaren hesaplanır",
       "reminderDaysLabel": "Kaç gün önce hatırlatsın",
       "noteLabel": "Hatırlatma Notu",
       "notePlaceholder": "Örneğin: E-imza yenileme, lisans uzatma..."
