@@ -193,20 +193,19 @@ export function ReportsPage() {
 
   // Yüklemeden sonra ?focus=<id> varsa ilgili karta scroll
   useEffect(() => {
-    if (!loading && focusRef.current) {
-      const target = focusRef.current;
-      // Kısa gecikme: tab değişimi sonrası DOM'un render olmasını bekle
-      const timer = setTimeout(() => {
-        const el = document.getElementById(target);
-        if (el) {
-          el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-          el.classList.add(styles.flashHighlight);
-          setTimeout(() => el.classList.remove(styles.flashHighlight), 2000);
-        }
-      }, 100);
-      focusRef.current = null;
-      return () => clearTimeout(timer);
-    }
+    if (loading || !focusRef.current) return;
+    const target = focusRef.current;
+    // Kısa gecikme: tab değişimi sonrası DOM'un render olmasını bekle
+    const timer = setTimeout(() => {
+      const el = document.getElementById(target);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        el.classList.add(styles.flashHighlight);
+        setTimeout(() => el.classList.remove(styles.flashHighlight), 2000);
+      }
+    }, 100);
+    focusRef.current = null;
+    return () => clearTimeout(timer);
   }, [loading, activeTab]);
 
   const renderGenelTab = () => (
