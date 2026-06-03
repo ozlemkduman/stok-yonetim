@@ -49,6 +49,7 @@ const icons = {
 type VatFilter = 'all' | 'with_vat' | 'without_vat';
 type InvoiceFilter = 'all' | 'issued' | 'not_issued';
 type SaleTypeFilter = 'all' | 'retail' | 'wholesale';
+type StatusFilter = 'active' | 'cancelled' | 'all';
 
 export function SaleListPage() {
   const navigate = useNavigate();
@@ -65,6 +66,7 @@ export function SaleListPage() {
   const [vatFilter, setVatFilter] = useState<VatFilter>('all');
   const [invoiceFilter, setInvoiceFilter] = useState<InvoiceFilter>('all');
   const [saleTypeFilter, setSaleTypeFilter] = useState<SaleTypeFilter>('all');
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>('active');
   const { showToast } = useToast();
   const { confirm } = useConfirmDialog();
 
@@ -80,6 +82,8 @@ export function SaleListPage() {
       if (invoiceFilter === 'issued') params.invoiceIssued = 'true';
       if (invoiceFilter === 'not_issued') params.invoiceIssued = 'false';
       if (saleTypeFilter !== 'all') params.saleType = saleTypeFilter;
+      if (statusFilter === 'active') params.status = 'completed';
+      else if (statusFilter === 'cancelled') params.status = 'cancelled';
 
       const response = await salesApi.getAll(params);
       setSales(response.data);
@@ -101,7 +105,7 @@ export function SaleListPage() {
     setLoading(false);
   };
 
-  useEffect(() => { fetchSales(); }, [page, search, startDate, endDate, vatFilter, invoiceFilter, saleTypeFilter]);
+  useEffect(() => { fetchSales(); }, [page, search, startDate, endDate, vatFilter, invoiceFilter, saleTypeFilter, statusFilter]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -131,6 +135,11 @@ export function SaleListPage() {
 
   const handleSaleTypeFilterChange = (filter: SaleTypeFilter) => {
     setSaleTypeFilter(filter);
+    setPage(1);
+  };
+
+  const handleStatusFilterChange = (filter: StatusFilter) => {
+    setStatusFilter(filter);
     setPage(1);
   };
 
@@ -374,6 +383,32 @@ export function SaleListPage() {
               onClick={() => handleInvoiceFilterChange('not_issued')}
             >
               {t('sales:list.filters.notIssued')}
+            </button>
+          </div>
+        </div>
+
+        <div className={styles.filterDivider} />
+
+        <div className={styles.filterGroup}>
+          <span className={styles.filterLabel}>{t('sales:list.filters.status')}</span>
+          <div className={styles.tabs}>
+            <button
+              className={`${styles.tab} ${statusFilter === 'active' ? styles.tabActive : ''}`}
+              onClick={() => handleStatusFilterChange('active')}
+            >
+              {t('sales:list.filters.statusActive')}
+            </button>
+            <button
+              className={`${styles.tab} ${statusFilter === 'cancelled' ? styles.tabActive : ''}`}
+              onClick={() => handleStatusFilterChange('cancelled')}
+            >
+              {t('sales:list.filters.statusCancelled')}
+            </button>
+            <button
+              className={`${styles.tab} ${statusFilter === 'all' ? styles.tabActive : ''}`}
+              onClick={() => handleStatusFilterChange('all')}
+            >
+              {t('sales:list.filters.all')}
             </button>
           </div>
         </div>
