@@ -311,8 +311,8 @@ export class QuotesService {
         }
       }
 
-      // Update quote status
-      await this.repository.updateStatus(id, 'converted', sale.id);
+      // Update quote status (aynı trx içinde — FK constraint sale.id'yi görmeli)
+      await this.repository.updateStatus(id, 'converted', sale.id, trx);
 
       return sale;
     });

@@ -162,12 +162,15 @@ export class QuotesRepository extends BaseTenantRepository<Quote> {
     await query.insert(itemsData);
   }
 
-  async updateStatus(id: string, status: string, convertedSaleId?: string): Promise<void> {
+  async updateStatus(id: string, status: string, convertedSaleId?: string, trx?: Knex.Transaction): Promise<void> {
     const updateData: any = { status, updated_at: this.knex.fn.now() };
     if (convertedSaleId) {
       updateData.converted_sale_id = convertedSaleId;
     }
-    await this.query.where(`${this.tableName}.id`, id).update(updateData);
+    // trx verilirse aynı transaction üzerinden gider (FK ile yeni insert edilmiş satışlar görünür).
+    const baseQuery = trx ? trx(this.tableName) : this.knex(this.tableName);
+    const query = this.applyTenantFilter(baseQuery);
+    await query.where(`${this.tableName}.id`, id).update(updateData);
   }
 
   async deleteQuote(id: string): Promise<void> {
