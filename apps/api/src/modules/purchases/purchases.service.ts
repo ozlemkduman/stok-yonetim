@@ -121,9 +121,12 @@ export class PurchasesService {
           line_total: lineTotal,
         });
 
-        // Stok artır (sale'in tam tersi)
+        // Stok artır + ürünün referans alış fiyatını son alıştaki fiyata güncelle.
+        // İskonto sonrası birim maliyet → kâr/zarar raporları için doğru COGS değeri.
+        const effectiveUnitCost = item.quantity > 0 ? lineAfterDiscount / item.quantity : item.unit_price;
         await trx('products').where('id', item.product_id).update({
           stock_quantity: trx.raw('stock_quantity + ?', [item.quantity]),
+          purchase_price: effectiveUnitCost,
           updated_at: trx.fn.now(),
         });
       }
