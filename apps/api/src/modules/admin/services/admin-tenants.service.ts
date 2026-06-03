@@ -15,6 +15,12 @@ export interface CreateTenantDto {
   planId?: string;
   billingEmail?: string;
   status?: string;
+  /**
+   * Üyelik süresi (gün). status='trial' → trial_ends_at, diğer durumda
+   * subscription_ends_at = now + durationDays olarak set edilir.
+   * Boş bırakılırsa süresiz.
+   */
+  durationDays?: number;
 }
 
 export interface UpdateTenantDto {
@@ -24,6 +30,7 @@ export interface UpdateTenantDto {
   billingEmail?: string;
   status?: string;
   settings?: Record<string, any>;
+  durationDays?: number;
 }
 
 @Injectable()
@@ -63,14 +70,30 @@ export class AdminTenantsService {
       }
     }
 
+    // durationDays varsa status'a göre uygun "ends_at" alanını hesapla
+    const effectiveStatus = dto.status || 'active';
+    let trialEndsAt: Date | undefined;
+    let subscriptionEndsAt: Date | undefined;
+    if (dto.durationDays && dto.durationDays > 0) {
+      const end = new Date();
+      end.setDate(end.getDate() + dto.durationDays);
+      if (effectiveStatus === 'trial') {
+        trialEndsAt = end;
+      } else {
+        subscriptionEndsAt = end;
+      }
+    }
+
     const tenant = await this.tenantsRepository.create({
       name: dto.name,
       slug,
       domain: dto.domain,
       plan_id: dto.planId,
       billing_email: dto.billingEmail,
-      status: dto.status || 'active',
+      status: effectiveStatus,
       settings: {},
+      trial_ends_at: trialEndsAt,
+      subscription_ends_at: subscriptionEndsAt,
     });
 
     return tenant;
@@ -90,14 +113,27 @@ export class AdminTenantsService {
       }
     }
 
-    const updated = await this.tenantsRepository.update(id, {
+    // durationDays verilirse mevcut tarihten itibaren süreyi yeniden hesapla
+    const updateData: any = {
       name: dto.name,
       domain: dto.domain,
       plan_id: dto.planId,
       billing_email: dto.billingEmail,
       status: dto.status,
       settings: dto.settings,
-    } as any);
+    };
+    if (dto.durationDays && dto.durationDays > 0) {
+      const end = new Date();
+      end.setDate(end.getDate() + dto.durationDays);
+      const effectiveStatus = dto.status || tenant.status;
+      if (effectiveStatus === 'trial') {
+        updateData.trial_ends_at = end;
+      } else {
+        updateData.subscription_ends_at = end;
+      }
+    }
+
+    const updated = await this.tenantsRepository.update(id, updateData);
 
     return updated;
   }

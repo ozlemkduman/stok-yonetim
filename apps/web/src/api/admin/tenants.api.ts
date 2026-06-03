@@ -35,6 +35,8 @@ export interface CreateTenantData {
   planId?: string;
   billingEmail?: string;
   status?: string;
+  /** Süre (gün). status='trial' → trial_ends_at, diğer durumlarda subscription_ends_at. */
+  durationDays?: number;
 }
 
 export interface UpdateTenantData {
@@ -44,6 +46,7 @@ export interface UpdateTenantData {
   billingEmail?: string;
   status?: string;
   settings?: Record<string, any>;
+  durationDays?: number;
 }
 
 export interface TenantListParams {
