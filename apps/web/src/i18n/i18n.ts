@@ -15,7 +15,6 @@ import trExpenses from './locales/tr/expenses.json';
 import trAccounts from './locales/tr/accounts.json';
 import trWarehouses from './locales/tr/warehouses.json';
 import trQuotes from './locales/tr/quotes.json';
-import trEdocuments from './locales/tr/edocuments.json';
 import trReports from './locales/tr/reports.json';
 import trSettings from './locales/tr/settings.json';
 import trAdmin from './locales/tr/admin.json';
@@ -36,7 +35,6 @@ import enExpenses from './locales/en/expenses.json';
 import enAccounts from './locales/en/accounts.json';
 import enWarehouses from './locales/en/warehouses.json';
 import enQuotes from './locales/en/quotes.json';
-import enEdocuments from './locales/en/edocuments.json';
 import enReports from './locales/en/reports.json';
 import enSettings from './locales/en/settings.json';
 import enAdmin from './locales/en/admin.json';
@@ -47,7 +45,7 @@ import enIntegrations from './locales/en/integrations.json';
 const ns = [
   'common', 'nav', 'landing', 'auth', 'dashboard', 'sales', 'products',
   'customers', 'returns', 'expenses', 'accounts', 'warehouses', 'quotes',
-  'edocuments', 'reports', 'settings', 'admin', 'crm', 'fieldteam', 'integrations',
+  'reports', 'settings', 'admin', 'crm', 'fieldteam', 'integrations',
 ] as const;
 
 i18n
@@ -60,7 +58,7 @@ i18n
         dashboard: trDashboard, sales: trSales, products: trProducts,
         customers: trCustomers, returns: trReturns, expenses: trExpenses,
         accounts: trAccounts, warehouses: trWarehouses, quotes: trQuotes,
-        edocuments: trEdocuments, reports: trReports, settings: trSettings,
+        reports: trReports, settings: trSettings,
         admin: trAdmin, crm: trCrm, fieldteam: trFieldteam, integrations: trIntegrations,
       },
       en: {
@@ -68,7 +66,7 @@ i18n
         dashboard: enDashboard, sales: enSales, products: enProducts,
         customers: enCustomers, returns: enReturns, expenses: enExpenses,
         accounts: enAccounts, warehouses: enWarehouses, quotes: enQuotes,
-        edocuments: enEdocuments, reports: enReports, settings: enSettings,
+        reports: enReports, settings: enSettings,
         admin: enAdmin, crm: enCrm, fieldteam: enFieldteam, integrations: enIntegrations,
       },
     },
