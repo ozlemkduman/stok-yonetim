@@ -11,7 +11,7 @@
     "badge": "Türkiye'nin Yeni Nesil Stok Yönetim Platformu",
     "titleLine1": "İşletmenizi",
     "titleHighlight": "Dijitale Taşıyoruz",
-    "subtitle": "Stok takibi, satış yönetimi, e-Fatura, raporlama ve CRM — hepsi tek platformda. Excel dosyalarına, dağılan bilgilere ve kayıp stoklara elveda deyin.",
+    "subtitle": "Stok takibi, satış yönetimi, müşteri cari hesabı, raporlama ve CRM — hepsi tek platformda. Excel dosyalarına, dağılan bilgilere ve kayıp stoklara elveda deyin.",
     "ctaPrimary": "45 Gün Ücretsiz Dene",
     "ctaSecondary": "Nasıl Çalışır?",
     "note": "Kredi kartı gerekmez \u00b7 Hemen başlayabilirsiniz"
@@ -38,9 +38,9 @@
       "after": "Telefonunuzdan anlık stok durumunu görün. Kritik seviyeye düşen ürünler için otomatik uyarı alın."
     },
     "1": {
-      "title": "Fatura Takibi",
-      "before": "Faturalarınız başka portalde, satışlarınız başka yerde — eşleştirmek için saatler harcıyorsunuz.",
-      "after": "e-Fatura XML dosyanızı sisteme aktarın, satışlarla otomatik eşleşsin. Tüm belgeler tek ekranda."
+      "title": "Fatura Import",
+      "before": "Tedarikçi faturaları başka portalde, satışlarınız başka yerde — manuel girmek için saatler harcıyorsunuz.",
+      "after": "Tedarikçi faturalarınızı XML / CSV / Excel olarak toplu yükleyin, sisteme aktarılsın. Stoklar ve müşteri kayıtları otomatik güncellensin."
     },
     "2": {
       "title": "Kâr mı Ediyorum?",
@@ -68,7 +68,7 @@
     "subtitle": "İşletmenizi büyütmek için ihtiyacınız olan tüm araçlar tek çatıda",
     "0": { "title": "Stok Takibi", "desc": "Ürünlerinizi kategorilere ayırın, stok seviyelerini anlık takip edin. Kritik stok uyarıları ile hiçbir ürünü kaybetmeyin." },
     "1": { "title": "Satış Yönetimi", "desc": "Satışlarınızı kaydedin, faturalayın ve tek ekranda tüm satış geçmişinizi görüntüleyin." },
-    "2": { "title": "e-Belge", "desc": "e-Fatura ve e-Arşiv belgelerinizi saniyeler içinde oluşturun, müşterilerinize gönderin." },
+    "2": { "title": "Cari Hesap & Tahsilat", "desc": "Veresiye satışlar, müşteri borç/alacakları ve kısmi tahsilatlar tek ekranda. Vade tarihi geçenler için otomatik bildirim." },
     "3": { "title": "Raporlama", "desc": "Detaylı satış, stok ve kâr/zarar raporları ile işletmenizin nabzını tutun." },
     "4": { "title": "CRM", "desc": "Müşterilerinizi yönetin, iletişim geçmişini takip edin, satış fırsatlarını kaçırmayın." },
     "5": { "title": "Depo Yönetimi", "desc": "Birden fazla depo ile stok transferlerini ve hareketlerini kolayca yönetin." }
@@ -92,7 +92,7 @@
     "1": {
       "name": "Fatma K.",
       "role": "Toptan Gıda",
-      "text": "e-Fatura entegrasyonu muhteşem. Eskiden her fatura için 10 dakika harcıyordum, şimdi tek tıkla hazırlanıyor.",
+      "text": "Veresiye satışlar ve müşteri cari hesap takibi muhteşem. Kimin ne kadar borcu olduğunu artık anında görebiliyorum, tahsilat kaçırmıyorum.",
       "avatar": "FK"
     },
     "2": {
