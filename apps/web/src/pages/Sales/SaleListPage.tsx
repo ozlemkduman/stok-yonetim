@@ -85,14 +85,15 @@ export function SaleListPage() {
       setSales(response.data);
       setTotalPages(response.meta?.totalPages || 1);
 
-      // Calculate stats
+      // Calculate stats — ciro/toplam iptal edilenleri içermez
       const allSales = response.data;
+      const activeSales = allSales.filter(s => s.status !== 'cancelled');
       setStats({
-        total: allSales.reduce((sum, s) => sum + parseFloat(String(s.grand_total) || '0'), 0),
+        total: activeSales.reduce((sum, s) => sum + parseFloat(String(s.grand_total) || '0'), 0),
         count: response.meta?.total || allSales.length,
         completed: allSales.filter(s => s.status === 'completed').length,
         cancelled: allSales.filter(s => s.status === 'cancelled').length,
-        noVatCount: allSales.filter(s => !s.include_vat).length,
+        noVatCount: activeSales.filter(s => !s.include_vat).length,
       });
     } catch (err) {
       showToast('error', t('sales:toast.loadError'));
