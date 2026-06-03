@@ -1,7 +1,6 @@
 import { Injectable, Logger, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import knex, { Knex } from 'knex';
-import * as path from 'path';
 import * as bcrypt from 'bcryptjs';
 
 @Injectable()
@@ -30,20 +29,10 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
       throw error;
     }
 
-    // Auto-run migrations on startup
-    try {
-      const migrationsDir = path.resolve(__dirname, 'migrations');
-      const [batch, migrations] = await this._knex.migrate.latest({
-        directory: migrationsDir,
-      });
-      if (migrations.length > 0) {
-        this.logger.log(`Ran ${migrations.length} migrations (batch ${batch})`);
-      } else {
-        this.logger.log('Database schema is up to date');
-      }
-    } catch (error) {
-      this.logger.error('Migration failed', error);
-    }
+    // NOT: Migration'lar start.sh tarafından ts-node + src/database/migrations
+    // üzerinden idempotent advisory lock ile çalıştırılıyor. Burada tekrar
+    // çağırmıyoruz; aksi halde dist altında migration dosyaları olmadığı için
+    // "migration directory is corrupt" hatası verir.
 
     // Ensure plans and super admin exist
     await this.ensurePlansAndAdmin();
