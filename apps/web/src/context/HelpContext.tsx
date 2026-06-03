@@ -1,6 +1,6 @@
-import { createContext, useContext, useState, useCallback, type ReactNode } from 'react';
+import { createContext, useContext, useEffect, useState, useCallback, type ReactNode } from 'react';
 import { useLocation } from 'react-router-dom';
-import { Modal } from '@stok/ui';
+import { HelpDrawer } from '../components/HelpDrawer';
 import { getHelpContent } from '../data/helpContent';
 
 interface HelpContextValue {
@@ -17,6 +17,11 @@ export function HelpProvider({ children }: { children: ReactNode }) {
   const content = getHelpContent(location.pathname);
   const hasHelp = content !== null;
 
+  // Sayfa değişince paneli kapat
+  useEffect(() => {
+    setIsOpen(false);
+  }, [location.pathname]);
+
   const openHelp = useCallback(() => {
     if (content) {
       setIsOpen(true);
@@ -31,28 +36,15 @@ export function HelpProvider({ children }: { children: ReactNode }) {
     <HelpContext.Provider value={{ openHelp, hasHelp }}>
       {children}
       {content && (
-        <Modal
-          isOpen={isOpen}
-          onClose={closeHelp}
-          title={content.title}
-          size="md"
-        >
-          <ul style={{ margin: 0, padding: '0 0 0 1.25rem', listStyle: 'disc' }}>
+        <HelpDrawer isOpen={isOpen} onClose={closeHelp} title={content.title}>
+          <ul style={{ margin: 0, padding: '0 0 0 1.1rem', listStyle: 'disc' }}>
             {content.items.map((item, i) => (
-              <li
-                key={i}
-                style={{
-                  fontSize: '14px',
-                  lineHeight: '1.7',
-                  color: 'var(--color-text-secondary)',
-                  marginBottom: '8px',
-                }}
-              >
+              <li key={i} style={{ marginBottom: '12px' }}>
                 {item}
               </li>
             ))}
           </ul>
-        </Modal>
+        </HelpDrawer>
       )}
     </HelpContext.Provider>
   );
