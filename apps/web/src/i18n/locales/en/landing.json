@@ -11,7 +11,7 @@
     "badge": "Turkey's Next-Generation Inventory Management Platform",
     "titleLine1": "We Bring Your",
     "titleHighlight": "Business to Digital",
-    "subtitle": "Inventory tracking, sales management, e-Invoice, reporting and CRM — all in one platform. Say goodbye to Excel files, scattered data and lost stock.",
+    "subtitle": "Inventory tracking, sales management, customer accounts, reporting and CRM — all in one platform. Say goodbye to Excel files, scattered data and lost stock.",
     "ctaPrimary": "45-Day Free Trial",
     "ctaSecondary": "How It Works?",
     "note": "No credit card required \u00b7 Start right away"
@@ -38,9 +38,9 @@
       "after": "See real-time stock status from your phone. Get automatic alerts for products dropping to critical levels."
     },
     "1": {
-      "title": "Invoice Tracking",
-      "before": "Your invoices are on one portal, your sales are elsewhere — you spend hours matching them.",
-      "after": "Import your e-Invoice XML file into the system, auto-match with sales. All documents on one screen."
+      "title": "Invoice Import",
+      "before": "Supplier invoices are on one portal, your sales are elsewhere — you spend hours entering them manually.",
+      "after": "Bulk-upload supplier invoices as XML / CSV / Excel. Stock and customer records update automatically."
     },
     "2": {
       "title": "Am I Making Profit?",
@@ -68,7 +68,7 @@
     "subtitle": "All the tools you need to grow your business under one roof",
     "0": { "title": "Inventory Tracking", "desc": "Categorize your products, track stock levels in real-time. Never lose a product with critical stock alerts." },
     "1": { "title": "Sales Management", "desc": "Record your sales, invoice them and view your entire sales history on a single screen." },
-    "2": { "title": "e-Document", "desc": "Create your e-Invoice and e-Archive documents in seconds, send them to your customers." },
+    "2": { "title": "Customer Accounts & Collections", "desc": "Track credit sales, customer balances and partial payments in one screen. Automatic alerts for overdue invoices." },
     "3": { "title": "Reporting", "desc": "Keep your finger on the pulse of your business with detailed sales, stock and profit/loss reports." },
     "4": { "title": "CRM", "desc": "Manage your customers, track communication history, never miss sales opportunities." },
     "5": { "title": "Warehouse Management", "desc": "Easily manage stock transfers and movements with multiple warehouses." }
@@ -92,7 +92,7 @@
     "1": {
       "name": "Fatma K.",
       "role": "Wholesale Food",
-      "text": "e-Invoice integration is amazing. I used to spend 10 minutes per invoice, now it's ready with one click.",
+      "text": "Credit sales and customer current account tracking are amazing. I can now see who owes how much instantly — never miss a payment.",
       "avatar": "FK"
     },
     "2": {
