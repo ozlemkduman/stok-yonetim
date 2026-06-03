@@ -23,6 +23,8 @@
     "no": "Hayır"
   },
   "labels": {
+    "saving": "Kaydediliyor...",
+    "loading": "Yükleniyor...",
     "name": "Ad",
     "email": "E-posta",
     "phone": "Telefon",

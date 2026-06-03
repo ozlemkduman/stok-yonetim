@@ -10,6 +10,8 @@ import trDashboard from './locales/tr/dashboard.json';
 import trSales from './locales/tr/sales.json';
 import trProducts from './locales/tr/products.json';
 import trCustomers from './locales/tr/customers.json';
+import trSuppliers from './locales/tr/suppliers.json';
+import trPurchases from './locales/tr/purchases.json';
 import trReturns from './locales/tr/returns.json';
 import trExpenses from './locales/tr/expenses.json';
 import trAccounts from './locales/tr/accounts.json';
@@ -30,6 +32,8 @@ import enDashboard from './locales/en/dashboard.json';
 import enSales from './locales/en/sales.json';
 import enProducts from './locales/en/products.json';
 import enCustomers from './locales/en/customers.json';
+import enSuppliers from './locales/en/suppliers.json';
+import enPurchases from './locales/en/purchases.json';
 import enReturns from './locales/en/returns.json';
 import enExpenses from './locales/en/expenses.json';
 import enAccounts from './locales/en/accounts.json';
@@ -44,7 +48,7 @@ import enIntegrations from './locales/en/integrations.json';
 
 const ns = [
   'common', 'nav', 'landing', 'auth', 'dashboard', 'sales', 'products',
-  'customers', 'returns', 'expenses', 'accounts', 'warehouses', 'quotes',
+  'customers', 'suppliers', 'purchases', 'returns', 'expenses', 'accounts', 'warehouses', 'quotes',
   'reports', 'settings', 'admin', 'crm', 'fieldteam', 'integrations',
 ] as const;
 
@@ -56,7 +60,8 @@ i18n
       tr: {
         common: trCommon, nav: trNav, landing: trLanding, auth: trAuth,
         dashboard: trDashboard, sales: trSales, products: trProducts,
-        customers: trCustomers, returns: trReturns, expenses: trExpenses,
+        customers: trCustomers, suppliers: trSuppliers, purchases: trPurchases,
+        returns: trReturns, expenses: trExpenses,
         accounts: trAccounts, warehouses: trWarehouses, quotes: trQuotes,
         reports: trReports, settings: trSettings,
         admin: trAdmin, crm: trCrm, fieldteam: trFieldteam, integrations: trIntegrations,
@@ -64,7 +69,8 @@ i18n
       en: {
         common: enCommon, nav: enNav, landing: enLanding, auth: enAuth,
         dashboard: enDashboard, sales: enSales, products: enProducts,
-        customers: enCustomers, returns: enReturns, expenses: enExpenses,
+        customers: enCustomers, suppliers: enSuppliers, purchases: enPurchases,
+        returns: enReturns, expenses: enExpenses,
         accounts: enAccounts, warehouses: enWarehouses, quotes: enQuotes,
         reports: enReports, settings: enSettings,
         admin: enAdmin, crm: enCrm, fieldteam: enFieldteam, integrations: enIntegrations,

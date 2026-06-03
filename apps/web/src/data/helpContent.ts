@@ -14,6 +14,26 @@ export const helpContent: Record<string, HelpItem> = {
       'Mevcut planınız Basic veya Pro ise üstte plan yükseltme önerisi gözükür.',
     ],
   },
+  '/suppliers': {
+    title: 'Tedarikçiler',
+    items: [
+      'Tedarikçi = mal/hizmet aldığınız firmalar. Müşterilerden ayrı liste tutulur.',
+      'Bakiye işareti: NEGATİF = siz tedarikçiye borçlusunuz. POZİTİF = tedarikçi size borçlu (örn. iade sonrası).',
+      'Veresiye alış yaptığınızda tedarikçi bakiyesi otomatik olarak borç tarafına işler.',
+      'Tedarikçi silindiğinde sadece pasifleştirilir; alış geçmişi korunur.',
+    ],
+  },
+  '/purchases': {
+    title: 'Alışlar',
+    items: [
+      'Tedarikçiden yapılan mal/hizmet alımları bu sayfada kaydedilir.',
+      'Alış oluşturulduğunda: kalemlerin stokları OTOMATİK ARTAR.',
+      'Ödeme yöntemine göre: Nakit/Kart/Havale → kasa/banka hesabı azalır (gider); Veresiye → tedarikçi cari hesabı borçlanır.',
+      'Tedarikçi Fatura No alanına, tedarikçinin verdiği orijinal fatura numarasını yazın (eşleştirme için).',
+      'Alış iptal edildiğinde stoklar geri alınır; iptal anında bu ürünler satılmış olamaz (yetersiz stoğa düşürmemek için).',
+      'Durum filtresi ile aktif/iptal/tümü görünümleri arasında geçiş yapın.',
+    ],
+  },
   '/customers': {
     title: 'Müşteriler',
     items: [

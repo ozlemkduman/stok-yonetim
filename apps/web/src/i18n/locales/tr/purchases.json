@@ -1,0 +1,96 @@
+{
+  "pageTitle": "Alışlar",
+  "subtitle": "Tedarikçilerden yapılan alışların kayıt ve takibi",
+  "newPurchase": "+ Yeni Alış",
+  "searchPlaceholder": "Alış no, tedarikçi veya fatura no ile ara...",
+  "empty": "Henüz alış kaydı yok",
+  "columns": {
+    "number": "Alış No",
+    "date": "Tarih",
+    "supplier": "Tedarikçi",
+    "paymentMethod": "Ödeme",
+    "total": "Toplam",
+    "status": "Durum"
+  },
+  "filters": {
+    "active": "Aktif",
+    "cancelled": "İptal",
+    "all": "Tümü"
+  },
+  "stats": {
+    "totalPurchases": "Toplam Alış (adet)",
+    "totalAmount": "Toplam Tutar",
+    "cancelledCount": "İptal Edilen"
+  },
+  "paymentMethods": {
+    "nakit": "Nakit",
+    "kredi_karti": "Kredi Kartı",
+    "havale": "Havale/EFT",
+    "veresiye": "Veresiye"
+  },
+  "statuses": {
+    "completed": "Tamamlandı",
+    "cancelled": "İptal Edildi"
+  },
+  "form": {
+    "title": "Yeni Alış",
+    "back": "Alışlar",
+    "basicInfo": "Temel Bilgiler",
+    "supplier": "Tedarikçi",
+    "selectSupplier": "Tedarikçi seçin",
+    "warehouse": "Depo",
+    "purchaseDate": "Alış Tarihi",
+    "supplierInvoiceNo": "Tedarikçi Fatura No",
+    "supplierInvoiceNoPlaceholder": "Tedarikçinin verdiği fatura numarası",
+    "paymentMethod": "Ödeme Yöntemi *",
+    "dueDate": "Vade Tarihi",
+    "vatIncluded": "KDV Dahil",
+    "items": "Alış Kalemleri",
+    "addItem": "Kalem Ekle",
+    "emptyItems": "Henüz kalem eklenmedi. \"Kalem Ekle\" butonuna tıklayın.",
+    "product": "Ürün",
+    "selectProduct": "Ürün seçin",
+    "quantity": "Adet",
+    "unitPrice": "Birim Fiyat",
+    "vatRate": "KDV %",
+    "lineTotal": "Tutar",
+    "notes": "Not",
+    "notesPlaceholder": "Ek açıklama...",
+    "subtotal": "Ara Toplam",
+    "vatTotal": "KDV Toplam",
+    "grandTotal": "Genel Toplam",
+    "save": "Alışı Kaydet"
+  },
+  "validation": {
+    "addItem": "En az bir kalem ekleyin",
+    "selectProduct": "Tüm kalemlerde ürün seçin",
+    "invalidQuantity": "Geçerli bir miktar girin",
+    "creditNeedsSupplier": "Veresiye alış için tedarikçi seçilmelidir"
+  },
+  "toast": {
+    "loadError": "Alışlar yüklenemedi",
+    "dataLoadError": "Veriler yüklenemedi",
+    "created": "Alış kaydı oluşturuldu",
+    "cancelled": "Alış iptal edildi",
+    "saveError": "Kayıt başarısız",
+    "cancelError": "İptal başarısız"
+  },
+  "detail": {
+    "back": "Alışlar",
+    "notFound": "Alış bulunamadı",
+    "info": "Alış Bilgileri",
+    "supplierInvoiceNo": "Tedarikçi Fatura No",
+    "paymentMethod": "Ödeme",
+    "dueDate": "Vade",
+    "createdBy": "Kaydeden",
+    "amounts": "Tutarlar",
+    "discount": "İskonto",
+    "items": "Kalemler ({{count}})",
+    "notes": "Not",
+    "cancel": "Alışı İptal Et",
+    "cancelling": "İptal Ediliyor..."
+  },
+  "confirm": {
+    "cancel": "{{number}} numaralı alışı iptal etmek istediğinize emin misiniz? Stoklar geri alınacak."
+  }
+}

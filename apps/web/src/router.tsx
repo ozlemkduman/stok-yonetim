@@ -33,6 +33,8 @@ import { TenantSettingsPage, UserManagementPage, ProfilePage } from './pages/Set
 // Main App Pages
 import { DashboardPage } from './pages/Dashboard';
 import { CustomerListPage, CustomerDetailPage, CustomerImportPage } from './pages/Customers';
+import { SupplierListPage } from './pages/Suppliers';
+import { PurchaseListPage, PurchaseFormPage, PurchaseDetailPage } from './pages/Purchases';
 import { ProductListPage, ProductDetailPage } from './pages/Products';
 import { SaleListPage, SaleDetailPage, SaleFormPage, InvoiceImportPage } from './pages/Sales';
 import { ReturnListPage, ReturnDetailPage, ReturnFormPage } from './pages/Returns';
@@ -104,6 +106,14 @@ export function AppRouter() {
         <Route path="customers" element={<CustomerListPage />} />
         <Route path="customers/import" element={<CustomerImportPage />} />
         <Route path="customers/:id" element={<CustomerDetailPage />} />
+
+        {/* Suppliers */}
+        <Route path="suppliers" element={<SupplierListPage />} />
+
+        {/* Purchases */}
+        <Route path="purchases" element={<PurchaseListPage />} />
+        <Route path="purchases/new" element={<PurchaseFormPage />} />
+        <Route path="purchases/:id" element={<PurchaseDetailPage />} />
 
         {/* Products */}
         <Route path="products" element={<ProductListPage />} />

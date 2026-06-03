@@ -1,0 +1,40 @@
+{
+  "pageTitle": "Suppliers",
+  "subtitle": "{{count}} total suppliers",
+  "newSupplier": "+ New Supplier",
+  "searchPlaceholder": "Search supplier...",
+  "empty": "No suppliers added yet",
+  "newTitle": "New Supplier",
+  "editTitle": "Edit Supplier",
+  "debtSuffix": "(we owe)",
+  "creditSuffix": "(owes us)",
+  "columns": {
+    "name": "Name",
+    "phone": "Phone",
+    "taxNumber": "Tax No",
+    "balance": "Balance"
+  },
+  "form": {
+    "name": "Name *",
+    "phone": "Phone",
+    "email": "Email",
+    "address": "Address",
+    "taxNumber": "Tax Number",
+    "taxOffice": "Tax Office",
+    "notes": "Notes"
+  },
+  "validation": {
+    "nameRequired": "Supplier name is required"
+  },
+  "toast": {
+    "loadError": "Failed to load suppliers",
+    "created": "Supplier created",
+    "updated": "Supplier updated",
+    "deleted": "Supplier deactivated",
+    "saveError": "Save failed",
+    "deleteError": "Delete failed"
+  },
+  "confirm": {
+    "delete": "Are you sure you want to deactivate supplier {{name}}?"
+  }
+}

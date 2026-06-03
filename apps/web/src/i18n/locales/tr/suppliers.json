@@ -1,0 +1,40 @@
+{
+  "pageTitle": "Tedarikçiler",
+  "subtitle": "Toplam {{count}} tedarikçi",
+  "newSupplier": "+ Yeni Tedarikçi",
+  "searchPlaceholder": "Tedarikçi ara...",
+  "empty": "Henüz tedarikçi eklenmedi",
+  "newTitle": "Yeni Tedarikçi",
+  "editTitle": "Tedarikçi Düzenle",
+  "debtSuffix": "(borcumuz)",
+  "creditSuffix": "(alacağımız)",
+  "columns": {
+    "name": "Ad",
+    "phone": "Telefon",
+    "taxNumber": "Vergi No",
+    "balance": "Bakiye"
+  },
+  "form": {
+    "name": "Ad *",
+    "phone": "Telefon",
+    "email": "E-posta",
+    "address": "Adres",
+    "taxNumber": "Vergi Numarası",
+    "taxOffice": "Vergi Dairesi",
+    "notes": "Not"
+  },
+  "validation": {
+    "nameRequired": "Tedarikçi adı zorunludur"
+  },
+  "toast": {
+    "loadError": "Tedarikçiler yüklenemedi",
+    "created": "Tedarikçi oluşturuldu",
+    "updated": "Tedarikçi güncellendi",
+    "deleted": "Tedarikçi pasifleştirildi",
+    "saveError": "Kayıt başarısız",
+    "deleteError": "Silme başarısız"
+  },
+  "confirm": {
+    "delete": "{{name}} tedarikçisini pasifleştirmek istediğinize emin misiniz?"
+  }
+}
