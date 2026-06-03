@@ -28,6 +28,9 @@ export function TenantFormPage() {
     status: 'active',
   });
 
+  // Süre preset: '' = süresiz, 'demo' = 45 gün, '1'..'12' = N ay (30 günden)
+  const [durationPreset, setDurationPreset] = useState<string>('');
+
   useEffect(() => {
     loadPlans();
     if (isEditing && id) {
@@ -77,13 +80,28 @@ export function TenantFormPage() {
     try {
       setIsSaving(true);
 
+      // Preset → (status, durationDays)
+      let status = formData.status;
+      let durationDays: number | undefined;
+      if (durationPreset === 'demo') {
+        status = 'trial';
+        durationDays = 45;
+      } else if (durationPreset) {
+        const months = parseInt(durationPreset, 10);
+        if (!isNaN(months) && months > 0) {
+          status = 'active';
+          durationDays = months * 30;
+        }
+      }
+
       const data = {
         name: formData.name.trim(),
         slug: formData.slug?.trim() || undefined,
         domain: formData.domain?.trim() || undefined,
         planId: formData.planId || undefined,
         billingEmail: formData.billingEmail?.trim() || undefined,
-        status: formData.status,
+        status,
+        durationDays,
       };
 
       if (isEditing && id) {
@@ -223,6 +241,29 @@ export function TenantFormPage() {
                 <option value="suspended">{t('admin:tenantForm.statusSuspended')}</option>
                 <option value="cancelled">{t('admin:tenantForm.statusCancelled')}</option>
               </select>
+              <small className={styles.fieldHint}>
+                {t('admin:tenantForm.statusHint')}
+              </small>
+            </div>
+
+            <div className={styles.field}>
+              <label>{t('admin:tenantForm.labelDuration')}</label>
+              <select
+                value={durationPreset}
+                onChange={(e) => setDurationPreset(e.target.value)}
+                className={styles.select}
+              >
+                <option value="">{t('admin:tenantForm.durationUnlimited')}</option>
+                <option value="demo">{t('admin:tenantForm.durationDemo')}</option>
+                {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((m) => (
+                  <option key={m} value={String(m)}>
+                    {t('admin:tenantForm.durationMonth', { count: m })}
+                  </option>
+                ))}
+              </select>
+              <small className={styles.fieldHint}>
+                {t('admin:tenantForm.durationHint')}
+              </small>
             </div>
           </div>
 

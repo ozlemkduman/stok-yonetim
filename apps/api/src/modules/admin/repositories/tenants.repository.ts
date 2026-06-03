@@ -125,6 +125,7 @@ export class TenantsRepository {
     if (data.billing_email) insertData.billing_email = data.billing_email;
     if (data.owner_id) insertData.owner_id = data.owner_id;
     if (data.trial_ends_at) insertData.trial_ends_at = data.trial_ends_at;
+    if (data.subscription_ends_at) insertData.subscription_ends_at = data.subscription_ends_at;
 
     const [tenant] = await this.db.knex('tenants')
       .insert(insertData)
