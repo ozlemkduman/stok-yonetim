@@ -2,6 +2,7 @@
   "groups": {
     "main": "Home",
     "sales": "Sales Management",
+    "purchasing": "Purchasing",
     "inventory": "Inventory",
     "finance": "Finance",
     "crm": "CRM & Field",
@@ -14,6 +15,8 @@
     "quotes": "Quotes",
     "sales": "Sales",
     "returns": "Returns",
+    "suppliers": "Suppliers",
+    "purchases": "Purchases",
     "products": "Products",
     "stockMovements": "Stock Movements",
     "warehouses": "Warehouses",

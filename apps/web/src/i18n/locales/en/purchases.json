@@ -1,0 +1,96 @@
+{
+  "pageTitle": "Purchases",
+  "subtitle": "Record and track purchases from suppliers",
+  "newPurchase": "+ New Purchase",
+  "searchPlaceholder": "Search by purchase #, supplier or invoice #...",
+  "empty": "No purchases yet",
+  "columns": {
+    "number": "Purchase #",
+    "date": "Date",
+    "supplier": "Supplier",
+    "paymentMethod": "Payment",
+    "total": "Total",
+    "status": "Status"
+  },
+  "filters": {
+    "active": "Active",
+    "cancelled": "Cancelled",
+    "all": "All"
+  },
+  "stats": {
+    "totalPurchases": "Total Purchases (count)",
+    "totalAmount": "Total Amount",
+    "cancelledCount": "Cancelled"
+  },
+  "paymentMethods": {
+    "nakit": "Cash",
+    "kredi_karti": "Credit Card",
+    "havale": "Bank Transfer",
+    "veresiye": "Credit"
+  },
+  "statuses": {
+    "completed": "Completed",
+    "cancelled": "Cancelled"
+  },
+  "form": {
+    "title": "New Purchase",
+    "back": "Purchases",
+    "basicInfo": "Basic Info",
+    "supplier": "Supplier",
+    "selectSupplier": "Select supplier",
+    "warehouse": "Warehouse",
+    "purchaseDate": "Purchase Date",
+    "supplierInvoiceNo": "Supplier Invoice #",
+    "supplierInvoiceNoPlaceholder": "Invoice number from supplier",
+    "paymentMethod": "Payment Method *",
+    "dueDate": "Due Date",
+    "vatIncluded": "VAT Included",
+    "items": "Line Items",
+    "addItem": "Add Item",
+    "emptyItems": "No items added yet. Click \"Add Item\".",
+    "product": "Product",
+    "selectProduct": "Select product",
+    "quantity": "Qty",
+    "unitPrice": "Unit Price",
+    "vatRate": "VAT %",
+    "lineTotal": "Total",
+    "notes": "Notes",
+    "notesPlaceholder": "Additional notes...",
+    "subtotal": "Subtotal",
+    "vatTotal": "VAT Total",
+    "grandTotal": "Grand Total",
+    "save": "Save Purchase"
+  },
+  "validation": {
+    "addItem": "Add at least one item",
+    "selectProduct": "Select a product for all items",
+    "invalidQuantity": "Enter a valid quantity",
+    "creditNeedsSupplier": "Credit purchase requires a supplier"
+  },
+  "toast": {
+    "loadError": "Failed to load purchases",
+    "dataLoadError": "Failed to load data",
+    "created": "Purchase created",
+    "cancelled": "Purchase cancelled",
+    "saveError": "Save failed",
+    "cancelError": "Cancel failed"
+  },
+  "detail": {
+    "back": "Purchases",
+    "notFound": "Purchase not found",
+    "info": "Purchase Info",
+    "supplierInvoiceNo": "Supplier Invoice #",
+    "paymentMethod": "Payment",
+    "dueDate": "Due Date",
+    "createdBy": "Created By",
+    "amounts": "Amounts",
+    "discount": "Discount",
+    "items": "Items ({{count}})",
+    "notes": "Notes",
+    "cancel": "Cancel Purchase",
+    "cancelling": "Cancelling..."
+  },
+  "confirm": {
+    "cancel": "Cancel purchase {{number}}? Stock will be reverted."
+  }
+}

@@ -23,6 +23,8 @@
     "no": "No"
   },
   "labels": {
+    "saving": "Saving...",
+    "loading": "Loading...",
     "name": "Name",
     "email": "Email",
     "phone": "Phone",

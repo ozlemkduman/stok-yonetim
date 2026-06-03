@@ -11,6 +11,8 @@ import { AdminModule } from './modules/admin/admin.module';
 import { UsersModule } from './modules/users/users.module';
 import { TenantSettingsModule } from './modules/tenant-settings/tenant-settings.module';
 import { CustomersModule } from './modules/customers/customers.module';
+import { SuppliersModule } from './modules/suppliers/suppliers.module';
+import { PurchasesModule } from './modules/purchases/purchases.module';
 import { ProductsModule } from './modules/products/products.module';
 import { SalesModule } from './modules/sales/sales.module';
 import { ReturnsModule } from './modules/returns/returns.module';
@@ -62,6 +64,8 @@ import { FeatureGuard } from './common/guards/feature.guard';
     UsersModule,
     TenantSettingsModule,
     CustomersModule,
+    SuppliersModule,
+    PurchasesModule,
     ProductsModule,
     SalesModule,
     ReturnsModule,
