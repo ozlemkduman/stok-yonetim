@@ -174,15 +174,6 @@ export function ProductListPage() {
     });
   };
 
-  const handlePurchaseVatToggle = (included: boolean) => {
-    setPurchaseVatIncluded(included);
-    if (included) {
-      setDisplayPurchasePrice(roundMoney(formData.purchase_price * vatMultiplier).toString());
-    } else {
-      setDisplayPurchasePrice(roundMoney(formData.purchase_price).toString());
-    }
-  };
-
   const handleSaleVatToggle = (included: boolean) => {
     setSaleVatIncluded(included);
     if (included) {
@@ -236,7 +227,6 @@ export function ProductListPage() {
         </Badge>
       )
     },
-    { key: 'purchase_price', header: t('products:columns.purchasePrice'), align: 'right', render: (p) => formatCurrency(Number(p.purchase_price) * (1 + Number(p.vat_rate) / 100)) },
     { key: 'sale_price', header: t('products:columns.salePrice'), align: 'right', render: (p) => formatCurrency(Number(p.sale_price) * (1 + Number(p.vat_rate) / 100)) },
     { key: 'created_by_name', header: t('products:columns.createdBy'), render: (p) => p.created_by_name || '-' },
     {
@@ -375,28 +365,6 @@ export function ProductListPage() {
           <Input label={t('products:form.unit')} value={formData.unit || 'adet'} onChange={(e) => setFormData({ ...formData, unit: e.target.value })} fullWidth />
           <div className={styles.vatRateRow}>
             <Input label={t('products:form.vatRate')} type="number" step="any" value={formData.vat_rate ?? 20} onChange={(e) => handleVatRateChange(parseFloat(e.target.value) || 0)} fullWidth />
-          </div>
-
-          <div className={styles.priceSection}>
-            <div className={styles.priceSectionHeader}>
-              <span className={styles.priceSectionTitle}>{t('products:form.purchasePriceSection')}</span>
-              <div className={styles.vatToggle}>
-                <button type="button" className={`${styles.vatToggleBtn} ${!purchaseVatIncluded ? styles.vatToggleActive : ''}`} onClick={() => handlePurchaseVatToggle(false)}>{t('products:form.vatExcluded')}</button>
-                <button type="button" className={`${styles.vatToggleBtn} ${purchaseVatIncluded ? styles.vatToggleActive : ''}`} onClick={() => handlePurchaseVatToggle(true)}>{t('products:form.vatIncluded')}</button>
-              </div>
-            </div>
-            <div className={styles.priceField}>
-              <Input
-                label={t('products:form.purchasePriceLabel', { vatStatus: vatStatusLabel(purchaseVatIncluded) })}
-                type="number"
-                step="any"
-                value={displayPurchasePrice}
-                onChange={(e) => handlePriceChange('purchase_price', e.target.value)}
-                fullWidth
-              />
-              <span className={styles.priceHint}>{getPriceInfo('purchase_price')}</span>
-              <span className={styles.priceHint}>{t('products:form.purchasePriceHint')}</span>
-            </div>
           </div>
 
           <div className={styles.priceSection}>

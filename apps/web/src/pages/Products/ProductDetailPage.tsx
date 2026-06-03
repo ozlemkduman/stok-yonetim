@@ -100,10 +100,6 @@ export function ProductDetailPage() {
               <span className={styles.infoValue}>{formatCurrency(Number(product.wholesale_price) * (1 + Number(product.vat_rate) / 100))}</span>
             </div>
             <div className={styles.infoItem}>
-              <span className={styles.infoLabel}>{t('products:detail.purchasePrice')}</span>
-              <span className={styles.infoValue}>{formatCurrency(Number(product.purchase_price) * (1 + Number(product.vat_rate) / 100))}</span>
-            </div>
-            <div className={styles.infoItem}>
               <span className={styles.infoLabel}>{t('products:detail.vatRate')}</span>
               <span className={styles.infoValue}>%{product.vat_rate}</span>
             </div>
