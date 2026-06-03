@@ -31,9 +31,10 @@ export class CreateProductDto {
   @MaxLength(20)
   unit?: string = 'adet';
 
+  @IsOptional()
   @IsNumber()
   @Min(0)
-  purchase_price: number;
+  purchase_price?: number = 0;
 
   @IsNumber()
   @Min(0)

@@ -395,6 +395,7 @@ export function ProductListPage() {
                 fullWidth
               />
               <span className={styles.priceHint}>{getPriceInfo('purchase_price')}</span>
+              <span className={styles.priceHint}>{t('products:form.purchasePriceHint')}</span>
             </div>
           </div>
 
