@@ -225,17 +225,18 @@ export function QuoteListPage() {
       width: '230px',
       render: (q) => (
         <div className={styles.actions}>
+          {/* Akış: Taslak → Gönder → (Kabul/Red) → Satışa Dönüştür */}
           {q.status === 'draft' && (
-            <Button size="xs" variant="secondary" onClick={() => handleSend(q)}>{t('quotes:actions.send')}</Button>
+            <Button size="xs" variant="primary" onClick={() => handleSend(q)}>{t('quotes:actions.send')}</Button>
           )}
-          {['draft', 'sent'].includes(q.status) && (
+          {q.status === 'sent' && (
             <>
-              <Button size="xs" variant="secondary" onClick={() => handleAccept(q)}>{t('quotes:actions.accept')}</Button>
+              <Button size="xs" variant="primary" onClick={() => handleAccept(q)}>{t('quotes:actions.accept')}</Button>
               <Button size="xs" variant="secondary" onClick={() => handleReject(q)}>{t('quotes:actions.reject')}</Button>
             </>
           )}
-          {['draft', 'sent', 'accepted'].includes(q.status) && (
-            <Button size="xs" variant="secondary" onClick={() => handleConvert(q)}>{t('quotes:actions.convertShort')}</Button>
+          {q.status === 'accepted' && (
+            <Button size="xs" variant="primary" onClick={() => handleConvert(q)}>{t('quotes:actions.convertShort')}</Button>
           )}
           {q.status !== 'converted' && (
             <Button size="xs" variant="danger" onClick={() => handleDelete(q)}>{t('quotes:actions.delete')}</Button>

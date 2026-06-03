@@ -171,9 +171,10 @@ export function QuoteDetailPage() {
   }
 
   const validityStatus = getValidityStatus();
+  // Akış: Taslak → Gönderildi → Kabul/Red → Satışa Dönüştürüldü
   const canSend = quote.status === 'draft';
-  const canAcceptReject = ['draft', 'sent'].includes(quote.status);
-  const canConvert = ['draft', 'sent', 'accepted'].includes(quote.status);
+  const canAcceptReject = quote.status === 'sent';
+  const canConvert = quote.status === 'accepted';
   const canDelete = quote.status !== 'converted';
 
   return (
