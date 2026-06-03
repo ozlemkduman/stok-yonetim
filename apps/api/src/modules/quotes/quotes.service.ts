@@ -4,6 +4,8 @@ import { CreateQuoteDto, UpdateQuoteDto, ConvertToSaleDto } from './dto';
 import { DatabaseService } from '../../database/database.service';
 import { SalesRepository } from '../sales/sales.repository';
 import { validateSortColumn } from '../../common/utils/validate-sort';
+import { getCurrentTenantId } from '../../common/context/tenant.context';
+import { recordSaleAccountMovement } from '../../common/helpers/account-movement.helper';
 
 const ALLOWED_SORT_COLUMNS = ['quote_date', 'valid_until', 'grand_total', 'quote_number', 'status', 'created_at'];
 
@@ -221,21 +223,45 @@ export class QuotesService {
       throw new BadRequestException('Bu teklif satisa donusturulemez');
     }
 
+    if (dto.payment_method === 'veresiye' && !quote.customer_id) {
+      throw new BadRequestException('Veresiye satis icin teklifte musteri secili olmalidir');
+    }
+
     const items = await this.repository.findItemsByQuoteId(id);
+    if (items.length === 0) {
+      throw new BadRequestException('Teklifte ürün bulunamadi');
+    }
 
     return this.db.transaction(async (trx) => {
       const invoiceNumber = await this.salesRepository.generateInvoiceNumber();
+
+      // Stok kontrolü + düşür (her item için)
+      for (const item of items) {
+        const product = await trx('products').where('id', item.product_id).forUpdate().first();
+        if (!product) throw new BadRequestException(`Ürün bulunamadi: ${item.product_id}`);
+        if (!product.is_active) throw new BadRequestException(`Ürün pasif durumda: ${product.name}`);
+        if (Number(product.stock_quantity) < Number(item.quantity)) {
+          throw new BadRequestException(`Yetersiz stok: ${product.name}`);
+        }
+        await trx('products').where('id', item.product_id).update({
+          stock_quantity: trx.raw('stock_quantity - ?', [item.quantity]),
+          updated_at: trx.fn.now(),
+        });
+      }
+
+      const grandTotal = Number(quote.grand_total) || 0;
+      const saleDate = new Date();
 
       // Create sale
       const sale = await this.salesRepository.createSale({
         invoice_number: invoiceNumber,
         customer_id: quote.customer_id,
-        sale_date: new Date(),
+        sale_date: saleDate,
         subtotal: quote.subtotal,
         discount_amount: quote.discount_amount,
         discount_rate: quote.discount_rate,
         vat_total: quote.vat_total,
-        grand_total: quote.grand_total,
+        grand_total: grandTotal,
         include_vat: quote.include_vat,
         payment_method: dto.payment_method,
         due_date: dto.due_date ? new Date(dto.due_date) : null,
@@ -251,6 +277,39 @@ export class QuotesService {
         vat_amount: item.vat_amount,
         line_total: item.line_total,
       })), trx);
+
+      // Ödeme yöntemine göre yan etkiler
+      if (quote.customer_id && dto.payment_method === 'veresiye') {
+        // Veresiye: müşteri cari hesabı borçlanır
+        await trx('customers').where('id', quote.customer_id).update({
+          balance: trx.raw('balance - ?', [grandTotal]),
+          updated_at: trx.fn.now(),
+        });
+        await trx('account_transactions').insert({
+          customer_id: quote.customer_id,
+          type: 'borc',
+          amount: grandTotal,
+          description: `Satis: ${invoiceNumber} (Teklif: ${quote.quote_number})`,
+          reference_type: 'sale',
+          reference_id: sale.id,
+          transaction_date: saleDate,
+        });
+      } else {
+        // Peşin/kart/havale: kasa/banka hesabına gelir
+        const tenantId = getCurrentTenantId();
+        if (tenantId) {
+          await recordSaleAccountMovement(
+            trx,
+            tenantId,
+            dto.payment_method,
+            grandTotal,
+            sale.id,
+            invoiceNumber,
+            1,
+            saleDate,
+          );
+        }
+      }
 
       // Update quote status
       await this.repository.updateStatus(id, 'converted', sale.id);

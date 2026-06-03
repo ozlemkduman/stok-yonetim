@@ -1,5 +1,4 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
-import { Knex } from 'knex';
 import { SalesRepository, Sale, SaleItem } from './sales.repository';
 import { ProductsRepository } from '../products/products.repository';
 import { CustomersRepository } from '../customers/customers.repository';
@@ -8,68 +7,7 @@ import { DatabaseService } from '../../database/database.service';
 import { createPaginatedResult } from '../../common/dto/pagination.dto';
 import { ActivityLogService } from '../../common/services/activity-log.service';
 import { getCurrentTenantId } from '../../common/context/tenant.context';
-
-// Hangi ödeme yöntemi hangi hesap türüne aktarılır?
-function accountTypeForPayment(method: string): 'kasa' | 'banka' | null {
-  if (method === 'nakit') return 'kasa';
-  if (method === 'kredi_karti' || method === 'havale') return 'banka';
-  return null; // veresiye ve bilinmeyen → hesap hareketi yok
-}
-
-/**
- * Satış için tenant'ın ilgili türdeki default (veya ilk aktif) hesabına
- * "gelir" hareketi ekler ve bakiyeyi günceller.
- * Hiç uygun hesap yoksa sessizce atlanır (satışı bloklamamalı).
- * direction: +1 satış, -1 satış iptali (ters hareket).
- * movementDate: hareketin işlendiği tarih (geri tarihli satışta sale_date,
- *   iptalde bugünün tarihi olabilir).
- */
-async function recordSaleAccountMovement(
-  trx: Knex.Transaction,
-  tenantId: string,
-  paymentMethod: string,
-  amount: number,
-  saleId: string,
-  invoiceNumber: string,
-  direction: 1 | -1,
-  movementDate: Date,
-): Promise<void> {
-  const accountType = accountTypeForPayment(paymentMethod);
-  if (!accountType) return;
-
-  // Default + aktif hesap, yoksa ilk aktif aynı türden
-  const account =
-    (await trx('accounts')
-      .where({ tenant_id: tenantId, account_type: accountType, is_default: true, is_active: true })
-      .first()) ||
-    (await trx('accounts')
-      .where({ tenant_id: tenantId, account_type: accountType, is_active: true })
-      .orderBy('created_at', 'asc')
-      .first());
-
-  if (!account) return; // uygun hesap yok, satış bloklanmasın
-
-  const signedAmount = direction * amount;
-  const newBalance = (Number(account.current_balance) || 0) + signedAmount;
-
-  await trx('account_movements').insert({
-    tenant_id: tenantId,
-    account_id: account.id,
-    movement_type: direction === 1 ? 'gelir' : 'gider',
-    amount,
-    balance_after: newBalance,
-    category: direction === 1 ? 'satış' : 'satış iptali',
-    description: direction === 1 ? `Satış: ${invoiceNumber}` : `Satış iptali: ${invoiceNumber}`,
-    reference_type: 'sale',
-    reference_id: saleId,
-    movement_date: movementDate,
-  });
-
-  await trx('accounts').where('id', account.id).update({
-    current_balance: newBalance,
-    updated_at: trx.fn.now(),
-  });
-}
+import { recordSaleAccountMovement } from '../../common/helpers/account-movement.helper';
 
 @Injectable()
 export class SalesService {
