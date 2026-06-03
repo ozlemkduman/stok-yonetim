@@ -48,6 +48,7 @@
     "items": "Line Items",
     "addItem": "Add Item",
     "emptyItems": "No items added yet. Click \"Add Item\".",
+    "noProductsWarning": "No products yet. Please add at least one product from the 'Products' page first, then you can select them as purchase line items.",
     "product": "Product",
     "selectProduct": "Select product",
     "quantity": "Qty",
@@ -70,6 +71,7 @@
   "toast": {
     "loadError": "Failed to load purchases",
     "dataLoadError": "Failed to load data",
+    "noProducts": "Product list is empty — please add at least one product to make a purchase",
     "created": "Purchase created",
     "cancelled": "Purchase cancelled",
     "saveError": "Save failed",
