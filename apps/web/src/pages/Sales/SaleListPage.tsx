@@ -85,19 +85,26 @@ export function SaleListPage() {
       if (statusFilter === 'active') params.status = 'completed';
       else if (statusFilter === 'cancelled') params.status = 'cancelled';
 
-      const response = await salesApi.getAll(params);
+      // İstatistikler için status filtresini geçici olarak kaldır — backend hem aktif hem iptal toplamlarını ayrı döner
+      const statsParams = { ...params };
+      delete statsParams.status;
+
+      const [response, statsResponse] = await Promise.all([
+        salesApi.getAll(params),
+        salesApi.getStats(statsParams),
+      ]);
       setSales(response.data);
       setTotalPages(response.meta?.totalPages || 1);
 
-      // Calculate stats — ciro/toplam iptal edilenleri içermez
-      const allSales = response.data;
-      const activeSales = allSales.filter(s => s.status !== 'cancelled');
+      // İstatistikler arka uçtan — tüm filtreye uyan satışları kapsar, sadece görünen sayfa değil
+      const s = statsResponse.data;
+      const activeSalesOnPage = response.data.filter(x => x.status !== 'cancelled');
       setStats({
-        total: activeSales.reduce((sum, s) => sum + parseFloat(String(s.grand_total) || '0'), 0),
-        count: response.meta?.total || allSales.length,
-        completed: allSales.filter(s => s.status === 'completed').length,
-        cancelled: allSales.filter(s => s.status === 'cancelled').length,
-        noVatCount: activeSales.filter(s => !s.include_vat).length,
+        total: s.total, // tüm aktif satışların grand_total toplamı
+        count: s.count + s.cancelledCount, // tüm satışların adedi
+        completed: s.count,
+        cancelled: s.cancelledCount,
+        noVatCount: activeSalesOnPage.filter(x => !x.include_vat).length, // bu hala sayfa bazlı — yaklaşık
       });
     } catch (err) {
       showToast('error', t('sales:toast.loadError'));

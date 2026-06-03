@@ -114,6 +114,34 @@ export class SalesRepository extends BaseTenantRepository<Sale> {
     return { items, total: parseInt(count as string, 10) };
   }
 
+  async getStats(params: { search?: string; customerId?: string; status?: string; startDate?: string; endDate?: string; includeVat?: string; invoiceIssued?: string; saleType?: string }): Promise<{ count: number; total: number; cancelledCount: number; cancelledTotal: number }> {
+    const { search, customerId, status, startDate, endDate, includeVat, invoiceIssued, saleType } = params;
+    let q = this.query.clone();
+    if (customerId) q = q.where('customer_id', customerId);
+    if (status) q = q.where('status', status);
+    if (startDate) q = q.where('sale_date', '>=', startDate);
+    if (endDate) q = q.where('sale_date', '<=', endDate);
+    if (includeVat === 'true') q = q.where('include_vat', true);
+    else if (includeVat === 'false') q = q.where('include_vat', false);
+    if (invoiceIssued === 'true') q = q.where('invoice_issued', true);
+    else if (invoiceIssued === 'false') q = q.where('invoice_issued', false);
+    if (saleType) q = q.where('sale_type', saleType);
+    if (search) q = q.whereILike('invoice_number', `%${search}%`);
+
+    const [result] = await q.select(
+      this.knex.raw("COUNT(*) FILTER (WHERE status != 'cancelled') as count"),
+      this.knex.raw("COALESCE(SUM(grand_total) FILTER (WHERE status != 'cancelled'), 0) as total"),
+      this.knex.raw("COUNT(*) FILTER (WHERE status = 'cancelled') as cancelled_count"),
+      this.knex.raw("COALESCE(SUM(grand_total) FILTER (WHERE status = 'cancelled'), 0) as cancelled_total"),
+    );
+    return {
+      count: parseInt((result as any).count || '0', 10),
+      total: parseFloat((result as any).total || '0'),
+      cancelledCount: parseInt((result as any).cancelled_count || '0', 10),
+      cancelledTotal: parseFloat((result as any).cancelled_total || '0'),
+    };
+  }
+
   async findById(id: string): Promise<Sale | null> {
     const result = await this.query
       .leftJoin('customers', 'sales.customer_id', 'customers.id')

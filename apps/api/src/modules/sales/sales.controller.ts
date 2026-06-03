@@ -40,6 +40,21 @@ export class SalesController {
     };
   }
 
+  @Get('stats')
+  async getStats(@Query() query: { customerId?: string; status?: string; startDate?: string; endDate?: string; includeVat?: string; invoiceIssued?: string; saleType?: string; search?: string }) {
+    const data = await this.salesService.getStats({
+      search: query.search,
+      customerId: query.customerId,
+      status: query.status,
+      startDate: query.startDate,
+      endDate: query.endDate,
+      includeVat: query.includeVat,
+      invoiceIssued: query.invoiceIssued,
+      saleType: query.saleType,
+    });
+    return { success: true, data };
+  }
+
   @Get(':id')
   async findById(@Param('id', ParseUUIDPipe) id: string) {
     const data = await this.salesService.findById(id);
