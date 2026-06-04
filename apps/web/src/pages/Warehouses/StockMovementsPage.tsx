@@ -116,18 +116,21 @@ export function StockMovementsPage() {
       header: t('warehouses:columns.quantity'),
       align: 'right',
       width: '10%',
-      render: (m) => (
-        <span className={m.quantity > 0 ? styles.positive : styles.negative}>
-          {m.quantity > 0 ? '+' : ''}{m.quantity}
-        </span>
-      ),
+      render: (m) => {
+        const q = parseFloat(String(m.quantity));
+        return (
+          <span className={q > 0 ? styles.positive : styles.negative}>
+            {q > 0 ? '+' : ''}{q}
+          </span>
+        );
+      },
     },
     {
       key: 'stock_after',
       header: t('warehouses:columns.stockAfter'),
       align: 'right',
       width: '10%',
-      render: (m) => m.stock_after,
+      render: (m) => parseFloat(String(m.stock_after)),
     },
     {
       key: 'notes',

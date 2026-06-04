@@ -243,11 +243,11 @@ function MovementsTab({ movements, t }: { movements: StockMovement[]; t: (key: s
                 </span>
               </td>
               <td>
-                <span className={`${styles.movementQuantity} ${movement.quantity > 0 ? styles.positive : styles.negative}`}>
-                  {movement.quantity > 0 ? '+' : ''}{movement.quantity}
+                <span className={`${styles.movementQuantity} ${Number(movement.quantity) > 0 ? styles.positive : styles.negative}`}>
+                  {Number(movement.quantity) > 0 ? '+' : ''}{parseFloat(String(movement.quantity))}
                 </span>
               </td>
-              <td className={styles.stockAfter}>{movement.stock_after}</td>
+              <td className={styles.stockAfter}>{parseFloat(String(movement.stock_after))}</td>
               <td className={styles.movementNotes}>{movement.notes || '-'}</td>
             </tr>
           ))}
