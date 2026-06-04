@@ -366,10 +366,10 @@ function MovementsTab({
                   {t(`products:movementTypes.${movement.movement_type}`, { defaultValue: movement.movement_type })}
                 </Badge>
               </td>
-              <td className={movement.quantity > 0 ? styles.positive : styles.negative}>
-                {movement.quantity > 0 ? '+' : ''}{movement.quantity} {unit}
+              <td className={Number(movement.quantity) > 0 ? styles.positive : styles.negative}>
+                {Number(movement.quantity) > 0 ? '+' : ''}{parseFloat(String(movement.quantity))} {unit}
               </td>
-              <td>{formatNumber(movement.stock_after)} {unit}</td>
+              <td>{formatNumber(Number(movement.stock_after))} {unit}</td>
               <td>{movement.warehouse_name || '-'}</td>
               <td>{movement.notes || '-'}</td>
             </tr>
