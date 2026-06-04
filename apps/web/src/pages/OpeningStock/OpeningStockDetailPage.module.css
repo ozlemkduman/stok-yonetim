@@ -12,3 +12,14 @@
 .itemsTable { width: 100%; border-collapse: collapse; }
 .itemsTable th, .itemsTable td { padding: var(--space-2); border-bottom: 1px solid var(--color-border-light, rgba(0,0,0,0.05)); font-size: var(--font-size-sm); }
 .itemsTable th { font-weight: 600; color: var(--color-text-muted); }
+
+.inactiveBadge {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 1px 6px;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  background: color-mix(in srgb, var(--color-text-muted) 12%, transparent);
+  border-radius: var(--radius-sm);
+  font-weight: 500;
+}

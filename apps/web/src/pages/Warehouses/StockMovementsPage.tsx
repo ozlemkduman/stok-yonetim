@@ -90,7 +90,12 @@ export function StockMovementsPage() {
       key: 'product_name',
       header: t('warehouses:columns.product'),
       width: '20%',
-      render: (m) => m.product_name || '-',
+      render: (m: any) => (
+        <>
+          {m.product_name || '-'}
+          {m.product_is_active === false && <span className={styles.inactiveBadge}>({t('common:labels.inactive')})</span>}
+        </>
+      ),
     },
     {
       key: 'movement_type',

@@ -325,7 +325,7 @@ export class WarehousesRepository extends BaseTenantRepository<Warehouse> {
     let query = this.knex('stock_movements')
       .leftJoin('warehouses', 'stock_movements.warehouse_id', 'warehouses.id')
       .leftJoin('products', 'stock_movements.product_id', 'products.id')
-      .select('stock_movements.*', 'warehouses.name as warehouse_name', 'products.name as product_name');
+      .select('stock_movements.*', 'warehouses.name as warehouse_name', 'products.name as product_name', 'products.is_active as product_is_active');
 
     query = this.applyTenantFilter(query, 'stock_movements');
 
