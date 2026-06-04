@@ -665,7 +665,7 @@ export function ReportsPage() {
           <h3 className={styles.reportCardTitle}>{t('reports:stock.lowStockProducts')}</h3>
         </div>
         <div className={styles.reportCardBody}>
-          {stockReport?.products && stockReport.products.filter(p => p.stock_quantity <= p.min_stock_level).length > 0 ? (
+          {stockReport?.products && stockReport.products.filter(p => Number(p.stock_quantity) <= Number(p.min_stock_level)).length > 0 ? (
             <table className={styles.reportTable}>
               <thead>
                 <tr>
@@ -678,14 +678,14 @@ export function ReportsPage() {
               </thead>
               <tbody>
                 {stockReport.products
-                  .filter(p => p.stock_quantity <= p.min_stock_level)
+                  .filter(p => Number(p.stock_quantity) <= Number(p.min_stock_level))
                   .slice(0, 15)
                   .map((p) => (
                     <tr key={p.id}>
                       <td>{p.name}</td>
                       <td>{p.barcode || '-'}</td>
-                      <td className={styles.alignRight}>{p.stock_quantity}</td>
-                      <td className={styles.alignRight}>{p.min_stock_level}</td>
+                      <td className={styles.alignRight}>{parseFloat(String(p.stock_quantity))}</td>
+                      <td className={styles.alignRight}>{parseFloat(String(p.min_stock_level))}</td>
                       <td className={styles.alignRight}>
                         <span className={`${styles.badge} ${p.stock_quantity === 0 ? styles.badgeDanger : styles.badgeWarning}`}>
                           {p.stock_quantity === 0 ? t('reports:stock.depleted') : t('reports:stock.low')}

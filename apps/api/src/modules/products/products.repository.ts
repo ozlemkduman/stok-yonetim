@@ -272,8 +272,8 @@ export class ProductsRepository extends BaseTenantRepository<Product> {
     const [returnsStats] = await this.applyTenantFilter(returnsBaseQuery, 'returns') as { total_quantity: string; returns_count: string }[];
 
     return {
-      totalSold: parseInt(salesStats?.total_quantity || '0', 10),
-      totalReturned: parseInt(returnsStats?.total_quantity || '0', 10),
+      totalSold: parseFloat(salesStats?.total_quantity || '0'),
+      totalReturned: parseFloat(returnsStats?.total_quantity || '0'),
       totalRevenue: parseFloat(salesStats?.total_revenue || '0'),
       salesCount: parseInt(salesStats?.sales_count || '0', 10),
       returnsCount: parseInt(returnsStats?.returns_count || '0', 10),
