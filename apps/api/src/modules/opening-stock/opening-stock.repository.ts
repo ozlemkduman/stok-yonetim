@@ -86,7 +86,7 @@ export class OpeningStockRepository extends BaseTenantRepository<OpeningStockEnt
   async findItemsByEntryId(entryId: string): Promise<OpeningStockItem[]> {
     const baseQuery = this.knex('opening_stock_items')
       .leftJoin('products', 'opening_stock_items.product_id', 'products.id')
-      .select('opening_stock_items.*', 'products.name as product_name', 'products.barcode', 'products.unit')
+      .select('opening_stock_items.*', 'products.name as product_name', 'products.barcode', 'products.unit', 'products.is_active as product_is_active')
       .where('opening_stock_items.entry_id', entryId);
     return this.applyTenantFilter(baseQuery, 'opening_stock_items');
   }

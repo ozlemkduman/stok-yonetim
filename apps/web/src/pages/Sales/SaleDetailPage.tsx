@@ -326,7 +326,10 @@ export function SaleDetailPage() {
             <tbody>
               {data.items.map((item) => (
                 <tr key={item.id}>
-                  <td>{item.product_name || '-'}</td>
+                  <td>
+                    {item.product_name || '-'}
+                    {(item as any).product_is_active === false && <span className={styles.inactiveBadge}>({t('common:labels.inactive')})</span>}
+                  </td>
                   <td>{item.barcode || '-'}</td>
                   <td className={styles.alignRight}>{item.quantity}</td>
                   <td className={styles.alignRight}>{formatCurrency(item.unit_price)}</td>

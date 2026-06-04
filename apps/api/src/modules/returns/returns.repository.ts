@@ -98,7 +98,8 @@ export class ReturnsRepository extends BaseTenantRepository<Return> {
       .select(
         'return_items.*',
         'products.name as product_name',
-        'products.barcode as barcode'
+        'products.barcode as barcode',
+        'products.is_active as product_is_active'
       )
       .where('return_items.return_id', returnId);
 

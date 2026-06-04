@@ -56,6 +56,17 @@
   font-weight: var(--font-weight-medium);
 }
 
+.inactiveBadge {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 1px 6px;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  background: color-mix(in srgb, var(--color-text-muted) 12%, transparent);
+  border-radius: var(--radius-sm);
+  font-weight: 500;
+}
+
 .negative {
   color: var(--color-danger);
   font-weight: var(--font-weight-medium);

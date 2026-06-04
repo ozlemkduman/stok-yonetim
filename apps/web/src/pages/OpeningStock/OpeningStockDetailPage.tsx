@@ -101,7 +101,10 @@ export function OpeningStockDetailPage() {
           <tbody>
             {data.items.map((it) => (
               <tr key={it.id}>
-                <td>{it.product_name || '-'}</td>
+                <td>
+                  {it.product_name || '-'}
+                  {(it as any).product_is_active === false && <span className={styles.inactiveBadge}>({t('common:labels.inactive')})</span>}
+                </td>
                 <td style={{ textAlign: 'right' }}>{Number(it.quantity)} {it.unit || ''}</td>
                 <td style={{ textAlign: 'right' }}>{formatCurrency(Number(it.unit_cost))}</td>
                 <td style={{ textAlign: 'right' }}><strong>{formatCurrency(Number(it.quantity) * Number(it.unit_cost))}</strong></td>

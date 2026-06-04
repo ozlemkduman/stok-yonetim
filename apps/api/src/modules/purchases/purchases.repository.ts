@@ -110,7 +110,7 @@ export class PurchasesRepository extends BaseTenantRepository<Purchase> {
   async findItemsByPurchaseId(purchaseId: string): Promise<PurchaseItem[]> {
     const baseQuery = this.knex('purchase_items')
       .leftJoin('products', 'purchase_items.product_id', 'products.id')
-      .select('purchase_items.*', 'products.name as product_name', 'products.barcode')
+      .select('purchase_items.*', 'products.name as product_name', 'products.barcode', 'products.is_active as product_is_active')
       .where('purchase_items.purchase_id', purchaseId);
     return this.applyTenantFilter(baseQuery, 'purchase_items');
   }
