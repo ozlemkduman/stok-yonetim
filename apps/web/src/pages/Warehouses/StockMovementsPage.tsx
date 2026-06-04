@@ -98,8 +98,8 @@ export function StockMovementsPage() {
       width: '12%',
       render: (m) => (
         <Badge variant={
-          ['sale', 'transfer_out'].includes(m.movement_type) ? 'danger' :
-          ['return', 'transfer_in', 'purchase'].includes(m.movement_type) ? 'success' :
+          ['sale', 'transfer_out', 'opening_cancel'].includes(m.movement_type) ? 'danger' :
+          ['return', 'transfer_in', 'purchase', 'opening'].includes(m.movement_type) ? 'success' :
           'default'
         }>
           {t(`warehouses:movementTypes.${m.movement_type}`)}
@@ -178,6 +178,8 @@ export function StockMovementsPage() {
                 { value: 'transfer_out', label: t('warehouses:movementTypes.transfer_out') },
                 { value: 'adjustment', label: t('warehouses:movementTypes.adjustment') },
                 { value: 'purchase', label: t('warehouses:movementTypes.purchaseFull') },
+                { value: 'opening', label: t('warehouses:movementTypes.opening') },
+                { value: 'opening_cancel', label: t('warehouses:movementTypes.opening_cancel') },
               ]}
             />
           </div>

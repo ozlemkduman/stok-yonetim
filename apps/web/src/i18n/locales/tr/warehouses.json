@@ -60,7 +60,9 @@
     "adjustment": "Düzeltme",
     "purchase": "Alış",
     "initial": "Başlangıç",
-    "purchaseFull": "Satın Alma"
+    "purchaseFull": "Satın Alma",
+    "opening": "Açılış Stoğu",
+    "opening_cancel": "Açılış İptali"
   },
   "buttons": {
     "detail": "Detay",

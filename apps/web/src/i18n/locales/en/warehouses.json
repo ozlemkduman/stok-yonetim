@@ -60,7 +60,9 @@
     "adjustment": "Adjustment",
     "purchase": "Purchase",
     "initial": "Initial",
-    "purchaseFull": "Purchase"
+    "purchaseFull": "Purchase",
+    "opening": "Opening Stock",
+    "opening_cancel": "Opening Reversal"
   },
   "buttons": {
     "detail": "Detail",
