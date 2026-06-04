@@ -176,6 +176,15 @@ export class WarehousesService {
 
       await this.repository.updateStock(warehouseId, dto.product_id, newQty, trx);
 
+      // Invariant: products.stock_quantity = SUM(warehouse_stocks.quantity)
+      // Adjustment'ta delta'yı products tablosuna da yansıt.
+      if (movementQty !== 0) {
+        await trx('products').where('id', dto.product_id).update({
+          stock_quantity: trx.raw('stock_quantity + ?', [movementQty]),
+          updated_at: trx.fn.now(),
+        });
+      }
+
       await this.repository.createMovement({
         warehouse_id: warehouseId,
         product_id: dto.product_id,

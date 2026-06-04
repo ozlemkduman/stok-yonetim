@@ -1,4 +1,5 @@
 import { Knex } from 'knex';
+import { getCurrentTenantId } from '../context/tenant.context';
 
 /**
  * warehouse_stocks tablosunu günceller (per-depo stok).
@@ -22,13 +23,16 @@ export async function updateWarehouseStock(
   },
 ): Promise<string | null> {
   let warehouseId = params.warehouseId || null;
+  const tenantId = getCurrentTenantId();
 
   if (!warehouseId) {
-    const defaultWh = await trx('warehouses').where({ is_default: true, is_active: true }).first();
+    if (!tenantId) return null; // Tenant context yoksa cross-tenant leak'i önle
+    const defaultWh = await trx('warehouses').where({ tenant_id: tenantId, is_default: true, is_active: true }).first();
     warehouseId = defaultWh?.id || null;
   }
   if (!warehouseId) {
-    const anyWh = await trx('warehouses').where({ is_active: true }).orderBy('created_at', 'asc').first();
+    if (!tenantId) return null;
+    const anyWh = await trx('warehouses').where({ tenant_id: tenantId, is_active: true }).orderBy('created_at', 'asc').first();
     warehouseId = anyWh?.id || null;
   }
   if (!warehouseId) return null;

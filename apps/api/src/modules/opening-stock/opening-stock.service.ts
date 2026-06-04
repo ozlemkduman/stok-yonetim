@@ -5,6 +5,7 @@ import { DatabaseService } from '../../database/database.service';
 import { createPaginatedResult } from '../../common/dto/pagination.dto';
 import { ActivityLogService } from '../../common/services/activity-log.service';
 import { updateWarehouseStock } from '../../common/helpers/warehouse-stock.helper';
+import { getCurrentTenantId } from '../../common/context/tenant.context';
 
 @Injectable()
 export class OpeningStockService {
@@ -34,15 +35,23 @@ export class OpeningStockService {
 
       // Depo zorunlu — audit izi (stock_movements) için warehouse_id NOT NULL.
       // Form'da seçilmediyse tenant'ın default deposunu, yoksa ilk aktif depoyu seç.
+      // KRİTİK: tenant_id filtresi olmadan cross-tenant leak olur.
+      const tenantId = getCurrentTenantId();
+      if (!tenantId) {
+        throw new BadRequestException('Tenant context bulunamadı');
+      }
       let warehouseId = dto.warehouse_id || null;
       if (!warehouseId) {
         const defaultWarehouse = await trx('warehouses')
-          .where({ is_default: true, is_active: true })
+          .where({ tenant_id: tenantId, is_default: true, is_active: true })
           .first();
         warehouseId = defaultWarehouse?.id || null;
       }
       if (!warehouseId) {
-        const anyWarehouse = await trx('warehouses').where({ is_active: true }).orderBy('created_at', 'asc').first();
+        const anyWarehouse = await trx('warehouses')
+          .where({ tenant_id: tenantId, is_active: true })
+          .orderBy('created_at', 'asc')
+          .first();
         warehouseId = anyWarehouse?.id || null;
       }
       if (!warehouseId) {

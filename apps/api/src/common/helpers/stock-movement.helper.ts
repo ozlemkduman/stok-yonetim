@@ -1,4 +1,5 @@
 import { Knex } from 'knex';
+import { getCurrentTenantId } from '../context/tenant.context';
 
 /**
  * Stok hareketi audit kaydı atar (stock_movements tablosuna).
@@ -24,19 +25,22 @@ export async function writeStockMovement(
   },
 ): Promise<void> {
   let warehouseId = params.warehouseId || null;
+  const tenantId = getCurrentTenantId();
 
   if (!warehouseId) {
+    if (!tenantId) return; // Tenant context yoksa cross-tenant leak'i önle
     const defaultWarehouse = await trx('warehouses')
-      .where({ is_default: true, is_active: true })
+      .where({ tenant_id: tenantId, is_default: true, is_active: true })
       .first();
     warehouseId = defaultWarehouse?.id || null;
   }
   if (!warehouseId) {
-    const anyWarehouse = await trx('warehouses').where({ is_active: true }).orderBy('created_at', 'asc').first();
+    if (!tenantId) return;
+    const anyWarehouse = await trx('warehouses').where({ tenant_id: tenantId, is_active: true }).orderBy('created_at', 'asc').first();
     warehouseId = anyWarehouse?.id || null;
   }
   if (!warehouseId) {
-    // Tenant'ın hiç deposu yok — audit'i atla, iş akışını blokla­ma.
+    // Tenant'ın hiç deposu yok — audit'i atla, iş akışını bloklama.
     return;
   }
 
