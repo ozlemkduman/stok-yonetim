@@ -32,6 +32,39 @@ export const helpContent: Record<string, HelpItem> = {
       'Tedarikçi Fatura No alanına, tedarikçinin verdiği orijinal fatura numarasını yazın (eşleştirme için).',
       'Alış iptal edildiğinde stoklar geri alınır; iptal anında bu ürünler satılmış olamaz (yetersiz stoğa düşürmemek için).',
       'Durum filtresi ile aktif/iptal/tümü görünümleri arasında geçiş yapın.',
+      'Mevcut envanteri (sistem öncesi stoğu) maliyetiyle girmek için "Açılış Stoğu" sayfasını kullanın — kasa hareketi oluşturmaz.',
+    ],
+  },
+  '/purchases/new': {
+    title: 'Yeni Alış',
+    items: [
+      'Tedarikçi seçimi opsiyonel — sadece "Veresiye" ödemede zorunludur (cari hesaba borç yazılması için).',
+      'KDV Dahil/Hariç seçimi: form üstündeki "KDV Dahil" işaretine göre kalem fiyatları üzerine KDV eklenir veya içinden çıkarılır.',
+      'Birim fiyat: bu alışta ödediğiniz GERÇEK fiyatı yazın. Ürünün "referans alış fiyatı" otomatik buna güncellenir (raporlar için).',
+      'İskonto: satır bazlı yüzde olarak verebilirsiniz; iskonto sonrası tutar üzerinden KDV hesaplanır.',
+      'Vade Tarihi sadece Veresiye ödemede gözükür; girilmezse satış tarihi + 30 gün otomatik atanır.',
+      'Kaydet sonrası: stoklar artar, kasa/banka veya tedarikçi cari hesabı güncellenir, stok hareketi oluşur.',
+    ],
+  },
+  '/opening-stock': {
+    title: 'Açılış Stoğu',
+    items: [
+      'Açılış Stoğu = sistemden ÖNCE elinizde olan envanteri (devir) sisteme girmek içindir. Gerçek bir alış değildir.',
+      'Genelde sadece bir kez kullanılır: sisteme geçtiğinizde mevcut tüm stokları maliyetleriyle birlikte tek seferde girersiniz.',
+      'Stoklar artar, ürünün maliyeti (purchase_price) set edilir, stok hareketi oluşur — AMA kasa/banka/tedarikçi cari hareketi OLUŞMAZ.',
+      'Bir kez girdikten sonra normal alış akışına geçin: yeni gelen mallar için "Alışlar > Yeni Alış" kullanın.',
+      'Açılış kaydı iptal edilebilir — yeterli stok varsa stoklar geri alınır.',
+      'Bu kayıtlar "Alışlar" raporunda görünmez; yıllık alış cirosu hesabına dahil edilmez (devir farkıyla karışmaması için).',
+    ],
+  },
+  '/opening-stock/new': {
+    title: 'Yeni Açılış Kaydı',
+    items: [
+      'Tarih: stoğun fiilen var olduğu tarih (genelde sisteme geçiş günü).',
+      'Depo: en az bir aktif depo seçilmiş veya varsayılan depo tanımlanmış olmalı — yoksa kayıt başarısız olur.',
+      'Her satıra ürün + miktar + BİRİM MALİYET girin. Birim maliyet, o stoğun size kaça mâl olduğudur (faturasız da olabilir, tahmini bedel yazabilirsiniz).',
+      'Birim maliyet ürünün kâr/zarar hesabını etkiler. Yanlış girerseniz: ürünü pasif edip yeniden eklemek yerine, açılış kaydını iptal edip yenisini girin.',
+      'Bu form ürünleri OLUŞTURMAZ — önce "Ürünler" sayfasından ürünleri eklemiş olmanız gerekir.',
     ],
   },
   '/customers': {
