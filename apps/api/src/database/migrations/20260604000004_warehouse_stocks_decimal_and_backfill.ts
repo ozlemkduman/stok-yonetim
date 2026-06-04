@@ -60,6 +60,7 @@ export async function up(knex: Knex): Promise<void> {
       // Backfill durumunda diff hep pozitif olmalı (eksikse mantık hatası);
       // negatif olursa yine de kayıt atılır, sonradan düzeltilebilir.
       await knex('warehouse_stocks').insert({
+        tenant_id: tenantId,
         warehouse_id: defaultWh.id,
         product_id: productId,
         quantity: diff,
