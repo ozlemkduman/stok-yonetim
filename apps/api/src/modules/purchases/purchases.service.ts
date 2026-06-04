@@ -9,6 +9,7 @@ import { ActivityLogService } from '../../common/services/activity-log.service';
 import { getCurrentTenantId } from '../../common/context/tenant.context';
 import { accountTypeForPayment } from '../../common/helpers/account-movement.helper';
 import { writeStockMovement } from '../../common/helpers/stock-movement.helper';
+import { updateWarehouseStock } from '../../common/helpers/warehouse-stock.helper';
 
 /**
  * Alış için tenant'ın kasa/banka hesabından gider hareketi yapar.
@@ -158,8 +159,13 @@ export class PurchasesService {
         created_by: userId || null,
       }, purchaseItems, trx);
 
-      // Stok hareketi audit kaydı (her satır için)
+      // Stok: warehouse_stocks güncelle + audit kaydı
       for (const item of dto.items) {
+        await updateWarehouseStock(trx, {
+          productId: item.product_id,
+          delta: Number(item.quantity),
+          warehouseId: dto.warehouse_id || null,
+        });
         await writeStockMovement(trx, {
           productId: item.product_id,
           movementType: 'purchase',
@@ -214,6 +220,11 @@ export class PurchasesService {
         await trx('products').where('id', item.product_id).update({
           stock_quantity: trx.raw('stock_quantity - ?', [item.quantity]),
           updated_at: trx.fn.now(),
+        });
+        await updateWarehouseStock(trx, {
+          productId: item.product_id,
+          delta: -Number(item.quantity),
+          warehouseId: purchase.warehouse_id || null,
         });
         await writeStockMovement(trx, {
           productId: item.product_id,

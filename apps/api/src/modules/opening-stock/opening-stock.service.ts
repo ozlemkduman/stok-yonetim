@@ -4,6 +4,7 @@ import { CreateOpeningStockDto } from './dto';
 import { DatabaseService } from '../../database/database.service';
 import { createPaginatedResult } from '../../common/dto/pagination.dto';
 import { ActivityLogService } from '../../common/services/activity-log.service';
+import { updateWarehouseStock } from '../../common/helpers/warehouse-stock.helper';
 
 @Injectable()
 export class OpeningStockService {
@@ -68,6 +69,11 @@ export class OpeningStockService {
           purchase_price: item.unit_cost,
           updated_at: trx.fn.now(),
         });
+        await updateWarehouseStock(trx, {
+          productId: item.product_id,
+          delta: Number(item.quantity),
+          warehouseId: warehouseId,
+        });
       }
 
       const entry = await this.repository.createEntry({
@@ -123,6 +129,11 @@ export class OpeningStockService {
         await trx('products').where('id', item.product_id).update({
           stock_quantity: trx.raw('stock_quantity - ?', [item.quantity]),
           updated_at: trx.fn.now(),
+        });
+        await updateWarehouseStock(trx, {
+          productId: item.product_id,
+          delta: -Number(item.quantity),
+          warehouseId: entry.warehouse_id || null,
         });
       }
 

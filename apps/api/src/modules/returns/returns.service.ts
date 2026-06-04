@@ -6,6 +6,7 @@ import { DatabaseService } from '../../database/database.service';
 import { createPaginatedResult } from '../../common/dto/pagination.dto';
 import { ActivityLogService } from '../../common/services/activity-log.service';
 import { writeStockMovement } from '../../common/helpers/stock-movement.helper';
+import { updateWarehouseStock } from '../../common/helpers/warehouse-stock.helper';
 
 @Injectable()
 export class ReturnsService {
@@ -130,8 +131,9 @@ export class ReturnsService {
         created_by: userId || null,
       }, returnItems, trx);
 
-      // Stok hareketi audit kaydı
+      // Stok: warehouse_stocks güncelle + audit kaydı
       for (const item of dto.items) {
+        await updateWarehouseStock(trx, { productId: item.product_id, delta: Number(item.quantity) });
         await writeStockMovement(trx, {
           productId: item.product_id,
           movementType: 'return',
