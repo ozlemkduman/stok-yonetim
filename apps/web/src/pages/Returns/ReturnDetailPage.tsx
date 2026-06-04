@@ -193,7 +193,7 @@ export function ReturnDetailPage() {
                       {(item as any).product_is_active === false && <span className={styles.inactiveBadge}>({t('common:labels.inactive')})</span>}
                     </td>
                     <td className={styles.barcode}>{item.barcode || '-'}</td>
-                    <td className={styles.textRight}>{item.quantity}</td>
+                    <td className={styles.textRight}>{parseFloat(String(item.quantity))}</td>
                     <td className={styles.textRight}>{formatCurrency(item.unit_price)}</td>
                     <td className={styles.textRight}>{formatCurrency(item.vat_amount)}</td>
                     <td className={styles.textRight}>{formatCurrency(item.line_total)}</td>

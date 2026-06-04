@@ -349,13 +349,20 @@ export class ReportsService {
       .whereBetween('returns.return_date', [startDate, this.toEndOfDay(endDate)]);
     if (tenantId) topReturnedQuery = topReturnedQuery.where('returns.tenant_id', tenantId);
 
-    const topReturnedProducts = await topReturnedQuery
+    const topReturnedRaw = await topReturnedQuery
       .select('products.id', 'products.name')
       .sum('return_items.quantity as total_quantity')
       .sum('return_items.line_total as total_amount')
       .groupBy('products.id', 'products.name')
       .orderBy('total_quantity', 'desc')
       .limit(10);
+
+    const topReturnedProducts = topReturnedRaw.map((r: any) => ({
+      id: r.id,
+      name: r.name,
+      total_quantity: parseFloat(r.total_quantity || '0'),
+      total_amount: parseFloat(r.total_amount || '0'),
+    }));
 
     return {
       returns,

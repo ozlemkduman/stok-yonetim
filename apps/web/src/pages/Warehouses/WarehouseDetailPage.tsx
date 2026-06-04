@@ -191,13 +191,15 @@ function StocksTab({ stocks, t }: { stocks: WarehouseStock[]; t: (key: string) =
         </thead>
         <tbody>
           {stocks.map((stock) => {
-            const isLowStock = stock.quantity <= stock.min_stock_level;
+            const qty = Number(stock.quantity);
+            const minLvl = Number(stock.min_stock_level);
+            const isLowStock = qty <= minLvl;
             return (
               <tr key={stock.id} className={isLowStock ? styles.lowStockRow : ''}>
                 <td className={styles.productName}>{stock.product_name || '-'}</td>
                 <td className={styles.barcode}>{stock.product_barcode || '-'}</td>
-                <td className={styles.quantity}>{stock.quantity}</td>
-                <td className={styles.minStock}>{stock.min_stock_level}</td>
+                <td className={styles.quantity}>{parseFloat(String(stock.quantity))}</td>
+                <td className={styles.minStock}>{parseFloat(String(stock.min_stock_level))}</td>
                 <td>
                   {isLowStock ? (
                     <Badge variant="warning">{t('warehouses:badges.lowStock')}</Badge>

@@ -249,7 +249,7 @@ function SalesTab({ sales }: { sales: CustomerSale[] }) {
                     <tr key={item.id}>
                       <td>{item.product_name}</td>
                       <td>{item.barcode || '-'}</td>
-                      <td>{item.quantity}</td>
+                      <td>{parseFloat(String(item.quantity))}</td>
                       <td>{formatCurrency(item.unit_price)}</td>
                       <td>%{item.vat_rate}</td>
                       <td>{formatCurrency(item.line_total)}</td>
@@ -333,7 +333,7 @@ function ReturnsTab({ returns }: { returns: CustomerReturn[] }) {
                     <tr key={item.id}>
                       <td>{item.product_name}</td>
                       <td>{item.barcode || '-'}</td>
-                      <td>{item.quantity}</td>
+                      <td>{parseFloat(String(item.quantity))}</td>
                       <td>{formatCurrency(item.unit_price)}</td>
                       <td>{formatCurrency(item.vat_amount)}</td>
                       <td>{formatCurrency(item.line_total)}</td>

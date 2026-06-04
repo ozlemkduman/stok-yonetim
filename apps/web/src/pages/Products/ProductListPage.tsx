@@ -214,7 +214,7 @@ export function ProductListPage() {
       header: t('products:columns.totalSold'),
       align: 'right',
       render: (p) => (
-        <strong>{p.total_sold ?? '-'}</strong>
+        <strong>{p.total_sold != null ? parseFloat(String(p.total_sold)) : '-'}</strong>
       )
     },
     {
@@ -222,8 +222,8 @@ export function ProductListPage() {
       header: t('products:columns.stock'),
       align: 'right',
       render: (p) => (
-        <Badge variant={p.stock_quantity <= p.min_stock_level ? 'danger' : 'success'}>
-          {p.stock_quantity} {p.unit}
+        <Badge variant={Number(p.stock_quantity) <= Number(p.min_stock_level) ? 'danger' : 'success'}>
+          {parseFloat(String(p.stock_quantity))} {p.unit}
         </Badge>
       )
     },

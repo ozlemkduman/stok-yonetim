@@ -108,7 +108,7 @@ export const InvoicePrintView = forwardRef<HTMLDivElement, InvoicePrintViewProps
                 <td>{index + 1}</td>
                 <td>{item.product_name}</td>
                 <td>{item.barcode || '-'}</td>
-                <td className={styles.right}>{item.quantity}</td>
+                <td className={styles.right}>{parseFloat(String(item.quantity))}</td>
                 <td className={styles.right}>{formatCurrency(item.unit_price)}</td>
                 {data.items.some(i => i.discount_rate > 0) && (
                   <td className={styles.right}>

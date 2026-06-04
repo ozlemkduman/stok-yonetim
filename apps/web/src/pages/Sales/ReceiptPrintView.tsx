@@ -53,7 +53,7 @@ export const ReceiptPrintView = forwardRef<HTMLDivElement, ReceiptPrintViewProps
             <div key={item.id} className={styles.item}>
               <div className={styles.itemName}>{item.product_name}</div>
               <div className={styles.itemDetails}>
-                <span>{item.quantity} x {formatCurrency(item.unit_price)}</span>
+                <span>{parseFloat(String(item.quantity))} x {formatCurrency(item.unit_price)}</span>
                 <span>{formatCurrency(item.line_total)}</span>
               </div>
               {item.discount_rate > 0 && (

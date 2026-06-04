@@ -54,7 +54,7 @@ export function ProductDetailPage() {
 
   const { product, sales, returns, movements, stats, warehouseStocks } = data;
 
-  const isLowStock = product.stock_quantity <= product.min_stock_level;
+  const isLowStock = Number(product.stock_quantity) <= Number(product.min_stock_level);
 
   return (
     <div className={styles.page}>
@@ -79,7 +79,7 @@ export function ProductDetailPage() {
           <div className={styles.stockCard}>
             <span className={styles.stockLabel}>{t('products:detail.currentStock')}</span>
             <span className={`${styles.stockValue} ${isLowStock ? styles.lowStock : ''}`}>
-              {formatNumber(product.stock_quantity)} {product.unit}
+              {formatNumber(Number(product.stock_quantity))} {product.unit}
             </span>
             <span className={styles.stockNote}>{t('products:detail.minStock', { value: formatNumber(product.min_stock_level), unit: product.unit })}</span>
           </div>

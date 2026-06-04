@@ -331,7 +331,7 @@ export function SaleDetailPage() {
                     {(item as any).product_is_active === false && <span className={styles.inactiveBadge}>({t('common:labels.inactive')})</span>}
                   </td>
                   <td>{item.barcode || '-'}</td>
-                  <td className={styles.alignRight}>{item.quantity}</td>
+                  <td className={styles.alignRight}>{parseFloat(String(item.quantity))}</td>
                   <td className={styles.alignRight}>{formatCurrency(item.unit_price)}</td>
                   <td className={styles.alignRight}>
                     {item.discount_rate > 0 ? `%${item.discount_rate}` : '-'}

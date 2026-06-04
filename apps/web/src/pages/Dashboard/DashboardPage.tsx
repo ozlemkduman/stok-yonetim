@@ -174,7 +174,7 @@ export function DashboardPage() {
       key: 'stock_quantity',
       header: t('dashboard:lowStockTable.columnCurrentStock'),
       align: 'right',
-      render: (p) => <Badge variant="danger">{p.stock_quantity}</Badge>,
+      render: (p) => <Badge variant="danger">{parseFloat(String(p.stock_quantity))}</Badge>,
     },
     { key: 'min_stock_level', header: t('dashboard:lowStockTable.columnMinLevel'), align: 'right' },
   ];
