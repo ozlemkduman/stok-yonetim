@@ -22,16 +22,16 @@ export async function updateWarehouseStock(
     warehouseId?: string | null;
   },
 ): Promise<string | null> {
-  let warehouseId = params.warehouseId || null;
   const tenantId = getCurrentTenantId();
+  if (!tenantId) return null; // Tenant context yoksa cross-tenant leak'i önle
+
+  let warehouseId = params.warehouseId || null;
 
   if (!warehouseId) {
-    if (!tenantId) return null; // Tenant context yoksa cross-tenant leak'i önle
     const defaultWh = await trx('warehouses').where({ tenant_id: tenantId, is_default: true, is_active: true }).first();
     warehouseId = defaultWh?.id || null;
   }
   if (!warehouseId) {
-    if (!tenantId) return null;
     const anyWh = await trx('warehouses').where({ tenant_id: tenantId, is_active: true }).orderBy('created_at', 'asc').first();
     warehouseId = anyWh?.id || null;
   }
@@ -51,6 +51,7 @@ export async function updateWarehouseStock(
       });
   } else {
     await trx('warehouse_stocks').insert({
+      tenant_id: tenantId,
       warehouse_id: warehouseId,
       product_id: params.productId,
       quantity: params.delta,

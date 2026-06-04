@@ -98,6 +98,7 @@ export class OpeningStockService {
       for (const item of dto.items) {
         const product = await trx('products').where('id', item.product_id).first();
         await trx('stock_movements').insert({
+          tenant_id: tenantId,
           warehouse_id: warehouseId,
           product_id: item.product_id,
           movement_type: 'opening',
@@ -149,11 +150,13 @@ export class OpeningStockService {
       await trx('opening_stock_entries').where('id', id).update({ status: 'cancelled', updated_at: trx.fn.now() });
 
       // Ters stok hareketi
-      if (entry.warehouse_id) {
+      const cancelTenantId = getCurrentTenantId();
+      if (entry.warehouse_id && cancelTenantId) {
         for (const item of entry.items) {
           if (!item.product_id) continue;
           const product = await trx('products').where('id', item.product_id).first();
           await trx('stock_movements').insert({
+            tenant_id: cancelTenantId,
             warehouse_id: entry.warehouse_id,
             product_id: item.product_id,
             movement_type: 'opening_cancel',
