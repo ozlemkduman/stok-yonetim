@@ -24,18 +24,18 @@ export async function writeStockMovement(
     warehouseId?: string | null;
   },
 ): Promise<void> {
-  let warehouseId = params.warehouseId || null;
   const tenantId = getCurrentTenantId();
+  if (!tenantId) return; // Tenant context yoksa cross-tenant leak'i önle
+
+  let warehouseId = params.warehouseId || null;
 
   if (!warehouseId) {
-    if (!tenantId) return; // Tenant context yoksa cross-tenant leak'i önle
     const defaultWarehouse = await trx('warehouses')
       .where({ tenant_id: tenantId, is_default: true, is_active: true })
       .first();
     warehouseId = defaultWarehouse?.id || null;
   }
   if (!warehouseId) {
-    if (!tenantId) return;
     const anyWarehouse = await trx('warehouses').where({ tenant_id: tenantId, is_active: true }).orderBy('created_at', 'asc').first();
     warehouseId = anyWarehouse?.id || null;
   }
@@ -48,6 +48,7 @@ export async function writeStockMovement(
   const stockAfter = Number(product?.stock_quantity) || 0;
 
   await trx('stock_movements').insert({
+    tenant_id: tenantId,
     warehouse_id: warehouseId,
     product_id: params.productId,
     movement_type: params.movementType,
