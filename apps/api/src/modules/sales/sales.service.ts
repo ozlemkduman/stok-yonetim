@@ -9,6 +9,7 @@ import { ActivityLogService } from '../../common/services/activity-log.service';
 import { getCurrentTenantId } from '../../common/context/tenant.context';
 import { recordSaleAccountMovement } from '../../common/helpers/account-movement.helper';
 import { writeStockMovement } from '../../common/helpers/stock-movement.helper';
+import { updateWarehouseStock } from '../../common/helpers/warehouse-stock.helper';
 
 @Injectable()
 export class SalesService {
@@ -124,8 +125,9 @@ export class SalesService {
         created_by: userId || null,
       }, saleItems, trx);
 
-      // Stok hareketi audit kaydı (her satır için)
+      // Stok: warehouse_stocks güncelle + audit kaydı
       for (const item of dto.items) {
+        await updateWarehouseStock(trx, { productId: item.product_id, delta: -item.quantity });
         await writeStockMovement(trx, {
           productId: item.product_id,
           movementType: 'sale',
@@ -195,6 +197,7 @@ export class SalesService {
           stock_quantity: trx.raw('stock_quantity + ?', [item.quantity]),
           updated_at: trx.fn.now(),
         });
+        await updateWarehouseStock(trx, { productId: item.product_id, delta: Number(item.quantity) });
         await writeStockMovement(trx, {
           productId: item.product_id,
           movementType: 'sale_cancel',
