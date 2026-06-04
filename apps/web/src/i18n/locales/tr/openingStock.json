@@ -1,0 +1,73 @@
+{
+  "pageTitle": "Açılış Stoğu",
+  "subtitle": "Sistemden önce mevcut envanteri tek seferde girin (devir fişi)",
+  "newEntry": "+ Yeni Açılış Kaydı",
+  "searchPlaceholder": "Belge no ile ara...",
+  "empty": "Henüz açılış kaydı yok",
+  "info": "Açılış stoğu; sisteme geçişten önce zaten elinizde olan stoğu, maliyetiyle birlikte sisteme tanıtmak içindir. Kasa/banka hareketi oluşturmaz, tedarikçi cari etkilenmez. Gerçek alışlardan ayrı raporlanır.",
+  "columns": {
+    "number": "Belge No",
+    "date": "Tarih",
+    "warehouse": "Depo",
+    "createdBy": "Kaydeden",
+    "status": "Durum"
+  },
+  "filters": {
+    "active": "Aktif",
+    "cancelled": "İptal",
+    "all": "Tümü"
+  },
+  "statuses": {
+    "completed": "Tamamlandı",
+    "cancelled": "İptal Edildi"
+  },
+  "form": {
+    "title": "Yeni Açılış Kaydı",
+    "back": "Açılış Stoğu",
+    "warning": "Bu belge bir gerçek alış değildir. Sadece envanter ve maliyet girer; kasa/banka/tedarikçi cari hareketi oluşturulmaz. Genelde sadece sisteme geçişte bir kez kullanılır.",
+    "basicInfo": "Temel Bilgiler",
+    "entryDate": "Tarih",
+    "warehouse": "Depo",
+    "items": "Stok Kalemleri",
+    "addItem": "Kalem Ekle",
+    "emptyItems": "Henüz kalem eklenmedi. \"Kalem Ekle\" butonuna tıklayın.",
+    "noProductsWarning": "Henüz ürün yok. Önce 'Ürünler' sayfasından ürün ekleyin, sonra buradan stoklarını girin.",
+    "product": "Ürün",
+    "selectProduct": "Ürün seçin",
+    "quantity": "Miktar",
+    "unitCost": "Birim Maliyet",
+    "lineTotal": "Tutar",
+    "totalValue": "Toplam Stok Değeri",
+    "notes": "Not",
+    "notesPlaceholder": "Ek açıklama...",
+    "save": "Açılışı Kaydet"
+  },
+  "validation": {
+    "addItem": "En az bir kalem ekleyin",
+    "selectProduct": "Tüm kalemlerde ürün seçin",
+    "invalidQuantity": "Geçerli bir miktar girin"
+  },
+  "toast": {
+    "loadError": "Açılış kayıtları yüklenemedi",
+    "dataLoadError": "Veriler yüklenemedi",
+    "noProducts": "Ürün listesi boş — önce ürün eklemelisiniz",
+    "created": "Açılış stoğu kaydedildi",
+    "cancelled": "Açılış kaydı iptal edildi",
+    "saveError": "Kayıt başarısız",
+    "cancelError": "İptal başarısız"
+  },
+  "detail": {
+    "back": "Açılış Stoğu",
+    "notFound": "Açılış kaydı bulunamadı",
+    "info": "Belge Bilgileri",
+    "createdBy": "Kaydeden",
+    "totalValue": "Toplam Stok Değeri",
+    "items": "Kalemler ({{count}})",
+    "notes": "Not",
+    "cancel": "Açılışı İptal Et",
+    "cancelling": "İptal Ediliyor..."
+  },
+  "confirm": {
+    "cancel": "{{number}} numaralı açılış kaydını iptal etmek istediğinize emin misiniz? Stoklar geri alınacak (yeterli stok varsa)."
+  }
+}

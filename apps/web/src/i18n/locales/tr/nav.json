@@ -17,6 +17,7 @@
     "returns": "İadeler",
     "suppliers": "Tedarikçiler",
     "purchases": "Alışlar",
+    "openingStock": "Açılış Stoğu",
     "products": "Ürünler",
     "stockMovements": "Stok Hareketleri",
     "warehouses": "Depolar",

@@ -1,0 +1,73 @@
+{
+  "pageTitle": "Opening Stock",
+  "subtitle": "Enter pre-existing inventory at system start (opening / carry-over entry)",
+  "newEntry": "+ New Opening Entry",
+  "searchPlaceholder": "Search by document number...",
+  "empty": "No opening entries yet",
+  "info": "Opening stock is used to record inventory that already existed before you started using the system, with its cost. No cash/bank movement, no supplier balance impact. Reported separately from real purchases.",
+  "columns": {
+    "number": "Document #",
+    "date": "Date",
+    "warehouse": "Warehouse",
+    "createdBy": "Created By",
+    "status": "Status"
+  },
+  "filters": {
+    "active": "Active",
+    "cancelled": "Cancelled",
+    "all": "All"
+  },
+  "statuses": {
+    "completed": "Completed",
+    "cancelled": "Cancelled"
+  },
+  "form": {
+    "title": "New Opening Entry",
+    "back": "Opening Stock",
+    "warning": "This is not a real purchase. It enters inventory and cost only; no cash, bank or supplier account movement is created. Typically used once, when switching to the system.",
+    "basicInfo": "Basic Info",
+    "entryDate": "Date",
+    "warehouse": "Warehouse",
+    "items": "Stock Items",
+    "addItem": "Add Item",
+    "emptyItems": "No items added yet. Click \"Add Item\".",
+    "noProductsWarning": "No products yet. Please add products from the 'Products' page first, then enter their opening stock here.",
+    "product": "Product",
+    "selectProduct": "Select product",
+    "quantity": "Quantity",
+    "unitCost": "Unit Cost",
+    "lineTotal": "Total",
+    "totalValue": "Total Stock Value",
+    "notes": "Notes",
+    "notesPlaceholder": "Additional notes...",
+    "save": "Save Opening Entry"
+  },
+  "validation": {
+    "addItem": "Add at least one item",
+    "selectProduct": "Select a product for all items",
+    "invalidQuantity": "Enter a valid quantity"
+  },
+  "toast": {
+    "loadError": "Failed to load opening entries",
+    "dataLoadError": "Failed to load data",
+    "noProducts": "Product list is empty — please add products first",
+    "created": "Opening stock saved",
+    "cancelled": "Opening entry cancelled",
+    "saveError": "Save failed",
+    "cancelError": "Cancel failed"
+  },
+  "detail": {
+    "back": "Opening Stock",
+    "notFound": "Opening entry not found",
+    "info": "Document Info",
+    "createdBy": "Created By",
+    "totalValue": "Total Stock Value",
+    "items": "Items ({{count}})",
+    "notes": "Notes",
+    "cancel": "Cancel Entry",
+    "cancelling": "Cancelling..."
+  },
+  "confirm": {
+    "cancel": "Cancel opening entry {{number}}? Stock will be reverted (if sufficient stock exists)."
+  }
+}

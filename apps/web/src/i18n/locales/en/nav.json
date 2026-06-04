@@ -17,6 +17,7 @@
     "returns": "Returns",
     "suppliers": "Suppliers",
     "purchases": "Purchases",
+    "openingStock": "Opening Stock",
     "products": "Products",
     "stockMovements": "Stock Movements",
     "warehouses": "Warehouses",
