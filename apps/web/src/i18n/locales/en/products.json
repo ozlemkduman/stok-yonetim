@@ -168,6 +168,8 @@
     "adjustment": "Adjustment",
     "purchase": "Purchase",
     "opening": "Opening Stock",
-    "opening_cancel": "Opening Reversal"
+    "opening_cancel": "Opening Reversal",
+    "purchase_cancel": "Purchase Cancel",
+    "sale_cancel": "Sale Cancel"
   }
 }
