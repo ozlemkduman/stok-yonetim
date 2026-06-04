@@ -47,6 +47,7 @@ const menuGroups: MenuGroup[] = [
     items: [
       { path: '/suppliers', labelKey: 'items.suppliers' },
       { path: '/purchases', labelKey: 'items.purchases' },
+      { path: '/opening-stock', labelKey: 'items.openingStock' },
     ],
   },
   {

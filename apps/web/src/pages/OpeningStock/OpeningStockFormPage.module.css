@@ -1,0 +1,67 @@
+.page { display: flex; flex-direction: column; gap: var(--space-4); }
+.header { display: flex; align-items: center; gap: var(--space-3); flex-wrap: wrap; }
+.title { margin: 0; font-size: var(--font-size-xl); font-weight: 700; }
+.loading { padding: var(--space-6); text-align: center; color: var(--color-text-muted); }
+
+.card {
+  background: var(--color-bg-card, #fff);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  border: 1px solid var(--color-border, rgba(0,0,0,0.06));
+}
+
+.row { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-3); margin-top: var(--space-3); }
+@media (max-width: 640px) { .row { grid-template-columns: 1fr; } }
+
+.field { display: flex; flex-direction: column; gap: 6px; }
+.field label { font-size: var(--font-size-sm); font-weight: 600; color: var(--color-text); }
+
+.itemsHeader { display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-3); }
+.emptyItems { padding: var(--space-6); text-align: center; color: var(--color-text-muted); border: 2px dashed var(--color-border); border-radius: var(--radius-md); }
+
+.itemsList { display: flex; flex-direction: column; gap: var(--space-3); }
+.itemCard {
+  border: 1px solid var(--color-border, rgba(0,0,0,0.08));
+  border-radius: var(--radius-md);
+  padding: var(--space-3);
+  background: var(--color-bg-card, #fff);
+}
+.itemHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-bottom: var(--space-3);
+  padding-bottom: var(--space-2);
+  border-bottom: 1px solid var(--color-border-light, rgba(0,0,0,0.05));
+}
+.itemNumber { color: var(--color-text-muted); font-weight: 600; font-size: var(--font-size-sm); }
+.itemTotal { flex: 1; text-align: right; font-size: var(--font-size-md); color: var(--color-primary, #3b82f6); }
+
+.itemBody { display: flex; flex-direction: column; gap: var(--space-3); }
+.itemFieldFull { display: flex; flex-direction: column; gap: 6px; }
+.itemFieldFull label, .itemField label { font-size: var(--font-size-sm); font-weight: 600; }
+.itemFieldGrid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-3); }
+@media (max-width: 640px) { .itemFieldGrid { grid-template-columns: 1fr; } }
+.itemField { display: flex; flex-direction: column; gap: 6px; }
+
+.warningBox {
+  background: color-mix(in srgb, var(--color-warning, #f59e0b) 12%, transparent);
+  border-left: 4px solid var(--color-warning, #f59e0b);
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+}
+
+.summary {
+  background: var(--color-bg-card, #fff);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  border: 1px solid var(--color-border);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+.summaryRow { display: flex; justify-content: space-between; font-size: var(--font-size-md); }
+
+.actions { display: flex; justify-content: flex-end; gap: var(--space-2); }

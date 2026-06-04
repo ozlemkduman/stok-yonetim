@@ -12,6 +12,7 @@ import trProducts from './locales/tr/products.json';
 import trCustomers from './locales/tr/customers.json';
 import trSuppliers from './locales/tr/suppliers.json';
 import trPurchases from './locales/tr/purchases.json';
+import trOpeningStock from './locales/tr/openingStock.json';
 import trReturns from './locales/tr/returns.json';
 import trExpenses from './locales/tr/expenses.json';
 import trAccounts from './locales/tr/accounts.json';
@@ -34,6 +35,7 @@ import enProducts from './locales/en/products.json';
 import enCustomers from './locales/en/customers.json';
 import enSuppliers from './locales/en/suppliers.json';
 import enPurchases from './locales/en/purchases.json';
+import enOpeningStock from './locales/en/openingStock.json';
 import enReturns from './locales/en/returns.json';
 import enExpenses from './locales/en/expenses.json';
 import enAccounts from './locales/en/accounts.json';
@@ -48,7 +50,7 @@ import enIntegrations from './locales/en/integrations.json';
 
 const ns = [
   'common', 'nav', 'landing', 'auth', 'dashboard', 'sales', 'products',
-  'customers', 'suppliers', 'purchases', 'returns', 'expenses', 'accounts', 'warehouses', 'quotes',
+  'customers', 'suppliers', 'purchases', 'openingStock', 'returns', 'expenses', 'accounts', 'warehouses', 'quotes',
   'reports', 'settings', 'admin', 'crm', 'fieldteam', 'integrations',
 ] as const;
 
@@ -60,7 +62,7 @@ i18n
       tr: {
         common: trCommon, nav: trNav, landing: trLanding, auth: trAuth,
         dashboard: trDashboard, sales: trSales, products: trProducts,
-        customers: trCustomers, suppliers: trSuppliers, purchases: trPurchases,
+        customers: trCustomers, suppliers: trSuppliers, purchases: trPurchases, openingStock: trOpeningStock,
         returns: trReturns, expenses: trExpenses,
         accounts: trAccounts, warehouses: trWarehouses, quotes: trQuotes,
         reports: trReports, settings: trSettings,
@@ -69,7 +71,7 @@ i18n
       en: {
         common: enCommon, nav: enNav, landing: enLanding, auth: enAuth,
         dashboard: enDashboard, sales: enSales, products: enProducts,
-        customers: enCustomers, suppliers: enSuppliers, purchases: enPurchases,
+        customers: enCustomers, suppliers: enSuppliers, purchases: enPurchases, openingStock: enOpeningStock,
         returns: enReturns, expenses: enExpenses,
         accounts: enAccounts, warehouses: enWarehouses, quotes: enQuotes,
         reports: enReports, settings: enSettings,
