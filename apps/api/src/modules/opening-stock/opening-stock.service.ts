@@ -31,13 +31,23 @@ export class OpeningStockService {
       const entryDate = dto.entry_date ? new Date(dto.entry_date) : new Date();
       const items: Partial<OpeningStockItem>[] = [];
 
-      // Varsayılan depo seçilmediyse tenant'ın default deposu
+      // Depo zorunlu — audit izi (stock_movements) için warehouse_id NOT NULL.
+      // Form'da seçilmediyse tenant'ın default deposunu, yoksa ilk aktif depoyu seç.
       let warehouseId = dto.warehouse_id || null;
       if (!warehouseId) {
         const defaultWarehouse = await trx('warehouses')
           .where({ is_default: true, is_active: true })
           .first();
         warehouseId = defaultWarehouse?.id || null;
+      }
+      if (!warehouseId) {
+        const anyWarehouse = await trx('warehouses').where({ is_active: true }).orderBy('created_at', 'asc').first();
+        warehouseId = anyWarehouse?.id || null;
+      }
+      if (!warehouseId) {
+        throw new BadRequestException(
+          'Açılış stoğu kaydedilemedi: en az bir aktif depo gereklidir. Lütfen önce Depolar sayfasından depo ekleyin.',
+        );
       }
 
       for (const item of dto.items) {
@@ -69,22 +79,20 @@ export class OpeningStockService {
         created_by: userId || null,
       }, items, trx);
 
-      // Stok hareketleri kaydı (audit izi). Depo yoksa atla.
-      if (warehouseId) {
-        for (const item of dto.items) {
-          const product = await trx('products').where('id', item.product_id).first();
-          await trx('stock_movements').insert({
-            warehouse_id: warehouseId,
-            product_id: item.product_id,
-            movement_type: 'opening',
-            quantity: Math.round(item.quantity),
-            stock_after: Math.round(Number(product.stock_quantity) || 0),
-            reference_type: 'opening_stock',
-            reference_id: entry.id,
-            notes: `Açılış: ${entryNumber}`,
-            movement_date: entryDate,
-          });
-        }
+      // Stok hareketleri kaydı (audit izi) — depo yukarıda garanti edildi.
+      for (const item of dto.items) {
+        const product = await trx('products').where('id', item.product_id).first();
+        await trx('stock_movements').insert({
+          warehouse_id: warehouseId,
+          product_id: item.product_id,
+          movement_type: 'opening',
+          quantity: Math.round(item.quantity),
+          stock_after: Math.round(Number(product.stock_quantity) || 0),
+          reference_type: 'opening_stock',
+          reference_id: entry.id,
+          notes: `Açılış: ${entryNumber}`,
+          movement_date: entryDate,
+        });
       }
 
       await this.activityLog.log({

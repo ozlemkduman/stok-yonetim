@@ -166,6 +166,8 @@
     "transfer_in": "Transfer Giriş",
     "transfer_out": "Transfer Çıkış",
     "adjustment": "Düzeltme",
-    "purchase": "Alış"
+    "purchase": "Alış",
+    "opening": "Açılış Stoğu",
+    "opening_cancel": "Açılış İptali"
   }
 }

@@ -166,6 +166,8 @@
     "transfer_in": "Transfer In",
     "transfer_out": "Transfer Out",
     "adjustment": "Adjustment",
-    "purchase": "Purchase"
+    "purchase": "Purchase",
+    "opening": "Opening Stock",
+    "opening_cancel": "Opening Reversal"
   }
 }
