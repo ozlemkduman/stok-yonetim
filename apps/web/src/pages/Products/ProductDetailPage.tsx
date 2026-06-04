@@ -339,8 +339,8 @@ function MovementsTab({
   }
 
   const getMovementVariant = (type: string): 'success' | 'danger' | 'warning' | 'default' => {
-    if (['return', 'transfer_in', 'purchase', 'opening'].includes(type)) return 'success';
-    if (['sale', 'transfer_out', 'opening_cancel'].includes(type)) return 'danger';
+    if (['return', 'transfer_in', 'purchase', 'opening', 'sale_cancel'].includes(type)) return 'success';
+    if (['sale', 'transfer_out', 'opening_cancel', 'purchase_cancel'].includes(type)) return 'danger';
     return 'default';
   };
 

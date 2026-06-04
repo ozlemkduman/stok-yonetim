@@ -8,6 +8,7 @@ import { createPaginatedResult } from '../../common/dto/pagination.dto';
 import { ActivityLogService } from '../../common/services/activity-log.service';
 import { getCurrentTenantId } from '../../common/context/tenant.context';
 import { recordSaleAccountMovement } from '../../common/helpers/account-movement.helper';
+import { writeStockMovement } from '../../common/helpers/stock-movement.helper';
 
 @Injectable()
 export class SalesService {
@@ -123,6 +124,19 @@ export class SalesService {
         created_by: userId || null,
       }, saleItems, trx);
 
+      // Stok hareketi audit kaydı (her satır için)
+      for (const item of dto.items) {
+        await writeStockMovement(trx, {
+          productId: item.product_id,
+          movementType: 'sale',
+          quantity: -item.quantity,
+          referenceType: 'sale',
+          referenceId: sale.id,
+          notes: `Satış: ${invoiceNumber}`,
+          movementDate: dto.sale_date ? new Date(dto.sale_date) : new Date(),
+        });
+      }
+
       if (dto.customer_id && dto.payment_method === 'veresiye') {
         await trx('customers').where('id', dto.customer_id).update({
           balance: trx.raw('balance - ?', [grandTotal]),
@@ -180,6 +194,14 @@ export class SalesService {
         await trx('products').where('id', item.product_id).update({
           stock_quantity: trx.raw('stock_quantity + ?', [item.quantity]),
           updated_at: trx.fn.now(),
+        });
+        await writeStockMovement(trx, {
+          productId: item.product_id,
+          movementType: 'sale_cancel',
+          quantity: item.quantity,
+          referenceType: 'sale',
+          referenceId: sale.id,
+          notes: `Satış iptali: ${sale.invoice_number}`,
         });
       }
 

@@ -8,6 +8,7 @@ import { createPaginatedResult } from '../../common/dto/pagination.dto';
 import { ActivityLogService } from '../../common/services/activity-log.service';
 import { getCurrentTenantId } from '../../common/context/tenant.context';
 import { accountTypeForPayment } from '../../common/helpers/account-movement.helper';
+import { writeStockMovement } from '../../common/helpers/stock-movement.helper';
 
 /**
  * Alış için tenant'ın kasa/banka hesabından gider hareketi yapar.
@@ -157,6 +158,20 @@ export class PurchasesService {
         created_by: userId || null,
       }, purchaseItems, trx);
 
+      // Stok hareketi audit kaydı (her satır için)
+      for (const item of dto.items) {
+        await writeStockMovement(trx, {
+          productId: item.product_id,
+          movementType: 'purchase',
+          quantity: item.quantity,
+          referenceType: 'purchase',
+          referenceId: purchase.id,
+          notes: `Alış: ${purchaseNumber}`,
+          movementDate: purchaseDate,
+          warehouseId: dto.warehouse_id || null,
+        });
+      }
+
       // Ödeme yöntemine göre yan etkiler
       if (dto.supplier_id && dto.payment_method === 'veresiye') {
         // Veresiye alış: tedarikçi bize alacaklı → supplier.balance -= grandTotal (negatif = bizim borcumuz)
@@ -199,6 +214,15 @@ export class PurchasesService {
         await trx('products').where('id', item.product_id).update({
           stock_quantity: trx.raw('stock_quantity - ?', [item.quantity]),
           updated_at: trx.fn.now(),
+        });
+        await writeStockMovement(trx, {
+          productId: item.product_id,
+          movementType: 'purchase_cancel',
+          quantity: -Number(item.quantity),
+          referenceType: 'purchase',
+          referenceId: purchase.id,
+          notes: `Alış iptali: ${purchase.purchase_number}`,
+          warehouseId: purchase.warehouse_id || null,
         });
       }
 

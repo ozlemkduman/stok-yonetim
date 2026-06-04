@@ -168,6 +168,8 @@
     "adjustment": "Düzeltme",
     "purchase": "Alış",
     "opening": "Açılış Stoğu",
-    "opening_cancel": "Açılış İptali"
+    "opening_cancel": "Açılış İptali",
+    "purchase_cancel": "Alış İptali",
+    "sale_cancel": "Satış İptali"
   }
 }

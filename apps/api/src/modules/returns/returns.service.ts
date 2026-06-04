@@ -5,6 +5,7 @@ import { CreateReturnDto } from './dto';
 import { DatabaseService } from '../../database/database.service';
 import { createPaginatedResult } from '../../common/dto/pagination.dto';
 import { ActivityLogService } from '../../common/services/activity-log.service';
+import { writeStockMovement } from '../../common/helpers/stock-movement.helper';
 
 @Injectable()
 export class ReturnsService {
@@ -128,6 +129,18 @@ export class ReturnsService {
         status: 'completed',
         created_by: userId || null,
       }, returnItems, trx);
+
+      // Stok hareketi audit kaydı
+      for (const item of dto.items) {
+        await writeStockMovement(trx, {
+          productId: item.product_id,
+          movementType: 'return',
+          quantity: item.quantity,
+          referenceType: 'return',
+          referenceId: ret.id,
+          notes: `İade: ${returnNumber}`,
+        });
+      }
 
       if (dto.customer_id) {
         await trx('customers').where('id', dto.customer_id).forUpdate().update({
