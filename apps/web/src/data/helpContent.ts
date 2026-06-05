@@ -57,6 +57,18 @@ export const helpContent: Record<string, HelpItem> = {
       'Bu kayıtlar "Alışlar" raporunda görünmez; yıllık alış cirosu hesabına dahil edilmez (devir farkıyla karışmaması için).',
     ],
   },
+  '/stock-count': {
+    title: 'Stok Sayım',
+    items: [
+      'Stok Sayım, deponuzdaki fiziksel stoğu sayıp sistemdekiyle karşılaştırmak içindir.',
+      '"Sayım Başlat" dediğinizde tenant\'ın tüm aktif ürünleri için sistem stoğu o anki haliyle snapshot alınır.',
+      'Tek tek ürünleri sayıp "Sayılan" alanına yazın — değer girilince otomatik kaydedilir.',
+      'Sayılmayan ürünleri "Sayılmayan" filtresi ile bulabilirsiniz; farkı olanlar için "Farklı Olan" filtresi var.',
+      '"Tamamla" → farklar otomatik adjustment hareketi olarak yazılır, products.stock_quantity ve warehouse_stocks counted değerine güncellenir. Stok hareketleri sayfasında "Düzeltme" tipiyle audit izi görünür.',
+      'Sayılmayan ürünler korunur (atlanır), mevcut sistem stoğu değişmez.',
+      'Sayım sırasında diğer satış/alış işlemleri devam edebilir — ama dikkat: snapshot anlık alındığı için sayım uzun sürerse arada yapılan satışlar tamamlama anında "fark" olarak değil "sistem stoğunun değişimi" olarak yansır. Sayımı kısa sürede tamamlayın veya satışları durdurun.',
+    ],
+  },
   '/opening-stock/new': {
     title: 'Yeni Açılış Kaydı',
     items: [

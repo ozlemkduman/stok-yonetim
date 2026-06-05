@@ -56,6 +56,7 @@ const menuGroups: MenuGroup[] = [
     items: [
       { path: '/products', labelKey: 'items.products' },
       { path: '/warehouses/movements', labelKey: 'items.stockMovements' },
+      { path: '/stock-count', labelKey: 'items.stockCount' },
       { path: '/warehouses', labelKey: 'items.warehouses', feature: 'warehouses' },
     ],
   },

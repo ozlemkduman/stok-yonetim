@@ -1,0 +1,72 @@
+{
+  "pageTitle": "Stok Sayım",
+  "subtitle": "Fiziksel sayım — sistem stoğunu gerçek stoğa eşitle",
+  "info": "Stok Sayım, depodaki fiziksel stoğu sayıp sistemle karşılaştırmak içindir. Sayım başlattığınızda mevcut tüm aktif ürünlerin sistem stoğu kaydedilir. Tek tek sayılan miktarları girin; 'Tamamla' dediğinizde farklar otomatik düzeltme (adjustment) olarak işlenir.",
+  "newCount": "Yeni Sayım Başlat",
+  "selectWarehouse": "Depo seçin",
+  "default": "varsayılan",
+  "startCount": "Sayım Başlat",
+  "starting": "Başlatılıyor...",
+  "searchPlaceholder": "Sayım no ile ara...",
+  "empty": "Henüz sayım kaydı yok",
+  "columns": {
+    "number": "Sayım No",
+    "startedAt": "Başlangıç",
+    "completedAt": "Bitiş",
+    "warehouse": "Depo",
+    "status": "Durum",
+    "createdBy": "Başlatan"
+  },
+  "filters": {
+    "all": "Tümü",
+    "in_progress": "Devam Eden",
+    "completed": "Tamamlanan",
+    "cancelled": "İptal"
+  },
+  "statuses": {
+    "in_progress": "Devam Ediyor",
+    "completed": "Tamamlandı",
+    "cancelled": "İptal Edildi"
+  },
+  "stats": {
+    "total": "Toplam Ürün",
+    "counted": "Sayılan",
+    "uncounted": "Sayılmayan",
+    "differences": "Farklı Olan"
+  },
+  "detail": {
+    "back": "Stok Sayım",
+    "notFound": "Sayım bulunamadı",
+    "completedAt": "Tamamlandı",
+    "complete": "Sayımı Tamamla",
+    "completing": "Tamamlanıyor...",
+    "cancel": "İptal Et",
+    "searchPlaceholder": "Ürün adı veya barkod ara...",
+    "product": "Ürün",
+    "expected": "Sistem",
+    "counted": "Sayılan",
+    "difference": "Fark",
+    "noResults": "Filtreye uyan ürün yok",
+    "notes": "Not",
+    "filters": {
+      "all": "Tümü",
+      "counted": "Sayılan",
+      "uncounted": "Sayılmayan",
+      "differences": "Farklı Olan"
+    }
+  },
+  "confirm": {
+    "complete": "{{counted}} / {{total}} ürün sayıldı. Sayımı tamamlamak istediğinize emin misiniz? Farklar düzeltme olarak işlenecek, sayılmayanlar atlanacak.",
+    "cancel": "Sayımı iptal etmek istediğinize emin misiniz? Sayılan değerler kaybolur."
+  },
+  "toast": {
+    "loadError": "Sayım yüklenemedi",
+    "created": "Sayım başlatıldı",
+    "createError": "Sayım başlatılamadı",
+    "saveError": "Kaydedilemedi",
+    "completed": "Sayım tamamlandı: {{updated}} fark düzeltildi, {{unchanged}} aynı, {{skipped}} atlandı",
+    "completeError": "Tamamlanamadı",
+    "cancelled": "Sayım iptal edildi",
+    "cancelError": "İptal edilemedi"
+  }
+}
