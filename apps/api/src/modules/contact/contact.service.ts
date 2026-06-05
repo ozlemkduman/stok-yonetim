@@ -13,7 +13,7 @@ export class ContactService {
   ) {}
 
   async submitDemoApplication(dto: DemoApplicationDto): Promise<boolean> {
-    const recipient = this.configService.get<string>('DEMO_NOTIFY_EMAIL') || 'test@stoksayac.com';
+    const recipient = this.configService.get<string>('DEMO_NOTIFY_EMAIL') || 'stoksayac@gmail.com';
 
     const html = `
       <div style="font-family: 'Segoe UI', Tahoma, sans-serif; max-width: 600px; margin: 0 auto; padding: 40px 20px;">
