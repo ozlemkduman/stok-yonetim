@@ -36,7 +36,11 @@
 .posDiff { color: var(--color-success, #10b981); font-weight: 600; }
 .negDiff { color: var(--color-danger, #ef4444); font-weight: 600; }
 .barcode { font-size: var(--font-size-xs); color: var(--color-text-muted); margin-top: 2px; }
-.countedInput { max-width: 110px; text-align: right; }
+.countedInput {
+  max-width: 110px;
+  margin-left: auto;
+}
+.countedInput input { text-align: right; }
 .empty { padding: var(--space-6); text-align: center; color: var(--color-text-muted); }
 
 .inactiveBadge {
