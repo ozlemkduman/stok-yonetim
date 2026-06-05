@@ -37,6 +37,7 @@ import { SupplierListPage } from './pages/Suppliers';
 import { PurchaseListPage, PurchaseFormPage, PurchaseDetailPage } from './pages/Purchases';
 import { OpeningStockListPage, OpeningStockFormPage, OpeningStockDetailPage } from './pages/OpeningStock';
 import { StockCountListPage, StockCountDetailPage } from './pages/StockCount';
+import { ChequeListPage, ChequeFormPage, ChequeDetailPage } from './pages/Cheques';
 import { ProductListPage, ProductDetailPage } from './pages/Products';
 import { SaleListPage, SaleDetailPage, SaleFormPage, InvoiceImportPage } from './pages/Sales';
 import { ReturnListPage, ReturnDetailPage, ReturnFormPage } from './pages/Returns';
@@ -125,6 +126,11 @@ export function AppRouter() {
         {/* Stock Count */}
         <Route path="stock-count" element={<StockCountListPage />} />
         <Route path="stock-count/:id" element={<StockCountDetailPage />} />
+
+        {/* Cheques */}
+        <Route path="cheques" element={<ChequeListPage />} />
+        <Route path="cheques/new" element={<ChequeFormPage />} />
+        <Route path="cheques/:id" element={<ChequeDetailPage />} />
 
         {/* Products */}
         <Route path="products" element={<ProductListPage />} />
