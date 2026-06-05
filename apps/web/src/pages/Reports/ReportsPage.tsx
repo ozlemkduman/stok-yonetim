@@ -265,24 +265,26 @@ export function ReportsPage() {
               {Object.keys(endOfDayReport.sales.byPaymentMethod).length > 0 && (
                 <>
                   <h4 style={{ marginTop: 24 }}>{t('reports:endOfDay.byPaymentMethod')}</h4>
-                  <table className={styles.reportTable}>
-                    <thead>
-                      <tr>
-                        <th>{t('reports:endOfDay.method')}</th>
-                        <th className={styles.alignRight}>{t('reports:endOfDay.count')}</th>
-                        <th className={styles.alignRight}>{t('reports:endOfDay.amount')}</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {Object.entries(endOfDayReport.sales.byPaymentMethod).map(([method, v]: any) => (
-                        <tr key={method}>
-                          <td>{t(`sales:paymentMethods.${method}`, { defaultValue: method })}</td>
-                          <td className={styles.alignRight}>{v.count}</td>
-                          <td className={styles.alignRight}><strong>{formatCurrency(v.total)}</strong></td>
+                  <div className={styles.tableWrap}>
+                    <table className={styles.reportTable}>
+                      <thead>
+                        <tr>
+                          <th>{t('reports:endOfDay.method')}</th>
+                          <th className={styles.alignRight}>{t('reports:endOfDay.count')}</th>
+                          <th className={styles.alignRight}>{t('reports:endOfDay.amount')}</th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                      </thead>
+                      <tbody>
+                        {Object.entries(endOfDayReport.sales.byPaymentMethod).map(([method, v]: any) => (
+                          <tr key={method}>
+                            <td>{t(`sales:paymentMethods.${method}`, { defaultValue: method })}</td>
+                            <td className={styles.alignRight}>{v.count}</td>
+                            <td className={styles.alignRight}><strong>{formatCurrency(v.total)}</strong></td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
                 </>
               )}
 
@@ -327,28 +329,30 @@ export function ReportsPage() {
 
               {/* Hesap bakiyeleri snapshot */}
               <h4 style={{ marginTop: 24 }}>{t('reports:endOfDay.accountBalances')}</h4>
-              <table className={styles.reportTable}>
-                <thead>
-                  <tr>
-                    <th>{t('reports:endOfDay.accountName')}</th>
-                    <th>{t('reports:endOfDay.accountType')}</th>
-                    <th className={styles.alignRight}>{t('reports:endOfDay.balance')}</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {endOfDayReport.accountBalances.map((a: any) => (
-                    <tr key={a.id}>
-                      <td>{a.name}{a.is_default && ' ★'}</td>
-                      <td>{t(`accounts:accountTypes.${a.account_type}`, { defaultValue: a.account_type })}</td>
-                      <td className={styles.alignRight}><strong>{formatCurrency(a.current_balance)}</strong></td>
+              <div className={styles.tableWrap}>
+                <table className={styles.reportTable}>
+                  <thead>
+                    <tr>
+                      <th>{t('reports:endOfDay.accountName')}</th>
+                      <th>{t('reports:endOfDay.accountType')}</th>
+                      <th className={styles.alignRight}>{t('reports:endOfDay.balance')}</th>
                     </tr>
-                  ))}
-                  <tr style={{ background: 'rgba(0,0,0,0.04)' }}>
-                    <td colSpan={2}><strong>{t('reports:endOfDay.totalBalance')}</strong></td>
-                    <td className={styles.alignRight}><strong>{formatCurrency(endOfDayReport.totalAccountBalance)}</strong></td>
-                  </tr>
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {endOfDayReport.accountBalances.map((a: any) => (
+                      <tr key={a.id}>
+                        <td>{a.name}{a.is_default && ' ★'}</td>
+                        <td>{t(`accounts:accountTypes.${a.account_type}`, { defaultValue: a.account_type })}</td>
+                        <td className={styles.alignRight}><strong>{formatCurrency(a.current_balance)}</strong></td>
+                      </tr>
+                    ))}
+                    <tr style={{ background: 'rgba(0,0,0,0.04)' }}>
+                      <td colSpan={2}><strong>{t('reports:endOfDay.totalBalance')}</strong></td>
+                      <td className={styles.alignRight}><strong>{formatCurrency(endOfDayReport.totalAccountBalance)}</strong></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
             </>
           ) : (
             <div className={styles.emptyState}>{t('reports:endOfDay.noData')}</div>
@@ -392,35 +396,37 @@ export function ReportsPage() {
                 {t('reports:profitability.cogsNote')}
               </p>
 
-              <table className={styles.reportTable} style={{ marginTop: 16 }}>
-                <thead>
-                  <tr>
-                    <th>{t('reports:profitability.product')}</th>
-                    <th className={styles.alignRight}>{t('reports:profitability.quantity')}</th>
-                    <th className={styles.alignRight}>{t('reports:profitability.revenue')}</th>
-                    <th className={styles.alignRight}>{t('reports:profitability.cogs')}</th>
-                    <th className={styles.alignRight}>{t('reports:profitability.profit')}</th>
-                    <th className={styles.alignRight}>{t('reports:profitability.marginCol')}</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {productProfitability.products.map((p: any) => (
-                    <tr key={p.id}>
-                      <td>
-                        <div>{p.name}</div>
-                        {p.barcode && <div className={styles.barcode}>{p.barcode}</div>}
-                      </td>
-                      <td className={styles.alignRight}>{parseFloat(String(p.total_quantity))} {p.unit || ''}</td>
-                      <td className={styles.alignRight}>{formatCurrency(p.total_revenue)}</td>
-                      <td className={styles.alignRight}>{formatCurrency(p.total_cogs)}</td>
-                      <td className={`${styles.alignRight} ${p.gross_profit < 0 ? styles.danger : styles.success}`}>
-                        <strong>{formatCurrency(p.gross_profit)}</strong>
-                      </td>
-                      <td className={styles.alignRight}>%{p.margin_percent}</td>
+              <div className={styles.tableWrap} style={{ marginTop: 16 }}>
+                <table className={styles.reportTable}>
+                  <thead>
+                    <tr>
+                      <th>{t('reports:profitability.product')}</th>
+                      <th className={styles.alignRight}>{t('reports:profitability.quantity')}</th>
+                      <th className={styles.alignRight}>{t('reports:profitability.revenue')}</th>
+                      <th className={styles.alignRight}>{t('reports:profitability.cogs')}</th>
+                      <th className={styles.alignRight}>{t('reports:profitability.profit')}</th>
+                      <th className={styles.alignRight}>{t('reports:profitability.marginCol')}</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {productProfitability.products.map((p: any) => (
+                      <tr key={p.id}>
+                        <td>
+                          <div>{p.name}</div>
+                          {p.barcode && <div className={styles.barcode}>{p.barcode}</div>}
+                        </td>
+                        <td className={styles.alignRight}>{parseFloat(String(p.total_quantity))} {p.unit || ''}</td>
+                        <td className={styles.alignRight}>{formatCurrency(p.total_revenue)}</td>
+                        <td className={styles.alignRight}>{formatCurrency(p.total_cogs)}</td>
+                        <td className={`${styles.alignRight} ${p.gross_profit < 0 ? styles.danger : styles.success}`}>
+                          <strong>{formatCurrency(p.gross_profit)}</strong>
+                        </td>
+                        <td className={styles.alignRight}>%{p.margin_percent}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </>
           ) : (
             <div className={styles.emptyState}>{t('reports:profitability.noData')}</div>
@@ -468,39 +474,41 @@ export function ReportsPage() {
                 {t('reports:aging.note')}
               </p>
 
-              <table className={styles.reportTable} style={{ marginTop: 16 }}>
-                <thead>
-                  <tr>
-                    <th>{t('reports:aging.customer')}</th>
-                    <th className={styles.alignRight}>0-30</th>
-                    <th className={styles.alignRight}>30-60</th>
-                    <th className={styles.alignRight}>60-90</th>
-                    <th className={styles.alignRight}>90+</th>
-                    <th className={styles.alignRight}>{t('reports:aging.total')}</th>
-                    <th className={styles.alignRight}>{t('reports:aging.oldest')}</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {agingReport.customers.map((c: any, i: number) => (
-                    <tr key={c.customer_id || i}>
-                      <td>
-                        {c.customer_id ? (
-                          <span className={styles.linkLike} onClick={() => navigate(`/customers/${c.customer_id}`)} style={{ cursor: 'pointer', color: 'var(--color-primary, #3b82f6)' }}>
-                            {c.customer_name}
-                          </span>
-                        ) : c.customer_name}
-                        <div className={styles.barcode}>{c.sale_count} {t('reports:aging.invoices')}</div>
-                      </td>
-                      <td className={styles.alignRight}>{c.buckets['0_30'] > 0 ? formatCurrency(c.buckets['0_30']) : '-'}</td>
-                      <td className={`${styles.alignRight} ${c.buckets['30_60'] > 0 ? styles.warning : ''}`}>{c.buckets['30_60'] > 0 ? formatCurrency(c.buckets['30_60']) : '-'}</td>
-                      <td className={`${styles.alignRight} ${c.buckets['60_90'] > 0 ? styles.warning : ''}`}>{c.buckets['60_90'] > 0 ? formatCurrency(c.buckets['60_90']) : '-'}</td>
-                      <td className={`${styles.alignRight} ${c.buckets['90_plus'] > 0 ? styles.danger : ''}`}>{c.buckets['90_plus'] > 0 ? formatCurrency(c.buckets['90_plus']) : '-'}</td>
-                      <td className={styles.alignRight}><strong>{formatCurrency(c.total)}</strong></td>
-                      <td className={styles.alignRight}>{c.oldest_days_overdue}g</td>
+              <div className={styles.tableWrap} style={{ marginTop: 16 }}>
+                <table className={styles.reportTable}>
+                  <thead>
+                    <tr>
+                      <th>{t('reports:aging.customer')}</th>
+                      <th className={styles.alignRight}>0-30</th>
+                      <th className={styles.alignRight}>30-60</th>
+                      <th className={styles.alignRight}>60-90</th>
+                      <th className={styles.alignRight}>90+</th>
+                      <th className={styles.alignRight}>{t('reports:aging.total')}</th>
+                      <th className={styles.alignRight}>{t('reports:aging.oldest')}</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {agingReport.customers.map((c: any, i: number) => (
+                      <tr key={c.customer_id || i}>
+                        <td>
+                          {c.customer_id ? (
+                            <span className={styles.linkLike} onClick={() => navigate(`/customers/${c.customer_id}`)} style={{ cursor: 'pointer', color: 'var(--color-primary, #3b82f6)' }}>
+                              {c.customer_name}
+                            </span>
+                          ) : c.customer_name}
+                          <div className={styles.barcode}>{c.sale_count} {t('reports:aging.invoices')}</div>
+                        </td>
+                        <td className={styles.alignRight}>{c.buckets['0_30'] > 0 ? formatCurrency(c.buckets['0_30']) : '-'}</td>
+                        <td className={`${styles.alignRight} ${c.buckets['30_60'] > 0 ? styles.warning : ''}`}>{c.buckets['30_60'] > 0 ? formatCurrency(c.buckets['30_60']) : '-'}</td>
+                        <td className={`${styles.alignRight} ${c.buckets['60_90'] > 0 ? styles.warning : ''}`}>{c.buckets['60_90'] > 0 ? formatCurrency(c.buckets['60_90']) : '-'}</td>
+                        <td className={`${styles.alignRight} ${c.buckets['90_plus'] > 0 ? styles.danger : ''}`}>{c.buckets['90_plus'] > 0 ? formatCurrency(c.buckets['90_plus']) : '-'}</td>
+                        <td className={styles.alignRight}><strong>{formatCurrency(c.total)}</strong></td>
+                        <td className={styles.alignRight}>{c.oldest_days_overdue}g</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </>
           ) : (
             <div className={styles.emptyState}>{t('reports:aging.noData')}</div>

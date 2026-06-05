@@ -116,7 +116,13 @@ export function MainLayout() {
   const { isSuperAdmin } = usePermissions();
   const { impersonatedTenant, isImpersonating, stopImpersonating, hasFeature } = useTenant();
   const { openHelp, hasHelp } = useHelp();
-  const [sidebarOpen, setSidebarOpen] = useState(!isCompact);
+  const [sidebarOpen, setSidebarOpen] = useState(() => {
+    // Mobile/tablet: default closed; Desktop: localStorage > default open
+    if (typeof window === 'undefined') return true;
+    if (window.innerWidth < 1024) return false;
+    const saved = localStorage.getItem('sidebarOpen');
+    return saved === null ? true : saved === 'true';
+  });
   const [expandedGroups, setExpandedGroups] = useState<string[]>([]);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [dismissedIds, setDismissedIds] = useState<Set<string>>(new Set());
@@ -213,12 +219,26 @@ export function MainLayout() {
     }
   };
 
-  // Sync sidebar state with viewport size
+  // Mobile/tablet'a düşünce otomatik kapat; tekrar genişlerse desktop tercihini uygula
   useEffect(() => {
-    setSidebarOpen(!isCompact);
+    if (isCompact) {
+      setSidebarOpen(false);
+    } else {
+      const saved = typeof window !== 'undefined' ? localStorage.getItem('sidebarOpen') : null;
+      setSidebarOpen(saved === null ? true : saved === 'true');
+    }
   }, [isCompact]);
 
-  const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
+  const toggleSidebar = () => {
+    setSidebarOpen((prev) => {
+      const next = !prev;
+      // Desktop tercihini sakla (mobile için anlamsız — sayfa yeniden açıldığında kapalı başlar)
+      if (!isCompact && typeof window !== 'undefined') {
+        localStorage.setItem('sidebarOpen', String(next));
+      }
+      return next;
+    });
+  };
   const closeSidebar = () => isCompact && setSidebarOpen(false);
 
   const toggleGroup = (groupId: string) => {
@@ -355,7 +375,7 @@ export function MainLayout() {
       </aside>
 
       {/* Main content */}
-      <div className={styles.main}>
+      <div className={`${styles.main} ${!sidebarOpen ? styles.mainFull : ''}`}>
         {/* TopBar */}
         <header className={styles.topbar}>
           <div className={styles.topbarLeft}>
