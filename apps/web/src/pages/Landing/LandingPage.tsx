@@ -29,6 +29,8 @@ interface PlanDef {
   key: string;
   name: string;
   price: string;
+  priceYearly: string;
+  priceYearlyOriginal: string;
   popular?: boolean;
   featureKeys: { key: string; included: boolean }[];
 }
@@ -38,6 +40,8 @@ const planDefs: PlanDef[] = [
     key: 'basic',
     name: 'Basic',
     price: '199',
+    priceYearly: '1.990',
+    priceYearlyOriginal: '2.388',
     featureKeys: [
       { key: 'stockTracking', included: true },
       { key: 'salesReturn', included: true },
@@ -60,6 +64,8 @@ const planDefs: PlanDef[] = [
     key: 'pro',
     name: 'Pro',
     price: '449',
+    priceYearly: '4.490',
+    priceYearlyOriginal: '5.388',
     popular: true,
     featureKeys: [
       { key: 'stockTracking', included: true },
@@ -83,6 +89,8 @@ const planDefs: PlanDef[] = [
     key: 'plus',
     name: 'Plus',
     price: '799',
+    priceYearly: '7.990',
+    priceYearlyOriginal: '9.588',
     featureKeys: [
       { key: 'stockTracking', included: true },
       { key: 'salesReturn', included: true },
@@ -298,6 +306,9 @@ export function LandingPage() {
   const demoView = useInView(0.1);
   const ctaView = useInView(0.2);
 
+  // Faturalama döngüsü — varsayılan yıllık (peşin ödemeyi teşvik için)
+  const [billing, setBilling] = useState<'monthly' | 'yearly'>('yearly');
+
   return (
     <div className={styles.landing}>
       {/* Navbar */}
@@ -496,17 +507,65 @@ export function LandingPage() {
       >
         <h2 className={styles.sectionTitle}>{t('plans.title')}</h2>
         <p className={styles.sectionSubtitle}>{t('plans.subtitle')}</p>
+
+        {/* Kuruluş dönemi banner */}
+        <div className={styles.foundingBanner}>{t('plans.foundingBanner')}</div>
+
+        {/* Aylık / Yıllık toggle */}
+        <div className={styles.billingToggle} role="tablist" aria-label="Billing period">
+          <button
+            type="button"
+            role="tab"
+            aria-selected={billing === 'monthly'}
+            className={`${styles.billingToggleBtn} ${billing === 'monthly' ? styles.billingToggleActive : ''}`}
+            onClick={() => setBilling('monthly')}
+          >
+            {t('plans.billingMonthly')}
+          </button>
+          <button
+            type="button"
+            role="tab"
+            aria-selected={billing === 'yearly'}
+            className={`${styles.billingToggleBtn} ${billing === 'yearly' ? styles.billingToggleActive : ''}`}
+            onClick={() => setBilling('yearly')}
+          >
+            {t('plans.billingYearly')}
+            <span className={styles.billingToggleHint}>{t('plans.yearlyDiscountBadge')}</span>
+          </button>
+        </div>
+
         <div className={styles.plansGrid}>
           {planDefs.map((plan) => (
             <div
               key={plan.name}
               className={`${styles.planCard} ${plan.popular ? styles.planPopular : ''}`}
             >
-              {plan.popular && <span className={styles.planBadge}>{t('plans.popular')}</span>}
+              {plan.popular && (
+                <>
+                  <span className={styles.planRibbon}>{t('plans.recommended')}</span>
+                  <span className={styles.planBadge}>{t('plans.popular')}</span>
+                </>
+              )}
               <h3 className={styles.planName}>{plan.name}</h3>
               <div className={styles.planPrice}>
-                {plan.price}₺<span className={styles.planPeriod}>{t('plans.perMonth')}</span>
+                {billing === 'yearly' ? (
+                  <>
+                    {plan.priceYearly}₺
+                    <span className={styles.planPeriod}>{t('plans.perYear')}</span>
+                  </>
+                ) : (
+                  <>
+                    {plan.price}₺
+                    <span className={styles.planPeriod}>{t('plans.perMonth')}</span>
+                  </>
+                )}
               </div>
+              {billing === 'yearly' && (
+                <div className={styles.planSavings}>
+                  <span className={styles.planStrikedPrice}>{plan.priceYearlyOriginal}₺</span>
+                  <span className={styles.planSavingsBadge}>{t('plans.yearlyDiscount')}</span>
+                </div>
+              )}
               <p className={styles.planUsers}>{t(`plans.${plan.key}.users`)}</p>
               <ul className={styles.planFeatures}>
                 {plan.featureKeys.map((f) => (
