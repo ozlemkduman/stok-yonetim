@@ -20,6 +20,7 @@
     "openingStock": "Opening Stock",
     "products": "Products",
     "stockMovements": "Stock Movements",
+    "stockCount": "Stock Count",
     "warehouses": "Warehouses",
     "accounts": "Cash/Bank",
     "expenses": "Expenses",

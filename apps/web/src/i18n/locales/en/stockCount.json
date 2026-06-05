@@ -1,0 +1,73 @@
+{
+  "pageTitle": "Stock Count",
+  "subtitle": "Physical inventory count — reconcile system stock with actual stock",
+  "info": "Stock Count is used to physically count your warehouse and compare against system records. Starting a count snapshots current system stock for all active products. Enter the counted quantities one by one; on 'Complete', differences are applied as automatic adjustments.",
+  "newCount": "Start New Count",
+  "selectWarehouse": "Select warehouse",
+  "default": "default",
+  "startCount": "Start Count",
+  "starting": "Starting...",
+  "searchPlaceholder": "Search by count number...",
+  "empty": "No counts yet",
+  "columns": {
+    "number": "Count #",
+    "startedAt": "Started",
+    "completedAt": "Completed",
+    "warehouse": "Warehouse",
+    "status": "Status",
+    "createdBy": "Started By"
+  },
+  "filters": {
+    "all": "All",
+    "in_progress": "In Progress",
+    "completed": "Completed",
+    "cancelled": "Cancelled"
+  },
+  "statuses": {
+    "in_progress": "In Progress",
+    "completed": "Completed",
+    "cancelled": "Cancelled"
+  },
+  "stats": {
+    "total": "Total Products",
+    "counted": "Counted",
+    "uncounted": "Uncounted",
+    "differences": "With Differences"
+  },
+  "detail": {
+    "back": "Stock Count",
+    "notFound": "Count not found",
+    "completedAt": "Completed",
+    "complete": "Complete Count",
+    "completing": "Completing...",
+    "cancel": "Cancel",
+    "searchPlaceholder": "Search by product name or barcode...",
+    "product": "Product",
+    "expected": "System Stock",
+    "counted": "Counted / On Hand",
+    "countedHint": "Enter the quantity physically present",
+    "difference": "Difference",
+    "noResults": "No products match the filter",
+    "notes": "Notes",
+    "filters": {
+      "all": "All",
+      "counted": "Counted",
+      "uncounted": "Uncounted",
+      "differences": "With Differences"
+    }
+  },
+  "confirm": {
+    "complete": "{{counted}} / {{total}} products counted. Complete this count? Differences will be applied as adjustments, uncounted items will be skipped.",
+    "cancel": "Cancel this count? Counted values will be lost."
+  },
+  "toast": {
+    "loadError": "Failed to load count",
+    "created": "Count started",
+    "createError": "Failed to start count",
+    "saveError": "Failed to save",
+    "completed": "Count completed: {{updated}} differences applied, {{unchanged}} unchanged, {{skipped}} skipped",
+    "completeError": "Failed to complete",
+    "cancelled": "Count cancelled",
+    "cancelError": "Failed to cancel"
+  }
+}

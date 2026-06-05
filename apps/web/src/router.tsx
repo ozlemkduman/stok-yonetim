@@ -36,6 +36,7 @@ import { CustomerListPage, CustomerDetailPage, CustomerImportPage } from './page
 import { SupplierListPage } from './pages/Suppliers';
 import { PurchaseListPage, PurchaseFormPage, PurchaseDetailPage } from './pages/Purchases';
 import { OpeningStockListPage, OpeningStockFormPage, OpeningStockDetailPage } from './pages/OpeningStock';
+import { StockCountListPage, StockCountDetailPage } from './pages/StockCount';
 import { ProductListPage, ProductDetailPage } from './pages/Products';
 import { SaleListPage, SaleDetailPage, SaleFormPage, InvoiceImportPage } from './pages/Sales';
 import { ReturnListPage, ReturnDetailPage, ReturnFormPage } from './pages/Returns';
@@ -120,6 +121,10 @@ export function AppRouter() {
         <Route path="opening-stock" element={<OpeningStockListPage />} />
         <Route path="opening-stock/new" element={<OpeningStockFormPage />} />
         <Route path="opening-stock/:id" element={<OpeningStockDetailPage />} />
+
+        {/* Stock Count */}
+        <Route path="stock-count" element={<StockCountListPage />} />
+        <Route path="stock-count/:id" element={<StockCountDetailPage />} />
 
         {/* Products */}
         <Route path="products" element={<ProductListPage />} />
