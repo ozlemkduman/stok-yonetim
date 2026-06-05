@@ -28,6 +28,10 @@ export class ContactService {
               <td style="padding: 8px 12px; color: #4b5563;">${dto.name}</td>
             </tr>
             <tr style="background: #f9fafb;">
+              <td style="padding: 8px 12px; font-weight: 600; color: #374151;">E-posta:</td>
+              <td style="padding: 8px 12px; color: #4b5563;"><a href="mailto:${dto.email}" style="color: #4361ee;">${dto.email}</a></td>
+            </tr>
+            <tr>
               <td style="padding: 8px 12px; font-weight: 600; color: #374151;">Telefon:</td>
               <td style="padding: 8px 12px; color: #4b5563;">${dto.phone}</td>
             </tr>
@@ -58,10 +62,11 @@ export class ContactService {
       to: recipient,
       subject: `StokSayaç Demo Basvurusu - ${dto.name}`,
       html,
+      replyTo: dto.email,
     });
 
     if (sent) {
-      this.logger.log(`Demo basvurusu alindi: ${dto.name} (${dto.phone})`);
+      this.logger.log(`Demo basvurusu alindi: ${dto.name} (${dto.email}, ${dto.phone})`);
     }
 
     return sent;

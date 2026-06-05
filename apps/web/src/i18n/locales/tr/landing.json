@@ -191,6 +191,8 @@
       "namePlaceholder": "Adınız Soyadınız",
       "phoneLabel": "Telefon *",
       "phonePlaceholder": "05XX XXX XX XX",
+      "emailLabel": "E-posta *",
+      "emailPlaceholder": "ornek@firma.com",
       "companyLabel": "İşletme Adı",
       "companyPlaceholder": "İşletmenizin adı",
       "sectorLabel": "Sektör",

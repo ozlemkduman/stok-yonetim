@@ -165,7 +165,7 @@ function AnimatedCounter({ target, suffix }: { target: number; suffix: string })
 
 function DemoForm() {
   const { t } = useTranslation('landing');
-  const [form, setForm] = useState({ name: '', phone: '', company: '', sector: '', note: '' });
+  const [form, setForm] = useState({ name: '', email: '', phone: '', company: '', sector: '', note: '' });
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
@@ -182,6 +182,7 @@ function DemoForm() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           name: form.name,
+          email: form.email,
           phone: form.phone,
           company: form.company || undefined,
           sector: form.sector || undefined,
@@ -209,7 +210,7 @@ function DemoForm() {
         </p>
         <button
           className={styles.btnOutline}
-          onClick={() => { setSubmitted(false); setForm({ name: '', phone: '', company: '', sector: '', note: '' }); }}
+          onClick={() => { setSubmitted(false); setForm({ name: '', email: '', phone: '', company: '', sector: '', note: '' }); }}
         >
           {t('demo.success.newApplication')}
         </button>
@@ -242,6 +243,18 @@ function DemoForm() {
             onChange={(e) => setForm({ ...form, phone: e.target.value })}
           />
         </div>
+      </div>
+      <div className={styles.formGroup}>
+        <label className={styles.formLabel}>{t('demo.form.emailLabel')}</label>
+        <input
+          type="email"
+          required
+          autoComplete="email"
+          className={styles.formInput}
+          placeholder={t('demo.form.emailPlaceholder')}
+          value={form.email}
+          onChange={(e) => setForm({ ...form, email: e.target.value })}
+        />
       </div>
       <div className={styles.formRow}>
         <div className={styles.formGroup}>
