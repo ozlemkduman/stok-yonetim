@@ -122,8 +122,10 @@ export class AccountsRepository extends BaseTenantRepository<Account> {
     await this.db.knex.transaction(async (trx) => {
       // Remove default from all accounts of same type
       await this.applyTenantFilter(trx('accounts')).where('account_type', accountType).update({ is_default: false });
-      // Set new default
-      await this.applyTenantFilter(trx('accounts')).where('id', id).update({ is_default: true, updated_at: trx.fn.now() });
+      // Set new default (id boş ise sadece eski default'ları kaldır, yeni id ataması yapma)
+      if (id) {
+        await this.applyTenantFilter(trx('accounts')).where('id', id).update({ is_default: true, updated_at: trx.fn.now() });
+      }
     });
   }
 
