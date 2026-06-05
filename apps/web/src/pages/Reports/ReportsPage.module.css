@@ -98,7 +98,11 @@
   margin: 0;
 }
 
-.reportCardBody { padding: var(--space-4) var(--space-5); }
+.reportCardBody {
+  padding: var(--space-4) var(--space-5);
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
 
 .reportGrid { display: flex; flex-direction: column; }
 
@@ -153,6 +157,17 @@
   width: 100%;
   border-collapse: collapse;
   font-size: var(--font-size-sm);
+}
+
+/* Geniş tablolar için yatay scroll wrapper — dar ekranda taşmasın */
+.tableWrap {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.tableWrap .reportTable {
+  min-width: 640px;
 }
 
 .reportTable th,

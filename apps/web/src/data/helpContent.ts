@@ -79,6 +79,30 @@ export const helpContent: Record<string, HelpItem> = {
       'Bu form ürünleri OLUŞTURMAZ — önce "Ürünler" sayfasından ürünleri eklemiş olmanız gerekir.',
     ],
   },
+  '/cheques': {
+    title: 'Çek / Senet',
+    items: [
+      'Vadeli ödeme araçlarının (çek, senet) portföy takibi içindir.',
+      'Yön: ALINAN (müşteriden geldi) veya VERİLEN (tedarikçiye verildi). Yeni kayıt portföye girer (in_portfolio) — henüz kasa/cari etkisi yoktur.',
+      '"Tahsil Et" (alınan için) → seçilen kasa/bankaya gelir hareketi yazılır.',
+      '"Ödendi" (verilen için) → seçilen kasa/bankadan gider hareketi yazılır.',
+      '"Karşılıksız" / "İade" → sadece bilgi amaçlı durum değişimi, hesap etkilenmez.',
+      '"Portföye Geri Al" → daha önce yapılmış hesap hareketi varsa ters çevrilir.',
+      'Cari hesap (müşteri/tedarikçi bakiyesi) bu modülden doğrudan ETKİLENMEZ — veresiye satış/alış zaten cariye yansır.',
+      'Vadesi geçen kayıtlar listede kırmızı vurgulanır.',
+      'Hesap hareketi olan kayıt silinemez — önce "Portföye Geri Al" deyin.',
+    ],
+  },
+  '/cheques/new': {
+    title: 'Yeni Çek / Senet',
+    items: [
+      'Tip: Çek veya Senet seçin (yapı aynı, sadece etiket farklı).',
+      'Yön: Alınan = müşteriden / Verilen = tedarikçiye.',
+      'Tutar ve Vade Tarihi zorunlu. Diğer alanlar opsiyonel.',
+      'Keşideci: çeki imzalayan kişi/firma (müşteri olabilir veya 3. kişi).',
+      'Kayıt sonrası portföye girer — detay sayfasından tahsil/karşılıksız/iade aksiyonu yaparsınız.',
+    ],
+  },
   '/customers': {
     title: 'Müşteriler',
     items: [

@@ -1,0 +1,118 @@
+{
+  "pageTitle": "Cheques / Promissory Notes",
+  "subtitle": "Post-dated payment instruments — portfolio tracking",
+  "newCheque": "+ New Entry",
+  "searchPlaceholder": "Search by number, bank, drawer, customer/supplier...",
+  "empty": "No entries yet",
+  "types": {
+    "cek": "Cheque",
+    "senet": "Note"
+  },
+  "direction": {
+    "incoming": "Incoming",
+    "outgoing": "Outgoing"
+  },
+  "statuses": {
+    "in_portfolio": "In Portfolio",
+    "collected": "Collected",
+    "cashed_out": "Paid",
+    "bounced": "Bounced",
+    "returned": "Returned"
+  },
+  "columns": {
+    "type": "Type",
+    "number": "Document #",
+    "party": "Party",
+    "bank": "Bank",
+    "amount": "Amount",
+    "dueDate": "Due Date",
+    "status": "Status"
+  },
+  "filters": {
+    "direction": {
+      "all": "All",
+      "incoming": "Incoming",
+      "outgoing": "Outgoing"
+    },
+    "status": {
+      "all": "All",
+      "in_portfolio": "In Portfolio",
+      "overdue": "Overdue",
+      "collected": "Collected",
+      "cashed_out": "Paid",
+      "bounced": "Bounced"
+    }
+  },
+  "stats": {
+    "incomingPortfolio": "Incoming (In Portfolio)",
+    "outgoingPortfolio": "Outgoing (In Portfolio)",
+    "overdue": "Overdue",
+    "bounced": "Bounced",
+    "count": "items"
+  },
+  "form": {
+    "title": "New Cheque / Note",
+    "back": "Cheques / Notes",
+    "basicInfo": "Basic Info",
+    "type": "Type",
+    "direction": "Direction",
+    "fromCustomer": "Customer",
+    "toSupplier": "Supplier",
+    "selectCustomer": "Select customer",
+    "selectSupplier": "Select supplier",
+    "amount": "Amount",
+    "chequeNumber": "Document #",
+    "chequeNumberPlaceholder": "Number on the cheque/note",
+    "bankName": "Bank",
+    "bankPlaceholder": "Bank name",
+    "drawerName": "Drawer",
+    "drawerPlaceholder": "Person/company who signed",
+    "issueDate": "Issue Date",
+    "dueDate": "Due Date",
+    "notes": "Notes",
+    "notesPlaceholder": "Additional notes...",
+    "save": "Save"
+  },
+  "actions": {
+    "collect": "Collect",
+    "cashOut": "Mark as Paid",
+    "bounce": "Bounce",
+    "return": "Return",
+    "revertToPortfolio": "Revert to Portfolio"
+  },
+  "detail": {
+    "back": "Cheques / Notes",
+    "notFound": "Entry not found",
+    "info": "Document Info",
+    "amounts": "Amount & Account",
+    "party": "Party",
+    "account": "Account (Cash/Bank)",
+    "selectAccount": "Select account",
+    "statusChangedAt": "Status Changed At",
+    "createdBy": "Created By",
+    "dueDate": "Due Date",
+    "notes": "Notes",
+    "collectHint": "Which cash/bank account received this? The amount will be added as income to the selected account.",
+    "cashOutHint": "Which cash/bank account paid this? The amount will be deducted from the selected account.",
+    "bounceHint": "Marking as bounced. No account movement; previous collection (if any) will be reversed.",
+    "returnHint": "Marking as returned. No account movement.",
+    "revertHint": "Reverting to portfolio. Any previous account movement will be reversed."
+  },
+  "validation": {
+    "partyRequired": "Customer or supplier must be selected",
+    "amountRequired": "Enter a valid amount",
+    "dueDateRequired": "Due date is required",
+    "accountRequired": "Account (cash/bank) must be selected"
+  },
+  "toast": {
+    "loadError": "Failed to load",
+    "created": "Saved",
+    "saveError": "Save failed",
+    "statusUpdated": "Status updated",
+    "deleted": "Deleted",
+    "deleteError": "Delete failed"
+  },
+  "confirm": {
+    "delete": "Delete this entry? If it has account movements, revert to portfolio first."
+  }
+}

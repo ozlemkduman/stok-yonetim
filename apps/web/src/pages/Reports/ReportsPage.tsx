@@ -77,10 +77,10 @@ const icons = {
   ),
 };
 
-type TabType = 'genel' | 'satis' | 'musteri' | 'musteriSatis' | 'stok' | 'gider' | 'personel' | 'yenileme';
+type TabType = 'genel' | 'satis' | 'musteri' | 'musteriSatis' | 'stok' | 'gider' | 'personel' | 'yenileme' | 'gunSonu' | 'yaslandirma' | 'karlilik';
 
-const VALID_TABS: TabType[] = ['genel', 'satis', 'musteri', 'musteriSatis', 'stok', 'gider', 'personel', 'yenileme'];
-const ADVANCED_TABS: TabType[] = ['musteriSatis', 'gider', 'personel', 'yenileme'];
+const VALID_TABS: TabType[] = ['genel', 'gunSonu', 'satis', 'karlilik', 'musteri', 'musteriSatis', 'yaslandirma', 'stok', 'gider', 'personel', 'yenileme'];
+const ADVANCED_TABS: TabType[] = ['musteriSatis', 'gider', 'personel', 'yenileme', 'yaslandirma', 'karlilik'];
 
 export function ReportsPage() {
   const { t } = useTranslation(['reports', 'common']);
@@ -130,13 +130,19 @@ export function ReportsPage() {
   const [renewalsReport, setRenewalsReport] = useState<RenewalsReport | null>(null);
   const [renewalFilter, setRenewalFilter] = useState<'all' | 'expired' | 'red' | 'yellow' | 'green'>('all');
 
+  // Yeni raporlar
+  const [endOfDayDate, setEndOfDayDate] = useState(() => new Date().toISOString().split('T')[0]);
+  const [endOfDayReport, setEndOfDayReport] = useState<any>(null);
+  const [agingReport, setAgingReport] = useState<any>(null);
+  const [productProfitability, setProductProfitability] = useState<any>(null);
+
   const fetchReports = useCallback(async () => {
     setLoading(true);
     // Bir endpoint başarısız olursa diğerleri etkilenmesin (örn. Basic'te gelişmiş raporlar 403 döner).
     const safe = <T,>(p: Promise<T>): Promise<T | null> => p.catch(() => null);
     const isAdvanced = hasFeature('advancedReports');
     try {
-      const [sales, profit, debt, products, customers, upcoming, overdue, stock, returns, expenses, custProducts, custSales, empPerf, renewals] = await Promise.all([
+      const [sales, profit, debt, products, customers, upcoming, overdue, stock, returns, expenses, custProducts, custSales, empPerf, renewals, eod, aging, profit2] = await Promise.all([
         safe(reportsApi.getSalesSummary(startDate, endDate)),
         isAdvanced ? safe(reportsApi.getProfitLoss(startDate, endDate)) : Promise.resolve(null),
         safe(reportsApi.getDebtOverview()),
@@ -151,6 +157,9 @@ export function ReportsPage() {
         safe(reportsApi.getCustomerSales(startDate, endDate)),
         isAdvanced ? safe(reportsApi.getEmployeePerformance(startDate, endDate)) : Promise.resolve(null),
         isAdvanced ? safe(reportsApi.getRenewals()) : Promise.resolve(null),
+        safe(reportsApi.getEndOfDay(endOfDayDate)),
+        isAdvanced ? safe(reportsApi.getAging()) : Promise.resolve(null),
+        isAdvanced ? safe(reportsApi.getProductProfitability(startDate, endDate)) : Promise.resolve(null),
       ]);
       if (sales) setSalesSummary(sales.data);
       if (profit) setProfitLoss(profit.data);
@@ -166,11 +175,14 @@ export function ReportsPage() {
       if (custSales) setCustomerSales(custSales.data);
       if (empPerf) setEmployeePerformance(empPerf.data);
       if (renewals) setRenewalsReport(renewals.data);
+      if (eod) setEndOfDayReport(eod.data);
+      if (aging) setAgingReport(aging.data);
+      if (profit2) setProductProfitability(profit2.data);
     } catch (err) {
       showToast('error', t('reports:loadFailed'));
     }
     setLoading(false);
-  }, [startDate, endDate, hasFeature]);
+  }, [startDate, endDate, endOfDayDate, hasFeature]);
 
   useEffect(() => { fetchReports(); }, [fetchReports]);
 
@@ -207,6 +219,304 @@ export function ReportsPage() {
     focusRef.current = null;
     return () => clearTimeout(timer);
   }, [loading, activeTab]);
+
+  // ── Gün Sonu (Z) Raporu ─────────────────────────────────
+  const renderGunSonuTab = () => (
+    <div className={styles.grid}>
+      <div className={styles.reportCard}>
+        <div className={styles.reportCardHeader}>
+          {icons.sales}
+          <h3 className={styles.reportCardTitle}>{t('reports:endOfDay.title')}</h3>
+        </div>
+        <div className={styles.reportCardBody}>
+          <div style={{ display: 'flex', gap: 12, alignItems: 'center', marginBottom: 16 }}>
+            <label>{t('reports:endOfDay.date')}:</label>
+            <input
+              type="date"
+              className={styles.dateInput}
+              value={endOfDayDate}
+              onChange={(e) => setEndOfDayDate(e.target.value)}
+            />
+          </div>
+
+          {endOfDayReport ? (
+            <>
+              {/* Satış özet */}
+              <div className={styles.summaryGrid}>
+                <div className={styles.summaryItem}>
+                  <span>{t('reports:endOfDay.salesCount')}</span>
+                  <strong>{endOfDayReport.sales.count}</strong>
+                </div>
+                <div className={styles.summaryItem}>
+                  <span>{t('reports:endOfDay.salesTotal')}</span>
+                  <strong className={styles.success}>{formatCurrency(endOfDayReport.sales.total)}</strong>
+                </div>
+                <div className={styles.summaryItem}>
+                  <span>{t('reports:endOfDay.returnsTotal')}</span>
+                  <strong className={styles.danger}>−{formatCurrency(endOfDayReport.returns.total)}</strong>
+                </div>
+                <div className={styles.summaryItem}>
+                  <span>{t('reports:endOfDay.netSales')}</span>
+                  <strong>{formatCurrency(endOfDayReport.netSales)}</strong>
+                </div>
+              </div>
+
+              {/* Ödeme tipi kırılımı */}
+              {Object.keys(endOfDayReport.sales.byPaymentMethod).length > 0 && (
+                <>
+                  <h4 style={{ marginTop: 24 }}>{t('reports:endOfDay.byPaymentMethod')}</h4>
+                  <div className={styles.tableWrap}>
+                    <table className={styles.reportTable}>
+                      <thead>
+                        <tr>
+                          <th>{t('reports:endOfDay.method')}</th>
+                          <th className={styles.alignRight}>{t('reports:endOfDay.count')}</th>
+                          <th className={styles.alignRight}>{t('reports:endOfDay.amount')}</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {Object.entries(endOfDayReport.sales.byPaymentMethod).map(([method, v]: any) => (
+                          <tr key={method}>
+                            <td>{t(`sales:paymentMethods.${method}`, { defaultValue: method })}</td>
+                            <td className={styles.alignRight}>{v.count}</td>
+                            <td className={styles.alignRight}><strong>{formatCurrency(v.total)}</strong></td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </>
+              )}
+
+              {/* Kasa akışı */}
+              <h4 style={{ marginTop: 24 }}>{t('reports:endOfDay.cashFlow')}</h4>
+              <div className={styles.summaryGrid}>
+                <div className={styles.summaryItem}>
+                  <span>{t('reports:endOfDay.cashIn')}</span>
+                  <strong className={styles.success}>+{formatCurrency(endOfDayReport.cashFlow.in)}</strong>
+                </div>
+                <div className={styles.summaryItem}>
+                  <span>{t('reports:endOfDay.cashOut')}</span>
+                  <strong className={styles.danger}>−{formatCurrency(endOfDayReport.cashFlow.out)}</strong>
+                </div>
+                <div className={styles.summaryItem}>
+                  <span>{t('reports:endOfDay.netCash')}</span>
+                  <strong>{formatCurrency(endOfDayReport.cashFlow.net)}</strong>
+                </div>
+                <div className={styles.summaryItem}>
+                  <span>{t('reports:endOfDay.expenses')}</span>
+                  <strong className={styles.danger}>{formatCurrency(endOfDayReport.expenses.total)}</strong>
+                </div>
+              </div>
+
+              {/* Tahsilatlar + iptaller (info) */}
+              {(endOfDayReport.payments.count > 0 || endOfDayReport.cancelledSales.count > 0) && (
+                <div className={styles.summaryGrid} style={{ marginTop: 16 }}>
+                  {endOfDayReport.payments.count > 0 && (
+                    <div className={styles.summaryItem}>
+                      <span>{t('reports:endOfDay.payments')}</span>
+                      <strong>{formatCurrency(endOfDayReport.payments.total)} ({endOfDayReport.payments.count})</strong>
+                    </div>
+                  )}
+                  {endOfDayReport.cancelledSales.count > 0 && (
+                    <div className={styles.summaryItem}>
+                      <span>{t('reports:endOfDay.cancelledSales')}</span>
+                      <strong>{endOfDayReport.cancelledSales.count} · {formatCurrency(endOfDayReport.cancelledSales.total)}</strong>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Hesap bakiyeleri snapshot */}
+              <h4 style={{ marginTop: 24 }}>{t('reports:endOfDay.accountBalances')}</h4>
+              <div className={styles.tableWrap}>
+                <table className={styles.reportTable}>
+                  <thead>
+                    <tr>
+                      <th>{t('reports:endOfDay.accountName')}</th>
+                      <th>{t('reports:endOfDay.accountType')}</th>
+                      <th className={styles.alignRight}>{t('reports:endOfDay.balance')}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {endOfDayReport.accountBalances.map((a: any) => (
+                      <tr key={a.id}>
+                        <td>{a.name}{a.is_default && ' ★'}</td>
+                        <td>{t(`accounts:accountTypes.${a.account_type}`, { defaultValue: a.account_type })}</td>
+                        <td className={styles.alignRight}><strong>{formatCurrency(a.current_balance)}</strong></td>
+                      </tr>
+                    ))}
+                    <tr style={{ background: 'rgba(0,0,0,0.04)' }}>
+                      <td colSpan={2}><strong>{t('reports:endOfDay.totalBalance')}</strong></td>
+                      <td className={styles.alignRight}><strong>{formatCurrency(endOfDayReport.totalAccountBalance)}</strong></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </>
+          ) : (
+            <div className={styles.emptyState}>{t('reports:endOfDay.noData')}</div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+
+  // ── Ürün Bazlı Kârlılık ─────────────────────────────────
+  const renderKarlilikTab = () => (
+    <div className={styles.grid}>
+      <div className={styles.reportCard}>
+        <div className={styles.reportCardHeader}>
+          {icons.sales}
+          <h3 className={styles.reportCardTitle}>{t('reports:profitability.title')}</h3>
+        </div>
+        <div className={styles.reportCardBody}>
+          {productProfitability && productProfitability.products.length > 0 ? (
+            <>
+              <div className={styles.summaryGrid}>
+                <div className={styles.summaryItem}>
+                  <span>{t('reports:profitability.totalRevenue')}</span>
+                  <strong>{formatCurrency(productProfitability.summary.total_revenue)}</strong>
+                </div>
+                <div className={styles.summaryItem}>
+                  <span>{t('reports:profitability.totalCogs')}</span>
+                  <strong className={styles.danger}>{formatCurrency(productProfitability.summary.total_cogs)}</strong>
+                </div>
+                <div className={styles.summaryItem}>
+                  <span>{t('reports:profitability.grossProfit')}</span>
+                  <strong className={styles.success}>{formatCurrency(productProfitability.summary.gross_profit)}</strong>
+                </div>
+                <div className={styles.summaryItem}>
+                  <span>{t('reports:profitability.margin')}</span>
+                  <strong>%{productProfitability.summary.margin_percent}</strong>
+                </div>
+              </div>
+
+              <p className={styles.noteText} style={{ marginTop: 12, fontSize: 'var(--font-size-xs)', color: 'var(--color-text-muted)' }}>
+                {t('reports:profitability.cogsNote')}
+              </p>
+
+              <div className={styles.tableWrap} style={{ marginTop: 16 }}>
+                <table className={styles.reportTable}>
+                  <thead>
+                    <tr>
+                      <th>{t('reports:profitability.product')}</th>
+                      <th className={styles.alignRight}>{t('reports:profitability.quantity')}</th>
+                      <th className={styles.alignRight}>{t('reports:profitability.revenue')}</th>
+                      <th className={styles.alignRight}>{t('reports:profitability.cogs')}</th>
+                      <th className={styles.alignRight}>{t('reports:profitability.profit')}</th>
+                      <th className={styles.alignRight}>{t('reports:profitability.marginCol')}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {productProfitability.products.map((p: any) => (
+                      <tr key={p.id}>
+                        <td>
+                          <div>{p.name}</div>
+                          {p.barcode && <div className={styles.barcode}>{p.barcode}</div>}
+                        </td>
+                        <td className={styles.alignRight}>{parseFloat(String(p.total_quantity))} {p.unit || ''}</td>
+                        <td className={styles.alignRight}>{formatCurrency(p.total_revenue)}</td>
+                        <td className={styles.alignRight}>{formatCurrency(p.total_cogs)}</td>
+                        <td className={`${styles.alignRight} ${p.gross_profit < 0 ? styles.danger : styles.success}`}>
+                          <strong>{formatCurrency(p.gross_profit)}</strong>
+                        </td>
+                        <td className={styles.alignRight}>%{p.margin_percent}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </>
+          ) : (
+            <div className={styles.emptyState}>{t('reports:profitability.noData')}</div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+
+  // ── Cari Yaşlandırma ────────────────────────────────────
+  const renderYaslandirmaTab = () => (
+    <div className={styles.grid}>
+      <div className={styles.reportCard}>
+        <div className={styles.reportCardHeader}>
+          {icons.debt}
+          <h3 className={styles.reportCardTitle}>{t('reports:aging.title')}</h3>
+        </div>
+        <div className={styles.reportCardBody}>
+          {agingReport && agingReport.customers.length > 0 ? (
+            <>
+              <div className={styles.summaryGrid}>
+                <div className={styles.summaryItem}>
+                  <span>{t('reports:aging.bucket_0_30')}</span>
+                  <strong>{formatCurrency(agingReport.summary['0_30'])}</strong>
+                </div>
+                <div className={styles.summaryItem}>
+                  <span>{t('reports:aging.bucket_30_60')}</span>
+                  <strong className={styles.warning}>{formatCurrency(agingReport.summary['30_60'])}</strong>
+                </div>
+                <div className={styles.summaryItem}>
+                  <span>{t('reports:aging.bucket_60_90')}</span>
+                  <strong className={styles.warning}>{formatCurrency(agingReport.summary['60_90'])}</strong>
+                </div>
+                <div className={styles.summaryItem}>
+                  <span>{t('reports:aging.bucket_90_plus')}</span>
+                  <strong className={styles.danger}>{formatCurrency(agingReport.summary['90_plus'])}</strong>
+                </div>
+                <div className={styles.summaryItem}>
+                  <span>{t('reports:aging.total')}</span>
+                  <strong>{formatCurrency(agingReport.summary.total)}</strong>
+                </div>
+              </div>
+
+              <p className={styles.noteText} style={{ marginTop: 12, fontSize: 'var(--font-size-xs)', color: 'var(--color-text-muted)' }}>
+                {t('reports:aging.note')}
+              </p>
+
+              <div className={styles.tableWrap} style={{ marginTop: 16 }}>
+                <table className={styles.reportTable}>
+                  <thead>
+                    <tr>
+                      <th>{t('reports:aging.customer')}</th>
+                      <th className={styles.alignRight}>0-30</th>
+                      <th className={styles.alignRight}>30-60</th>
+                      <th className={styles.alignRight}>60-90</th>
+                      <th className={styles.alignRight}>90+</th>
+                      <th className={styles.alignRight}>{t('reports:aging.total')}</th>
+                      <th className={styles.alignRight}>{t('reports:aging.oldest')}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {agingReport.customers.map((c: any, i: number) => (
+                      <tr key={c.customer_id || i}>
+                        <td>
+                          {c.customer_id ? (
+                            <span className={styles.linkLike} onClick={() => navigate(`/customers/${c.customer_id}`)} style={{ cursor: 'pointer', color: 'var(--color-primary, #3b82f6)' }}>
+                              {c.customer_name}
+                            </span>
+                          ) : c.customer_name}
+                          <div className={styles.barcode}>{c.sale_count} {t('reports:aging.invoices')}</div>
+                        </td>
+                        <td className={styles.alignRight}>{c.buckets['0_30'] > 0 ? formatCurrency(c.buckets['0_30']) : '-'}</td>
+                        <td className={`${styles.alignRight} ${c.buckets['30_60'] > 0 ? styles.warning : ''}`}>{c.buckets['30_60'] > 0 ? formatCurrency(c.buckets['30_60']) : '-'}</td>
+                        <td className={`${styles.alignRight} ${c.buckets['60_90'] > 0 ? styles.warning : ''}`}>{c.buckets['60_90'] > 0 ? formatCurrency(c.buckets['60_90']) : '-'}</td>
+                        <td className={`${styles.alignRight} ${c.buckets['90_plus'] > 0 ? styles.danger : ''}`}>{c.buckets['90_plus'] > 0 ? formatCurrency(c.buckets['90_plus']) : '-'}</td>
+                        <td className={styles.alignRight}><strong>{formatCurrency(c.total)}</strong></td>
+                        <td className={styles.alignRight}>{c.oldest_days_overdue}g</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </>
+          ) : (
+            <div className={styles.emptyState}>{t('reports:aging.noData')}</div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
 
   const renderGenelTab = () => (
     <div className={styles.grid}>
@@ -1188,15 +1498,28 @@ export function ReportsPage() {
         <button className={`${styles.tab} ${activeTab === 'genel' ? styles.tabActive : ''}`} onClick={() => setActiveTab('genel')}>
           {t('reports:tabs.general')}
         </button>
+        <button className={`${styles.tab} ${activeTab === 'gunSonu' ? styles.tabActive : ''}`} onClick={() => setActiveTab('gunSonu')}>
+          {t('reports:tabs.endOfDay')}
+        </button>
         <button className={`${styles.tab} ${activeTab === 'satis' ? styles.tabActive : ''}`} onClick={() => setActiveTab('satis')}>
           {t('reports:tabs.sales')}
         </button>
+        {hasFeature('advancedReports') && (
+          <button className={`${styles.tab} ${activeTab === 'karlilik' ? styles.tabActive : ''}`} onClick={() => setActiveTab('karlilik')}>
+            {t('reports:tabs.profitability')}
+          </button>
+        )}
         <button className={`${styles.tab} ${activeTab === 'musteri' ? styles.tabActive : ''}`} onClick={() => setActiveTab('musteri')}>
           {t('reports:tabs.customers')}
         </button>
         {hasFeature('advancedReports') && (
           <button className={`${styles.tab} ${activeTab === 'musteriSatis' ? styles.tabActive : ''}`} onClick={() => setActiveTab('musteriSatis')}>
             {t('reports:tabs.customerSales')}
+          </button>
+        )}
+        {hasFeature('advancedReports') && (
+          <button className={`${styles.tab} ${activeTab === 'yaslandirma' ? styles.tabActive : ''}`} onClick={() => setActiveTab('yaslandirma')}>
+            {t('reports:tabs.aging')}
           </button>
         )}
         <button className={`${styles.tab} ${activeTab === 'stok' ? styles.tabActive : ''}`} onClick={() => setActiveTab('stok')}>
@@ -1224,9 +1547,12 @@ export function ReportsPage() {
       ) : (
         <>
           {activeTab === 'genel' && renderGenelTab()}
+          {activeTab === 'gunSonu' && renderGunSonuTab()}
           {activeTab === 'satis' && renderSatisTab()}
+          {activeTab === 'karlilik' && renderKarlilikTab()}
           {activeTab === 'musteri' && renderMusteriTab()}
           {activeTab === 'musteriSatis' && renderMusteriSatisTab()}
+          {activeTab === 'yaslandirma' && renderYaslandirmaTab()}
           {activeTab === 'stok' && renderStokTab()}
           {activeTab === 'gider' && renderGiderTab()}
           {activeTab === 'personel' && renderPersonelTab()}

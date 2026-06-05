@@ -617,4 +617,293 @@ export class ReportsService {
       },
     };
   }
+
+  /**
+   * Gün Sonu (Z) Raporu — belirli bir tarihte gerçekleşen tüm işlemlerin özeti.
+   * Perakende standardı: günlük kasa kapanışı için kullanılır.
+   *
+   * - Satışlar (ödeme tipine göre kırılım, iptaller hariç)
+   * - İptal edilen satışlar (sadece bilgi)
+   * - İadeler
+   * - Tahsilatlar (payments)
+   * - Giderler
+   * - Hesap hareketleri (gelir/gider/transfer)
+   * - Hesapların güncel bakiyesi (snapshot)
+   */
+  async getEndOfDayReport(date: string, tenantId?: string | null) {
+    const startOfDay = `${date} 00:00:00.000`;
+    const endOfDay = `${date} 23:59:59.999`;
+    const knex = this.db.knex;
+
+    // 1) Satışlar — ödeme tipine göre
+    const salesByMethodRaw = await this.tenantQuery('sales', tenantId)
+      .where('status', 'completed')
+      .whereBetween('sale_date', [startOfDay, endOfDay])
+      .groupBy('payment_method')
+      .select('payment_method')
+      .sum('grand_total as total')
+      .count('id as count');
+
+    // 2) İptal edilen satışlar (info)
+    const cancelledRows = await this.tenantQuery('sales', tenantId)
+      .where('status', 'cancelled')
+      .whereBetween('sale_date', [startOfDay, endOfDay])
+      .select(
+        knex.raw('COUNT(id)::int as count'),
+        knex.raw('COALESCE(SUM(grand_total), 0) as total'),
+      );
+
+    // 3) İadeler
+    const returnsRows = await this.tenantQuery('returns', tenantId)
+      .where('status', 'completed')
+      .whereBetween('return_date', [startOfDay, endOfDay])
+      .select(
+        knex.raw('COUNT(id)::int as count'),
+        knex.raw('COALESCE(SUM(total_amount), 0) as total'),
+      );
+
+    // 4) Tahsilatlar
+    const paymentsRows = await this.tenantQuery('payments', tenantId)
+      .whereBetween('payment_date', [startOfDay, endOfDay])
+      .select(
+        knex.raw('COUNT(id)::int as count'),
+        knex.raw('COALESCE(SUM(amount), 0) as total'),
+      );
+
+    // 5) Giderler — expenses.expense_date DATE tipinde
+    const expensesRows = await this.tenantQuery('expenses', tenantId)
+      .where('expense_date', date)
+      .select(
+        knex.raw('COUNT(id)::int as count'),
+        knex.raw('COALESCE(SUM(amount), 0) as total'),
+      );
+
+    // 6) Hesap hareketleri — account_type × movement_type
+    const accountMovementsRaw = await this.tenantQuery('account_movements', tenantId)
+      .leftJoin('accounts', 'account_movements.account_id', 'accounts.id')
+      .whereBetween('account_movements.movement_date', [startOfDay, endOfDay])
+      .groupBy('accounts.account_type', 'account_movements.movement_type')
+      .select(
+        'accounts.account_type',
+        'account_movements.movement_type',
+        knex.raw('COUNT(account_movements.id)::int as count'),
+        knex.raw('COALESCE(SUM(account_movements.amount), 0) as total'),
+      );
+
+    // 7) Hesap bakiyeleri snapshot
+    const accountBalancesRaw = await this.tenantQuery('accounts', tenantId)
+      .where('is_active', true)
+      .orderBy('account_type', 'asc')
+      .orderBy('is_default', 'desc')
+      .orderBy('name', 'asc')
+      .select('id', 'name', 'account_type', 'currency', 'current_balance', 'is_default');
+
+    // Build response
+    const byPaymentMethod: Record<string, { count: number; total: number }> = {};
+    let salesTotal = 0;
+    let salesCount = 0;
+    for (const row of salesByMethodRaw as any[]) {
+      const m = row.payment_method as string;
+      const t = parseFloat(row.total) || 0;
+      const c = parseInt(row.count, 10) || 0;
+      byPaymentMethod[m] = { count: c, total: t };
+      salesTotal += t;
+      salesCount += c;
+    }
+
+    const cancelledRow = (cancelledRows[0] as any) || {};
+    const returnsRow = (returnsRows[0] as any) || {};
+    const paymentsRow = (paymentsRows[0] as any) || {};
+    const expensesRow = (expensesRows[0] as any) || {};
+
+    const returnsTotal = parseFloat(returnsRow.total || '0');
+    const expensesTotal = parseFloat(expensesRow.total || '0');
+    const paymentsTotal = parseFloat(paymentsRow.total || '0');
+
+    let cashIn = 0;
+    let cashOut = 0;
+    const accountMovements = (accountMovementsRaw as any[]).map((m) => {
+      const total = parseFloat(m.total) || 0;
+      const count = parseInt(m.count, 10) || 0;
+      if (m.movement_type === 'gelir') cashIn += total;
+      else if (m.movement_type === 'gider') cashOut += total;
+      return { account_type: m.account_type, movement_type: m.movement_type, count, total };
+    });
+
+    const accountBalances = (accountBalancesRaw as any[]).map((a) => ({
+      id: a.id,
+      name: a.name,
+      account_type: a.account_type,
+      currency: a.currency,
+      is_default: !!a.is_default,
+      current_balance: parseFloat(a.current_balance) || 0,
+    }));
+
+    const totalAccountBalance = accountBalances.reduce((s, a) => s + a.current_balance, 0);
+
+    return {
+      date,
+      sales: { count: salesCount, total: salesTotal, byPaymentMethod },
+      cancelledSales: {
+        count: parseInt(cancelledRow.count || '0', 10),
+        total: parseFloat(cancelledRow.total || '0'),
+      },
+      returns: { count: parseInt(returnsRow.count || '0', 10), total: returnsTotal },
+      payments: { count: parseInt(paymentsRow.count || '0', 10), total: paymentsTotal },
+      expenses: { count: parseInt(expensesRow.count || '0', 10), total: expensesTotal },
+      netSales: salesTotal - returnsTotal,
+      cashFlow: { in: cashIn, out: cashOut, net: cashIn - cashOut },
+      accountMovements,
+      accountBalances,
+      totalAccountBalance,
+    };
+  }
+
+  /**
+   * Cari Yaşlandırma (Aging Report) — veresiye satışları vade tarihine göre
+   * 4 bucket'a böler: 0-30, 30-60, 60-90, 90+ gün.
+   *
+   * Notlar:
+   * - Sadece COMPLETED veresiye satışlar dahil
+   * - Vadesi gelmemiş (due_date > today) satışlar dahil EDİLMEZ
+   * - Kısmi tahsilat takip edilmiyor — her satışın full grand_total'u bucket'a düşer
+   *   (gerçek payment allocation için ileride payments tablosu join'lenebilir)
+   */
+  async getAgingReport(tenantId?: string | null) {
+    const knex = this.db.knex;
+    const todayStr = new Date().toISOString().split('T')[0];
+
+    const rows = await this.tenantQuery('sales', tenantId)
+      .leftJoin('customers', 'sales.customer_id', 'customers.id')
+      .where('sales.status', 'completed')
+      .where('sales.payment_method', 'veresiye')
+      .where('sales.due_date', '<=', todayStr)
+      .whereNotNull('sales.due_date')
+      .select(
+        'sales.id as sale_id',
+        'sales.invoice_number',
+        'sales.sale_date',
+        'sales.due_date',
+        'sales.grand_total',
+        'sales.customer_id',
+        'customers.name as customer_name',
+        knex.raw('(CURRENT_DATE - sales.due_date::date)::int as days_overdue'),
+      )
+      .orderBy('sales.due_date', 'asc');
+
+    const customerMap: Record<string, any> = {};
+    for (const sale of rows as any[]) {
+      const customerId = sale.customer_id || '__unknown__';
+      const daysOverdue = parseInt(sale.days_overdue, 10) || 0;
+      const amount = parseFloat(sale.grand_total) || 0;
+
+      let bucket: '0_30' | '30_60' | '60_90' | '90_plus';
+      if (daysOverdue <= 30) bucket = '0_30';
+      else if (daysOverdue <= 60) bucket = '30_60';
+      else if (daysOverdue <= 90) bucket = '60_90';
+      else bucket = '90_plus';
+
+      if (!customerMap[customerId]) {
+        customerMap[customerId] = {
+          customer_id: sale.customer_id,
+          customer_name: sale.customer_name || 'Müşterisiz',
+          buckets: { '0_30': 0, '30_60': 0, '60_90': 0, '90_plus': 0 },
+          total: 0,
+          oldest_days_overdue: 0,
+          sale_count: 0,
+        };
+      }
+      customerMap[customerId].buckets[bucket] += amount;
+      customerMap[customerId].total += amount;
+      customerMap[customerId].sale_count += 1;
+      if (daysOverdue > customerMap[customerId].oldest_days_overdue) {
+        customerMap[customerId].oldest_days_overdue = daysOverdue;
+      }
+    }
+
+    const customers = Object.values(customerMap).sort((a: any, b: any) => b.total - a.total);
+
+    const summary = customers.reduce(
+      (acc: any, c: any) => {
+        acc['0_30'] += c.buckets['0_30'];
+        acc['30_60'] += c.buckets['30_60'];
+        acc['60_90'] += c.buckets['60_90'];
+        acc['90_plus'] += c.buckets['90_plus'];
+        acc.total += c.total;
+        return acc;
+      },
+      { '0_30': 0, '30_60': 0, '60_90': 0, '90_plus': 0, total: 0, customer_count: customers.length },
+    );
+
+    return { customers, summary };
+  }
+
+  /**
+   * Ürün Bazlı Kârlılık — belirli aralıkta her ürünün kâr/zarar performansı.
+   *
+   * COGS hesabı: SUM(sale_items.quantity * products.purchase_price). NOT:
+   * products.purchase_price şu anki güncel maliyettir — geçmiş alış fiyatları
+   * snapshot'lanmıyor. Bu yüzden COGS proxy bir hesaptır (alış fiyatı çok
+   * dalgalanan ürünlerde sapma olur). Gerçek FIFO/Avg cost ileride
+   * sale_items'a unit_cost kolonu eklenerek snapshot'lanabilir.
+   */
+  async getProductProfitability(startDate: string, endDate: string, tenantId?: string | null) {
+    const knex = this.db.knex;
+    const rawRows = await this.tenantQuery('sale_items', tenantId)
+      .join('sales', 'sale_items.sale_id', 'sales.id')
+      .join('products', 'sale_items.product_id', 'products.id')
+      .where('sales.status', 'completed')
+      .whereBetween('sales.sale_date', [startDate, this.toEndOfDay(endDate)])
+      .groupBy('products.id', 'products.name', 'products.barcode', 'products.unit', 'products.purchase_price', 'products.sale_price')
+      .select(
+        'products.id',
+        'products.name',
+        'products.barcode',
+        'products.unit',
+        'products.purchase_price as current_purchase_price',
+        'products.sale_price as current_sale_price',
+        knex.raw('COALESCE(SUM(sale_items.quantity), 0) as total_quantity'),
+        knex.raw('COALESCE(SUM(sale_items.line_total), 0) as total_revenue'),
+        knex.raw('COALESCE(SUM(sale_items.quantity * products.purchase_price), 0) as total_cogs'),
+      )
+      .orderByRaw('SUM(sale_items.line_total - sale_items.quantity * products.purchase_price) DESC NULLS LAST');
+
+    const products = (rawRows as any[]).map((r) => {
+      const quantity = parseFloat(r.total_quantity) || 0;
+      const revenue = parseFloat(r.total_revenue) || 0;
+      const cogs = parseFloat(r.total_cogs) || 0;
+      const profit = revenue - cogs;
+      const margin = revenue > 0 ? (profit / revenue) * 100 : 0;
+      return {
+        id: r.id,
+        name: r.name,
+        barcode: r.barcode,
+        unit: r.unit,
+        current_purchase_price: parseFloat(r.current_purchase_price) || 0,
+        current_sale_price: parseFloat(r.current_sale_price) || 0,
+        total_quantity: quantity,
+        total_revenue: revenue,
+        total_cogs: cogs,
+        gross_profit: profit,
+        margin_percent: Math.round(margin * 100) / 100,
+      };
+    });
+
+    const summary = products.reduce(
+      (acc: any, p: any) => {
+        acc.total_quantity += p.total_quantity;
+        acc.total_revenue += p.total_revenue;
+        acc.total_cogs += p.total_cogs;
+        acc.gross_profit += p.gross_profit;
+        return acc;
+      },
+      { total_quantity: 0, total_revenue: 0, total_cogs: 0, gross_profit: 0 },
+    );
+    summary.margin_percent = summary.total_revenue > 0
+      ? Math.round((summary.gross_profit / summary.total_revenue) * 10000) / 100
+      : 0;
+    summary.product_count = products.length;
+
+    return { products, summary };
+  }
 }

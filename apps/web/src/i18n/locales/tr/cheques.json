@@ -1,0 +1,118 @@
+{
+  "pageTitle": "Çek / Senet",
+  "subtitle": "Vadeli ödeme araçları — portföydeki çek/senetlerin takibi",
+  "newCheque": "+ Yeni Kayıt",
+  "searchPlaceholder": "Çek no, banka, keşideci, müşteri/tedarikçi ara...",
+  "empty": "Henüz kayıt yok",
+  "types": {
+    "cek": "Çek",
+    "senet": "Senet"
+  },
+  "direction": {
+    "incoming": "Alınan",
+    "outgoing": "Verilen"
+  },
+  "statuses": {
+    "in_portfolio": "Portföyde",
+    "collected": "Tahsil Edildi",
+    "cashed_out": "Ödendi",
+    "bounced": "Karşılıksız",
+    "returned": "İade"
+  },
+  "columns": {
+    "type": "Tip",
+    "number": "Belge No",
+    "party": "Karşı Taraf",
+    "bank": "Banka",
+    "amount": "Tutar",
+    "dueDate": "Vade",
+    "status": "Durum"
+  },
+  "filters": {
+    "direction": {
+      "all": "Tümü",
+      "incoming": "Alınan",
+      "outgoing": "Verilen"
+    },
+    "status": {
+      "all": "Tümü",
+      "in_portfolio": "Portföyde",
+      "overdue": "Vadesi Geçen",
+      "collected": "Tahsil",
+      "cashed_out": "Ödendi",
+      "bounced": "Karşılıksız"
+    }
+  },
+  "stats": {
+    "incomingPortfolio": "Alınan (Portföyde)",
+    "outgoingPortfolio": "Verilen (Portföyde)",
+    "overdue": "Vadesi Geçen",
+    "bounced": "Karşılıksız",
+    "count": "adet"
+  },
+  "form": {
+    "title": "Yeni Çek / Senet",
+    "back": "Çek / Senet",
+    "basicInfo": "Temel Bilgiler",
+    "type": "Tip",
+    "direction": "Yön",
+    "fromCustomer": "Müşteri",
+    "toSupplier": "Tedarikçi",
+    "selectCustomer": "Müşteri seçin",
+    "selectSupplier": "Tedarikçi seçin",
+    "amount": "Tutar",
+    "chequeNumber": "Belge No",
+    "chequeNumberPlaceholder": "Çek/Senet üzerindeki numara",
+    "bankName": "Banka",
+    "bankPlaceholder": "Banka adı",
+    "drawerName": "Keşideci",
+    "drawerPlaceholder": "Çeki imzalayan kişi/firma",
+    "issueDate": "Düzenleme Tarihi",
+    "dueDate": "Vade Tarihi",
+    "notes": "Not",
+    "notesPlaceholder": "Ek açıklama...",
+    "save": "Kaydet"
+  },
+  "actions": {
+    "collect": "Tahsil Et",
+    "cashOut": "Ödendi Olarak İşaretle",
+    "bounce": "Karşılıksız",
+    "return": "İade",
+    "revertToPortfolio": "Portföye Geri Al"
+  },
+  "detail": {
+    "back": "Çek / Senet",
+    "notFound": "Kayıt bulunamadı",
+    "info": "Belge Bilgileri",
+    "amounts": "Tutar & Hesap",
+    "party": "Karşı Taraf",
+    "account": "Hesap (Kasa/Banka)",
+    "selectAccount": "Hesap seçin",
+    "statusChangedAt": "Durum Değişim Tarihi",
+    "createdBy": "Kaydeden",
+    "dueDate": "Vade",
+    "notes": "Not",
+    "collectHint": "Hangi kasa/bankaya tahsil edildi? Seçilen hesaba tutar gelir hareketi olarak yazılacak.",
+    "cashOutHint": "Hangi kasa/bankadan ödendi? Seçilen hesaptan tutar gider hareketi olarak çıkacak.",
+    "bounceHint": "Karşılıksız olarak işaretlenecek. Hesap hareketi oluşmaz; daha önce tahsil edilmişse geri alınır.",
+    "returnHint": "İade edildi olarak işaretlenecek. Hesap hareketi oluşmaz.",
+    "revertHint": "Portföye geri alınacak. Daha önce hesap hareketi oluşmuşsa geri alınır."
+  },
+  "validation": {
+    "partyRequired": "Müşteri veya tedarikçi seçilmelidir",
+    "amountRequired": "Geçerli bir tutar girin",
+    "dueDateRequired": "Vade tarihi zorunludur",
+    "accountRequired": "Hesap (kasa/banka) seçilmelidir"
+  },
+  "toast": {
+    "loadError": "Yüklenemedi",
+    "created": "Kaydedildi",
+    "saveError": "Kaydedilemedi",
+    "statusUpdated": "Durum güncellendi",
+    "deleted": "Silindi",
+    "deleteError": "Silinemedi"
+  },
+  "confirm": {
+    "delete": "Bu kaydı silmek istediğinize emin misiniz? Hesap hareketi varsa silmeden önce portföye geri alın."
+  }
+}

@@ -386,6 +386,11 @@
   transition: margin-left var(--transition-normal);
 }
 
+/* Sidebar kapalıyken main full-width — desktop'ta */
+.mainFull {
+  margin-left: 0;
+}
+
 /* ── TopBar ── */
 .topbar {
   position: sticky;
@@ -408,7 +413,9 @@
 }
 
 .menuButton {
-  display: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 40px;
   height: 40px;
   background: transparent;

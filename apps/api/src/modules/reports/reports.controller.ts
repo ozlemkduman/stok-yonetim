@@ -110,4 +110,30 @@ export class ReportsController {
     const data = await this.reportsService.getExpensesByCategory(startDate, endDate, resolveTenantId(req));
     return { success: true, data };
   }
+
+  @Get('end-of-day')
+  async getEndOfDay(@Query('date') date: string, @Req() req: any) {
+    const effectiveDate = date || new Date().toISOString().split('T')[0];
+    const data = await this.reportsService.getEndOfDayReport(effectiveDate, resolveTenantId(req));
+    return { success: true, data };
+  }
+
+  @Get('aging')
+  @RequireFeature('advancedReports')
+  async getAging(@Req() req: any) {
+    const data = await this.reportsService.getAgingReport(resolveTenantId(req));
+    return { success: true, data };
+  }
+
+  @Get('product-profitability')
+  @RequireFeature('advancedReports')
+  async getProductProfitability(@Query('startDate') startDate: string, @Query('endDate') endDate: string, @Req() req: any) {
+    // Defensive defaults: dates eksikse SQL whereBetween undefined ile çökerdi.
+    const today = new Date();
+    const effectiveEnd = endDate || today.toISOString().split('T')[0];
+    const start30 = new Date(today.getTime() - 30 * 86400000);
+    const effectiveStart = startDate || start30.toISOString().split('T')[0];
+    const data = await this.reportsService.getProductProfitability(effectiveStart, effectiveEnd, resolveTenantId(req));
+    return { success: true, data };
+  }
 }
