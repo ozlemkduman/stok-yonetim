@@ -128,7 +128,12 @@ export class ReportsController {
   @Get('product-profitability')
   @RequireFeature('advancedReports')
   async getProductProfitability(@Query('startDate') startDate: string, @Query('endDate') endDate: string, @Req() req: any) {
-    const data = await this.reportsService.getProductProfitability(startDate, endDate, resolveTenantId(req));
+    // Defensive defaults: dates eksikse SQL whereBetween undefined ile çökerdi.
+    const today = new Date();
+    const effectiveEnd = endDate || today.toISOString().split('T')[0];
+    const start30 = new Date(today.getTime() - 30 * 86400000);
+    const effectiveStart = startDate || start30.toISOString().split('T')[0];
+    const data = await this.reportsService.getProductProfitability(effectiveStart, effectiveEnd, resolveTenantId(req));
     return { success: true, data };
   }
 }
