@@ -49,7 +49,7 @@ spec:
         - name: SMTP_USER
           value: iletisim@pancar.io
         - name: DEMO_NOTIFY_EMAIL
-          value: iletisim@pancar.io
+          value: stoksayac@gmail.com
         - name: ADMIN_API_KEY
           value: DEGISTIR_ADMIN_API_KEY
         - name: SUPER_ADMIN_EMAIL

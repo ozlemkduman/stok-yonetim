@@ -191,6 +191,8 @@
       "namePlaceholder": "Your Full Name",
       "phoneLabel": "Phone *",
       "phonePlaceholder": "05XX XXX XX XX",
+      "emailLabel": "Email *",
+      "emailPlaceholder": "you@company.com",
       "companyLabel": "Company Name",
       "companyPlaceholder": "Your company name",
       "sectorLabel": "Industry",

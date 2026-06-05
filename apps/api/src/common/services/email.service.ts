@@ -7,6 +7,7 @@ interface SendMailOptions {
   to: string;
   subject: string;
   html: string;
+  replyTo?: string;
 }
 
 @Injectable()
@@ -73,6 +74,7 @@ export class EmailService {
           to: options.to,
           subject: options.subject,
           html: options.html,
+          ...(options.replyTo ? { replyTo: options.replyTo } : {}),
         });
 
         if (error) {
@@ -97,6 +99,7 @@ export class EmailService {
         to: options.to,
         subject: options.subject,
         html: options.html,
+        ...(options.replyTo ? { replyTo: options.replyTo } : {}),
       });
       this.logger.log(`E-posta gonderildi (SMTP): ${options.to}`);
       return true;

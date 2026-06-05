@@ -1,9 +1,13 @@
-import { IsString, IsNotEmpty, IsOptional } from 'class-validator';
+import { IsString, IsNotEmpty, IsOptional, IsEmail } from 'class-validator';
 
 export class DemoApplicationDto {
   @IsString()
   @IsNotEmpty()
   name: string;
+
+  @IsEmail({}, { message: 'Geçerli bir e-posta adresi girin' })
+  @IsNotEmpty({ message: 'E-posta zorunlu' })
+  email: string;
 
   @IsString()
   @IsNotEmpty()
