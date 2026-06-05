@@ -223,6 +223,9 @@ export function StockCountDetailPage() {
                         step="any"
                         min="0"
                         value={draft}
+                        placeholder={t('stockCount:detail.countedHint')}
+                        aria-label={`${item.product_name} - ${t('stockCount:detail.counted')}`}
+                        title={t('stockCount:detail.countedHint')}
                         onChange={(e) => setDraftValues((prev) => ({ ...prev, [item.id]: e.target.value }))}
                         onBlur={(e) => handleItemBlur(item, e.target.value)}
                         disabled={savingIds.has(item.id)}
