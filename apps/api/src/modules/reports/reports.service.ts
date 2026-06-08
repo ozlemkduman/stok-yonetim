@@ -906,4 +906,186 @@ export class ReportsService {
 
     return { products, summary };
   }
+
+  /**
+   * Alış Raporu — satış raporunun mirror'ı. Period totals, payment method,
+   * tedarikçi top-N, günlük trend, iptaller. Sadece status='completed' dahil.
+   */
+  async getPurchasesSummary(startDate: string, endDate: string, tenantId?: string | null) {
+    const knex = this.db.knex;
+
+    const [rawSummary] = await this.tenantQuery('purchases', tenantId)
+      .where('status', 'completed')
+      .whereBetween('purchase_date', [startDate, this.toEndOfDay(endDate)])
+      .select(
+        knex.raw('COUNT(*) as purchase_count'),
+        knex.raw('COALESCE(SUM(subtotal), 0) as subtotal'),
+        knex.raw('COALESCE(SUM(discount_amount), 0) as discount_total'),
+        knex.raw('COALESCE(SUM(vat_total), 0) as vat_total'),
+        knex.raw('COALESCE(SUM(grand_total), 0) as grand_total'),
+      );
+
+    const r = rawSummary as any;
+    const summary = {
+      purchase_count: parseInt(r?.purchase_count || '0', 10),
+      subtotal: parseFloat(r?.subtotal || '0'),
+      discount_total: parseFloat(r?.discount_total || '0'),
+      vat_total: parseFloat(r?.vat_total || '0'),
+      grand_total: parseFloat(r?.grand_total || '0'),
+    };
+
+    // İptaller
+    const [cancelledRaw] = await this.tenantQuery('purchases', tenantId)
+      .where('status', 'cancelled')
+      .whereBetween('purchase_date', [startDate, this.toEndOfDay(endDate)])
+      .select(
+        knex.raw('COUNT(*) as count'),
+        knex.raw('COALESCE(SUM(grand_total), 0) as total'),
+      );
+    const cancelled = {
+      count: parseInt((cancelledRaw as any)?.count || '0', 10),
+      total: parseFloat((cancelledRaw as any)?.total || '0'),
+    };
+
+    // Ödeme tipi kırılımı
+    const byPaymentRaw = await this.tenantQuery('purchases', tenantId)
+      .where('status', 'completed')
+      .whereBetween('purchase_date', [startDate, this.toEndOfDay(endDate)])
+      .select('payment_method')
+      .sum('grand_total as total')
+      .count('id as count')
+      .groupBy('payment_method');
+    const byPaymentMethod = byPaymentRaw.map((row: any) => ({
+      payment_method: row.payment_method,
+      total: parseFloat(row.total || '0'),
+      count: parseInt(row.count || '0', 10),
+    }));
+
+    // Top tedarikçiler
+    const topSuppliersRaw = await this.tenantQuery('purchases', tenantId)
+      .leftJoin('suppliers', 'purchases.supplier_id', 'suppliers.id')
+      .where('purchases.status', 'completed')
+      .whereBetween('purchases.purchase_date', [startDate, this.toEndOfDay(endDate)])
+      .whereNotNull('purchases.supplier_id')
+      .groupBy('purchases.supplier_id', 'suppliers.name')
+      .select(
+        'purchases.supplier_id',
+        'suppliers.name as supplier_name',
+        knex.raw('COUNT(purchases.id) as purchase_count'),
+        knex.raw('COALESCE(SUM(purchases.grand_total), 0) as total'),
+      )
+      .orderByRaw('SUM(purchases.grand_total) DESC NULLS LAST')
+      .limit(10);
+    const topSuppliers = topSuppliersRaw.map((row: any) => ({
+      supplier_id: row.supplier_id,
+      supplier_name: row.supplier_name || 'Tedarikçisiz',
+      purchase_count: parseInt(row.purchase_count || '0', 10),
+      total: parseFloat(row.total || '0'),
+    }));
+
+    // Günlük trend
+    const dailyRaw = await this.tenantQuery('purchases', tenantId)
+      .where('status', 'completed')
+      .whereBetween('purchase_date', [startDate, this.toEndOfDay(endDate)])
+      .select(knex.raw('DATE(purchase_date) as date'))
+      .sum('grand_total as total')
+      .count('id as count')
+      .groupBy(knex.raw('DATE(purchase_date)'))
+      .orderBy('date');
+    const dailyPurchases = dailyRaw.map((row: any) => ({
+      date: row.date,
+      total: parseFloat(row.total || '0'),
+      count: parseInt(row.count || '0', 10),
+    }));
+
+    return { summary, cancelled, byPaymentMethod, topSuppliers, dailyPurchases };
+  }
+
+  /**
+   * Kasa Hareketleri Raporu — account_movements üzerinden gelir/gider/transfer
+   * özeti + son N hareket listesi.
+   */
+  async getAccountMovementsReport(
+    startDate: string,
+    endDate: string,
+    accountId: string | undefined,
+    tenantId?: string | null,
+  ) {
+    const knex = this.db.knex;
+
+    // movement_type kırılımı
+    let groupQuery = this.tenantQuery('account_movements', tenantId)
+      .whereBetween('movement_date', [startDate, this.toEndOfDay(endDate)])
+      .groupBy('movement_type')
+      .select(
+        'movement_type',
+        knex.raw('COUNT(*) as count'),
+        knex.raw('COALESCE(SUM(amount), 0) as total'),
+      );
+    if (accountId) groupQuery = groupQuery.where('account_id', accountId);
+
+    const byTypeRaw = await groupQuery;
+    const byType = byTypeRaw.map((row: any) => ({
+      movement_type: row.movement_type,
+      count: parseInt(row.count || '0', 10),
+      total: parseFloat(row.total || '0'),
+    }));
+
+    // Hareket listesi (son 200, tarih sıralı)
+    let listQuery = this.tenantQuery('account_movements', tenantId)
+      .leftJoin('accounts', 'account_movements.account_id', 'accounts.id')
+      .whereBetween('account_movements.movement_date', [startDate, this.toEndOfDay(endDate)])
+      .select(
+        'account_movements.id',
+        'account_movements.movement_type',
+        'account_movements.amount',
+        'account_movements.balance_after',
+        'account_movements.category',
+        'account_movements.description',
+        'account_movements.movement_date',
+        'account_movements.reference_type',
+        'account_movements.reference_id',
+        'accounts.name as account_name',
+        'accounts.account_type',
+      )
+      .orderBy('account_movements.movement_date', 'desc')
+      .limit(200);
+    if (accountId) listQuery = listQuery.where('account_movements.account_id', accountId);
+
+    const movements = (await listQuery).map((row: any) => ({
+      id: row.id,
+      movement_type: row.movement_type,
+      amount: parseFloat(row.amount || '0'),
+      balance_after: parseFloat(row.balance_after || '0'),
+      category: row.category,
+      description: row.description,
+      movement_date: row.movement_date,
+      reference_type: row.reference_type,
+      reference_id: row.reference_id,
+      account_name: row.account_name,
+      account_type: row.account_type,
+    }));
+
+    // Hesap listesi (filter için)
+    const accountsRaw = await this.tenantQuery('accounts', tenantId)
+      .where('is_active', true)
+      .orderBy('name')
+      .select('id', 'name', 'account_type');
+    const accounts = accountsRaw.map((a: any) => ({
+      id: a.id,
+      name: a.name,
+      account_type: a.account_type,
+    }));
+
+    // Net cash flow
+    const cashIn = byType.filter((r) => r.movement_type === 'gelir').reduce((s, r) => s + r.total, 0);
+    const cashOut = byType.filter((r) => r.movement_type === 'gider').reduce((s, r) => s + r.total, 0);
+
+    return {
+      byType,
+      movements,
+      accounts,
+      summary: { cashIn, cashOut, net: cashIn - cashOut, totalMovements: movements.length },
+    };
+  }
 }

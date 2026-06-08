@@ -62,6 +62,7 @@ export class SalesService {
       let subtotal = 0;
       let vatTotal = 0;
       const saleItems: Partial<SaleItem>[] = [];
+      const serviceProductIds = new Set<string>();
 
       for (const item of dto.items) {
         // Lock product row and check stock inside transaction
@@ -71,7 +72,10 @@ export class SalesService {
           .first();
         if (!product) throw new BadRequestException(`Urun bulunamadi: ${item.product_id}`);
         if (!product.is_active) throw new BadRequestException(`Urun pasif durumda: ${product.name}`);
-        if (product.stock_quantity < item.quantity) {
+        // Service (hizmet) tipinde ürünlerde stok kontrolü yapılmaz
+        const isService = product.type === 'service';
+        if (isService) serviceProductIds.add(item.product_id);
+        if (!isService && product.stock_quantity < item.quantity) {
           throw new BadRequestException(`Yetersiz stok: ${product.name}`);
         }
 
@@ -94,7 +98,9 @@ export class SalesService {
           line_total: lineTotal,
         });
 
-        await this.productsRepository.updateStock(item.product_id, -item.quantity, trx);
+        if (!isService) {
+          await this.productsRepository.updateStock(item.product_id, -item.quantity, trx);
+        }
       }
 
       const discountAmount = dto.discount_amount || (subtotal * (dto.discount_rate || 0) / 100);
@@ -125,8 +131,9 @@ export class SalesService {
         created_by: userId || null,
       }, saleItems, trx);
 
-      // Stok: warehouse_stocks güncelle + audit kaydı
+      // Stok: warehouse_stocks güncelle + audit kaydı (service tipinde atlanır)
       for (const item of dto.items) {
+        if (serviceProductIds.has(item.product_id)) continue;
         await updateWarehouseStock(trx, { productId: item.product_id, delta: -item.quantity });
         await writeStockMovement(trx, {
           productId: item.product_id,
@@ -193,6 +200,9 @@ export class SalesService {
 
     await this.db.transaction(async (trx) => {
       for (const item of sale.items) {
+        // Hizmet ürünleri için stok geri eklenmez
+        const product = await trx('products').where('id', item.product_id).first();
+        if (product?.type === 'service') continue;
         await trx('products').where('id', item.product_id).update({
           stock_quantity: trx.raw('stock_quantity + ?', [item.quantity]),
           updated_at: trx.fn.now(),

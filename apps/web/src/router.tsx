@@ -43,6 +43,7 @@ import { SaleListPage, SaleDetailPage, SaleFormPage, InvoiceImportPage } from '.
 import { ReturnListPage, ReturnDetailPage, ReturnFormPage } from './pages/Returns';
 import { ExpenseListPage } from './pages/Expenses';
 import { ReportsPage } from './pages/Reports';
+import { EmployeeListPage } from './pages/Employees';
 import { AccountListPage, AccountDetailPage } from './pages/Accounts';
 import { WarehouseListPage, WarehouseDetailPage, StockTransferPage, StockMovementsPage } from './pages/Warehouses';
 import { QuoteListPage, QuoteDetailPage, QuoteFormPage, QuotePrintView } from './pages/Quotes';
@@ -156,6 +157,9 @@ export function AppRouter() {
 
         {/* Expenses */}
         <Route path="expenses" element={<ExpenseListPage />} />
+
+        {/* Employees */}
+        <Route path="employees" element={<EmployeeListPage />} />
 
         {/* Accounts */}
         <Route path="accounts" element={<AccountListPage />} />

@@ -77,9 +77,9 @@ const icons = {
   ),
 };
 
-type TabType = 'genel' | 'satis' | 'musteri' | 'musteriSatis' | 'stok' | 'gider' | 'personel' | 'yenileme' | 'gunSonu' | 'yaslandirma' | 'karlilik';
+type TabType = 'genel' | 'satis' | 'alis' | 'musteri' | 'musteriSatis' | 'stok' | 'gider' | 'personel' | 'yenileme' | 'gunSonu' | 'yaslandirma' | 'karlilik' | 'kasa';
 
-const VALID_TABS: TabType[] = ['genel', 'gunSonu', 'satis', 'karlilik', 'musteri', 'musteriSatis', 'yaslandirma', 'stok', 'gider', 'personel', 'yenileme'];
+const VALID_TABS: TabType[] = ['genel', 'gunSonu', 'satis', 'alis', 'karlilik', 'musteri', 'musteriSatis', 'yaslandirma', 'stok', 'gider', 'kasa', 'personel', 'yenileme'];
 const ADVANCED_TABS: TabType[] = ['musteriSatis', 'gider', 'personel', 'yenileme', 'yaslandirma', 'karlilik'];
 
 export function ReportsPage() {
@@ -135,6 +135,9 @@ export function ReportsPage() {
   const [endOfDayReport, setEndOfDayReport] = useState<any>(null);
   const [agingReport, setAgingReport] = useState<any>(null);
   const [productProfitability, setProductProfitability] = useState<any>(null);
+  const [purchasesSummary, setPurchasesSummary] = useState<any>(null);
+  const [accountMovementsReport, setAccountMovementsReport] = useState<any>(null);
+  const [accountFilterId, setAccountFilterId] = useState('');
 
   const fetchReports = useCallback(async () => {
     setLoading(true);
@@ -161,6 +164,10 @@ export function ReportsPage() {
         isAdvanced ? safe(reportsApi.getAging()) : Promise.resolve(null),
         isAdvanced ? safe(reportsApi.getProductProfitability(startDate, endDate)) : Promise.resolve(null),
       ]);
+      const [purSum, accMov] = await Promise.all([
+        safe(reportsApi.getPurchasesSummary(startDate, endDate)),
+        safe(reportsApi.getAccountMovements(startDate, endDate, accountFilterId || undefined)),
+      ]);
       if (sales) setSalesSummary(sales.data);
       if (profit) setProfitLoss(profit.data);
       if (debt) setDebtOverview(debt.data);
@@ -178,11 +185,13 @@ export function ReportsPage() {
       if (eod) setEndOfDayReport(eod.data);
       if (aging) setAgingReport(aging.data);
       if (profit2) setProductProfitability(profit2.data);
+      if (purSum) setPurchasesSummary(purSum.data);
+      if (accMov) setAccountMovementsReport(accMov.data);
     } catch (err) {
       showToast('error', t('reports:loadFailed'));
     }
     setLoading(false);
-  }, [startDate, endDate, endOfDayDate, hasFeature]);
+  }, [startDate, endDate, endOfDayDate, accountFilterId, hasFeature]);
 
   useEffect(() => { fetchReports(); }, [fetchReports]);
 
@@ -785,6 +794,201 @@ export function ReportsPage() {
                     </tbody>
                   </table>
                 </>
+              )}
+            </>
+          ) : (
+            <div className={styles.emptyState}>{t('reports:noData')}</div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+
+  // ── Alış Raporu ─────────────────────────────────────────
+  const renderAlisTab = () => (
+    <div className={`${styles.grid} ${styles.twoColGrid}`}>
+      {/* Alış özeti */}
+      <div className={styles.reportCard}>
+        <div className={styles.reportCardHeader}>
+          {icons.product}
+          <h3 className={styles.reportCardTitle}>{t('reports:purchases.summaryTitle')}</h3>
+        </div>
+        <div className={styles.reportCardBody}>
+          {purchasesSummary ? (
+            <>
+              <div className={styles.summaryGrid}>
+                <div className={styles.summaryCard}>
+                  <div className={styles.summaryValue}>{purchasesSummary.summary.purchase_count}</div>
+                  <div className={styles.summaryLabel}>{t('reports:purchases.count')}</div>
+                </div>
+                <div className={styles.summaryCard}>
+                  <div className={styles.summaryValue}>{formatCurrency(purchasesSummary.summary.grand_total)}</div>
+                  <div className={styles.summaryLabel}>{t('reports:purchases.grandTotal')}</div>
+                </div>
+                <div className={styles.summaryCard}>
+                  <div className={styles.summaryValue}>{formatCurrency(purchasesSummary.summary.subtotal)}</div>
+                  <div className={styles.summaryLabel}>{t('reports:purchases.subtotal')}</div>
+                </div>
+                <div className={styles.summaryCard}>
+                  <div className={styles.summaryValue}>{formatCurrency(purchasesSummary.summary.vat_total)}</div>
+                  <div className={styles.summaryLabel}>{t('reports:purchases.vatTotal')}</div>
+                </div>
+              </div>
+
+              {purchasesSummary.byPaymentMethod?.length > 0 && (
+                <>
+                  <h4 style={{ marginTop: 24 }}>{t('reports:purchases.byPaymentMethod')}</h4>
+                  <table className={styles.reportTable}>
+                    <thead>
+                      <tr>
+                        <th>{t('reports:purchases.method')}</th>
+                        <th className={styles.alignRight}>{t('reports:purchases.count')}</th>
+                        <th className={styles.alignRight}>{t('reports:purchases.amount')}</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {purchasesSummary.byPaymentMethod.map((p: any) => (
+                        <tr key={p.payment_method}>
+                          <td>{t(`sales:paymentMethods.${p.payment_method}`, { defaultValue: p.payment_method || '-' })}</td>
+                          <td className={styles.alignRight}>{p.count}</td>
+                          <td className={styles.alignRight}><strong>{formatCurrency(p.total)}</strong></td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </>
+              )}
+
+              {purchasesSummary.cancelled?.count > 0 && (
+                <div className={styles.summaryGrid} style={{ marginTop: 16 }}>
+                  <div className={styles.summaryItem}>
+                    <span>{t('reports:purchases.cancelled')}</span>
+                    <strong className={styles.danger}>{purchasesSummary.cancelled.count} · {formatCurrency(purchasesSummary.cancelled.total)}</strong>
+                  </div>
+                </div>
+              )}
+            </>
+          ) : (
+            <div className={styles.emptyState}>{t('reports:noData')}</div>
+          )}
+        </div>
+      </div>
+
+      {/* Top tedarikçiler */}
+      <div className={styles.reportCard}>
+        <div className={styles.reportCardHeader}>
+          {icons.customer}
+          <h3 className={styles.reportCardTitle}>{t('reports:purchases.topSuppliers')}</h3>
+        </div>
+        <div className={styles.reportCardBody}>
+          {purchasesSummary?.topSuppliers?.length > 0 ? (
+            <table className={styles.reportTable}>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>{t('reports:purchases.supplier')}</th>
+                  <th className={styles.alignRight}>{t('reports:purchases.count')}</th>
+                  <th className={styles.alignRight}>{t('reports:purchases.total')}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {purchasesSummary.topSuppliers.map((s: any, i: number) => (
+                  <tr key={s.supplier_id || i}>
+                    <td>{i + 1}</td>
+                    <td>{s.supplier_name}</td>
+                    <td className={styles.alignRight}>{s.purchase_count}</td>
+                    <td className={styles.alignRight}><strong>{formatCurrency(s.total)}</strong></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          ) : (
+            <div className={styles.emptyState}>{t('reports:noData')}</div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+
+  // ── Kasa Hareketleri Raporu ─────────────────────────────
+  const renderKasaTab = () => (
+    <div className={styles.grid}>
+      <div className={styles.reportCard}>
+        <div className={styles.reportCardHeader}>
+          {icons.debt}
+          <h3 className={styles.reportCardTitle}>{t('reports:cash.title')}</h3>
+        </div>
+        <div className={styles.reportCardBody}>
+          <div style={{ display: 'flex', gap: 12, alignItems: 'center', marginBottom: 16 }}>
+            <label>{t('reports:cash.account')}:</label>
+            <select
+              className={styles.dateInput}
+              value={accountFilterId}
+              onChange={(e) => setAccountFilterId(e.target.value)}
+            >
+              <option value="">{t('reports:cash.allAccounts')}</option>
+              {accountMovementsReport?.accounts?.map((a: any) => (
+                <option key={a.id} value={a.id}>{a.name}</option>
+              ))}
+            </select>
+          </div>
+
+          {accountMovementsReport ? (
+            <>
+              <div className={styles.summaryGrid}>
+                <div className={styles.summaryItem}>
+                  <span>{t('reports:cash.cashIn')}</span>
+                  <strong className={styles.success}>+{formatCurrency(accountMovementsReport.summary.cashIn)}</strong>
+                </div>
+                <div className={styles.summaryItem}>
+                  <span>{t('reports:cash.cashOut')}</span>
+                  <strong className={styles.danger}>−{formatCurrency(accountMovementsReport.summary.cashOut)}</strong>
+                </div>
+                <div className={styles.summaryItem}>
+                  <span>{t('reports:cash.net')}</span>
+                  <strong>{formatCurrency(accountMovementsReport.summary.net)}</strong>
+                </div>
+                <div className={styles.summaryItem}>
+                  <span>{t('reports:cash.totalMovements')}</span>
+                  <strong>{accountMovementsReport.summary.totalMovements}</strong>
+                </div>
+              </div>
+
+              <h4 style={{ marginTop: 24 }}>{t('reports:cash.movements')}</h4>
+              {accountMovementsReport.movements?.length > 0 ? (
+                <div className={styles.tableWrap}>
+                  <table className={styles.reportTable}>
+                    <thead>
+                      <tr>
+                        <th>{t('reports:cash.date')}</th>
+                        <th>{t('reports:cash.accountCol')}</th>
+                        <th>{t('reports:cash.type')}</th>
+                        <th>{t('reports:cash.description')}</th>
+                        <th className={styles.alignRight}>{t('reports:cash.amount')}</th>
+                        <th className={styles.alignRight}>{t('reports:cash.balanceAfter')}</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {accountMovementsReport.movements.map((m: any) => {
+                        const isOut = m.movement_type === 'gider' || m.movement_type === 'transfer_out';
+                        return (
+                          <tr key={m.id}>
+                            <td>{formatDate(m.movement_date)}</td>
+                            <td>{m.account_name || '-'}</td>
+                            <td>{t(`reports:cash.movementTypes.${m.movement_type}`, { defaultValue: m.movement_type })}</td>
+                            <td>{m.description || m.category || '-'}</td>
+                            <td className={`${styles.alignRight} ${isOut ? styles.danger : styles.success}`}>
+                              <strong>{isOut ? '−' : '+'}{formatCurrency(m.amount)}</strong>
+                            </td>
+                            <td className={styles.alignRight}>{formatCurrency(m.balance_after)}</td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                <div className={styles.emptyState}>{t('reports:cash.noMovements')}</div>
               )}
             </>
           ) : (
@@ -1504,6 +1708,9 @@ export function ReportsPage() {
         <button className={`${styles.tab} ${activeTab === 'satis' ? styles.tabActive : ''}`} onClick={() => setActiveTab('satis')}>
           {t('reports:tabs.sales')}
         </button>
+        <button className={`${styles.tab} ${activeTab === 'alis' ? styles.tabActive : ''}`} onClick={() => setActiveTab('alis')}>
+          {t('reports:tabs.purchases')}
+        </button>
         {hasFeature('advancedReports') && (
           <button className={`${styles.tab} ${activeTab === 'karlilik' ? styles.tabActive : ''}`} onClick={() => setActiveTab('karlilik')}>
             {t('reports:tabs.profitability')}
@@ -1524,6 +1731,9 @@ export function ReportsPage() {
         )}
         <button className={`${styles.tab} ${activeTab === 'stok' ? styles.tabActive : ''}`} onClick={() => setActiveTab('stok')}>
           {t('reports:tabs.stock')}
+        </button>
+        <button className={`${styles.tab} ${activeTab === 'kasa' ? styles.tabActive : ''}`} onClick={() => setActiveTab('kasa')}>
+          {t('reports:tabs.cash')}
         </button>
         {hasFeature('advancedReports') && (
           <button className={`${styles.tab} ${activeTab === 'gider' ? styles.tabActive : ''}`} onClick={() => setActiveTab('gider')}>
@@ -1549,11 +1759,13 @@ export function ReportsPage() {
           {activeTab === 'genel' && renderGenelTab()}
           {activeTab === 'gunSonu' && renderGunSonuTab()}
           {activeTab === 'satis' && renderSatisTab()}
+          {activeTab === 'alis' && renderAlisTab()}
           {activeTab === 'karlilik' && renderKarlilikTab()}
           {activeTab === 'musteri' && renderMusteriTab()}
           {activeTab === 'musteriSatis' && renderMusteriSatisTab()}
           {activeTab === 'yaslandirma' && renderYaslandirmaTab()}
           {activeTab === 'stok' && renderStokTab()}
+          {activeTab === 'kasa' && renderKasaTab()}
           {activeTab === 'gider' && renderGiderTab()}
           {activeTab === 'personel' && renderPersonelTab()}
           {activeTab === 'yenileme' && renderYenilemeTab()}

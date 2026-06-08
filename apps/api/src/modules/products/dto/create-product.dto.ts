@@ -17,6 +17,10 @@ export class CreateProductDto {
   name: string;
 
   @IsOptional()
+  @IsIn(['product', 'service'])
+  type?: string = 'product';
+
+  @IsOptional()
   @IsString()
   @MaxLength(50)
   barcode?: string;

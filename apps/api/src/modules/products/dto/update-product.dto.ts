@@ -18,6 +18,10 @@ export class UpdateProductDto {
   name?: string;
 
   @IsOptional()
+  @IsIn(['product', 'service'])
+  type?: string;
+
+  @IsOptional()
   @IsString()
   @MaxLength(50)
   barcode?: string;

@@ -25,6 +25,7 @@
     "accounts": "Cash/Bank",
     "expenses": "Expenses",
     "cheques": "Cheques / Notes",
+    "employees": "Employees",
     "crm": "CRM",
     "fieldTeam": "Field Team",
     "integrations": "Integrations",
