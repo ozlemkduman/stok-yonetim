@@ -1,0 +1,57 @@
+{
+  "title": "Çalışanlar",
+  "subtitle": "Toplam {{count}} çalışan",
+  "newEmployee": "Yeni Çalışan",
+  "searchPlaceholder": "İsim, pozisyon, telefon ara...",
+  "empty": "Henüz çalışan eklenmemiş",
+  "filters": {
+    "active": "Aktif",
+    "inactive": "Pasif",
+    "all": "Tümü"
+  },
+  "status": {
+    "active": "Aktif",
+    "inactive": "Pasif"
+  },
+  "columns": {
+    "name": "Ad Soyad",
+    "position": "Pozisyon",
+    "contact": "İletişim",
+    "hireDate": "İşe Giriş",
+    "commissionRate": "Komisyon",
+    "salary": "Maaş",
+    "status": "Durum"
+  },
+  "buttons": {
+    "edit": "Düzenle",
+    "delete": "Pasif Et"
+  },
+  "form": {
+    "createTitle": "Yeni Çalışan",
+    "editTitle": "Çalışanı Düzenle",
+    "name": "Ad Soyad",
+    "position": "Pozisyon",
+    "positionPlaceholder": "Satış, Kasiyer, Muhasebe...",
+    "email": "E-posta",
+    "phone": "Telefon",
+    "hireDate": "İşe Giriş Tarihi",
+    "salary": "Maaş",
+    "commissionRate": "Satış Komisyonu (%)",
+    "commissionRatePlaceholder": "0",
+    "notes": "Notlar",
+    "cancel": "İptal",
+    "create": "Oluştur",
+    "update": "Güncelle"
+  },
+  "confirm": {
+    "delete": "{{name}} adlı çalışanı pasif etmek istediğinize emin misiniz?"
+  },
+  "toast": {
+    "loadError": "Çalışanlar yüklenemedi",
+    "createSuccess": "Çalışan oluşturuldu",
+    "updateSuccess": "Çalışan güncellendi",
+    "deleteSuccess": "Çalışan pasif edildi",
+    "deleteFailed": "Çalışan pasif edilemedi",
+    "saveFailed": "Kaydetme başarısız"
+  }
+}

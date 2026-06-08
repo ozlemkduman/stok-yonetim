@@ -16,6 +16,7 @@ import { PurchasesModule } from './modules/purchases/purchases.module';
 import { OpeningStockModule } from './modules/opening-stock/opening-stock.module';
 import { StockCountModule } from './modules/stock-count/stock-count.module';
 import { ChequesModule } from './modules/cheques/cheques.module';
+import { EmployeesModule } from './modules/employees/employees.module';
 import { ProductsModule } from './modules/products/products.module';
 import { SalesModule } from './modules/sales/sales.module';
 import { ReturnsModule } from './modules/returns/returns.module';
@@ -72,6 +73,7 @@ import { FeatureGuard } from './common/guards/feature.guard';
     OpeningStockModule,
     StockCountModule,
     ChequesModule,
+    EmployeesModule,
     ProductsModule,
     SalesModule,
     ReturnsModule,

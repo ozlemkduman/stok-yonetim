@@ -26,6 +26,7 @@ import trAdmin from './locales/tr/admin.json';
 import trCrm from './locales/tr/crm.json';
 import trFieldteam from './locales/tr/fieldteam.json';
 import trIntegrations from './locales/tr/integrations.json';
+import trEmployees from './locales/tr/employees.json';
 
 import enCommon from './locales/en/common.json';
 import enNav from './locales/en/nav.json';
@@ -51,11 +52,12 @@ import enAdmin from './locales/en/admin.json';
 import enCrm from './locales/en/crm.json';
 import enFieldteam from './locales/en/fieldteam.json';
 import enIntegrations from './locales/en/integrations.json';
+import enEmployees from './locales/en/employees.json';
 
 const ns = [
   'common', 'nav', 'landing', 'auth', 'dashboard', 'sales', 'products',
   'customers', 'suppliers', 'purchases', 'openingStock', 'stockCount', 'cheques', 'returns', 'expenses', 'accounts', 'warehouses', 'quotes',
-  'reports', 'settings', 'admin', 'crm', 'fieldteam', 'integrations',
+  'reports', 'settings', 'admin', 'crm', 'fieldteam', 'integrations', 'employees',
 ] as const;
 
 i18n
@@ -71,6 +73,7 @@ i18n
         accounts: trAccounts, warehouses: trWarehouses, quotes: trQuotes,
         reports: trReports, settings: trSettings,
         admin: trAdmin, crm: trCrm, fieldteam: trFieldteam, integrations: trIntegrations,
+        employees: trEmployees,
       },
       en: {
         common: enCommon, nav: enNav, landing: enLanding, auth: enAuth,
@@ -80,6 +83,7 @@ i18n
         accounts: enAccounts, warehouses: enWarehouses, quotes: enQuotes,
         reports: enReports, settings: enSettings,
         admin: enAdmin, crm: enCrm, fieldteam: enFieldteam, integrations: enIntegrations,
+        employees: enEmployees,
       },
     },
     fallbackLng: 'tr',

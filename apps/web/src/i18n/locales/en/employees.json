@@ -1,0 +1,57 @@
+{
+  "title": "Employees",
+  "subtitle": "{{count}} employees in total",
+  "newEmployee": "New Employee",
+  "searchPlaceholder": "Search name, position, phone...",
+  "empty": "No employees added yet",
+  "filters": {
+    "active": "Active",
+    "inactive": "Inactive",
+    "all": "All"
+  },
+  "status": {
+    "active": "Active",
+    "inactive": "Inactive"
+  },
+  "columns": {
+    "name": "Name",
+    "position": "Position",
+    "contact": "Contact",
+    "hireDate": "Hire Date",
+    "commissionRate": "Commission",
+    "salary": "Salary",
+    "status": "Status"
+  },
+  "buttons": {
+    "edit": "Edit",
+    "delete": "Deactivate"
+  },
+  "form": {
+    "createTitle": "New Employee",
+    "editTitle": "Edit Employee",
+    "name": "Full Name",
+    "position": "Position",
+    "positionPlaceholder": "Sales, Cashier, Accounting...",
+    "email": "Email",
+    "phone": "Phone",
+    "hireDate": "Hire Date",
+    "salary": "Salary",
+    "commissionRate": "Sales Commission (%)",
+    "commissionRatePlaceholder": "0",
+    "notes": "Notes",
+    "cancel": "Cancel",
+    "create": "Create",
+    "update": "Update"
+  },
+  "confirm": {
+    "delete": "Are you sure you want to deactivate {{name}}?"
+  },
+  "toast": {
+    "loadError": "Failed to load employees",
+    "createSuccess": "Employee created",
+    "updateSuccess": "Employee updated",
+    "deleteSuccess": "Employee deactivated",
+    "deleteFailed": "Failed to deactivate employee",
+    "saveFailed": "Failed to save"
+  }
+}

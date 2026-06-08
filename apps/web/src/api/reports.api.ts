@@ -170,4 +170,8 @@ export const reportsApi = {
   getAging: () => apiClient.get<any>('/reports/aging'),
   getProductProfitability: (startDate: string, endDate: string) =>
     apiClient.get<any>('/reports/product-profitability', { startDate, endDate }),
+  getPurchasesSummary: (startDate: string, endDate: string) =>
+    apiClient.get<any>('/reports/purchases-summary', { startDate, endDate }),
+  getAccountMovements: (startDate: string, endDate: string, accountId?: string) =>
+    apiClient.get<any>('/reports/account-movements', accountId ? { startDate, endDate, accountId } : { startDate, endDate }),
 };

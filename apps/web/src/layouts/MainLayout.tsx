@@ -67,6 +67,7 @@ const menuGroups: MenuGroup[] = [
       { path: '/accounts', labelKey: 'items.accounts' },
       { path: '/expenses', labelKey: 'items.expenses' },
       { path: '/cheques', labelKey: 'items.cheques' },
+      { path: '/employees', labelKey: 'items.employees' },
     ],
   },
   {
