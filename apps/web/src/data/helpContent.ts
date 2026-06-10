@@ -154,7 +154,7 @@ export const helpContent: Record<string, HelpItem> = {
       'Düşük stok uyarı seviyesini ürün bazında ayarlayabilirsiniz (varsayılan 5).',
       'Stok seviyesi limitin altına düştüğünde dashboard bildiriminde görünür.',
       'Ürün detay sayfasında satış, iade ve stok hareketi geçmişi sekmeleri bulunur.',
-      'Kategori "E-İmza" seçilirse abonelik süresi (1/2/3 yıl) alanı açılır.',
+      'Kategori "Yazılım" seçilirse opsiyonel abonelik süresi (1/2/3 yıl) alanı açılır.',
     ],
   },
   '/warehouses': {

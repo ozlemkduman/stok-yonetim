@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Modal, Button, Input, Select } from '@stok/ui';
 import { Product, CreateProductData, productsApi } from '../../../api/products.api';
 import { useToast } from '../../../context/ToastContext';
+import { PRODUCT_CATEGORIES } from '../../../utils/constants';
 import styles from '../SaleFormPage.module.css';
 
 interface InlineProductFormProps {
@@ -153,28 +154,25 @@ export function InlineProductForm({ isOpen, onClose, onCreated }: InlineProductF
             label={t('sales:inlineProduct.category')}
             options={[
               { value: '', label: t('products:form.selectCategory') },
-              { value: 'E-İmza', label: 'E-İmza' },
-              { value: 'Yazılım', label: t('products:form.categorySoftware') },
-              { value: 'Donanım', label: t('products:form.categoryHardware') },
-              { value: 'Hizmet', label: t('products:form.categoryService') },
-              { value: 'Diğer', label: t('products:form.categoryOther') },
+              ...Object.entries(PRODUCT_CATEGORIES).map(([value, label]) => ({ value, label })),
             ]}
             value={formData.category || ''}
             onChange={(e) => setFormData({
               ...formData,
               category: e.target.value || undefined,
-              subscription_duration: e.target.value === 'E-İmza' ? formData.subscription_duration : undefined,
+              subscription_duration: e.target.value === 'yazilim' ? formData.subscription_duration : undefined,
             })}
           />
-          {formData.category === 'E-İmza' && (
+          {formData.category === 'yazilim' && (
             <Select
               label={t('products:form.subscriptionDuration')}
               options={[
+                { value: '', label: t('products:form.noSubscription') },
                 { value: '1_yillik', label: t('products:form.duration1Year') },
                 { value: '2_yillik', label: t('products:form.duration2Year') },
                 { value: '3_yillik', label: t('products:form.duration3Year') },
               ]}
-              value={formData.subscription_duration || '1_yillik'}
+              value={formData.subscription_duration || ''}
               onChange={(e) => setFormData({ ...formData, subscription_duration: e.target.value })}
             />
           )}

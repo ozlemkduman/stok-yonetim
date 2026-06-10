@@ -27,7 +27,10 @@ export class CreateProductDto {
 
   @IsOptional()
   @IsString()
-  @MaxLength(100)
+  @IsIn([
+    'elektronik', 'gida', 'giyim', 'ev_yasam', 'kozmetik', 'kirtasiye',
+    'yapi_hirdavat', 'otomotiv', 'saglik', 'yazilim', 'hizmet', 'diger', '',
+  ])
   category?: string;
 
   @IsOptional()

@@ -30,6 +30,8 @@
   margin-bottom: 2rem;
   display: flex;
   justify-content: center;
+  cursor: pointer;
+  text-decoration: none;
 }
 
 .logo h1 {

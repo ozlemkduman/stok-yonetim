@@ -13,6 +13,29 @@ export const EXPENSE_CATEGORIES = {
   diger: 'Diğer',
 } as const;
 
+// Ürün kategorileri — SaaS geneli, sektör-bağımsız sabit liste.
+// İleride kiracıya özel `categories` tablosuna geçişte bu değerler seed olur.
+export const PRODUCT_CATEGORIES = {
+  elektronik: 'Elektronik',
+  gida: 'Gıda & İçecek',
+  giyim: 'Giyim & Tekstil',
+  ev_yasam: 'Ev & Yaşam',
+  kozmetik: 'Kozmetik & Kişisel Bakım',
+  kirtasiye: 'Kırtasiye & Ofis',
+  yapi_hirdavat: 'Yapı & Hırdavat',
+  otomotiv: 'Otomotiv & Yedek Parça',
+  saglik: 'Sağlık & Medikal',
+  yazilim: 'Yazılım',
+  hizmet: 'Hizmet',
+  diger: 'Diğer',
+} as const;
+
+export type ProductCategoryKey = keyof typeof PRODUCT_CATEGORIES;
+
+// Yardımcı: kategori anahtarından etiket (bilinmeyen/eski değerler ham döner)
+export const productCategoryLabel = (key?: string | null): string =>
+  (key && (PRODUCT_CATEGORIES as Record<string, string>)[key]) || key || '-';
+
 export const SALE_STATUSES = {
   completed: 'Tamamlandı',
   cancelled: 'İptal',

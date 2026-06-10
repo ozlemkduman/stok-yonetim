@@ -8,6 +8,7 @@ import { useConfirmDialog } from '../../context/ConfirmDialogContext';
 import { useTenant } from '../../context/TenantContext';
 import { UpgradePrompt } from '../../components/UpgradePrompt';
 import { formatCurrency } from '../../utils/formatters';
+import { PRODUCT_CATEGORIES, productCategoryLabel } from '../../utils/constants';
 import styles from './ProductListPage.module.css';
 
 const icons = {
@@ -208,7 +209,7 @@ export function ProductListPage() {
         </div>
       )
     },
-    { key: 'category', header: t('products:columns.category'), render: (p) => p.category || '-' },
+    { key: 'category', header: t('products:columns.category'), render: (p) => productCategoryLabel(p.category) },
     {
       key: 'total_sold',
       header: t('products:columns.totalSold'),
@@ -277,7 +278,7 @@ export function ProductListPage() {
             >
               <option value="">{t('products:filters.allCategories')}</option>
               {categories.map((cat) => (
-                <option key={cat} value={cat}>{cat}</option>
+                <option key={cat} value={cat}>{productCategoryLabel(cat)}</option>
               ))}
             </select>
             <select
@@ -337,28 +338,25 @@ export function ProductListPage() {
             label={t('products:form.category')}
             options={[
               { value: '', label: t('products:form.selectCategory') },
-              { value: 'E-İmza', label: 'E-İmza' },
-              { value: 'Yazılım', label: t('products:form.categorySoftware') },
-              { value: 'Donanım', label: t('products:form.categoryHardware') },
-              { value: 'Hizmet', label: t('products:form.categoryService') },
-              { value: 'Diğer', label: t('products:form.categoryOther') },
+              ...Object.entries(PRODUCT_CATEGORIES).map(([value, label]) => ({ value, label })),
             ]}
             value={formData.category || ''}
             onChange={(e) => setFormData({
               ...formData,
               category: e.target.value || undefined,
-              subscription_duration: e.target.value === 'E-İmza' ? formData.subscription_duration : undefined,
+              subscription_duration: e.target.value === 'yazilim' ? formData.subscription_duration : undefined,
             })}
           />
-          {formData.category === 'E-İmza' && (
+          {formData.category === 'yazilim' && (
             <Select
               label={t('products:form.subscriptionDuration')}
               options={[
+                { value: '', label: t('products:form.noSubscription') },
                 { value: '1_yillik', label: t('products:form.duration1Year') },
                 { value: '2_yillik', label: t('products:form.duration2Year') },
                 { value: '3_yillik', label: t('products:form.duration3Year') },
               ]}
-              value={formData.subscription_duration || '1_yillik'}
+              value={formData.subscription_duration || ''}
               onChange={(e) => setFormData({ ...formData, subscription_duration: e.target.value })}
             />
           )}
