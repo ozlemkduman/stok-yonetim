@@ -7,7 +7,7 @@ import { Sale, salesApi } from '../../api/sales.api';
 import { Customer, customersApi } from '../../api/customers.api';
 import { Product, productsApi } from '../../api/products.api';
 import { Warehouse, warehousesApi } from '../../api/warehouses.api';
-import { InlineEntityForm, SelectWithAdd } from '../../components/inline';
+import { InlineEntityForm, InlineWarehouseForm, SelectWithAdd } from '../../components/inline';
 import { useToast } from '../../context/ToastContext';
 import { formatCurrency } from '../../utils/formatters';
 import styles from './ReturnFormPage.module.css';
@@ -41,6 +41,7 @@ export function ReturnFormPage() {
   const [saleId, setSaleId] = useState<string>('');
   const [customerId, setCustomerId] = useState<string>('');
   const [showCustomerModal, setShowCustomerModal] = useState(false);
+  const [showWarehouseModal, setShowWarehouseModal] = useState(false);
   const [warehouseId, setWarehouseId] = useState<string>('');
   const [reason, setReason] = useState<string>('');
   const [notes, setNotes] = useState('');
@@ -280,10 +281,17 @@ export function ReturnFormPage() {
             <div className={styles.formRow}>
               <div className={styles.formGroup}>
                 <label className={styles.label}>{t('returns:form.warehouse')}</label>
-                <Select
+                <SelectWithAdd
                   value={warehouseId}
                   onChange={(e) => setWarehouseId(e.target.value)}
                   options={warehouses.map(w => ({ value: w.id, label: w.name }))}
+                  onAdd={() => setShowWarehouseModal(true)}
+                  addTitle={t('common:inlineEntity.addWarehouse')}
+                />
+                <InlineWarehouseForm
+                  isOpen={showWarehouseModal}
+                  onClose={() => setShowWarehouseModal(false)}
+                  onCreated={(w) => { setWarehouses((prev) => [...prev, w]); setWarehouseId(w.id); }}
                 />
               </div>
               <div className={styles.formGroup}>

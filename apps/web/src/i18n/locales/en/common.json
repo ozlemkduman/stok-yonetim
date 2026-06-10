@@ -143,6 +143,13 @@
     "invalidEmail": "Enter a valid email",
     "customerCreated": "Customer created",
     "supplierCreated": "Supplier created",
+    "newWarehouse": "New Warehouse",
+    "addWarehouse": "Add new warehouse",
+    "warehouseName": "Warehouse Name",
+    "warehouseCode": "Warehouse Code",
+    "manager": "Manager",
+    "codeRequired": "Code is required",
+    "warehouseCreated": "Warehouse created",
     "errorOccurred": "An error occurred"
   }
 }

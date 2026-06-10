@@ -143,6 +143,13 @@
     "invalidEmail": "Geçerli bir e-posta giriniz",
     "customerCreated": "Müşteri oluşturuldu",
     "supplierCreated": "Tedarikçi oluşturuldu",
+    "newWarehouse": "Yeni Depo",
+    "addWarehouse": "Yeni depo ekle",
+    "warehouseName": "Depo Adı",
+    "warehouseCode": "Depo Kodu",
+    "manager": "Sorumlu",
+    "codeRequired": "Kod zorunludur",
+    "warehouseCreated": "Depo oluşturuldu",
     "errorOccurred": "Bir hata oluştu"
   }
 }
