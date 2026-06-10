@@ -5,6 +5,7 @@ import { Button, Input, Select } from '@stok/ui';
 import { chequesApi, CreateChequeData } from '../../api/cheques.api';
 import { customersApi, Customer } from '../../api/customers.api';
 import { suppliersApi, Supplier } from '../../api/suppliers.api';
+import { InlineEntityForm, SelectWithAdd } from '../../components/inline';
 import { useToast } from '../../context/ToastContext';
 import styles from './ChequeFormPage.module.css';
 
@@ -17,6 +18,7 @@ export function ChequeFormPage() {
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [showPartyModal, setShowPartyModal] = useState(false);
 
   const [form, setForm] = useState<CreateChequeData>({
     type: 'cek',
@@ -108,20 +110,36 @@ export function ChequeFormPage() {
           <div className={styles.field}>
             <label>{isIncoming ? t('cheques:form.fromCustomer') : t('cheques:form.toSupplier')}</label>
             {isIncoming ? (
-              <Select
+              <SelectWithAdd
                 value={form.customer_id || ''}
                 onChange={(e) => setForm({ ...form, customer_id: e.target.value || undefined, supplier_id: undefined })}
                 options={[{ value: '', label: t('cheques:form.selectCustomer') }, ...customers.map((c) => ({ value: c.id, label: c.name }))]}
-                fullWidth
+                onAdd={() => setShowPartyModal(true)}
+                addTitle={t('common:inlineEntity.addCustomer')}
               />
             ) : (
-              <Select
+              <SelectWithAdd
                 value={form.supplier_id || ''}
                 onChange={(e) => setForm({ ...form, supplier_id: e.target.value || undefined, customer_id: undefined })}
                 options={[{ value: '', label: t('cheques:form.selectSupplier') }, ...suppliers.map((s) => ({ value: s.id, label: s.name }))]}
-                fullWidth
+                onAdd={() => setShowPartyModal(true)}
+                addTitle={t('common:inlineEntity.addSupplier')}
               />
             )}
+            <InlineEntityForm
+              type={isIncoming ? 'customer' : 'supplier'}
+              isOpen={showPartyModal}
+              onClose={() => setShowPartyModal(false)}
+              onCreated={(entity) => {
+                if (isIncoming) {
+                  setCustomers((prev) => [...prev, entity as Customer]);
+                  setForm((f) => ({ ...f, customer_id: entity.id, supplier_id: undefined }));
+                } else {
+                  setSuppliers((prev) => [...prev, entity as Supplier]);
+                  setForm((f) => ({ ...f, supplier_id: entity.id, customer_id: undefined }));
+                }
+              }}
+            />
           </div>
           <div className={styles.field}>
             <label>{t('cheques:form.amount')}</label>

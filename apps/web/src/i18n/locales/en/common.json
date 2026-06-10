@@ -125,5 +125,24 @@
     "thisWeek": "This Week",
     "thisMonth": "This Month",
     "thisYear": "This Year"
+  },
+  "inlineEntity": {
+    "newCustomer": "New Customer",
+    "newSupplier": "New Supplier",
+    "addCustomer": "Add new customer",
+    "addSupplier": "Add new supplier",
+    "name": "Name / Title",
+    "phone": "Phone",
+    "email": "Email",
+    "taxNumber": "Tax No",
+    "taxOffice": "Tax Office",
+    "address": "Address",
+    "cancel": "Cancel",
+    "save": "Save",
+    "nameRequired": "Name is required",
+    "invalidEmail": "Enter a valid email",
+    "customerCreated": "Customer created",
+    "supplierCreated": "Supplier created",
+    "errorOccurred": "An error occurred"
   }
 }

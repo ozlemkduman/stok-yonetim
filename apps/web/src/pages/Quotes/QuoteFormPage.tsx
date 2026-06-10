@@ -5,6 +5,7 @@ import { Button, Card, Input, Select } from '@stok/ui';
 import { QuoteItemInput, quotesApi } from '../../api/quotes.api';
 import { Customer, customersApi } from '../../api/customers.api';
 import { Product, productsApi } from '../../api/products.api';
+import { InlineEntityForm, SelectWithAdd } from '../../components/inline';
 import { useToast } from '../../context/ToastContext';
 import { formatCurrency } from '../../utils/formatters';
 import styles from './QuoteFormPage.module.css';
@@ -29,6 +30,7 @@ export function QuoteFormPage() {
 
   // Form state
   const [customerId, setCustomerId] = useState<string>('');
+  const [showCustomerModal, setShowCustomerModal] = useState(false);
   const [validUntil, setValidUntil] = useState<string>('');
   const [includeVat, setIncludeVat] = useState(true);
   const [discountRate, setDiscountRate] = useState<number>(0);
@@ -221,13 +223,21 @@ export function QuoteFormPage() {
             <div className={styles.formRow}>
               <div className={styles.formGroup}>
                 <label className={styles.label}>{t('quotes:form.customer')}</label>
-                <Select
+                <SelectWithAdd
                   value={customerId}
                   onChange={(e) => setCustomerId(e.target.value)}
                   options={[
                     { value: '', label: t('quotes:form.customerPlaceholder') },
                     ...customers.map(c => ({ value: c.id, label: c.name })),
                   ]}
+                  onAdd={() => setShowCustomerModal(true)}
+                  addTitle={t('common:inlineEntity.addCustomer')}
+                />
+                <InlineEntityForm
+                  type="customer"
+                  isOpen={showCustomerModal}
+                  onClose={() => setShowCustomerModal(false)}
+                  onCreated={(c) => { setCustomers((prev) => [...prev, c as Customer]); setCustomerId(c.id); }}
                 />
               </div>
               <div className={styles.formGroup}>
