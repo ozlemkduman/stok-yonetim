@@ -6,7 +6,7 @@ import { purchasesApi, CreatePurchaseData } from '../../api/purchases.api';
 import { suppliersApi, Supplier } from '../../api/suppliers.api';
 import { productsApi, Product } from '../../api/products.api';
 import { warehousesApi, Warehouse } from '../../api/warehouses.api';
-import { InlineEntityForm, SelectWithAdd } from '../../components/inline';
+import { InlineEntityForm, InlineWarehouseForm, SelectWithAdd } from '../../components/inline';
 import { useToast } from '../../context/ToastContext';
 import { formatCurrency } from '../../utils/formatters';
 import styles from './PurchaseFormPage.module.css';
@@ -34,6 +34,7 @@ export function PurchaseFormPage() {
   const [supplierId, setSupplierId] = useState('');
   const [warehouseId, setWarehouseId] = useState('');
   const [showSupplierModal, setShowSupplierModal] = useState(false);
+  const [showWarehouseModal, setShowWarehouseModal] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState('nakit');
   const [purchaseDate, setPurchaseDate] = useState(() => new Date().toISOString().split('T')[0]);
   const [dueDate, setDueDate] = useState('');
@@ -199,11 +200,17 @@ export function PurchaseFormPage() {
           </div>
           <div className={styles.field}>
             <label>{t('purchases:form.warehouse')}</label>
-            <Select
+            <SelectWithAdd
               value={warehouseId}
               onChange={(e) => setWarehouseId(e.target.value)}
               options={[{ value: '', label: '-' }, ...warehouses.map((w) => ({ value: w.id, label: w.name }))]}
-              fullWidth
+              onAdd={() => setShowWarehouseModal(true)}
+              addTitle={t('common:inlineEntity.addWarehouse')}
+            />
+            <InlineWarehouseForm
+              isOpen={showWarehouseModal}
+              onClose={() => setShowWarehouseModal(false)}
+              onCreated={(w) => { setWarehouses((prev) => [...prev, w]); setWarehouseId(w.id); }}
             />
           </div>
         </div>
