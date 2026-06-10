@@ -1,0 +1,18 @@
+.form { display: flex; flex-direction: column; gap: var(--space-3, 12px); }
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-3, 12px);
+}
+.formError {
+  background: color-mix(in srgb, var(--color-danger, #ef4444) 10%, transparent);
+  color: var(--color-danger, #ef4444);
+  padding: var(--space-2, 8px) var(--space-3, 12px);
+  border-radius: var(--radius-md, 8px);
+  font-size: var(--font-size-sm, 0.875rem);
+}
+.footer { display: flex; justify-content: flex-end; gap: var(--space-2, 8px); }
+
+@media (max-width: 640px) {
+  .grid { grid-template-columns: 1fr; }
+}

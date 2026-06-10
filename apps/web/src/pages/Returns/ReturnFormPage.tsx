@@ -7,6 +7,7 @@ import { Sale, salesApi } from '../../api/sales.api';
 import { Customer, customersApi } from '../../api/customers.api';
 import { Product, productsApi } from '../../api/products.api';
 import { Warehouse, warehousesApi } from '../../api/warehouses.api';
+import { InlineEntityForm, SelectWithAdd } from '../../components/inline';
 import { useToast } from '../../context/ToastContext';
 import { formatCurrency } from '../../utils/formatters';
 import styles from './ReturnFormPage.module.css';
@@ -39,6 +40,7 @@ export function ReturnFormPage() {
   // Form state
   const [saleId, setSaleId] = useState<string>('');
   const [customerId, setCustomerId] = useState<string>('');
+  const [showCustomerModal, setShowCustomerModal] = useState(false);
   const [warehouseId, setWarehouseId] = useState<string>('');
   const [reason, setReason] = useState<string>('');
   const [notes, setNotes] = useState('');
@@ -256,7 +258,7 @@ export function ReturnFormPage() {
               </div>
               <div className={styles.formGroup}>
                 <label className={styles.label}>{t('returns:form.customer')}</label>
-                <Select
+                <SelectWithAdd
                   value={customerId}
                   onChange={(e) => setCustomerId(e.target.value)}
                   options={[
@@ -264,6 +266,14 @@ export function ReturnFormPage() {
                     ...customers.map(c => ({ value: c.id, label: c.name })),
                   ]}
                   disabled={!!saleId}
+                  onAdd={() => setShowCustomerModal(true)}
+                  addTitle={t('common:inlineEntity.addCustomer')}
+                />
+                <InlineEntityForm
+                  type="customer"
+                  isOpen={showCustomerModal}
+                  onClose={() => setShowCustomerModal(false)}
+                  onCreated={(c) => { setCustomers((prev) => [...prev, c as Customer]); setCustomerId(c.id); }}
                 />
               </div>
             </div>

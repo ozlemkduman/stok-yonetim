@@ -125,5 +125,24 @@
     "thisWeek": "Bu Hafta",
     "thisMonth": "Bu Ay",
     "thisYear": "Bu Yıl"
+  },
+  "inlineEntity": {
+    "newCustomer": "Yeni Müşteri",
+    "newSupplier": "Yeni Tedarikçi",
+    "addCustomer": "Yeni müşteri ekle",
+    "addSupplier": "Yeni tedarikçi ekle",
+    "name": "Ad / Ünvan",
+    "phone": "Telefon",
+    "email": "E-posta",
+    "taxNumber": "Vergi No",
+    "taxOffice": "Vergi Dairesi",
+    "address": "Adres",
+    "cancel": "İptal",
+    "save": "Kaydet",
+    "nameRequired": "Ad zorunludur",
+    "invalidEmail": "Geçerli bir e-posta giriniz",
+    "customerCreated": "Müşteri oluşturuldu",
+    "supplierCreated": "Tedarikçi oluşturuldu",
+    "errorOccurred": "Bir hata oluştu"
   }
 }

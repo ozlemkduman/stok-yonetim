@@ -1,0 +1,30 @@
+.row {
+  display: flex;
+  gap: var(--space-2, 8px);
+  align-items: stretch;
+}
+.row > :first-child { flex: 1; min-width: 0; }
+
+.addBtn {
+  flex-shrink: 0;
+  width: 42px;
+  align-self: stretch;
+  min-height: 40px;
+  border: 1px solid var(--color-border, #d1d5db);
+  background: var(--color-bg-card, #fff);
+  border-radius: var(--radius-md, 8px);
+  color: var(--color-primary, #4361ee);
+  font-size: 22px;
+  font-weight: 600;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+.addBtn:hover:not(:disabled) {
+  background: var(--color-primary, #4361ee);
+  color: #fff;
+}
+.addBtn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
