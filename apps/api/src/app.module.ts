@@ -17,6 +17,7 @@ import { OpeningStockModule } from './modules/opening-stock/opening-stock.module
 import { StockCountModule } from './modules/stock-count/stock-count.module';
 import { ChequesModule } from './modules/cheques/cheques.module';
 import { EmployeesModule } from './modules/employees/employees.module';
+import { AutoServiceModule } from './modules/auto-service/auto-service.module';
 import { ProductsModule } from './modules/products/products.module';
 import { SalesModule } from './modules/sales/sales.module';
 import { ReturnsModule } from './modules/returns/returns.module';
@@ -75,6 +76,7 @@ import { SectorGuard } from './common/guards/sector.guard';
     StockCountModule,
     ChequesModule,
     EmployeesModule,
+    AutoServiceModule,
     ProductsModule,
     SalesModule,
     ReturnsModule,
