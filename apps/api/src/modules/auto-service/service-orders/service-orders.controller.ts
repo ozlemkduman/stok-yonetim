@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Patch, Body, Param, Query, ParseUUIDPipe, Req } from '@nestjs/common';
 import { ServiceOrdersService } from './service-orders.service';
-import { CreateServiceOrderDto, UpdateServiceOrderDto } from './dto';
+import { CreateServiceOrderDto, UpdateServiceOrderDto, RecordInvoiceDto } from './dto';
 import { PaginationDto } from '../../../common/dto/pagination.dto';
 import { validateSortColumn } from '../../../common/utils/validate-sort';
 import { RequireSector } from '../../../common/decorators/require-sector.decorator';
@@ -44,5 +44,10 @@ export class ServiceOrdersController {
   @Patch(':id')
   async update(@Param('id', ParseUUIDPipe) id: string, @Body() dto: UpdateServiceOrderDto) {
     return { success: true, data: await this.service.update(id, dto) };
+  }
+
+  @Patch(':id/invoice')
+  async recordInvoice(@Param('id', ParseUUIDPipe) id: string, @Body() dto: RecordInvoiceDto) {
+    return { success: true, data: await this.service.recordInvoice(id, dto) };
   }
 }

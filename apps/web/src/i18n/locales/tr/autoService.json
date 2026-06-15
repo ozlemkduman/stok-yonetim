@@ -71,7 +71,23 @@
       "customer": "Müşteri",
       "status": "Durum",
       "total": "Toplam",
-      "openedAt": "Açılış"
+      "openedAt": "Açılış",
+      "invoice": "Fatura"
+    },
+    "invoiceBadge": { "invoiced": "Faturalı", "none": "Faturasız" },
+    "stockBadge": { "deducted": "Stok düşüldü" },
+    "buttons": { "edit": "Düzenle", "invoice": "Fatura Ekle" },
+    "parts": {
+      "title": "Parçalar",
+      "add": "Parça Ekle",
+      "selectProduct": "Ürün seçin",
+      "qty": "Adet",
+      "unitPrice": "Birim Fiyat",
+      "lineTotal": "Tutar",
+      "total": "Parça Toplamı",
+      "remove": "Sil",
+      "empty": "Henüz parça eklenmedi",
+      "locked": "Stok düşülmüş; parça kalemleri değiştirilemez"
     },
     "status": {
       "open": "Açık",
@@ -114,5 +130,25 @@
     "empty": "Bu araç için iş emri yok",
     "close": "Kapat",
     "newOrder": "Yeni İş Emri"
+  },
+  "invoice": {
+    "title": "Fatura Bilgisi — {{order}}",
+    "hint": "Yasal fatura dış portalda (e-fatura/e-arşiv) kesilir; burada sadece kaydı tutulur.",
+    "number": "Fatura No",
+    "date": "Fatura Tarihi",
+    "amount": "Tutar (₺)",
+    "fileUrl": "Fatura Dosyası (URL, opsiyonel)",
+    "posting": "Cari / Kasa Hareketi",
+    "postings": {
+      "none": "Yok (sadece kayıt)",
+      "veresiye": "Veresiye (cariye borç)",
+      "nakit": "Nakit (kasa)",
+      "kredi_karti": "Kredi Kartı (banka)",
+      "havale": "Havale / EFT (banka)"
+    },
+    "save": "Kaydet",
+    "cancel": "İptal",
+    "current": "Kayıtlı fatura: {{number}}",
+    "toast": { "success": "Fatura kaydedildi", "failed": "Fatura kaydedilemedi" }
   }
 }

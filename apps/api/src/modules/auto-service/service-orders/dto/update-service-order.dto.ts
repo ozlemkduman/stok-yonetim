@@ -1,10 +1,21 @@
-import { IsString, IsOptional, IsUUID, IsInt, IsNumber, IsIn, Min } from 'class-validator';
-import { SERVICE_ORDER_STATUSES } from './create-service-order.dto';
+import { IsString, IsOptional, IsUUID, IsInt, IsNumber, IsIn, Min, IsArray, ValidateNested } from 'class-validator';
+import { Type } from 'class-transformer';
+import { SERVICE_ORDER_STATUSES, ServiceOrderItemDto } from './create-service-order.dto';
 
 export class UpdateServiceOrderDto {
   @IsOptional()
   @IsUUID()
   customer_id?: string;
+
+  @IsOptional()
+  @IsUUID()
+  warehouse_id?: string;
+
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => ServiceOrderItemDto)
+  items?: ServiceOrderItemDto[];
 
   @IsOptional()
   @IsUUID()
@@ -32,10 +43,7 @@ export class UpdateServiceOrderDto {
   @Min(0)
   labor_cost?: number;
 
-  @IsOptional()
-  @IsNumber()
-  @Min(0)
-  parts_cost?: number;
+  // parts_cost manuel girilmez — service_order_items kalemlerinden hesaplanır.
 
   @IsOptional()
   @IsNumber()

@@ -13,9 +13,10 @@ interface ServiceOrdersTabProps {
   refreshSignal: number;
   onNewOrder: () => void;
   onEditOrder: (order: ServiceOrder) => void;
+  onInvoice: (order: ServiceOrder) => void;
 }
 
-export function ServiceOrdersTab({ refreshSignal, onNewOrder, onEditOrder }: ServiceOrdersTabProps) {
+export function ServiceOrdersTab({ refreshSignal, onNewOrder, onEditOrder, onInvoice }: ServiceOrdersTabProps) {
   const { t } = useTranslation('autoService');
   const { showToast } = useToast();
 
@@ -58,6 +59,26 @@ export function ServiceOrdersTab({ refreshSignal, onNewOrder, onEditOrder }: Ser
     },
     { key: 'total_amount', header: t('orders.columns.total'), align: 'right', render: (o) => formatCurrency(Number(o.total_amount)) },
     { key: 'opened_at', header: t('orders.columns.openedAt'), render: (o) => formatDate(o.opened_at) },
+    {
+      key: 'invoice', header: t('orders.columns.invoice'),
+      render: (o) => (
+        <div className={styles.invoiceBadges}>
+          <Badge variant={o.invoice_number ? 'success' : 'default'}>
+            {o.invoice_number ? t('orders.invoiceBadge.invoiced') : t('orders.invoiceBadge.none')}
+          </Badge>
+          {o.stock_deducted && <Badge variant="info">{t('orders.stockBadge.deducted')}</Badge>}
+        </div>
+      ),
+    },
+    {
+      key: 'actions', header: '', width: '180px',
+      render: (o) => (
+        <div className={styles.actions} onClick={(ev) => ev.stopPropagation()}>
+          <Button size="sm" variant="primary" onClick={() => onEditOrder(o)}>{t('orders.buttons.edit')}</Button>
+          <Button size="sm" variant="secondary" onClick={() => onInvoice(o)}>{t('orders.buttons.invoice')}</Button>
+        </div>
+      ),
+    },
   ];
 
   return (

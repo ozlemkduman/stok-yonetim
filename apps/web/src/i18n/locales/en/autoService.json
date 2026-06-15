@@ -71,7 +71,23 @@
       "customer": "Customer",
       "status": "Status",
       "total": "Total",
-      "openedAt": "Opened"
+      "openedAt": "Opened",
+      "invoice": "Invoice"
+    },
+    "invoiceBadge": { "invoiced": "Invoiced", "none": "Not invoiced" },
+    "stockBadge": { "deducted": "Stock deducted" },
+    "buttons": { "edit": "Edit", "invoice": "Add Invoice" },
+    "parts": {
+      "title": "Parts",
+      "add": "Add Part",
+      "selectProduct": "Select product",
+      "qty": "Qty",
+      "unitPrice": "Unit Price",
+      "lineTotal": "Amount",
+      "total": "Parts Total",
+      "remove": "Remove",
+      "empty": "No parts added yet",
+      "locked": "Stock deducted; parts cannot be changed"
     },
     "status": {
       "open": "Open",
@@ -114,5 +130,25 @@
     "empty": "No service orders for this vehicle",
     "close": "Close",
     "newOrder": "New Order"
+  },
+  "invoice": {
+    "title": "Invoice Info — {{order}}",
+    "hint": "The legal invoice is issued on an external portal; this only records it.",
+    "number": "Invoice No",
+    "date": "Invoice Date",
+    "amount": "Amount (₺)",
+    "fileUrl": "Invoice File (URL, optional)",
+    "posting": "Account Posting",
+    "postings": {
+      "none": "None (record only)",
+      "veresiye": "Credit (customer debt)",
+      "nakit": "Cash (till)",
+      "kredi_karti": "Credit Card (bank)",
+      "havale": "Transfer / EFT (bank)"
+    },
+    "save": "Save",
+    "cancel": "Cancel",
+    "current": "Recorded invoice: {{number}}",
+    "toast": { "success": "Invoice recorded", "failed": "Failed to record invoice" }
   }
 }

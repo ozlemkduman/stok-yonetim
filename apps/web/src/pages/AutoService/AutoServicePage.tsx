@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { autoServiceApi, Vehicle, ServiceOrder, CreateServiceOrderData } from '../../api/autoService.api';
+import { autoServiceApi, Vehicle, ServiceOrder, CreateServiceOrderData, RecordInvoiceData } from '../../api/autoService.api';
 import { VehiclesTab } from './VehiclesTab';
 import { ServiceOrdersTab } from './ServiceOrdersTab';
 import { ServiceOrderFormModal } from './ServiceOrderFormModal';
 import { ServiceHistoryModal } from './ServiceHistoryModal';
+import { InvoiceModal } from './InvoiceModal';
 import { useToast } from '../../context/ToastContext';
 import styles from './AutoService.module.css';
 
@@ -30,6 +31,9 @@ export function AutoServicePage() {
   const [editingOrder, setEditingOrder] = useState<ServiceOrder | null>(null);
   const [presetVehicleId, setPresetVehicleId] = useState<string | undefined>(undefined);
 
+  // Fatura kaydı
+  const [invoiceOrder, setInvoiceOrder] = useState<ServiceOrder | null>(null);
+
   const openNewOrder = (vehicleId?: string) => {
     setEditingOrder(null);
     setPresetVehicleId(vehicleId);
@@ -54,6 +58,12 @@ export function AutoServicePage() {
       await autoServiceApi.serviceOrders.create(data);
       showToast('success', t('orders.toast.createSuccess'));
     }
+    setRefreshSignal((n) => n + 1);
+  };
+
+  const handleInvoiceSubmit = async (data: RecordInvoiceData) => {
+    if (!invoiceOrder) return;
+    await autoServiceApi.serviceOrders.recordInvoice(invoiceOrder.id, data);
     setRefreshSignal((n) => n + 1);
   };
 
@@ -84,6 +94,7 @@ export function AutoServicePage() {
             refreshSignal={refreshSignal}
             onNewOrder={() => openNewOrder()}
             onEditOrder={openEditOrder}
+            onInvoice={setInvoiceOrder}
           />
         )}
       </div>
@@ -102,6 +113,13 @@ export function AutoServicePage() {
         onSubmit={handleOrderSubmit}
         order={editingOrder}
         presetVehicleId={presetVehicleId}
+      />
+
+      <InvoiceModal
+        isOpen={!!invoiceOrder}
+        onClose={() => setInvoiceOrder(null)}
+        order={invoiceOrder}
+        onSubmit={handleInvoiceSubmit}
       />
     </div>
   );
