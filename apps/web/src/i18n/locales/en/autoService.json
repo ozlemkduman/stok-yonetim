@@ -1,0 +1,154 @@
+{
+  "title": "Auto Service",
+  "subtitle": "Vehicle records and service orders",
+  "tabs": {
+    "vehicles": "Vehicles",
+    "orders": "Service Orders"
+  },
+  "vehicles": {
+    "newVehicle": "New Vehicle",
+    "searchPlaceholder": "Search plate, brand, model...",
+    "empty": "No vehicles yet",
+    "subtitle_one": "{{count}} vehicle",
+    "subtitle_other": "{{count}} vehicles",
+    "columns": {
+      "plate": "Plate",
+      "brandModel": "Brand / Model",
+      "customer": "Customer",
+      "year": "Year",
+      "mileage": "Mileage",
+      "status": "Status"
+    },
+    "status": { "active": "Active", "inactive": "Inactive" },
+    "filters": { "active": "Active", "inactive": "Inactive", "all": "All" },
+    "buttons": { "edit": "Edit", "delete": "Delete", "history": "Service History", "newOrder": "New Order" },
+    "confirm": { "delete": "Deactivate vehicle {{plate}}?" },
+    "form": {
+      "createTitle": "New Vehicle",
+      "editTitle": "Edit Vehicle",
+      "plate": "Plate",
+      "customer": "Customer (owner)",
+      "selectCustomer": "Select customer (optional)",
+      "brand": "Brand",
+      "model": "Model",
+      "modelYear": "Model Year",
+      "vin": "VIN",
+      "engineNo": "Engine No",
+      "color": "Color",
+      "fuelType": "Fuel Type",
+      "mileage": "Current Mileage",
+      "notes": "Notes",
+      "cancel": "Cancel",
+      "create": "Create",
+      "update": "Update"
+    },
+    "fuelTypes": {
+      "none": "Select",
+      "benzin": "Petrol",
+      "dizel": "Diesel",
+      "lpg": "LPG",
+      "elektrik": "Electric",
+      "hibrit": "Hybrid"
+    },
+    "toast": {
+      "loadError": "Failed to load vehicles",
+      "createSuccess": "Vehicle created",
+      "updateSuccess": "Vehicle updated",
+      "deleteSuccess": "Vehicle deactivated",
+      "deleteFailed": "Failed to delete vehicle",
+      "saveFailed": "Failed to save vehicle"
+    }
+  },
+  "orders": {
+    "newOrder": "New Service Order",
+    "searchPlaceholder": "Search order no or plate...",
+    "empty": "No service orders yet",
+    "subtitle_one": "{{count}} order",
+    "subtitle_other": "{{count}} orders",
+    "columns": {
+      "orderNumber": "Order No",
+      "vehicle": "Vehicle",
+      "customer": "Customer",
+      "status": "Status",
+      "total": "Total",
+      "openedAt": "Opened",
+      "invoice": "Invoice"
+    },
+    "invoiceBadge": { "invoiced": "Invoiced", "none": "Not invoiced" },
+    "stockBadge": { "deducted": "Stock deducted" },
+    "buttons": { "edit": "Edit", "invoice": "Add Invoice" },
+    "parts": {
+      "title": "Parts",
+      "add": "Add Part",
+      "selectProduct": "Select product",
+      "qty": "Qty",
+      "unitPrice": "Unit Price",
+      "lineTotal": "Amount",
+      "total": "Parts Total",
+      "remove": "Remove",
+      "empty": "No parts added yet",
+      "locked": "Stock deducted; parts cannot be changed"
+    },
+    "status": {
+      "open": "Open",
+      "in_progress": "In Progress",
+      "completed": "Completed",
+      "delivered": "Delivered",
+      "cancelled": "Cancelled"
+    },
+    "statusFilter": { "all": "All" },
+    "form": {
+      "createTitle": "New Service Order",
+      "editTitle": "Edit Service Order",
+      "vehicle": "Vehicle",
+      "selectVehicle": "Select vehicle",
+      "employee": "Assigned Staff",
+      "selectEmployee": "Select staff (optional)",
+      "status": "Status",
+      "mileageIn": "Mileage In",
+      "complaint": "Complaint",
+      "diagnosis": "Diagnosis / Work Done",
+      "laborCost": "Labor (₺)",
+      "partsCost": "Parts (₺)",
+      "discount": "Discount (₺)",
+      "total": "Total",
+      "notes": "Notes",
+      "cancel": "Cancel",
+      "create": "Create",
+      "update": "Update"
+    },
+    "toast": {
+      "loadError": "Failed to load service orders",
+      "createSuccess": "Service order created",
+      "updateSuccess": "Service order updated",
+      "saveFailed": "Failed to save service order",
+      "noVehicles": "Create a vehicle record first"
+    }
+  },
+  "history": {
+    "title": "{{plate}} — Service History",
+    "empty": "No service orders for this vehicle",
+    "close": "Close",
+    "newOrder": "New Order"
+  },
+  "invoice": {
+    "title": "Invoice Info — {{order}}",
+    "hint": "The legal invoice is issued on an external portal; this only records it.",
+    "number": "Invoice No",
+    "date": "Invoice Date",
+    "amount": "Amount (₺)",
+    "fileUrl": "Invoice File (URL, optional)",
+    "posting": "Account Posting",
+    "postings": {
+      "none": "None (record only)",
+      "veresiye": "Credit (customer debt)",
+      "nakit": "Cash (till)",
+      "kredi_karti": "Credit Card (bank)",
+      "havale": "Transfer / EFT (bank)"
+    },
+    "save": "Save",
+    "cancel": "Cancel",
+    "current": "Recorded invoice: {{number}}",
+    "toast": { "success": "Invoice recorded", "failed": "Failed to record invoice" }
+  }
+}

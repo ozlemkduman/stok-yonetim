@@ -15,6 +15,8 @@ export interface CreateTenantDto {
   planId?: string;
   billingEmail?: string;
   status?: string;
+  /** Sektör (business_type). 'general' (varsayılan) | 'auto_service' */
+  businessType?: string;
   /**
    * Üyelik süresi (gün). status='trial' → trial_ends_at, diğer durumda
    * subscription_ends_at = now + durationDays olarak set edilir.
@@ -31,6 +33,8 @@ export interface UpdateTenantDto {
   status?: string;
   settings?: Record<string, any>;
   durationDays?: number;
+  /** Sektör (business_type). 'general' | 'auto_service' */
+  businessType?: string;
 }
 
 @Injectable()
@@ -91,6 +95,7 @@ export class AdminTenantsService {
       plan_id: dto.planId,
       billing_email: dto.billingEmail,
       status: effectiveStatus,
+      business_type: dto.businessType || 'general',
       settings: {},
       trial_ends_at: trialEndsAt,
       subscription_ends_at: subscriptionEndsAt,
@@ -121,6 +126,7 @@ export class AdminTenantsService {
       billing_email: dto.billingEmail,
       status: dto.status,
       settings: dto.settings,
+      business_type: dto.businessType,
     };
     if (dto.durationDays && dto.durationDays > 0) {
       const end = new Date();

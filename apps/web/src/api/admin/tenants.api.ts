@@ -7,6 +7,7 @@ export interface Tenant {
   domain: string | null;
   logo_url: string | null;
   plan_id: string | null;
+  business_type: string;
   plan_name?: string;
   plan_code?: string;
   settings: Record<string, any>;
@@ -35,6 +36,8 @@ export interface CreateTenantData {
   planId?: string;
   billingEmail?: string;
   status?: string;
+  /** Sektör (business_type). 'general' (varsayılan) | 'auto_service' */
+  businessType?: string;
   /** Süre (gün). status='trial' → trial_ends_at, diğer durumlarda subscription_ends_at. */
   durationDays?: number;
 }
@@ -47,6 +50,8 @@ export interface UpdateTenantData {
   status?: string;
   settings?: Record<string, any>;
   durationDays?: number;
+  /** Sektör (business_type). 'general' | 'auto_service' */
+  businessType?: string;
 }
 
 export interface TenantListParams {

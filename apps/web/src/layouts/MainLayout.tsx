@@ -15,6 +15,7 @@ interface MenuItem {
   path: string;
   labelKey: string;
   feature?: string;
+  sector?: string;
 }
 
 interface MenuGroup {
@@ -71,6 +72,13 @@ const menuGroups: MenuGroup[] = [
     ],
   },
   {
+    id: 'autoService',
+    labelKey: 'groups.autoService',
+    items: [
+      { path: '/auto-service', labelKey: 'items.autoService', sector: 'auto_service' },
+    ],
+  },
+  {
     id: 'crm',
     labelKey: 'groups.crm',
     items: [
@@ -115,7 +123,7 @@ export function MainLayout() {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
   const { isSuperAdmin } = usePermissions();
-  const { impersonatedTenant, isImpersonating, stopImpersonating, hasFeature } = useTenant();
+  const { impersonatedTenant, isImpersonating, stopImpersonating, hasFeature, hasSector } = useTenant();
   const { openHelp, hasHelp } = useHelp();
   const [sidebarOpen, setSidebarOpen] = useState(() => {
     // Mobile/tablet: default closed; Desktop: localStorage > default open
@@ -273,7 +281,9 @@ export function MainLayout() {
           {menuGroups.map((group) => {
             const isBypass = isSuperAdmin();
             const visibleItems = group.items.filter(
-              (item) => !item.feature || isBypass || hasFeature(item.feature)
+              (item) =>
+                (!item.feature || isBypass || hasFeature(item.feature)) &&
+                (!item.sector || isBypass || hasSector(item.sector))
             );
             if (visibleItems.length === 0) return null;
 

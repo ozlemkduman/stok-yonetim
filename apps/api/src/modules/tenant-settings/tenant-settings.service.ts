@@ -9,6 +9,7 @@ export interface TenantSettings {
   domain: string | null;
   logo_url: string | null;
   plan_id: string | null;
+  business_type: string;
   settings: Record<string, any>;
   status: string;
   trial_ends_at: Date | null;
@@ -164,6 +165,27 @@ export class TenantSettingsService {
 
     const features = typeof tenant.features === 'string' ? JSON.parse(tenant.features) : tenant.features;
     return features[feature] === true;
+  }
+
+  /**
+   * Tenant'ın sektörü (business_type) verilen sektörle eşleşiyor mu?
+   * Plandan bağımsızdır; SectorGuard tarafından kullanılır.
+   * @param sector - kontrol edilecek sektör (örn. 'auto_service')
+   * @param providedTenantId - opsiyonel; Guard'lar TenantInterceptor'dan önce
+   *   çalıştığı için tenant_id'yi parametre olarak geçer.
+   */
+  async checkSector(sector: string, providedTenantId?: string): Promise<boolean> {
+    const tenantId = providedTenantId || getCurrentTenantId();
+    if (!tenantId) {
+      return false;
+    }
+
+    const tenant = await this.db.knex('tenants')
+      .select('business_type')
+      .where('id', tenantId)
+      .first();
+
+    return tenant?.business_type === sector;
   }
 
   async checkLimit(resource: string): Promise<{ allowed: boolean; current: number; limit: number }> {

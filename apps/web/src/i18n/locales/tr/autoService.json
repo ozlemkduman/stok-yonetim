@@ -1,0 +1,154 @@
+{
+  "title": "Oto Servis",
+  "subtitle": "Araç kayıtları ve iş emirleri",
+  "tabs": {
+    "vehicles": "Araçlar",
+    "orders": "İş Emirleri"
+  },
+  "vehicles": {
+    "newVehicle": "Yeni Araç",
+    "searchPlaceholder": "Plaka, marka, model ara...",
+    "empty": "Henüz araç kaydı yok",
+    "subtitle_one": "{{count}} araç",
+    "subtitle_other": "{{count}} araç",
+    "columns": {
+      "plate": "Plaka",
+      "brandModel": "Marka / Model",
+      "customer": "Müşteri",
+      "year": "Yıl",
+      "mileage": "Km",
+      "status": "Durum"
+    },
+    "status": { "active": "Aktif", "inactive": "Pasif" },
+    "filters": { "active": "Aktif", "inactive": "Pasif", "all": "Tümü" },
+    "buttons": { "edit": "Düzenle", "delete": "Sil", "history": "Servis Geçmişi", "newOrder": "Yeni İş Emri" },
+    "confirm": { "delete": "{{plate}} plakalı aracı pasif etmek istediğinize emin misiniz?" },
+    "form": {
+      "createTitle": "Yeni Araç",
+      "editTitle": "Aracı Düzenle",
+      "plate": "Plaka",
+      "customer": "Müşteri (sahibi)",
+      "selectCustomer": "Müşteri seçin (opsiyonel)",
+      "brand": "Marka",
+      "model": "Model",
+      "modelYear": "Model Yılı",
+      "vin": "Şasi No (VIN)",
+      "engineNo": "Motor No",
+      "color": "Renk",
+      "fuelType": "Yakıt Tipi",
+      "mileage": "Güncel Km",
+      "notes": "Notlar",
+      "cancel": "İptal",
+      "create": "Oluştur",
+      "update": "Güncelle"
+    },
+    "fuelTypes": {
+      "none": "Seçiniz",
+      "benzin": "Benzin",
+      "dizel": "Dizel",
+      "lpg": "LPG",
+      "elektrik": "Elektrik",
+      "hibrit": "Hibrit"
+    },
+    "toast": {
+      "loadError": "Araçlar yüklenemedi",
+      "createSuccess": "Araç oluşturuldu",
+      "updateSuccess": "Araç güncellendi",
+      "deleteSuccess": "Araç pasif edildi",
+      "deleteFailed": "Araç silinemedi",
+      "saveFailed": "Araç kaydedilemedi"
+    }
+  },
+  "orders": {
+    "newOrder": "Yeni İş Emri",
+    "searchPlaceholder": "İş emri no veya plaka ara...",
+    "empty": "Henüz iş emri yok",
+    "subtitle_one": "{{count}} iş emri",
+    "subtitle_other": "{{count}} iş emri",
+    "columns": {
+      "orderNumber": "İş Emri No",
+      "vehicle": "Araç",
+      "customer": "Müşteri",
+      "status": "Durum",
+      "total": "Toplam",
+      "openedAt": "Açılış",
+      "invoice": "Fatura"
+    },
+    "invoiceBadge": { "invoiced": "Faturalı", "none": "Faturasız" },
+    "stockBadge": { "deducted": "Stok düşüldü" },
+    "buttons": { "edit": "Düzenle", "invoice": "Fatura Ekle" },
+    "parts": {
+      "title": "Parçalar",
+      "add": "Parça Ekle",
+      "selectProduct": "Ürün seçin",
+      "qty": "Adet",
+      "unitPrice": "Birim Fiyat",
+      "lineTotal": "Tutar",
+      "total": "Parça Toplamı",
+      "remove": "Sil",
+      "empty": "Henüz parça eklenmedi",
+      "locked": "Stok düşülmüş; parça kalemleri değiştirilemez"
+    },
+    "status": {
+      "open": "Açık",
+      "in_progress": "Devam Ediyor",
+      "completed": "Tamamlandı",
+      "delivered": "Teslim Edildi",
+      "cancelled": "İptal"
+    },
+    "statusFilter": { "all": "Tümü" },
+    "form": {
+      "createTitle": "Yeni İş Emri",
+      "editTitle": "İş Emrini Düzenle",
+      "vehicle": "Araç",
+      "selectVehicle": "Araç seçin",
+      "employee": "İlgilenen Personel",
+      "selectEmployee": "Personel seçin (opsiyonel)",
+      "status": "Durum",
+      "mileageIn": "Giriş Km",
+      "complaint": "Şikayet",
+      "diagnosis": "Tespit / Yapılan İşlem",
+      "laborCost": "İşçilik (₺)",
+      "partsCost": "Parça (₺)",
+      "discount": "İndirim (₺)",
+      "total": "Toplam",
+      "notes": "Notlar",
+      "cancel": "İptal",
+      "create": "Oluştur",
+      "update": "Güncelle"
+    },
+    "toast": {
+      "loadError": "İş emirleri yüklenemedi",
+      "createSuccess": "İş emri oluşturuldu",
+      "updateSuccess": "İş emri güncellendi",
+      "saveFailed": "İş emri kaydedilemedi",
+      "noVehicles": "Önce bir araç kaydı oluşturmalısınız"
+    }
+  },
+  "history": {
+    "title": "{{plate}} — Servis Geçmişi",
+    "empty": "Bu araç için iş emri yok",
+    "close": "Kapat",
+    "newOrder": "Yeni İş Emri"
+  },
+  "invoice": {
+    "title": "Fatura Bilgisi — {{order}}",
+    "hint": "Yasal fatura dış portalda (e-fatura/e-arşiv) kesilir; burada sadece kaydı tutulur.",
+    "number": "Fatura No",
+    "date": "Fatura Tarihi",
+    "amount": "Tutar (₺)",
+    "fileUrl": "Fatura Dosyası (URL, opsiyonel)",
+    "posting": "Cari / Kasa Hareketi",
+    "postings": {
+      "none": "Yok (sadece kayıt)",
+      "veresiye": "Veresiye (cariye borç)",
+      "nakit": "Nakit (kasa)",
+      "kredi_karti": "Kredi Kartı (banka)",
+      "havale": "Havale / EFT (banka)"
+    },
+    "save": "Kaydet",
+    "cancel": "İptal",
+    "current": "Kayıtlı fatura: {{number}}",
+    "toast": { "success": "Fatura kaydedildi", "failed": "Fatura kaydedilemedi" }
+  }
+}

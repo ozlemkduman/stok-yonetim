@@ -1,0 +1,32 @@
+.page { display: flex; flex-direction: column; gap: var(--space-4); }
+.header { display: flex; justify-content: space-between; align-items: flex-start; gap: var(--space-3); flex-wrap: wrap; }
+.title { margin: 0; font-size: var(--font-size-xl); font-weight: 700; }
+.subtitle { margin: var(--space-1) 0 0 0; font-size: var(--font-size-sm); color: var(--color-text-muted); }
+.card {
+  background: var(--color-bg-card, #fff);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  border: 1px solid var(--color-border, rgba(0, 0, 0, 0.06));
+}
+
+.mainTabs { display: flex; gap: var(--space-2); border-bottom: 1px solid var(--color-border, rgba(0,0,0,0.08)); margin-bottom: var(--space-4); }
+.mainTab { background: transparent; border: none; padding: 10px 16px; cursor: pointer; font-size: var(--font-size-md); font-weight: 600; color: var(--color-text-muted); border-bottom: 2px solid transparent; margin-bottom: -1px; }
+.mainTabActive { color: var(--color-primary, #3b82f6); border-bottom-color: var(--color-primary, #3b82f6); }
+
+.filters { display: flex; gap: var(--space-3); align-items: center; flex-wrap: wrap; margin-bottom: var(--space-3); }
+.tabs { display: flex; gap: 4px; border: 1px solid var(--color-border, rgba(0,0,0,0.08)); padding: 4px; border-radius: var(--radius-md); background: var(--color-bg-card, #fff); }
+.tab { background: transparent; border: none; padding: 6px 12px; border-radius: var(--radius-sm); cursor: pointer; font-size: var(--font-size-sm); color: var(--color-text-muted); }
+.tabActive { background: var(--color-primary, #3b82f6); color: #fff; font-weight: 600; }
+
+.actions { display: flex; gap: var(--space-2); justify-content: flex-end; flex-wrap: wrap; }
+.muted { color: var(--color-text-muted); }
+.pagination { margin-top: var(--space-3); }
+
+.formGrid { display: flex; flex-direction: column; gap: var(--space-4); }
+.formRow { display: flex; gap: var(--space-4); }
+.formActions { display: flex; justify-content: flex-end; gap: var(--space-2); margin-top: var(--space-6); }
+.totalRow { display: flex; justify-content: space-between; align-items: center; padding: var(--space-3); background: var(--color-bg-muted, #f9fafb); border-radius: var(--radius-md); font-weight: 600; }
+
+.partRow { display: grid; grid-template-columns: 2fr 80px 110px 100px auto; gap: var(--space-2); align-items: center; margin-bottom: var(--space-2); }
+.partLineTotal { text-align: right; font-variant-numeric: tabular-nums; font-size: var(--font-size-sm); }
+.invoiceBadges { display: flex; gap: var(--space-1); flex-wrap: wrap; }

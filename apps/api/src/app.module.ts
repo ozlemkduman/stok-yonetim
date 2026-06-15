@@ -17,6 +17,7 @@ import { OpeningStockModule } from './modules/opening-stock/opening-stock.module
 import { StockCountModule } from './modules/stock-count/stock-count.module';
 import { ChequesModule } from './modules/cheques/cheques.module';
 import { EmployeesModule } from './modules/employees/employees.module';
+import { AutoServiceModule } from './modules/auto-service/auto-service.module';
 import { ProductsModule } from './modules/products/products.module';
 import { SalesModule } from './modules/sales/sales.module';
 import { ReturnsModule } from './modules/returns/returns.module';
@@ -37,6 +38,7 @@ import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { TransformInterceptor } from './common/interceptors/transform.interceptor';
 import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
 import { FeatureGuard } from './common/guards/feature.guard';
+import { SectorGuard } from './common/guards/sector.guard';
 
 @Module({
   imports: [
@@ -74,6 +76,7 @@ import { FeatureGuard } from './common/guards/feature.guard';
     StockCountModule,
     ChequesModule,
     EmployeesModule,
+    AutoServiceModule,
     ProductsModule,
     SalesModule,
     ReturnsModule,
@@ -112,6 +115,10 @@ import { FeatureGuard } from './common/guards/feature.guard';
     {
       provide: APP_GUARD,
       useClass: FeatureGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: SectorGuard,
     },
     {
       provide: APP_INTERCEPTOR,

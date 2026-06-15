@@ -6,6 +6,7 @@ import { ProtectedRoute } from './components/ProtectedRoute';
 import { PublicRoute } from './components/PublicRoute';
 import { RoleGate } from './components/RoleGate';
 import { FeatureGate } from './components/FeatureGate';
+import { SectorGate } from './components/SectorGate';
 import { USER_ROLES } from './hooks/usePermissions';
 
 // Landing Page
@@ -50,6 +51,7 @@ import { QuoteListPage, QuoteDetailPage, QuoteFormPage, QuotePrintView } from '.
 import { IntegrationListPage, IntegrationDetailPage, ECommerceOrdersPage, BankStatementsPage } from './pages/Integrations';
 import { ContactListPage, ContactDetailPage } from './pages/CRM';
 import { RouteListPage, RouteDetailPage, RoutePlannerPage } from './pages/FieldTeam';
+import { AutoServicePage } from './pages/AutoService';
 import { NotFoundPage } from './pages/NotFound';
 
 export function AppRouter() {
@@ -160,6 +162,9 @@ export function AppRouter() {
 
         {/* Employees */}
         <Route path="employees" element={<EmployeeListPage />} />
+
+        {/* Auto Service (sektöre özel) */}
+        <Route path="auto-service" element={<SectorGate sector="auto_service"><AutoServicePage /></SectorGate>} />
 
         {/* Accounts */}
         <Route path="accounts" element={<AccountListPage />} />
