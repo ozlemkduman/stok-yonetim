@@ -26,6 +26,7 @@ export function TenantFormPage() {
     planId: '',
     billingEmail: '',
     status: 'active',
+    businessType: 'general',
   });
 
   // Süre preset: '' = süresiz, 'demo' = 45 gün, '1'..'12' = N ay (30 günden)
@@ -59,6 +60,7 @@ export function TenantFormPage() {
         planId: tenant.plan_id || '',
         billingEmail: tenant.billing_email || '',
         status: tenant.status,
+        businessType: tenant.business_type || 'general',
       });
     } catch (err) {
       showToast('error', t('admin:tenantForm.loadFailed'));
@@ -101,6 +103,7 @@ export function TenantFormPage() {
         planId: formData.planId || undefined,
         billingEmail: formData.billingEmail?.trim() || undefined,
         status,
+        businessType: formData.businessType || 'general',
         durationDays,
       };
 
@@ -243,6 +246,27 @@ export function TenantFormPage() {
               </select>
               <small className={styles.fieldHint}>
                 {t('admin:tenantForm.statusHint')}
+              </small>
+            </div>
+
+            <div className={styles.field}>
+              <label>{t('admin:tenantForm.labelBusinessType', { defaultValue: 'Sektör' })}</label>
+              <select
+                value={formData.businessType}
+                onChange={(e) => setFormData({ ...formData, businessType: e.target.value })}
+                className={styles.select}
+              >
+                <option value="general">
+                  {t('admin:tenantForm.businessTypeGeneral', { defaultValue: 'Genel İşletme' })}
+                </option>
+                <option value="auto_service">
+                  {t('admin:tenantForm.businessTypeAutoService', { defaultValue: 'Oto Servis' })}
+                </option>
+              </select>
+              <small className={styles.fieldHint}>
+                {t('admin:tenantForm.businessTypeHint', {
+                  defaultValue: 'Sektöre özel modüllerin (ör. Oto Servis paneli) görünürlüğünü belirler.',
+                })}
               </small>
             </div>
 

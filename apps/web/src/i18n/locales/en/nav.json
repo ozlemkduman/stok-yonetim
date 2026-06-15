@@ -5,6 +5,7 @@
     "purchasing": "Purchasing",
     "inventory": "Inventory",
     "finance": "Finance",
+    "autoService": "Auto Service",
     "crm": "CRM & Field",
     "reports": "Reports",
     "settings": "Settings"
@@ -26,6 +27,7 @@
     "expenses": "Expenses",
     "cheques": "Cheques / Notes",
     "employees": "Employees",
+    "autoService": "Auto Service",
     "crm": "CRM",
     "fieldTeam": "Field Team",
     "integrations": "Integrations",
@@ -33,6 +35,9 @@
     "companySettings": "Company Settings",
     "users": "Users",
     "profile": "Profile"
+  },
+  "autoService": {
+    "comingSoon": "The auto service module is on its way. Vehicle records, work orders, and service history will appear here soon."
   },
   "topbar": {
     "search": "Search...",

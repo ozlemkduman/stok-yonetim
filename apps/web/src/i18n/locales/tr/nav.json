@@ -5,6 +5,7 @@
     "purchasing": "Satınalma",
     "inventory": "Stok Yönetimi",
     "finance": "Finans",
+    "autoService": "Oto Servis",
     "crm": "CRM & Saha",
     "reports": "Raporlar",
     "settings": "Ayarlar"
@@ -26,6 +27,7 @@
     "expenses": "Giderler",
     "cheques": "Çek / Senet",
     "employees": "Çalışanlar",
+    "autoService": "Oto Servis",
     "crm": "CRM",
     "fieldTeam": "Saha Ekip",
     "integrations": "Entegrasyonlar",
@@ -33,6 +35,9 @@
     "companySettings": "Şirket Ayarları",
     "users": "Kullanıcılar",
     "profile": "Profil"
+  },
+  "autoService": {
+    "comingSoon": "Oto servis modülü hazırlanıyor. Yakında araç kaydı, iş emri ve servis geçmişi burada olacak."
   },
   "topbar": {
     "search": "Ara...",

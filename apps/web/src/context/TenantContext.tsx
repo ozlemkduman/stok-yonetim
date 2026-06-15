@@ -9,6 +9,7 @@ interface TenantSettings {
   domain: string | null;
   logo_url: string | null;
   plan_id: string | null;
+  business_type?: string;
   plan_name?: string;
   plan_code?: string;
   plan_features?: Record<string, boolean>;
@@ -42,6 +43,7 @@ interface TenantContextType {
   refreshSettings: () => Promise<void>;
   refreshUsage: () => Promise<void>;
   hasFeature: (feature: string) => boolean;
+  hasSector: (sector: string) => boolean;
   isWithinLimit: (resource: string) => boolean;
   // Impersonation for super_admin
   impersonatedTenant: ImpersonatedTenant | null;
@@ -125,6 +127,13 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
     [settings]
   );
 
+  const hasSector = useCallback(
+    (sector: string): boolean => {
+      return settings?.business_type === sector;
+    },
+    [settings]
+  );
+
   const isWithinLimit = useCallback(
     (resource: string): boolean => {
       if (!usage) return true;
@@ -146,6 +155,7 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
         refreshSettings,
         refreshUsage,
         hasFeature,
+        hasSector,
         isWithinLimit,
         impersonatedTenant,
         impersonate,

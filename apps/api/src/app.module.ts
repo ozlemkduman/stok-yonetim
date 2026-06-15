@@ -37,6 +37,7 @@ import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { TransformInterceptor } from './common/interceptors/transform.interceptor';
 import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
 import { FeatureGuard } from './common/guards/feature.guard';
+import { SectorGuard } from './common/guards/sector.guard';
 
 @Module({
   imports: [
@@ -112,6 +113,10 @@ import { FeatureGuard } from './common/guards/feature.guard';
     {
       provide: APP_GUARD,
       useClass: FeatureGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: SectorGuard,
     },
     {
       provide: APP_INTERCEPTOR,

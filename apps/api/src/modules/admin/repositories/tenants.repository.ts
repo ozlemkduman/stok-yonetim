@@ -9,6 +9,7 @@ export interface Tenant {
   domain: string | null;
   logo_url: string | null;
   plan_id: string | null;
+  business_type: string;
   settings: Record<string, any>;
   status: string;
   trial_ends_at: Date | null;
@@ -120,6 +121,7 @@ export class TenantsRepository {
     };
 
     // Only add optional fields if they have values
+    if (data.business_type) insertData.business_type = data.business_type;
     if (data.domain) insertData.domain = data.domain;
     if (data.plan_id) insertData.plan_id = data.plan_id;
     if (data.billing_email) insertData.billing_email = data.billing_email;
