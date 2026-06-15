@@ -128,6 +128,31 @@ export function TenantDetailPage() {
     }
   };
 
+  const [savingSector, setSavingSector] = useState(false);
+  const handleSectorChange = async (businessType: string) => {
+    if (!id || !tenant || businessType === tenant.business_type) return;
+    const prev = tenant.business_type;
+    setSavingSector(true);
+    setTenant({ ...tenant, business_type: businessType }); // iyimser güncelleme
+    try {
+      // Mevcut değerleri de gönder ki diğer alanlar etkilenmesin (edit formuyla aynı)
+      await adminTenantsApi.update(id, {
+        name: tenant.name,
+        domain: tenant.domain || undefined,
+        planId: tenant.plan_id || undefined,
+        billingEmail: tenant.billing_email || undefined,
+        status: tenant.status,
+        businessType,
+      });
+      showToast('success', t('admin:tenantDetail.sectorUpdated'));
+    } catch {
+      setTenant({ ...tenant, business_type: prev }); // geri al
+      showToast('error', t('admin:tenantDetail.sectorUpdateFailed'));
+    } finally {
+      setSavingSector(false);
+    }
+  };
+
   const handleDelete = async () => {
     if (!id) return;
     const confirmed = await confirm({ message: t('admin:tenantDetail.deleteConfirm'), variant: 'danger' });
@@ -289,6 +314,19 @@ export function TenantDetailPage() {
 
             <dt>{t('admin:tenantDetail.plan')}</dt>
             <dd>{tenant.plan_name || t('admin:tenantDetail.noPlan')}</dd>
+
+            <dt>{t('admin:tenantDetail.sector')}</dt>
+            <dd>
+              <select
+                value={tenant.business_type || 'general'}
+                onChange={(e) => handleSectorChange(e.target.value)}
+                disabled={savingSector}
+                aria-label={t('admin:tenantDetail.sector')}
+              >
+                <option value="general">{t('admin:tenantForm.businessTypeGeneral')}</option>
+                <option value="auto_service">{t('admin:tenantForm.businessTypeAutoService')}</option>
+              </select>
+            </dd>
 
             <dt>{t('admin:tenantDetail.billingEmail')}</dt>
             <dd>{tenant.billing_email || '-'}</dd>
