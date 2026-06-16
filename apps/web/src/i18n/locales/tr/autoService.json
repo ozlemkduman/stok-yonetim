@@ -3,7 +3,77 @@
   "subtitle": "Araç kayıtları ve iş emirleri",
   "tabs": {
     "vehicles": "Araçlar",
-    "orders": "İş Emirleri"
+    "orders": "İş Emirleri",
+    "customers": "Müşteriler",
+    "employees": "Personel",
+    "products": "Ürünler"
+  },
+  "customersTab": {
+    "newCustomer": "Yeni Müşteri",
+    "searchPlaceholder": "Müşteri adı, telefon ara...",
+    "empty": "Henüz müşteri kaydı yok",
+    "subtitle_one": "{{count}} müşteri",
+    "subtitle_other": "{{count}} müşteri",
+    "columns": {
+      "name": "Ad",
+      "phone": "Telefon",
+      "email": "E-posta",
+      "balance": "Bakiye"
+    },
+    "buttons": { "edit": "Düzenle", "delete": "Sil" },
+    "confirm": { "delete": "{{name}} adlı müşteriyi silmek istediğinize emin misiniz?" },
+    "toast": {
+      "loadError": "Müşteriler yüklenemedi",
+      "createSuccess": "Müşteri oluşturuldu",
+      "updateSuccess": "Müşteri güncellendi",
+      "deleteSuccess": "Müşteri silindi",
+      "deleteFailed": "Müşteri silinemedi"
+    }
+  },
+  "employeesTab": {
+    "newEmployee": "Yeni Personel",
+    "searchPlaceholder": "Personel adı ara...",
+    "empty": "Henüz personel kaydı yok",
+    "subtitle_one": "{{count}} personel",
+    "subtitle_other": "{{count}} personel",
+    "columns": {
+      "name": "Ad",
+      "position": "Pozisyon",
+      "phone": "Telefon",
+      "hireDate": "İşe Giriş"
+    },
+    "buttons": { "edit": "Düzenle", "delete": "Sil" },
+    "confirm": { "delete": "{{name}} adlı personeli silmek istediğinize emin misiniz?" },
+    "toast": {
+      "loadError": "Personel yüklenemedi",
+      "createSuccess": "Personel oluşturuldu",
+      "updateSuccess": "Personel güncellendi",
+      "deleteSuccess": "Personel silindi",
+      "deleteFailed": "Personel silinemedi"
+    }
+  },
+  "productsTab": {
+    "newProduct": "Yeni Ürün",
+    "searchPlaceholder": "Ürün adı, barkod ara...",
+    "empty": "Henüz ürün kaydı yok",
+    "subtitle_one": "{{count}} ürün",
+    "subtitle_other": "{{count}} ürün",
+    "columns": {
+      "name": "Ürün",
+      "category": "Kategori",
+      "stock": "Stok",
+      "salePrice": "Satış Fiyatı"
+    },
+    "buttons": { "edit": "Düzenle", "delete": "Sil" },
+    "confirm": { "delete": "{{name}} adlı ürünü silmek istediğinize emin misiniz?" },
+    "toast": {
+      "loadError": "Ürünler yüklenemedi",
+      "createSuccess": "Ürün oluşturuldu",
+      "updateSuccess": "Ürün güncellendi",
+      "deleteSuccess": "Ürün silindi",
+      "deleteFailed": "Ürün silinemedi",
+      "saveFailed": "Ürün kaydedilemedi"
+    }
   },
   "vehicles": {
     "newVehicle": "Yeni Araç",
