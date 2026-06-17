@@ -30,6 +30,8 @@
     "category": "Category *",
     "amount": "Amount *",
     "date": "Date *",
+    "account": "Paid From Account",
+    "accountAuto": "Automatic (default cash)",
     "description": "Description",
     "cancel": "Cancel",
     "save": "Save",

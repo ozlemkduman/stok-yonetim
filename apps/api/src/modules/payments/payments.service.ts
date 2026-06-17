@@ -5,6 +5,8 @@ import { CreatePaymentDto } from './dto';
 import { DatabaseService } from '../../database/database.service';
 import { createPaginatedResult } from '../../common/dto/pagination.dto';
 import { ActivityLogService } from '../../common/services/activity-log.service';
+import { getCurrentTenantId } from '../../common/context/tenant.context';
+import { accountTypeForPayment, postAccountMovement } from '../../common/helpers/account-movement.helper';
 
 @Injectable()
 export class PaymentsService {
@@ -39,7 +41,10 @@ export class PaymentsService {
         updated_at: trx.fn.now(),
       });
 
+      const tenantId = getCurrentTenantId();
+
       await trx('account_transactions').insert({
+        tenant_id: tenantId,
         customer_id: dto.customer_id,
         type: 'alacak',
         amount: dto.amount,
@@ -48,6 +53,21 @@ export class PaymentsService {
         reference_id: payment.id,
         transaction_date: new Date(),
       });
+
+      // Tahsilat parası kasaya/bankaya girsin (satışlarla aynı mantık: yöntem → hesap türü).
+      if (tenantId) {
+        await postAccountMovement(trx, {
+          tenantId,
+          accountType: accountTypeForPayment(dto.method),
+          movementType: 'gelir',
+          amount: dto.amount,
+          category: 'tahsilat',
+          description: `Tahsilat: ${customer.name}`,
+          referenceType: 'payment',
+          referenceId: payment.id,
+          movementDate: dto.payment_date ? new Date(dto.payment_date) : new Date(),
+        });
+      }
 
       await this.activityLog.log({
         action: 'payment_created',

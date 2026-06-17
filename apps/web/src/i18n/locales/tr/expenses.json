@@ -30,6 +30,8 @@
     "category": "Kategori *",
     "amount": "Tutar *",
     "date": "Tarih *",
+    "account": "Ödendiği Hesap",
+    "accountAuto": "Otomatik (varsayılan kasa)",
     "description": "Açıklama",
     "cancel": "İptal",
     "save": "Kaydet",

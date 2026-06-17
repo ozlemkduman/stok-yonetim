@@ -1,9 +1,13 @@
-import { IsString, IsOptional, IsNumber, IsBoolean, IsDateString, IsIn, Min } from 'class-validator';
+import { IsString, IsOptional, IsNumber, IsBoolean, IsDateString, IsIn, IsUUID, Min } from 'class-validator';
 
 export class CreateExpenseDto {
   @IsString()
   @IsIn(['kira', 'vergi', 'maas', 'fatura', 'diger'])
   category: string;
+
+  @IsOptional()
+  @IsUUID()
+  account_id?: string;
 
   @IsOptional()
   @IsString()
@@ -31,6 +35,10 @@ export class UpdateExpenseDto {
   @IsString()
   @IsIn(['kira', 'vergi', 'maas', 'fatura', 'diger'])
   category?: string;
+
+  @IsOptional()
+  @IsUUID()
+  account_id?: string;
 
   @IsOptional()
   @IsString()
