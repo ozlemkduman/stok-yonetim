@@ -3,7 +3,77 @@
   "subtitle": "Vehicle records and service orders",
   "tabs": {
     "vehicles": "Vehicles",
-    "orders": "Service Orders"
+    "orders": "Service Orders",
+    "customers": "Customers",
+    "employees": "Staff",
+    "products": "Products"
+  },
+  "customersTab": {
+    "newCustomer": "New Customer",
+    "searchPlaceholder": "Search customer name, phone...",
+    "empty": "No customers yet",
+    "subtitle_one": "{{count}} customer",
+    "subtitle_other": "{{count}} customers",
+    "columns": {
+      "name": "Name",
+      "phone": "Phone",
+      "email": "Email",
+      "balance": "Balance"
+    },
+    "buttons": { "edit": "Edit", "delete": "Delete" },
+    "confirm": { "delete": "Are you sure you want to delete customer {{name}}?" },
+    "toast": {
+      "loadError": "Failed to load customers",
+      "createSuccess": "Customer created",
+      "updateSuccess": "Customer updated",
+      "deleteSuccess": "Customer deleted",
+      "deleteFailed": "Failed to delete customer"
+    }
+  },
+  "employeesTab": {
+    "newEmployee": "New Staff",
+    "searchPlaceholder": "Search staff name...",
+    "empty": "No staff yet",
+    "subtitle_one": "{{count}} staff member",
+    "subtitle_other": "{{count}} staff members",
+    "columns": {
+      "name": "Name",
+      "position": "Position",
+      "phone": "Phone",
+      "hireDate": "Hire Date"
+    },
+    "buttons": { "edit": "Edit", "delete": "Delete" },
+    "confirm": { "delete": "Are you sure you want to delete staff member {{name}}?" },
+    "toast": {
+      "loadError": "Failed to load staff",
+      "createSuccess": "Staff created",
+      "updateSuccess": "Staff updated",
+      "deleteSuccess": "Staff deleted",
+      "deleteFailed": "Failed to delete staff"
+    }
+  },
+  "productsTab": {
+    "newProduct": "New Product",
+    "searchPlaceholder": "Search product name, barcode...",
+    "empty": "No products yet",
+    "subtitle_one": "{{count}} product",
+    "subtitle_other": "{{count}} products",
+    "columns": {
+      "name": "Product",
+      "category": "Category",
+      "stock": "Stock",
+      "salePrice": "Sale Price"
+    },
+    "buttons": { "edit": "Edit", "delete": "Delete" },
+    "confirm": { "delete": "Are you sure you want to delete product {{name}}?" },
+    "toast": {
+      "loadError": "Failed to load products",
+      "createSuccess": "Product created",
+      "updateSuccess": "Product updated",
+      "deleteSuccess": "Product deleted",
+      "deleteFailed": "Failed to delete product",
+      "saveFailed": "Failed to save product"
+    }
   },
   "vehicles": {
     "newVehicle": "New Vehicle",

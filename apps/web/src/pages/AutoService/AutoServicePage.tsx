@@ -3,13 +3,18 @@ import { useTranslation } from 'react-i18next';
 import { autoServiceApi, Vehicle, ServiceOrder, CreateServiceOrderData, RecordInvoiceData } from '../../api/autoService.api';
 import { VehiclesTab } from './VehiclesTab';
 import { ServiceOrdersTab } from './ServiceOrdersTab';
+import { CustomersTab } from './CustomersTab';
+import { EmployeesTab } from './EmployeesTab';
+import { ProductsTab } from './ProductsTab';
 import { ServiceOrderFormModal } from './ServiceOrderFormModal';
 import { ServiceHistoryModal } from './ServiceHistoryModal';
 import { InvoiceModal } from './InvoiceModal';
 import { useToast } from '../../context/ToastContext';
 import styles from './AutoService.module.css';
 
-type MainTab = 'vehicles' | 'orders';
+type MainTab = 'vehicles' | 'orders' | 'customers' | 'employees' | 'products';
+
+const MAIN_TABS: MainTab[] = ['vehicles', 'orders', 'customers', 'employees', 'products'];
 
 /**
  * Oto Servis modülü (Faz 2). business_type='auto_service' tenant'lara görünür
@@ -76,7 +81,7 @@ export function AutoServicePage() {
 
       <div className={styles.card}>
         <div className={styles.mainTabs}>
-          {(['vehicles', 'orders'] as MainTab[]).map((tab) => (
+          {MAIN_TABS.map((tab) => (
             <button
               key={tab}
               className={`${styles.mainTab} ${mainTab === tab ? styles.mainTabActive : ''}`}
@@ -87,9 +92,8 @@ export function AutoServicePage() {
           ))}
         </div>
 
-        {mainTab === 'vehicles' ? (
-          <VehiclesTab onOpenHistory={setHistoryVehicle} />
-        ) : (
+        {mainTab === 'vehicles' && <VehiclesTab onOpenHistory={setHistoryVehicle} />}
+        {mainTab === 'orders' && (
           <ServiceOrdersTab
             refreshSignal={refreshSignal}
             onNewOrder={() => openNewOrder()}
@@ -97,6 +101,9 @@ export function AutoServicePage() {
             onInvoice={setInvoiceOrder}
           />
         )}
+        {mainTab === 'customers' && <CustomersTab />}
+        {mainTab === 'employees' && <EmployeesTab />}
+        {mainTab === 'products' && <ProductsTab />}
       </div>
 
       <ServiceHistoryModal
