@@ -46,10 +46,17 @@ export function AutoServicePage() {
     setOrderModalOpen(true);
   };
 
-  const openEditOrder = (order: ServiceOrder) => {
-    setEditingOrder(order);
+  const openEditOrder = async (order: ServiceOrder) => {
     setPresetVehicleId(undefined);
     setHistoryVehicle(null);
+    // Liste kaydı parça kalemlerini içermez; tam siparişi (items dahil) çek,
+    // aksi halde düzenlemede mevcut parçalar görünmez ve kaydedince silinirdi.
+    try {
+      const res = await autoServiceApi.serviceOrders.getById(order.id);
+      setEditingOrder(res.data);
+    } catch {
+      setEditingOrder(order);
+    }
     setOrderModalOpen(true);
   };
 

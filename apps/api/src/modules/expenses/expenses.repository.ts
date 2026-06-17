@@ -11,6 +11,7 @@ export interface Expense {
   expense_date: Date;
   is_recurring: boolean;
   recurrence_period: string | null;
+  account_id: string | null;
   created_by: string | null;
   created_at: Date;
   updated_at: Date;

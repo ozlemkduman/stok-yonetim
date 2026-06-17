@@ -4,8 +4,10 @@ import { useTranslation } from 'react-i18next';
 import { Button, Badge, Card, Modal, Input, Select } from '@stok/ui';
 import { salesApi, SaleDetail } from '../../api/sales.api';
 import { paymentsApi } from '../../api/payments.api';
+import { eDocumentsApi } from '../../api/e-documents.api';
 import { formatCurrency, formatDate, formatDateTime } from '../../utils/formatters';
 import { useToast } from '../../context/ToastContext';
+import { useTenant } from '../../context/TenantContext';
 import { useConfirmDialog } from '../../context/ConfirmDialogContext';
 import { PrintModal } from './PrintModal';
 import styles from './SaleDetailPage.module.css';
@@ -23,6 +25,8 @@ export function SaleDetailPage() {
   const [showPrintModal, setShowPrintModal] = useState(false);
   const [togglingInvoice, setTogglingInvoice] = useState(false);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [creatingEDoc, setCreatingEDoc] = useState(false);
+  const { hasFeature } = useTenant();
   const [paymentAmount, setPaymentAmount] = useState<string>('');
   const [paymentMethod, setPaymentMethod] = useState<'nakit' | 'kredi_karti' | 'havale'>('nakit');
   const [paymentNotes, setPaymentNotes] = useState('');
@@ -114,6 +118,20 @@ export function SaleDetailPage() {
     }
   };
 
+  const handleCreateEDocument = async () => {
+    if (!data) return;
+    setCreatingEDoc(true);
+    try {
+      await eDocumentsApi.create({ document_type: 'e_fatura', reference_type: 'sale', reference_id: data.id });
+      showToast('success', t('eDocuments:toast.createSuccess'));
+      navigate('/e-documents');
+    } catch (err) {
+      showToast('error', err instanceof Error ? err.message : t('eDocuments:toast.actionError'));
+    } finally {
+      setCreatingEDoc(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className={styles.page}>
@@ -167,6 +185,11 @@ export function SaleDetailPage() {
           {data.status === 'completed' && (
             <Button variant="secondary" onClick={() => navigate(`/returns/new?saleId=${data.id}`)}>
               {t('sales:detail.createReturn')}
+            </Button>
+          )}
+          {data.status === 'completed' && hasFeature('eDocuments') && (
+            <Button variant="secondary" onClick={handleCreateEDocument} disabled={creatingEDoc}>
+              {t('eDocuments:actions.createInvoice')}
             </Button>
           )}
           {canCancel && (

@@ -159,7 +159,8 @@ export class EDocumentsRepository extends BaseTenantRepository<EDocument> {
 
   async createLog(data: Partial<EDocumentLog>, trx?: Knex.Transaction): Promise<EDocumentLog> {
     const query = trx ? trx('e_document_logs') : this.knex('e_document_logs');
-    const [log] = await query.insert(data).returning('*');
+    // getInsertData tenant_id'yi context'ten ekler (createDocument ile tutarlı; orphan tenant_id önlenir).
+    const [log] = await query.insert(this.getInsertData(data)).returning('*');
     return log;
   }
 

@@ -49,6 +49,7 @@ import { AccountListPage, AccountDetailPage } from './pages/Accounts';
 import { WarehouseListPage, WarehouseDetailPage, StockTransferPage, StockMovementsPage } from './pages/Warehouses';
 import { QuoteListPage, QuoteDetailPage, QuoteFormPage, QuotePrintView } from './pages/Quotes';
 import { IntegrationListPage, IntegrationDetailPage, ECommerceOrdersPage, BankStatementsPage } from './pages/Integrations';
+import { EDocumentListPage } from './pages/EDocuments';
 import { ContactListPage, ContactDetailPage } from './pages/CRM';
 import { RouteListPage, RouteDetailPage, RoutePlannerPage } from './pages/FieldTeam';
 import { AutoServicePage } from './pages/AutoService';
@@ -150,6 +151,7 @@ export function AppRouter() {
         <Route path="sales" element={<SaleListPage />} />
         <Route path="sales/new" element={<SaleFormPage />} />
         <Route path="sales/import" element={<FeatureGate feature="invoiceImport"><InvoiceImportPage /></FeatureGate>} />
+        <Route path="e-documents" element={<FeatureGate feature="eDocuments"><EDocumentListPage /></FeatureGate>} />
         <Route path="sales/:id" element={<SaleDetailPage />} />
 
         {/* Returns */}

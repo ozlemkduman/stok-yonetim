@@ -5,6 +5,7 @@ export interface Product {
   name: string;
   barcode: string | null;
   category: string | null;
+  type: 'product' | 'service';
   unit: string;
   purchase_price: number;
   sale_price: number;
@@ -25,6 +26,7 @@ export interface CreateProductData {
   name: string;
   barcode?: string;
   category?: string;
+  type?: 'product' | 'service';
   unit?: string;
   purchase_price: number;
   sale_price: number;

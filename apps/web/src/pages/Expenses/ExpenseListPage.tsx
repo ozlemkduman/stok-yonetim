@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Table, Button, Input, Badge, Modal, Select, Pagination, type Column } from '@stok/ui';
 import { expensesApi, Expense, CreateExpenseData } from '../../api/expenses.api';
+import { accountsApi, Account } from '../../api/accounts.api';
 import { useToast } from '../../context/ToastContext';
 import { useConfirmDialog } from '../../context/ConfirmDialogContext';
 import { formatCurrency, formatDate } from '../../utils/formatters';
@@ -28,6 +29,7 @@ export function ExpenseListPage() {
   const [endDate, setEndDate] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingExpense, setEditingExpense] = useState<Expense | null>(null);
+  const [accounts, setAccounts] = useState<Account[]>([]);
   const [formData, setFormData] = useState<CreateExpenseData>({
     category: 'diger',
     amount: 0,
@@ -56,6 +58,10 @@ export function ExpenseListPage() {
   };
 
   useEffect(() => { fetchExpenses(); }, [page, categoryFilter, startDate, endDate]);
+
+  useEffect(() => {
+    accountsApi.getAll({ isActive: true }).then((res) => setAccounts(res.data)).catch(() => setAccounts([]));
+  }, []);
 
   const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setCategoryFilter(e.target.value);
@@ -108,7 +114,8 @@ export function ExpenseListPage() {
       amount: expense.amount,
       expense_date: expense.expense_date.split('T')[0],
       is_recurring: expense.is_recurring,
-      recurrence_period: expense.recurrence_period || undefined
+      recurrence_period: expense.recurrence_period || undefined,
+      account_id: expense.account_id || undefined
     } : {
       category: 'diger',
       amount: 0,
@@ -225,6 +232,16 @@ export function ExpenseListPage() {
             type="date"
             value={formData.expense_date}
             onChange={(e) => setFormData({ ...formData, expense_date: e.target.value })}
+            fullWidth
+          />
+          <Select
+            label={t('expenses:modal.account')}
+            options={[
+              { value: '', label: t('expenses:modal.accountAuto') },
+              ...accounts.map((a) => ({ value: a.id, label: a.name })),
+            ]}
+            value={formData.account_id || ''}
+            onChange={(e) => setFormData({ ...formData, account_id: e.target.value || undefined })}
             fullWidth
           />
           <Input

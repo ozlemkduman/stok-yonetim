@@ -8,6 +8,7 @@ export interface Expense {
   expense_date: string;
   is_recurring: boolean;
   recurrence_period: string | null;
+  account_id?: string | null;
   created_by?: string | null;
   created_by_name?: string | null;
   created_at: string;
@@ -21,6 +22,7 @@ export interface CreateExpenseData {
   expense_date: string;
   is_recurring?: boolean;
   recurrence_period?: string;
+  account_id?: string;
 }
 
 export const expensesApi = {

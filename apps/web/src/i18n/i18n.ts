@@ -28,6 +28,7 @@ import trFieldteam from './locales/tr/fieldteam.json';
 import trIntegrations from './locales/tr/integrations.json';
 import trEmployees from './locales/tr/employees.json';
 import trAutoService from './locales/tr/autoService.json';
+import trEDocuments from './locales/tr/eDocuments.json';
 
 import enCommon from './locales/en/common.json';
 import enNav from './locales/en/nav.json';
@@ -55,11 +56,12 @@ import enFieldteam from './locales/en/fieldteam.json';
 import enIntegrations from './locales/en/integrations.json';
 import enEmployees from './locales/en/employees.json';
 import enAutoService from './locales/en/autoService.json';
+import enEDocuments from './locales/en/eDocuments.json';
 
 const ns = [
   'common', 'nav', 'landing', 'auth', 'dashboard', 'sales', 'products',
   'customers', 'suppliers', 'purchases', 'openingStock', 'stockCount', 'cheques', 'returns', 'expenses', 'accounts', 'warehouses', 'quotes',
-  'reports', 'settings', 'admin', 'crm', 'fieldteam', 'integrations', 'employees', 'autoService',
+  'reports', 'settings', 'admin', 'crm', 'fieldteam', 'integrations', 'employees', 'autoService', 'eDocuments',
 ] as const;
 
 i18n
@@ -75,7 +77,7 @@ i18n
         accounts: trAccounts, warehouses: trWarehouses, quotes: trQuotes,
         reports: trReports, settings: trSettings,
         admin: trAdmin, crm: trCrm, fieldteam: trFieldteam, integrations: trIntegrations,
-        employees: trEmployees, autoService: trAutoService,
+        employees: trEmployees, autoService: trAutoService, eDocuments: trEDocuments,
       },
       en: {
         common: enCommon, nav: enNav, landing: enLanding, auth: enAuth,
@@ -85,7 +87,7 @@ i18n
         accounts: enAccounts, warehouses: enWarehouses, quotes: enQuotes,
         reports: enReports, settings: enSettings,
         admin: enAdmin, crm: enCrm, fieldteam: enFieldteam, integrations: enIntegrations,
-        employees: enEmployees, autoService: enAutoService,
+        employees: enEmployees, autoService: enAutoService, eDocuments: enEDocuments,
       },
     },
     fallbackLng: 'tr',
