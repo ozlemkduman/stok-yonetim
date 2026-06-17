@@ -40,6 +40,7 @@ export function ProductFormModal({ isOpen, onClose, onSubmit, product }: Product
         name: product.name,
         barcode: product.barcode || '',
         category: product.category || '',
+        type: product.type || 'product',
         unit: product.unit,
         purchase_price: pp,
         sale_price: sp,
@@ -152,6 +153,15 @@ export function ProductFormModal({ isOpen, onClose, onSubmit, product }: Product
         <Input label={t('products:form.productName')} value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} fullWidth />
         <Input label={t('products:form.barcode')} value={formData.barcode || ''} onChange={(e) => setFormData({ ...formData, barcode: e.target.value })} fullWidth />
         <Select
+          label={t('products:form.type')}
+          options={[
+            { value: 'product', label: t('products:form.typeProduct') },
+            { value: 'service', label: t('products:form.typeService') },
+          ]}
+          value={formData.type || 'product'}
+          onChange={(e) => setFormData({ ...formData, type: e.target.value as 'product' | 'service' })}
+        />
+        <Select
           label={t('products:form.category')}
           options={[
             { value: '', label: t('products:form.selectCategory') },
@@ -214,8 +224,15 @@ export function ProductFormModal({ isOpen, onClose, onSubmit, product }: Product
           </div>
         </div>
 
-        <Input label={t('products:form.minStockLevel')} type="number" step="any" value={formData.min_stock_level ?? ''} onChange={(e) => setFormData({ ...formData, min_stock_level: e.target.value === '' ? undefined : parseFloat(e.target.value) })} fullWidth />
-        <p className={styles.priceHint}>{t('products:form.stockSourceHint')}</p>
+        {formData.type !== 'service' && (
+          <>
+            <Input label={t('products:form.minStockLevel')} type="number" step="any" value={formData.min_stock_level ?? ''} onChange={(e) => setFormData({ ...formData, min_stock_level: e.target.value === '' ? undefined : parseFloat(e.target.value) })} fullWidth />
+            <p className={styles.priceHint}>{t('products:form.stockSourceHint')}</p>
+          </>
+        )}
+        {formData.type === 'service' && (
+          <p className={styles.priceHint}>{t('products:form.serviceStockHint')}</p>
+        )}
       </div>
     </Modal>
   );
