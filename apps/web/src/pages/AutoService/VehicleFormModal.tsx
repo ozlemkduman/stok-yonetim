@@ -2,8 +2,10 @@ import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Modal, Input, Button, Select, type SelectOption } from '@stok/ui';
 import { Vehicle, CreateVehicleData } from '../../api/autoService.api';
-import { customersApi } from '../../api/customers.api';
+import { customersApi, CreateCustomerData } from '../../api/customers.api';
 import { useToast } from '../../context/ToastContext';
+import { SelectWithAdd } from '../../components/inline';
+import { CustomerFormModal } from '../Customers/CustomerFormModal';
 import styles from './AutoService.module.css';
 
 interface VehicleFormModalProps {
@@ -26,6 +28,7 @@ export function VehicleFormModal({ isOpen, onClose, onSubmit, vehicle }: Vehicle
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState<CreateVehicleData>(emptyForm);
   const [customers, setCustomers] = useState<SelectOption[]>([]);
+  const [customerModalOpen, setCustomerModalOpen] = useState(false);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -63,6 +66,13 @@ export function VehicleFormModal({ isOpen, onClose, onSubmit, vehicle }: Vehicle
     ...customers,
   ];
 
+  const handleCreateCustomer = async (data: CreateCustomerData) => {
+    const res = await customersApi.create(data);
+    const created = res.data;
+    setCustomers((prev) => [{ value: created.id, label: created.name }, ...prev]);
+    setFormData((prev) => ({ ...prev, customer_id: created.id }));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -89,6 +99,7 @@ export function VehicleFormModal({ isOpen, onClose, onSubmit, vehicle }: Vehicle
   };
 
   return (
+    <>
     <Modal
       isOpen={isOpen}
       onClose={onClose}
@@ -105,13 +116,16 @@ export function VehicleFormModal({ isOpen, onClose, onSubmit, vehicle }: Vehicle
               required
               fullWidth
             />
-            <Select
-              label={t('vehicles.form.customer')}
-              options={customerOptions}
-              value={formData.customer_id}
-              onChange={(e) => setFormData({ ...formData, customer_id: e.target.value })}
-              fullWidth
-            />
+            <div style={{ width: '100%', minWidth: 0 }}>
+              <SelectWithAdd
+                label={t('vehicles.form.customer')}
+                options={customerOptions}
+                value={formData.customer_id}
+                onChange={(e) => setFormData({ ...formData, customer_id: e.target.value })}
+                onAdd={() => setCustomerModalOpen(true)}
+                addTitle={t('vehicles.form.addCustomer')}
+              />
+            </div>
           </div>
 
           <div className={styles.formRow}>
@@ -195,5 +209,13 @@ export function VehicleFormModal({ isOpen, onClose, onSubmit, vehicle }: Vehicle
         </div>
       </form>
     </Modal>
+
+    <CustomerFormModal
+      isOpen={customerModalOpen}
+      onClose={() => setCustomerModalOpen(false)}
+      onSubmit={handleCreateCustomer}
+      customer={null}
+    />
+    </>
   );
 }
