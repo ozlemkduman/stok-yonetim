@@ -121,10 +121,15 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
 
   const hasFeature = useCallback(
     (feature: string): boolean => {
+      // Super admin tüm özellikleri görür (örn. "paneli gör" ile bir kiracının
+      // paneline bakarken). Backend FeatureGuard da super_admin'i bypass eder,
+      // bu yüzden UI gating'i de aynı davranmalı — aksi halde sekmeler gizlenir
+      // ama veri çağrıları çalışır, tutarsızlık olurdu.
+      if (user?.role === 'super_admin') return true;
       if (!settings?.plan_features) return false;
       return settings.plan_features[feature] === true;
     },
-    [settings]
+    [settings, user?.role]
   );
 
   const hasSector = useCallback(

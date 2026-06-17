@@ -135,6 +135,74 @@ export interface RenewalsReport {
   };
 }
 
+export interface SalesReturnsDetailProduct {
+  id: string;
+  name: string;
+  barcode: string | null;
+  unit: string | null;
+  category: string | null;
+  sold_quantity: number;
+  sold_revenue: number;
+  returned_quantity: number;
+  returned_amount: number;
+  net_quantity: number;
+  net_revenue: number;
+  return_rate_percent: number;
+}
+
+export interface SalesMonthlyTrend {
+  month: string;
+  sale_count: number;
+  sold_revenue: number;
+  returned_amount: number;
+  net_revenue: number;
+}
+
+export interface SalesReturnsDetailReport {
+  products: SalesReturnsDetailProduct[];
+  summary: {
+    sold_quantity: number;
+    sold_revenue: number;
+    returned_quantity: number;
+    returned_amount: number;
+    net_revenue: number;
+    return_rate_percent: number;
+    product_count: number;
+  };
+  monthlyTrend: SalesMonthlyTrend[];
+}
+
+export interface StockDetailProduct {
+  id: string;
+  name: string;
+  barcode: string | null;
+  category: string | null;
+  unit: string | null;
+  stock_quantity: number;
+  min_stock_level: number;
+  purchase_price: number;
+  sale_price: number;
+  stock_value: number;
+  potential_sale_value: number;
+  potential_profit: number;
+  sold_quantity: number;
+  status: 'out' | 'low' | 'ok';
+}
+
+export interface StockDetailReport {
+  products: StockDetailProduct[];
+  summary: {
+    totalProducts: number;
+    totalStockValue: number;
+    totalSaleValue: number;
+    potentialProfit: number;
+    lowStockCount: number;
+    outOfStockCount: number;
+    totalSoldQuantity: number;
+  };
+  byCategory: { category: string; product_count: number; stock_quantity: number; stock_value: number }[];
+}
+
 export const reportsApi = {
   getSalesSummary: (startDate: string, endDate: string) =>
     apiClient.get<any>('/reports/sales-summary', { startDate, endDate }),
@@ -155,6 +223,10 @@ export const reportsApi = {
     apiClient.get<{ products: StockReportProduct[]; summary: any }>('/reports/stock-report'),
   getReturnsReport: (startDate: string, endDate: string) =>
     apiClient.get<{ returns: ReturnReport[]; summary: any; byReason: any[]; topReturnedProducts: any[] }>('/reports/returns-report', { startDate, endDate }),
+  getSalesReturnsDetail: (startDate: string, endDate: string) =>
+    apiClient.get<SalesReturnsDetailReport>('/reports/sales-returns-detail', { startDate, endDate }),
+  getStockDetail: (startDate: string, endDate: string) =>
+    apiClient.get<StockDetailReport>('/reports/stock-detail', { startDate, endDate }),
   getCustomerSales: (startDate: string, endDate: string) =>
     apiClient.get<CustomerSale[]>('/reports/customer-sales', { startDate, endDate }),
   getCustomerProductPurchases: (startDate: string, endDate: string) =>

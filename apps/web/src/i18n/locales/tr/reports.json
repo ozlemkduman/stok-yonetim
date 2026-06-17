@@ -4,6 +4,21 @@
   "filter": "Filtrele",
   "loadFailed": "Rapor yüklenemedi",
   "noData": "Veri bulunamadı",
+  "periods": {
+    "buAy": "Bu Ay",
+    "1ay": "Son 1 Ay",
+    "3ay": "Son 3 Ay",
+    "6ay": "Son 6 Ay",
+    "1yil": "Son 1 Yıl",
+    "ozel": "Özel Aralık"
+  },
+  "expenseCategories": {
+    "kira": "Kira",
+    "vergi": "Vergi",
+    "maas": "Maaş",
+    "fatura": "Fatura",
+    "diger": "Diğer"
+  },
   "tabs": {
     "general": "Genel Özet",
     "endOfDay": "Gün Sonu",
@@ -31,7 +46,10 @@
     "cancelled": "İptal Edilen",
     "topSuppliers": "En Çok Alış Yapılan Tedarikçiler",
     "supplier": "Tedarikçi",
-    "total": "Toplam"
+    "total": "Toplam",
+    "discountTotal": "Toplam İskonto",
+    "dailyTrend": "Günlük Alış Trendi",
+    "date": "Tarih"
   },
   "cash": {
     "title": "Kasa Hareketleri",
@@ -49,6 +67,9 @@
     "description": "Açıklama",
     "amount": "Tutar",
     "balanceAfter": "Bakiye",
+    "byType": "Hareket Tipine Göre",
+    "count": "Adet",
+    "truncated": "Yalnızca son 200 hareket gösteriliyor",
     "movementTypes": {
       "gelir": "Gelir",
       "gider": "Gider",
@@ -89,6 +110,7 @@
     "totalCogs": "Toplam Maliyet (COGS)",
     "grossProfit": "Brüt Kâr",
     "margin": "Kâr Marjı",
+    "totalQuantity": "Toplam Satılan Adet",
     "product": "Ürün",
     "quantity": "Satış Miktarı",
     "revenue": "Ciro",
@@ -105,6 +127,7 @@
     "bucket_60_90": "60-90 Gün",
     "bucket_90_plus": "90+ Gün",
     "total": "Toplam",
+    "customerCount": "Borçlu Müşteri",
     "customer": "Müşteri",
     "oldest": "En Eski",
     "invoices": "fatura",
@@ -141,7 +164,12 @@
     "amount": "Tutar",
     "noOverduePayments": "Geciken ödeme bulunmuyor",
     "upcomingPayments": "Yaklaşan Ödemeler (30 Gün)",
-    "noUpcomingPayments": "Yaklaşan ödeme bulunmuyor"
+    "noUpcomingPayments": "Yaklaşan ödeme bulunmuyor",
+    "byPaymentMethod": "Ödeme Tipine Göre Satış",
+    "method": "Ödeme Tipi",
+    "count": "Adet",
+    "dailyTrend": "Günlük Satış Trendi",
+    "date": "Tarih"
   },
   "sales": {
     "topProducts": "En Çok Satan Ürünler",
@@ -153,7 +181,41 @@
     "returnAmount": "İade Tutarı",
     "topReturnedProducts": "En Çok İade Edilen Ürünler",
     "returnQuantity": "Adet",
-    "returnTotal": "Tutar"
+    "returnTotal": "Tutar",
+    "byReason": "İade Nedenleri",
+    "reason": "Neden"
+  },
+  "salesDetail": {
+    "title": "Ürün Bazında Satış & İade Detayı",
+    "product": "Ürün",
+    "soldQty": "Satılan Adet",
+    "soldRevenue": "Satış Tutarı",
+    "returnedQty": "İade Adet",
+    "returnedAmount": "İade Tutarı",
+    "netQty": "Net Adet",
+    "netRevenue": "Net Tutar",
+    "returnRate": "İade Oranı",
+    "totalSoldQty": "Toplam Satılan",
+    "totalSoldRevenue": "Toplam Satış",
+    "totalReturnedQty": "Toplam İade Adet",
+    "totalReturnedAmount": "Toplam İade Tutarı",
+    "monthlyTitle": "Aylık Satış Trendi",
+    "month": "Ay",
+    "saleCount": "Satış Adedi"
+  },
+  "stockDetail": {
+    "title": "Ürün Bazında Stok Detayı",
+    "byCategoryTitle": "Kategori Bazlı Stok",
+    "product": "Ürün",
+    "category": "Kategori",
+    "productCount": "Ürün Sayısı",
+    "stockQty": "Stok Miktarı",
+    "stockValue": "Stok Değeri (Maliyet)",
+    "potentialSale": "Potansiyel Satış",
+    "potentialProfit": "Potansiyel Kâr",
+    "soldInPeriod": "Dönemde Satılan",
+    "status": "Durum",
+    "statusOk": "Yeterli"
   },
   "customers": {
     "topCustomers": "En Çok Alışveriş Yapan Müşteriler",
@@ -166,6 +228,7 @@
     "noDebtCustomers": "Borçlu müşteri bulunmuyor",
     "productPurchases": "Müşteri Bazlı Ürün Alım Detayı",
     "totalPieces": "adet toplam",
+    "amountTotal": "Tutar Toplamı",
     "noProductData": "Müşteri ürün verisi bulunamadı"
   },
   "customerSales": {
@@ -197,6 +260,7 @@
     "status": "Durum",
     "depleted": "Tükendi",
     "low": "Düşük",
+    "totalSold": "Dönemde Satılan",
     "noLowStock": "Düşük stoklu ürün bulunmuyor"
   },
   "expenses": {
@@ -236,6 +300,8 @@
     "future": "Normal",
     "futureLabel": "Normal",
     "customer": "Müşteri",
+    "contact": "İletişim",
+    "amount": "Tutar",
     "products": "Ürünler",
     "saleDate": "Satış Tarihi",
     "renewalDate": "Yenileme Tarihi",

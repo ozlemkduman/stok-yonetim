@@ -4,6 +4,21 @@
   "filter": "Filter",
   "loadFailed": "Failed to load report",
   "noData": "No data found",
+  "periods": {
+    "buAy": "This Month",
+    "1ay": "Last 1 Month",
+    "3ay": "Last 3 Months",
+    "6ay": "Last 6 Months",
+    "1yil": "Last 1 Year",
+    "ozel": "Custom Range"
+  },
+  "expenseCategories": {
+    "kira": "Rent",
+    "vergi": "Tax",
+    "maas": "Salary",
+    "fatura": "Utility",
+    "diger": "Other"
+  },
   "tabs": {
     "general": "Overview",
     "endOfDay": "End of Day",
@@ -31,7 +46,10 @@
     "cancelled": "Cancelled",
     "topSuppliers": "Top Suppliers",
     "supplier": "Supplier",
-    "total": "Total"
+    "total": "Total",
+    "discountTotal": "Total Discount",
+    "dailyTrend": "Daily Purchase Trend",
+    "date": "Date"
   },
   "cash": {
     "title": "Cash Movements",
@@ -49,6 +67,9 @@
     "description": "Description",
     "amount": "Amount",
     "balanceAfter": "Balance",
+    "byType": "By Movement Type",
+    "count": "Count",
+    "truncated": "Showing only the last 200 movements",
     "movementTypes": {
       "gelir": "Income",
       "gider": "Expense",
@@ -89,6 +110,7 @@
     "totalCogs": "Total COGS",
     "grossProfit": "Gross Profit",
     "margin": "Profit Margin",
+    "totalQuantity": "Total Qty Sold",
     "product": "Product",
     "quantity": "Qty Sold",
     "revenue": "Revenue",
@@ -105,6 +127,7 @@
     "bucket_60_90": "60-90 Days",
     "bucket_90_plus": "90+ Days",
     "total": "Total",
+    "customerCount": "Customers in Debt",
     "customer": "Customer",
     "oldest": "Oldest",
     "invoices": "invoices",
@@ -141,7 +164,12 @@
     "amount": "Amount",
     "noOverduePayments": "No overdue payments",
     "upcomingPayments": "Upcoming Payments (30 Days)",
-    "noUpcomingPayments": "No upcoming payments"
+    "noUpcomingPayments": "No upcoming payments",
+    "byPaymentMethod": "Sales by Payment Method",
+    "method": "Payment Method",
+    "count": "Count",
+    "dailyTrend": "Daily Sales Trend",
+    "date": "Date"
   },
   "sales": {
     "topProducts": "Top Selling Products",
@@ -153,7 +181,41 @@
     "returnAmount": "Return Amount",
     "topReturnedProducts": "Most Returned Products",
     "returnQuantity": "Qty",
-    "returnTotal": "Amount"
+    "returnTotal": "Amount",
+    "byReason": "Return Reasons",
+    "reason": "Reason"
+  },
+  "salesDetail": {
+    "title": "Per-Product Sales & Returns Detail",
+    "product": "Product",
+    "soldQty": "Sold Qty",
+    "soldRevenue": "Sales Amount",
+    "returnedQty": "Returned Qty",
+    "returnedAmount": "Returned Amount",
+    "netQty": "Net Qty",
+    "netRevenue": "Net Amount",
+    "returnRate": "Return Rate",
+    "totalSoldQty": "Total Sold",
+    "totalSoldRevenue": "Total Sales",
+    "totalReturnedQty": "Total Returned Qty",
+    "totalReturnedAmount": "Total Returned Amount",
+    "monthlyTitle": "Monthly Sales Trend",
+    "month": "Month",
+    "saleCount": "Sale Count"
+  },
+  "stockDetail": {
+    "title": "Per-Product Stock Detail",
+    "byCategoryTitle": "Stock by Category",
+    "product": "Product",
+    "category": "Category",
+    "productCount": "Product Count",
+    "stockQty": "Stock Qty",
+    "stockValue": "Stock Value (Cost)",
+    "potentialSale": "Potential Sale",
+    "potentialProfit": "Potential Profit",
+    "soldInPeriod": "Sold in Period",
+    "status": "Status",
+    "statusOk": "OK"
   },
   "customers": {
     "topCustomers": "Top Customers by Purchases",
@@ -166,6 +228,7 @@
     "noDebtCustomers": "No customers with debt",
     "productPurchases": "Customer Product Purchase Details",
     "totalPieces": "pieces total",
+    "amountTotal": "Amount Total",
     "noProductData": "No customer product data found"
   },
   "customerSales": {
@@ -197,6 +260,7 @@
     "status": "Status",
     "depleted": "Depleted",
     "low": "Low",
+    "totalSold": "Sold in Period",
     "noLowStock": "No low stock products"
   },
   "expenses": {
@@ -236,6 +300,8 @@
     "future": "Normal",
     "futureLabel": "Normal",
     "customer": "Customer",
+    "contact": "Contact",
+    "amount": "Amount",
     "products": "Products",
     "saleDate": "Sale Date",
     "renewalDate": "Renewal Date",
