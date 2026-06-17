@@ -155,6 +155,38 @@
     "returnQuantity": "Adet",
     "returnTotal": "Tutar"
   },
+  "salesDetail": {
+    "title": "Ürün Bazında Satış & İade Detayı",
+    "product": "Ürün",
+    "soldQty": "Satılan Adet",
+    "soldRevenue": "Satış Tutarı",
+    "returnedQty": "İade Adet",
+    "returnedAmount": "İade Tutarı",
+    "netQty": "Net Adet",
+    "netRevenue": "Net Tutar",
+    "returnRate": "İade Oranı",
+    "totalSoldQty": "Toplam Satılan",
+    "totalSoldRevenue": "Toplam Satış",
+    "totalReturnedQty": "Toplam İade Adet",
+    "totalReturnedAmount": "Toplam İade Tutarı",
+    "monthlyTitle": "Aylık Satış Trendi",
+    "month": "Ay",
+    "saleCount": "Satış Adedi"
+  },
+  "stockDetail": {
+    "title": "Ürün Bazında Stok Detayı",
+    "byCategoryTitle": "Kategori Bazlı Stok",
+    "product": "Ürün",
+    "category": "Kategori",
+    "productCount": "Ürün Sayısı",
+    "stockQty": "Stok Miktarı",
+    "stockValue": "Stok Değeri (Maliyet)",
+    "potentialSale": "Potansiyel Satış",
+    "potentialProfit": "Potansiyel Kâr",
+    "soldInPeriod": "Dönemde Satılan",
+    "status": "Durum",
+    "statusOk": "Yeterli"
+  },
   "customers": {
     "topCustomers": "En Çok Alışveriş Yapan Müşteriler",
     "customer": "Müşteri",

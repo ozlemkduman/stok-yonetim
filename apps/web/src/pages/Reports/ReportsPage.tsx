@@ -3,7 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Button, Spinner } from '@stok/ui';
 import { useToast } from '../../context/ToastContext';
-import { reportsApi, TopProduct, TopCustomer, UpcomingPayment, OverduePayment, StockReportProduct, ExpenseByCategory, CustomerProductPurchase, CustomerSale, EmployeePerformanceReport, RenewalsReport, RenewalItem } from '../../api/reports.api';
+import { reportsApi, TopProduct, TopCustomer, UpcomingPayment, OverduePayment, StockReportProduct, ExpenseByCategory, CustomerProductPurchase, CustomerSale, EmployeePerformanceReport, RenewalsReport, RenewalItem, SalesReturnsDetailReport, StockDetailReport } from '../../api/reports.api';
 import { useAuth } from '../../hooks/useAuth';
 import { useTenant } from '../../context/TenantContext';
 import { formatCurrency, formatDate } from '../../utils/formatters';
@@ -138,6 +138,8 @@ export function ReportsPage() {
   const [purchasesSummary, setPurchasesSummary] = useState<any>(null);
   const [accountMovementsReport, setAccountMovementsReport] = useState<any>(null);
   const [accountFilterId, setAccountFilterId] = useState('');
+  const [salesReturnsDetail, setSalesReturnsDetail] = useState<SalesReturnsDetailReport | null>(null);
+  const [stockDetail, setStockDetail] = useState<StockDetailReport | null>(null);
 
   const fetchReports = useCallback(async () => {
     setLoading(true);
@@ -164,9 +166,11 @@ export function ReportsPage() {
         isAdvanced ? safe(reportsApi.getAging()) : Promise.resolve(null),
         isAdvanced ? safe(reportsApi.getProductProfitability(startDate, endDate)) : Promise.resolve(null),
       ]);
-      const [purSum, accMov] = await Promise.all([
+      const [purSum, accMov, srDetail, stkDetail] = await Promise.all([
         safe(reportsApi.getPurchasesSummary(startDate, endDate)),
         safe(reportsApi.getAccountMovements(startDate, endDate, accountFilterId || undefined)),
+        safe(reportsApi.getSalesReturnsDetail(startDate, endDate)),
+        safe(reportsApi.getStockDetail(startDate, endDate)),
       ]);
       if (sales) setSalesSummary(sales.data);
       if (profit) setProfitLoss(profit.data);
@@ -187,6 +191,8 @@ export function ReportsPage() {
       if (profit2) setProductProfitability(profit2.data);
       if (purSum) setPurchasesSummary(purSum.data);
       if (accMov) setAccountMovementsReport(accMov.data);
+      if (srDetail) setSalesReturnsDetail(srDetail.data);
+      if (stkDetail) setStockDetail(stkDetail.data);
     } catch (err) {
       showToast('error', t('reports:loadFailed'));
     }
@@ -801,6 +807,117 @@ export function ReportsPage() {
           )}
         </div>
       </div>
+
+      {/* Ürün Bazında Satış & İade Detayı */}
+      <div className={`${styles.reportCard} ${styles.fullWidthCard}`}>
+        <div className={styles.reportCardHeader}>
+          {icons.sales}
+          <h3 className={styles.reportCardTitle}>{t('reports:salesDetail.title')}</h3>
+        </div>
+        <div className={styles.reportCardBody}>
+          {salesReturnsDetail && salesReturnsDetail.products.length > 0 ? (
+            <>
+              <div className={styles.summaryGrid}>
+                <div className={styles.summaryCard}>
+                  <div className={styles.summaryValue}>{salesReturnsDetail.summary.sold_quantity}</div>
+                  <div className={styles.summaryLabel}>{t('reports:salesDetail.totalSoldQty')}</div>
+                </div>
+                <div className={styles.summaryCard}>
+                  <div className={`${styles.summaryValue} ${styles.success}`}>{formatCurrency(salesReturnsDetail.summary.sold_revenue)}</div>
+                  <div className={styles.summaryLabel}>{t('reports:salesDetail.totalSoldRevenue')}</div>
+                </div>
+                <div className={styles.summaryCard}>
+                  <div className={`${styles.summaryValue} ${styles.danger}`}>{salesReturnsDetail.summary.returned_quantity}</div>
+                  <div className={styles.summaryLabel}>{t('reports:salesDetail.totalReturnedQty')}</div>
+                </div>
+                <div className={styles.summaryCard}>
+                  <div className={`${styles.summaryValue} ${styles.danger}`}>{formatCurrency(salesReturnsDetail.summary.returned_amount)}</div>
+                  <div className={styles.summaryLabel}>{t('reports:salesDetail.totalReturnedAmount')}</div>
+                </div>
+                <div className={styles.summaryCard}>
+                  <div className={styles.summaryValue}>{formatCurrency(salesReturnsDetail.summary.net_revenue)}</div>
+                  <div className={styles.summaryLabel}>{t('reports:salesDetail.netRevenue')}</div>
+                </div>
+                <div className={styles.summaryCard}>
+                  <div className={styles.summaryValue}>%{salesReturnsDetail.summary.return_rate_percent}</div>
+                  <div className={styles.summaryLabel}>{t('reports:salesDetail.returnRate')}</div>
+                </div>
+              </div>
+              <div className={styles.tableWrap}>
+                <table className={styles.reportTable}>
+                  <thead>
+                    <tr>
+                      <th>{t('reports:salesDetail.product')}</th>
+                      <th className={styles.alignRight}>{t('reports:salesDetail.soldQty')}</th>
+                      <th className={styles.alignRight}>{t('reports:salesDetail.soldRevenue')}</th>
+                      <th className={styles.alignRight}>{t('reports:salesDetail.returnedQty')}</th>
+                      <th className={styles.alignRight}>{t('reports:salesDetail.returnedAmount')}</th>
+                      <th className={styles.alignRight}>{t('reports:salesDetail.netQty')}</th>
+                      <th className={styles.alignRight}>{t('reports:salesDetail.netRevenue')}</th>
+                      <th className={styles.alignRight}>{t('reports:salesDetail.returnRate')}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {salesReturnsDetail.products.map((p) => (
+                      <tr key={p.id}>
+                        <td>
+                          {p.name}
+                          {p.barcode && <span className={styles.barcode} style={{ display: 'block' }}>{p.barcode}</span>}
+                        </td>
+                        <td className={styles.alignRight}>{p.sold_quantity}</td>
+                        <td className={styles.alignRight}>{formatCurrency(p.sold_revenue)}</td>
+                        <td className={styles.alignRight}>{p.returned_quantity || '-'}</td>
+                        <td className={styles.alignRight}>{p.returned_amount ? formatCurrency(p.returned_amount) : '-'}</td>
+                        <td className={styles.alignRight}>{p.net_quantity}</td>
+                        <td className={styles.alignRight}><strong>{formatCurrency(p.net_revenue)}</strong></td>
+                        <td className={styles.alignRight}>{p.return_rate_percent ? `%${p.return_rate_percent}` : '-'}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </>
+          ) : (
+            <div className={styles.emptyState}>{t('reports:noData')}</div>
+          )}
+        </div>
+      </div>
+
+      {/* Aylık Satış Trendi */}
+      <div className={`${styles.reportCard} ${styles.fullWidthCard}`}>
+        <div className={styles.reportCardHeader}>
+          {icons.calendar}
+          <h3 className={styles.reportCardTitle}>{t('reports:salesDetail.monthlyTitle')}</h3>
+        </div>
+        <div className={styles.reportCardBody}>
+          {salesReturnsDetail && salesReturnsDetail.monthlyTrend.length > 0 ? (
+            <table className={styles.reportTable}>
+              <thead>
+                <tr>
+                  <th>{t('reports:salesDetail.month')}</th>
+                  <th className={styles.alignRight}>{t('reports:salesDetail.saleCount')}</th>
+                  <th className={styles.alignRight}>{t('reports:salesDetail.soldRevenue')}</th>
+                  <th className={styles.alignRight}>{t('reports:salesDetail.returnedAmount')}</th>
+                  <th className={styles.alignRight}>{t('reports:salesDetail.netRevenue')}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {salesReturnsDetail.monthlyTrend.map((m) => (
+                  <tr key={m.month}>
+                    <td>{m.month}</td>
+                    <td className={styles.alignRight}>{m.sale_count}</td>
+                    <td className={styles.alignRight}>{formatCurrency(m.sold_revenue)}</td>
+                    <td className={styles.alignRight}>{m.returned_amount ? formatCurrency(m.returned_amount) : '-'}</td>
+                    <td className={styles.alignRight}><strong>{formatCurrency(m.net_revenue)}</strong></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          ) : (
+            <div className={styles.emptyState}>{t('reports:noData')}</div>
+          )}
+        </div>
+      </div>
     </div>
   );
 
@@ -1211,6 +1328,89 @@ export function ReportsPage() {
             </table>
           ) : (
             <div className={styles.emptyState}>{t('reports:stock.noLowStock')}</div>
+          )}
+        </div>
+      </div>
+
+      {/* Kategori Bazlı Stok */}
+      <div className={`${styles.reportCard} ${styles.fullWidthCard}`}>
+        <div className={styles.reportCardHeader}>
+          {icons.product}
+          <h3 className={styles.reportCardTitle}>{t('reports:stockDetail.byCategoryTitle')}</h3>
+        </div>
+        <div className={styles.reportCardBody}>
+          {stockDetail && stockDetail.byCategory.length > 0 ? (
+            <table className={styles.reportTable}>
+              <thead>
+                <tr>
+                  <th>{t('reports:stockDetail.category')}</th>
+                  <th className={styles.alignRight}>{t('reports:stockDetail.productCount')}</th>
+                  <th className={styles.alignRight}>{t('reports:stockDetail.stockQty')}</th>
+                  <th className={styles.alignRight}>{t('reports:stockDetail.stockValue')}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {stockDetail.byCategory.map((c) => (
+                  <tr key={c.category}>
+                    <td>{c.category}</td>
+                    <td className={styles.alignRight}>{c.product_count}</td>
+                    <td className={styles.alignRight}>{c.stock_quantity}</td>
+                    <td className={styles.alignRight}><strong>{formatCurrency(c.stock_value)}</strong></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          ) : (
+            <div className={styles.emptyState}>{t('reports:noData')}</div>
+          )}
+        </div>
+      </div>
+
+      {/* Ürün Bazında Stok Detayı */}
+      <div className={`${styles.reportCard} ${styles.fullWidthCard}`}>
+        <div className={styles.reportCardHeader}>
+          {icons.product}
+          <h3 className={styles.reportCardTitle}>{t('reports:stockDetail.title')}</h3>
+        </div>
+        <div className={styles.reportCardBody}>
+          {stockDetail && stockDetail.products.length > 0 ? (
+            <div className={styles.tableWrap}>
+              <table className={styles.reportTable}>
+                <thead>
+                  <tr>
+                    <th>{t('reports:stockDetail.product')}</th>
+                    <th className={styles.alignRight}>{t('reports:stockDetail.stockQty')}</th>
+                    <th className={styles.alignRight}>{t('reports:stockDetail.soldInPeriod')}</th>
+                    <th className={styles.alignRight}>{t('reports:stockDetail.stockValue')}</th>
+                    <th className={styles.alignRight}>{t('reports:stockDetail.potentialSale')}</th>
+                    <th className={styles.alignRight}>{t('reports:stockDetail.potentialProfit')}</th>
+                    <th className={styles.alignRight}>{t('reports:stockDetail.status')}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {stockDetail.products.map((p) => (
+                    <tr key={p.id}>
+                      <td>
+                        {p.name}
+                        {p.barcode && <span className={styles.barcode} style={{ display: 'block' }}>{p.barcode}</span>}
+                      </td>
+                      <td className={styles.alignRight}>{p.stock_quantity} {p.unit || ''}</td>
+                      <td className={styles.alignRight}>{p.sold_quantity || '-'}</td>
+                      <td className={styles.alignRight}>{formatCurrency(p.stock_value)}</td>
+                      <td className={styles.alignRight}>{formatCurrency(p.potential_sale_value)}</td>
+                      <td className={styles.alignRight}>{formatCurrency(p.potential_profit)}</td>
+                      <td className={styles.alignRight}>
+                        <span className={`${styles.badge} ${p.status === 'out' ? styles.badgeDanger : p.status === 'low' ? styles.badgeWarning : styles.badgeSuccess}`}>
+                          {p.status === 'out' ? t('reports:stock.depleted') : p.status === 'low' ? t('reports:stock.low') : t('reports:stockDetail.statusOk')}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <div className={styles.emptyState}>{t('reports:noData')}</div>
           )}
         </div>
       </div>

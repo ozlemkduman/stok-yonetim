@@ -1088,4 +1088,199 @@ export class ReportsService {
       summary: { cashIn, cashOut, net: cashIn - cashOut, totalMovements: movements.length },
     };
   }
+
+  // Ürün bazında satış + iade detayı: her ürünün satılan/iade edilen miktar ve
+  // tutarı, net değerleri, iade oranı; ayrıca dönemin aylık satış/iade trendi.
+  async getSalesReturnsDetail(startDate: string, endDate: string, tenantId?: string | null) {
+    // Ürün bazında satış toplamları
+    let salesQuery = this.db.knex('sale_items')
+      .join('sales', 'sale_items.sale_id', 'sales.id')
+      .join('products', 'sale_items.product_id', 'products.id')
+      .where('sales.status', 'completed')
+      .whereBetween('sales.sale_date', [startDate, this.toEndOfDay(endDate)]);
+    if (tenantId) salesQuery = salesQuery.where('sales.tenant_id', tenantId);
+    const salesRaw = await salesQuery
+      .select('products.id', 'products.name', 'products.barcode', 'products.unit', 'products.category')
+      .sum('sale_items.quantity as sold_quantity')
+      .sum('sale_items.line_total as sold_revenue')
+      .groupBy('products.id', 'products.name', 'products.barcode', 'products.unit', 'products.category');
+
+    // Ürün bazında iade toplamları
+    let returnsQuery = this.db.knex('return_items')
+      .join('returns', 'return_items.return_id', 'returns.id')
+      .join('products', 'return_items.product_id', 'products.id')
+      .where('returns.status', 'completed')
+      .whereBetween('returns.return_date', [startDate, this.toEndOfDay(endDate)]);
+    if (tenantId) returnsQuery = returnsQuery.where('returns.tenant_id', tenantId);
+    const returnsRaw = await returnsQuery
+      .select('products.id', 'products.name', 'products.barcode', 'products.unit', 'products.category')
+      .sum('return_items.quantity as returned_quantity')
+      .sum('return_items.line_total as returned_amount')
+      .groupBy('products.id', 'products.name', 'products.barcode', 'products.unit', 'products.category');
+
+    // Ürün bazında birleştir (sadece iadesi olan ürünler de dahil)
+    const map = new Map<string, any>();
+    for (const r of salesRaw as any[]) {
+      map.set(r.id, {
+        id: r.id, name: r.name, barcode: r.barcode, unit: r.unit, category: r.category,
+        sold_quantity: parseFloat(r.sold_quantity || '0'),
+        sold_revenue: parseFloat(r.sold_revenue || '0'),
+        returned_quantity: 0, returned_amount: 0,
+      });
+    }
+    for (const r of returnsRaw as any[]) {
+      const existing = map.get(r.id);
+      if (existing) {
+        existing.returned_quantity = parseFloat(r.returned_quantity || '0');
+        existing.returned_amount = parseFloat(r.returned_amount || '0');
+      } else {
+        map.set(r.id, {
+          id: r.id, name: r.name, barcode: r.barcode, unit: r.unit, category: r.category,
+          sold_quantity: 0, sold_revenue: 0,
+          returned_quantity: parseFloat(r.returned_quantity || '0'),
+          returned_amount: parseFloat(r.returned_amount || '0'),
+        });
+      }
+    }
+
+    const products = Array.from(map.values())
+      .map((p) => ({
+        ...p,
+        net_quantity: Math.round((p.sold_quantity - p.returned_quantity) * 1000) / 1000,
+        net_revenue: Math.round((p.sold_revenue - p.returned_amount) * 100) / 100,
+        return_rate_percent: p.sold_quantity > 0
+          ? Math.round((p.returned_quantity / p.sold_quantity) * 10000) / 100
+          : 0,
+      }))
+      .sort((a, b) => b.net_revenue - a.net_revenue);
+
+    const acc = products.reduce(
+      (s, p) => {
+        s.sold_quantity += p.sold_quantity;
+        s.sold_revenue += p.sold_revenue;
+        s.returned_quantity += p.returned_quantity;
+        s.returned_amount += p.returned_amount;
+        return s;
+      },
+      { sold_quantity: 0, sold_revenue: 0, returned_quantity: 0, returned_amount: 0 },
+    );
+    const summary = {
+      sold_quantity: Math.round(acc.sold_quantity * 1000) / 1000,
+      sold_revenue: Math.round(acc.sold_revenue * 100) / 100,
+      returned_quantity: Math.round(acc.returned_quantity * 1000) / 1000,
+      returned_amount: Math.round(acc.returned_amount * 100) / 100,
+      net_revenue: Math.round((acc.sold_revenue - acc.returned_amount) * 100) / 100,
+      return_rate_percent: acc.sold_quantity > 0
+        ? Math.round((acc.returned_quantity / acc.sold_quantity) * 10000) / 100
+        : 0,
+      product_count: products.length,
+    };
+
+    // Aylık trend (satış ve iade ayrı sorgu, ay bazında birleştir)
+    const monthlySalesRaw = await this.tenantQuery('sales', tenantId)
+      .where('status', 'completed')
+      .whereBetween('sale_date', [startDate, this.toEndOfDay(endDate)])
+      .select(this.db.knex.raw("TO_CHAR(sale_date, 'YYYY-MM') as month"))
+      .count('id as sale_count')
+      .sum('grand_total as sold_revenue')
+      .groupBy(this.db.knex.raw("TO_CHAR(sale_date, 'YYYY-MM')"));
+    const monthlyReturnsRaw = await this.tenantQuery('returns', tenantId)
+      .where('status', 'completed')
+      .whereBetween('return_date', [startDate, this.toEndOfDay(endDate)])
+      .select(this.db.knex.raw("TO_CHAR(return_date, 'YYYY-MM') as month"))
+      .sum('total_amount as returned_amount')
+      .groupBy(this.db.knex.raw("TO_CHAR(return_date, 'YYYY-MM')"));
+
+    const monthMap = new Map<string, any>();
+    for (const r of monthlySalesRaw as any[]) {
+      monthMap.set(r.month, {
+        month: r.month,
+        sale_count: parseInt(r.sale_count || '0', 10),
+        sold_revenue: parseFloat(r.sold_revenue || '0'),
+        returned_amount: 0,
+      });
+    }
+    for (const r of monthlyReturnsRaw as any[]) {
+      const existing = monthMap.get(r.month);
+      if (existing) existing.returned_amount = parseFloat(r.returned_amount || '0');
+      else monthMap.set(r.month, { month: r.month, sale_count: 0, sold_revenue: 0, returned_amount: parseFloat(r.returned_amount || '0') });
+    }
+    const monthlyTrend = Array.from(monthMap.values())
+      .map((m) => ({ ...m, net_revenue: Math.round((m.sold_revenue - m.returned_amount) * 100) / 100 }))
+      .sort((a, b) => a.month.localeCompare(b.month));
+
+    return { products, summary, monthlyTrend };
+  }
+
+  // Detaylı stok raporu: tüm aktif ürünlerin stok miktarı/değeri, potansiyel
+  // satış değeri/kârı, seçili dönemde satılan miktarı ve durumu; kategori kırılımı.
+  async getStockDetail(startDate: string, endDate: string, tenantId?: string | null) {
+    const rawProducts = await this.tenantQuery('products', tenantId)
+      .where('is_active', true)
+      .select('id', 'name', 'barcode', 'category', 'unit', 'stock_quantity', 'min_stock_level', 'purchase_price', 'sale_price')
+      .orderBy('name', 'asc');
+
+    // Dönemde satılan miktar (ürün bazında)
+    let soldQuery = this.db.knex('sale_items')
+      .join('sales', 'sale_items.sale_id', 'sales.id')
+      .where('sales.status', 'completed')
+      .whereBetween('sales.sale_date', [startDate, this.toEndOfDay(endDate)]);
+    if (tenantId) soldQuery = soldQuery.where('sales.tenant_id', tenantId);
+    const soldRaw = await soldQuery
+      .select('sale_items.product_id')
+      .sum('sale_items.quantity as sold_quantity')
+      .groupBy('sale_items.product_id');
+    const soldMap = new Map<string, number>();
+    for (const r of soldRaw as any[]) soldMap.set(r.product_id, parseFloat(r.sold_quantity || '0'));
+
+    const products = rawProducts.map((p: any) => {
+      const stock_quantity = Number(p.stock_quantity) || 0;
+      const min_stock_level = Number(p.min_stock_level) || 0;
+      const purchase_price = Number(p.purchase_price) || 0;
+      const sale_price = Number(p.sale_price) || 0;
+      const stock_value = Math.round(stock_quantity * purchase_price * 100) / 100;
+      const potential_sale_value = Math.round(stock_quantity * sale_price * 100) / 100;
+      const status = stock_quantity <= 0 ? 'out' : (stock_quantity <= min_stock_level ? 'low' : 'ok');
+      return {
+        id: p.id, name: p.name, barcode: p.barcode, category: p.category, unit: p.unit,
+        stock_quantity, min_stock_level, purchase_price, sale_price,
+        stock_value, potential_sale_value,
+        potential_profit: Math.round((potential_sale_value - stock_value) * 100) / 100,
+        sold_quantity: soldMap.get(p.id) || 0,
+        status,
+      };
+    });
+
+    // Kategori kırılımı
+    const catMap = new Map<string, any>();
+    for (const p of products) {
+      const key = p.category || '—';
+      const c = catMap.get(key) || { category: key, product_count: 0, stock_quantity: 0, stock_value: 0 };
+      c.product_count += 1;
+      c.stock_quantity += p.stock_quantity;
+      c.stock_value += p.stock_value;
+      catMap.set(key, c);
+    }
+    const byCategory = Array.from(catMap.values())
+      .map((c) => ({
+        ...c,
+        stock_quantity: Math.round(c.stock_quantity * 1000) / 1000,
+        stock_value: Math.round(c.stock_value * 100) / 100,
+      }))
+      .sort((a, b) => b.stock_value - a.stock_value);
+
+    const totalStockValue = Math.round(products.reduce((s, p) => s + p.stock_value, 0) * 100) / 100;
+    const totalSaleValue = Math.round(products.reduce((s, p) => s + p.potential_sale_value, 0) * 100) / 100;
+    const summary = {
+      totalProducts: products.length,
+      totalStockValue,
+      totalSaleValue,
+      potentialProfit: Math.round((totalSaleValue - totalStockValue) * 100) / 100,
+      lowStockCount: products.filter((p) => p.status === 'low').length,
+      outOfStockCount: products.filter((p) => p.status === 'out').length,
+      totalSoldQuantity: Math.round(products.reduce((s, p) => s + p.sold_quantity, 0) * 1000) / 1000,
+    };
+
+    return { products, summary, byCategory };
+  }
 }

@@ -75,6 +75,26 @@ export class ReportsController {
     return { success: true, data };
   }
 
+  @Get('sales-returns-detail')
+  async getSalesReturnsDetail(@Query('startDate') startDate: string, @Query('endDate') endDate: string, @Req() req: any) {
+    const today = new Date();
+    const effectiveEnd = endDate || today.toISOString().split('T')[0];
+    const start30 = new Date(today.getTime() - 30 * 86400000);
+    const effectiveStart = startDate || start30.toISOString().split('T')[0];
+    const data = await this.reportsService.getSalesReturnsDetail(effectiveStart, effectiveEnd, resolveTenantId(req));
+    return { success: true, data };
+  }
+
+  @Get('stock-detail')
+  async getStockDetail(@Query('startDate') startDate: string, @Query('endDate') endDate: string, @Req() req: any) {
+    const today = new Date();
+    const effectiveEnd = endDate || today.toISOString().split('T')[0];
+    const start30 = new Date(today.getTime() - 30 * 86400000);
+    const effectiveStart = startDate || start30.toISOString().split('T')[0];
+    const data = await this.reportsService.getStockDetail(effectiveStart, effectiveEnd, resolveTenantId(req));
+    return { success: true, data };
+  }
+
   @Get('customer-sales')
   async getCustomerSales(@Query('startDate') startDate: string, @Query('endDate') endDate: string, @Req() req: any) {
     const data = await this.reportsService.getCustomerSales(startDate, endDate, resolveTenantId(req));

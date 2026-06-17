@@ -155,6 +155,38 @@
     "returnQuantity": "Qty",
     "returnTotal": "Amount"
   },
+  "salesDetail": {
+    "title": "Per-Product Sales & Returns Detail",
+    "product": "Product",
+    "soldQty": "Sold Qty",
+    "soldRevenue": "Sales Amount",
+    "returnedQty": "Returned Qty",
+    "returnedAmount": "Returned Amount",
+    "netQty": "Net Qty",
+    "netRevenue": "Net Amount",
+    "returnRate": "Return Rate",
+    "totalSoldQty": "Total Sold",
+    "totalSoldRevenue": "Total Sales",
+    "totalReturnedQty": "Total Returned Qty",
+    "totalReturnedAmount": "Total Returned Amount",
+    "monthlyTitle": "Monthly Sales Trend",
+    "month": "Month",
+    "saleCount": "Sale Count"
+  },
+  "stockDetail": {
+    "title": "Per-Product Stock Detail",
+    "byCategoryTitle": "Stock by Category",
+    "product": "Product",
+    "category": "Category",
+    "productCount": "Product Count",
+    "stockQty": "Stock Qty",
+    "stockValue": "Stock Value (Cost)",
+    "potentialSale": "Potential Sale",
+    "potentialProfit": "Potential Profit",
+    "soldInPeriod": "Sold in Period",
+    "status": "Status",
+    "statusOk": "OK"
+  },
   "customers": {
     "topCustomers": "Top Customers by Purchases",
     "customer": "Customer",

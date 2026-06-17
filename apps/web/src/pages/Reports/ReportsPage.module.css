@@ -459,3 +459,8 @@
   0% { box-shadow: 0 0 0 4px var(--color-warning, #f59e0b); }
   100% { box-shadow: 0 0 0 0 transparent; }
 }
+
+.barcode {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
