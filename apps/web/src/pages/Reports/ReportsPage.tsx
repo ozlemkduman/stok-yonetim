@@ -82,6 +82,23 @@ type TabType = 'genel' | 'satis' | 'alis' | 'musteri' | 'musteriSatis' | 'stok' 
 const VALID_TABS: TabType[] = ['genel', 'gunSonu', 'satis', 'alis', 'karlilik', 'musteri', 'musteriSatis', 'yaslandirma', 'stok', 'gider', 'kasa', 'personel', 'yenileme'];
 const ADVANCED_TABS: TabType[] = ['musteriSatis', 'gider', 'personel', 'yenileme', 'yaslandirma', 'karlilik'];
 
+const PERIOD_PRESETS = ['buAy', '1ay', '3ay', '6ay', '1yil'] as const;
+type PeriodPreset = (typeof PERIOD_PRESETS)[number] | 'ozel';
+
+// Hazır periyot seçimleri için [başlangıç, bitiş] tarih aralığı (YYYY-MM-DD) hesaplar.
+function computePresetRange(key: (typeof PERIOD_PRESETS)[number]): [string, string] {
+  const start = new Date();
+  const end = new Date();
+  switch (key) {
+    case 'buAy': start.setDate(1); break;
+    case '1ay': start.setMonth(start.getMonth() - 1); break;
+    case '3ay': start.setMonth(start.getMonth() - 3); break;
+    case '6ay': start.setMonth(start.getMonth() - 6); break;
+    case '1yil': start.setFullYear(start.getFullYear() - 1); break;
+  }
+  return [start.toISOString().split('T')[0], end.toISOString().split('T')[0]];
+}
+
 export function ReportsPage() {
   const { t } = useTranslation(['reports', 'common']);
   const navigate = useNavigate();
@@ -110,6 +127,15 @@ export function ReportsPage() {
     return d.toISOString().split('T')[0];
   });
   const [endDate, setEndDate] = useState(() => new Date().toISOString().split('T')[0]);
+  // Varsayılan aralık "son 1 ay" olduğundan başlangıç preset'i '1ay'.
+  const [activePreset, setActivePreset] = useState<PeriodPreset>('1ay');
+  const applyPreset = (key: (typeof PERIOD_PRESETS)[number]) => {
+    const [s, e] = computePresetRange(key);
+    setStartDate(s);
+    setEndDate(e);
+    setActivePreset(key);
+    // startDate/endDate değişince fetchReports (useCallback) otomatik yeniden çalışır.
+  };
   const [loading, setLoading] = useState(false);
 
   // Data states
@@ -1880,19 +1906,36 @@ export function ReportsPage() {
             {t('reports:title')}
           </h1>
           <p className={styles.subtitle}>{t('reports:subtitle')}</p>
+          <div className={styles.periodBadge}>
+            {icons.calendar}
+            <span className={styles.periodPreset}>{t(`reports:periods.${activePreset}`)}</span>
+            <span className={styles.periodRange}>{formatDate(startDate)} – {formatDate(endDate)}</span>
+          </div>
         </div>
         <div className={styles.filters}>
+          <div className={styles.presets}>
+            {PERIOD_PRESETS.map((key) => (
+              <button
+                key={key}
+                type="button"
+                className={`${styles.presetBtn} ${activePreset === key ? styles.presetBtnActive : ''}`}
+                onClick={() => applyPreset(key)}
+              >
+                {t(`reports:periods.${key}`)}
+              </button>
+            ))}
+          </div>
           <input
             type="date"
             className={styles.dateInput}
             value={startDate}
-            onChange={(e) => setStartDate(e.target.value)}
+            onChange={(e) => { setStartDate(e.target.value); setActivePreset('ozel'); }}
           />
           <input
             type="date"
             className={styles.dateInput}
             value={endDate}
-            onChange={(e) => setEndDate(e.target.value)}
+            onChange={(e) => { setEndDate(e.target.value); setActivePreset('ozel'); }}
           />
           <Button onClick={fetchReports}>{t('reports:filter')}</Button>
         </div>

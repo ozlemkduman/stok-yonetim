@@ -40,10 +40,46 @@
   margin: 0;
 }
 
+.periodBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-top: var(--space-1);
+  padding: var(--space-1) var(--space-3);
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  width: fit-content;
+}
+.periodBadge svg { width: 14px; height: 14px; color: var(--color-primary); }
+.periodPreset { font-weight: var(--font-weight-bold); color: var(--color-text-primary); }
+
 .filters {
   display: flex;
   align-items: center;
   gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.presets { display: flex; gap: var(--space-1); flex-wrap: wrap; }
+.presetBtn {
+  height: 40px;
+  padding: 0 var(--space-3);
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+.presetBtn:hover { border-color: var(--color-primary); color: var(--color-text-primary); }
+.presetBtnActive {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: #fff;
 }
 
 .dateInput {

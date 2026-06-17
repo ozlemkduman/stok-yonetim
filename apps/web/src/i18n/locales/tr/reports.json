@@ -4,6 +4,14 @@
   "filter": "Filtrele",
   "loadFailed": "Rapor yüklenemedi",
   "noData": "Veri bulunamadı",
+  "periods": {
+    "buAy": "Bu Ay",
+    "1ay": "Son 1 Ay",
+    "3ay": "Son 3 Ay",
+    "6ay": "Son 6 Ay",
+    "1yil": "Son 1 Yıl",
+    "ozel": "Özel Aralık"
+  },
   "tabs": {
     "general": "Genel Özet",
     "endOfDay": "Gün Sonu",

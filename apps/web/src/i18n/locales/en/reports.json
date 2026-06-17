@@ -4,6 +4,14 @@
   "filter": "Filter",
   "loadFailed": "Failed to load report",
   "noData": "No data found",
+  "periods": {
+    "buAy": "This Month",
+    "1ay": "Last 1 Month",
+    "3ay": "Last 3 Months",
+    "6ay": "Last 6 Months",
+    "1yil": "Last 1 Year",
+    "ozel": "Custom Range"
+  },
   "tabs": {
     "general": "Overview",
     "endOfDay": "End of Day",
