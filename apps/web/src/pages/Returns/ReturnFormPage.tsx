@@ -5,9 +5,10 @@ import { Button, Card, Input, Select } from '@stok/ui';
 import { returnsApi, CreateReturnData } from '../../api/returns.api';
 import { Sale, salesApi } from '../../api/sales.api';
 import { Customer, customersApi } from '../../api/customers.api';
-import { Product, productsApi } from '../../api/products.api';
+import { Product, productsApi, CreateProductData } from '../../api/products.api';
 import { Warehouse, warehousesApi } from '../../api/warehouses.api';
 import { InlineEntityForm, InlineWarehouseForm, SelectWithAdd } from '../../components/inline';
+import { ProductFormModal } from '../Products/ProductFormModal';
 import { useToast } from '../../context/ToastContext';
 import { formatCurrency } from '../../utils/formatters';
 import styles from './ReturnFormPage.module.css';
@@ -42,6 +43,7 @@ export function ReturnFormPage() {
   const [customerId, setCustomerId] = useState<string>('');
   const [showCustomerModal, setShowCustomerModal] = useState(false);
   const [showWarehouseModal, setShowWarehouseModal] = useState(false);
+  const [productModalRowIdx, setProductModalRowIdx] = useState<number | null>(null);
   const [warehouseId, setWarehouseId] = useState<string>('');
   const [reason, setReason] = useState<string>('');
   const [notes, setNotes] = useState('');
@@ -170,6 +172,31 @@ export function ReturnFormPage() {
 
     newItems[index] = item;
     setItems(newItems);
+  };
+
+  // İade formundan ayrılmadan yeni ürün oluştur; "+" hangi satırdan açıldıysa
+  // oluşan ürünü o kaleme (satış fiyatı/KDV dahil) yaz.
+  const handleCreateProduct = async (data: CreateProductData) => {
+    const res = await productsApi.create(data);
+    const p = res.data;
+    setProducts(prev => [p, ...prev]);
+    const rowIdx = productModalRowIdx;
+    if (rowIdx !== null) {
+      setItems(prev => {
+        if (!prev[rowIdx]) return prev;
+        const next = [...prev];
+        const item = { ...next[rowIdx] };
+        item.product_id = p.id;
+        item.product_name = p.name;
+        item.unit_price = Number(p.sale_price) || 0;
+        item.vat_rate = p.vat_rate;
+        const subtotal = item.quantity * item.unit_price;
+        item.vat_amount = subtotal * ((item.vat_rate || 0) / 100);
+        item.line_total = subtotal + item.vat_amount;
+        next[rowIdx] = item;
+        return next;
+      });
+    }
   };
 
   const calculateTotals = () => {
@@ -352,13 +379,15 @@ export function ReturnFormPage() {
                         {saleId ? (
                           <span>{item.product_name}</span>
                         ) : (
-                          <Select
+                          <SelectWithAdd
                             value={item.product_id}
                             onChange={(e) => updateItem(index, 'product_id', e.target.value)}
                             options={[
                               { value: '', label: t('returns:form.selectProduct') },
                               ...products.map(p => ({ value: p.id, label: p.name })),
                             ]}
+                            onAdd={() => setProductModalRowIdx(index)}
+                            addTitle={t('returns:form.addProduct')}
                           />
                         )}
                       </td>
@@ -431,6 +460,13 @@ export function ReturnFormPage() {
           </Button>
         </div>
       </form>
+
+      <ProductFormModal
+        isOpen={productModalRowIdx !== null}
+        onClose={() => setProductModalRowIdx(null)}
+        onSubmit={handleCreateProduct}
+        product={null}
+      />
     </div>
   );
 }

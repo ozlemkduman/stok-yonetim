@@ -44,6 +44,7 @@
     "emptyItemsManual": "No products added yet. Click \"Add Product\" or select a sale.",
     "product": "Product",
     "selectProduct": "Select Product",
+    "addProduct": "Add new product",
     "quantity": "Quantity",
     "unitPrice": "Unit Price",
     "vat": "VAT",
