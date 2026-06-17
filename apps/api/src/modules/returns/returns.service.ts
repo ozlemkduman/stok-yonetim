@@ -123,6 +123,7 @@ export class ReturnsService {
         return_number: returnNumber,
         sale_id: dto.sale_id || null,
         customer_id: dto.customer_id || null,
+        warehouse_id: dto.warehouse_id || null,
         return_date: new Date(),
         total_amount: grandTotal,
         vat_total: vatTotal,
@@ -131,15 +132,16 @@ export class ReturnsService {
         created_by: userId || null,
       }, returnItems, trx);
 
-      // Stok: warehouse_stocks güncelle + audit kaydı
+      // Stok: warehouse_stocks güncelle + audit kaydı (seçili depoya iade; yoksa default)
       for (const item of dto.items) {
-        await updateWarehouseStock(trx, { productId: item.product_id, delta: Number(item.quantity) });
+        await updateWarehouseStock(trx, { productId: item.product_id, delta: Number(item.quantity), warehouseId: dto.warehouse_id || null });
         await writeStockMovement(trx, {
           productId: item.product_id,
           movementType: 'return',
           quantity: item.quantity,
           referenceType: 'return',
           referenceId: ret.id,
+          warehouseId: dto.warehouse_id || null,
           notes: `İade: ${returnNumber}`,
         });
       }
