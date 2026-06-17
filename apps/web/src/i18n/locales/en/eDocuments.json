@@ -1,0 +1,56 @@
+{
+  "title": "e-Documents",
+  "subtitle": "e-Invoice / e-Archive documents (GİB simulation)",
+  "summary": {
+    "total": "Total Documents",
+    "draft": "Draft",
+    "pending": "Pending",
+    "approved": "Approved"
+  },
+  "filters": {
+    "allTypes": "All Types",
+    "allStatuses": "All Statuses"
+  },
+  "columns": {
+    "documentNumber": "Document No",
+    "type": "Type",
+    "customer": "Customer",
+    "issueDate": "Date",
+    "total": "Amount",
+    "status": "Status",
+    "actions": "Actions"
+  },
+  "types": {
+    "e_fatura": "e-Invoice",
+    "e_arsiv": "e-Archive",
+    "e_ihracat": "e-Export",
+    "e_irsaliye": "e-Waybill",
+    "e_smm": "e-SMM"
+  },
+  "statuses": {
+    "draft": "Draft",
+    "pending": "Pending",
+    "sent": "Sent",
+    "approved": "Approved",
+    "rejected": "Rejected",
+    "cancelled": "Cancelled"
+  },
+  "actions": {
+    "send": "Send",
+    "checkStatus": "Check Status",
+    "cancel": "Cancel",
+    "createInvoice": "Create e-Invoice"
+  },
+  "confirm": {
+    "cancel": "Are you sure you want to cancel this document?"
+  },
+  "toast": {
+    "loadError": "Failed to load e-documents",
+    "sendSuccess": "Document sent to GİB",
+    "statusSuccess": "Status updated",
+    "cancelSuccess": "Document cancelled",
+    "createSuccess": "e-Invoice created",
+    "actionError": "Operation failed"
+  },
+  "empty": "No e-documents found"
+}

@@ -1,0 +1,56 @@
+{
+  "title": "e-Belgeler",
+  "subtitle": "e-Fatura / e-Arşiv belgeleri (GİB simülasyonu)",
+  "summary": {
+    "total": "Toplam Belge",
+    "draft": "Taslak",
+    "pending": "Beklemede",
+    "approved": "Onaylandı"
+  },
+  "filters": {
+    "allTypes": "Tüm Tipler",
+    "allStatuses": "Tüm Durumlar"
+  },
+  "columns": {
+    "documentNumber": "Belge No",
+    "type": "Tip",
+    "customer": "Müşteri",
+    "issueDate": "Tarih",
+    "total": "Tutar",
+    "status": "Durum",
+    "actions": "İşlemler"
+  },
+  "types": {
+    "e_fatura": "e-Fatura",
+    "e_arsiv": "e-Arşiv",
+    "e_ihracat": "e-İhracat",
+    "e_irsaliye": "e-İrsaliye",
+    "e_smm": "e-SMM"
+  },
+  "statuses": {
+    "draft": "Taslak",
+    "pending": "Beklemede",
+    "sent": "Gönderildi",
+    "approved": "Onaylandı",
+    "rejected": "Reddedildi",
+    "cancelled": "İptal"
+  },
+  "actions": {
+    "send": "Gönder",
+    "checkStatus": "Durum Sorgula",
+    "cancel": "İptal Et",
+    "createInvoice": "E-Fatura Oluştur"
+  },
+  "confirm": {
+    "cancel": "Bu belgeyi iptal etmek istediğinize emin misiniz?"
+  },
+  "toast": {
+    "loadError": "e-Belgeler yüklenemedi",
+    "sendSuccess": "Belge GİB'e gönderildi",
+    "statusSuccess": "Durum güncellendi",
+    "cancelSuccess": "Belge iptal edildi",
+    "createSuccess": "e-Fatura oluşturuldu",
+    "actionError": "İşlem başarısız"
+  },
+  "empty": "e-Belge bulunamadı"
+}

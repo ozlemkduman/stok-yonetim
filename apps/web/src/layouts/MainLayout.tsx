@@ -40,6 +40,7 @@ const menuGroups: MenuGroup[] = [
       { path: '/quotes', labelKey: 'items.quotes', feature: 'quotes' },
       { path: '/sales', labelKey: 'items.sales' },
       { path: '/returns', labelKey: 'items.returns' },
+      { path: '/e-documents', labelKey: 'items.eDocuments', feature: 'eDocuments' },
     ],
   },
   {
