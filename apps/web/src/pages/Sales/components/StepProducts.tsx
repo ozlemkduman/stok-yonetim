@@ -3,6 +3,7 @@ import { Button, Input, Select } from '@stok/ui';
 import { Product } from '../../../api/products.api';
 import { SaleFormItem } from '../wizard.types';
 import { formatCurrency } from '../../../utils/formatters';
+import { SelectWithAdd } from '../../../components/inline';
 import styles from '../SaleFormPage.module.css';
 
 interface StepProductsProps {
@@ -12,6 +13,7 @@ interface StepProductsProps {
   onSaleTypeChange: (type: 'retail' | 'wholesale') => void;
   onItemsChange: (items: SaleFormItem[]) => void;
   onOpenProductModal: () => void;
+  onAddProductForRow: (index: number) => void;
 }
 
 export function StepProducts({
@@ -21,6 +23,7 @@ export function StepProducts({
   onSaleTypeChange,
   onItemsChange,
   onOpenProductModal,
+  onAddProductForRow,
 }: StepProductsProps) {
   const { t } = useTranslation(['sales', 'common']);
 
@@ -140,7 +143,7 @@ export function StepProducts({
               {items.map((item, index) => (
                 <tr key={index}>
                   <td>
-                    <Select
+                    <SelectWithAdd
                       value={item.product_id}
                       onChange={(e) => updateItem(index, 'product_id', e.target.value)}
                       options={[
@@ -150,6 +153,8 @@ export function StepProducts({
                           label: `${p.name} (${formatCurrency(saleType === 'wholesale' ? (p.wholesale_price || p.sale_price) : p.sale_price)})`,
                         })),
                       ]}
+                      onAdd={() => onAddProductForRow(index)}
+                      addTitle={t('sales:stepProducts.newProduct')}
                     />
                   </td>
                   <td className={styles.alignRight}>

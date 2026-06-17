@@ -54,6 +54,8 @@ export function SaleFormPage() {
 
   // Modal states
   const [showProductModal, setShowProductModal] = useState(false);
+  // "+" hangi kalem satırından açıldı? null ise yeni kalem olarak eklenir (üstteki "Yeni Ürün" butonu).
+  const [productModalRowIndex, setProductModalRowIndex] = useState<number | null>(null);
   const [showCustomerModal, setShowCustomerModal] = useState(false);
   const [showWarehouseModal, setShowWarehouseModal] = useState(false);
 
@@ -217,25 +219,31 @@ export function SaleFormPage() {
   // Inline form handlers
   const handleProductCreated = (product: Product) => {
     setProducts(prev => [...prev, product]);
-    // Auto-add to items
     const price = wizardData.saleType === 'wholesale' ? (product.wholesale_price || product.sale_price) : product.sale_price;
-    const subtotal = price;
-    const vatAmount = subtotal * ((product.vat_rate || 0) / 100);
-    setWizardData(prev => ({
-      ...prev,
-      items: [...prev.items, {
+    const vatAmount = price * ((product.vat_rate || 0) / 100);
+    const rowIndex = productModalRowIndex;
+    setProductModalRowIndex(null);
+    setWizardData(prev => {
+      const newItem = {
         product_id: product.id,
         product_name: product.name,
         quantity: 1,
         unit_price: price,
         discount_rate: 0,
         vat_rate: product.vat_rate,
-        line_total: subtotal + vatAmount,
+        line_total: price + vatAmount,
         vat_amount: vatAmount,
         stock_quantity: product.stock_quantity,
         unit: product.unit,
-      }],
-    }));
+      };
+      // Bir satırın "+" butonundan açıldıysa o satırı doldur; yoksa yeni kalem ekle.
+      if (rowIndex !== null && prev.items[rowIndex]) {
+        const items = [...prev.items];
+        items[rowIndex] = { ...items[rowIndex], ...newItem };
+        return { ...prev, items };
+      }
+      return { ...prev, items: [...prev.items, newItem] };
+    });
   };
 
   const handleCustomerCreated = (customer: Customer) => {
@@ -285,7 +293,8 @@ export function SaleFormPage() {
             products={products}
             onSaleTypeChange={(saleType) => updateWizardData({ saleType })}
             onItemsChange={(items) => updateWizardData({ items })}
-            onOpenProductModal={() => setShowProductModal(true)}
+            onOpenProductModal={() => { setProductModalRowIndex(null); setShowProductModal(true); }}
+            onAddProductForRow={(index) => { setProductModalRowIndex(index); setShowProductModal(true); }}
           />
         )}
 
@@ -346,7 +355,7 @@ export function SaleFormPage() {
       {/* Inline modals */}
       <InlineProductForm
         isOpen={showProductModal}
-        onClose={() => setShowProductModal(false)}
+        onClose={() => { setShowProductModal(false); setProductModalRowIndex(null); }}
         onCreated={handleProductCreated}
       />
       <InlineCustomerForm
