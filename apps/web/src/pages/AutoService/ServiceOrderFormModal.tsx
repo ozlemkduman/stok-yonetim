@@ -3,11 +3,16 @@ import { useTranslation } from 'react-i18next';
 import { Modal, Input, Button, Select, type SelectOption } from '@stok/ui';
 import {
   ServiceOrder, CreateServiceOrderData, ServiceOrderStatus, ServiceOrderItemInput, autoServiceApi,
+  CreateVehicleData,
 } from '../../api/autoService.api';
-import { employeesApi } from '../../api/employees.api';
-import { productsApi, Product } from '../../api/products.api';
+import { employeesApi, CreateEmployeeData } from '../../api/employees.api';
+import { productsApi, Product, CreateProductData } from '../../api/products.api';
 import { useToast } from '../../context/ToastContext';
 import { formatCurrency } from '../../utils/formatters';
+import { SelectWithAdd } from '../../components/inline';
+import { VehicleFormModal } from './VehicleFormModal';
+import { EmployeeFormModal } from '../Employees/EmployeeFormModal';
+import { ProductFormModal } from '../Products/ProductFormModal';
 import styles from './AutoService.module.css';
 
 interface ServiceOrderFormModalProps {
@@ -50,6 +55,9 @@ export function ServiceOrderFormModal({ isOpen, onClose, onSubmit, order, preset
   const [vehicles, setVehicles] = useState<SelectOption[]>([]);
   const [employees, setEmployees] = useState<SelectOption[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
+  const [vehicleModalOpen, setVehicleModalOpen] = useState(false);
+  const [employeeModalOpen, setEmployeeModalOpen] = useState(false);
+  const [productRowIdx, setProductRowIdx] = useState<number | null>(null);
 
   const isEdit = !!order;
   const vehicleLocked = isEdit || !!presetVehicleId;
@@ -117,6 +125,34 @@ export function ServiceOrderFormModal({ isOpen, onClose, onSubmit, order, preset
     });
   };
 
+  const handleCreateVehicle = async (data: CreateVehicleData) => {
+    const res = await autoServiceApi.vehicles.create(data);
+    const v = res.data;
+    const label = `${v.plate}${v.brand ? ` — ${v.brand} ${v.model || ''}`.trimEnd() : ''}`;
+    setVehicles((prev) => [{ value: v.id, label }, ...prev]);
+    setFormData((prev) => ({ ...prev, vehicle_id: v.id }));
+  };
+
+  const handleCreateEmployee = async (data: CreateEmployeeData) => {
+    const res = await employeesApi.create(data);
+    const e = res.data;
+    setEmployees((prev) => [{ value: e.id, label: e.name }, ...prev]);
+    setFormData((prev) => ({ ...prev, assigned_employee_id: e.id }));
+  };
+
+  const handleCreateProduct = async (data: CreateProductData) => {
+    const res = await productsApi.create(data);
+    const p = res.data;
+    setProducts((prev) => [p, ...prev]);
+    if (productRowIdx !== null) {
+      updatePart(productRowIdx, {
+        product_id: p.id,
+        unit_price: Number(p.sale_price) || 0,
+        vat_rate: Number(p.vat_rate) || 0,
+      });
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.vehicle_id) return;
@@ -150,6 +186,7 @@ export function ServiceOrderFormModal({ isOpen, onClose, onSubmit, order, preset
   };
 
   return (
+    <>
     <Modal
       isOpen={isOpen}
       onClose={onClose}
@@ -159,15 +196,18 @@ export function ServiceOrderFormModal({ isOpen, onClose, onSubmit, order, preset
       <form onSubmit={handleSubmit}>
         <div className={styles.formGrid}>
           <div className={styles.formRow}>
-            <Select
-              label={t('orders.form.vehicle')}
-              options={vehicleOptions}
-              value={formData.vehicle_id}
-              onChange={(e) => setFormData({ ...formData, vehicle_id: e.target.value })}
-              disabled={vehicleLocked}
-              required
-              fullWidth
-            />
+            <div style={{ width: '100%', minWidth: 0 }}>
+              <SelectWithAdd
+                label={t('orders.form.vehicle')}
+                options={vehicleOptions}
+                value={formData.vehicle_id}
+                onChange={(e) => setFormData({ ...formData, vehicle_id: e.target.value })}
+                disabled={vehicleLocked}
+                required
+                onAdd={() => setVehicleModalOpen(true)}
+                addTitle={t('orders.form.addVehicle')}
+              />
+            </div>
             <Select
               label={t('orders.form.status')}
               options={statusOptions}
@@ -178,13 +218,16 @@ export function ServiceOrderFormModal({ isOpen, onClose, onSubmit, order, preset
           </div>
 
           <div className={styles.formRow}>
-            <Select
-              label={t('orders.form.employee')}
-              options={employeeOptions}
-              value={formData.assigned_employee_id}
-              onChange={(e) => setFormData({ ...formData, assigned_employee_id: e.target.value })}
-              fullWidth
-            />
+            <div style={{ width: '100%', minWidth: 0 }}>
+              <SelectWithAdd
+                label={t('orders.form.employee')}
+                options={employeeOptions}
+                value={formData.assigned_employee_id}
+                onChange={(e) => setFormData({ ...formData, assigned_employee_id: e.target.value })}
+                onAdd={() => setEmployeeModalOpen(true)}
+                addTitle={t('orders.form.addEmployee')}
+              />
+            </div>
             <Input
               label={t('orders.form.mileageIn')}
               type="number" min="0"
@@ -219,12 +262,13 @@ export function ServiceOrderFormModal({ isOpen, onClose, onSubmit, order, preset
             {parts.length === 0 && !partsLocked && <p className={styles.muted}>{t('orders.parts.empty')}</p>}
             {parts.map((row, idx) => (
               <div key={idx} className={styles.partRow}>
-                <Select
+                <SelectWithAdd
                   options={productOptions}
                   value={row.product_id}
                   onChange={(e) => onProductPick(idx, e.target.value)}
                   disabled={partsLocked}
-                  fullWidth
+                  onAdd={() => setProductRowIdx(idx)}
+                  addTitle={t('orders.parts.addProduct')}
                 />
                 <Input
                   type="number" step="0.001" min="0"
@@ -290,5 +334,25 @@ export function ServiceOrderFormModal({ isOpen, onClose, onSubmit, order, preset
         </div>
       </form>
     </Modal>
+
+    <VehicleFormModal
+      isOpen={vehicleModalOpen}
+      onClose={() => setVehicleModalOpen(false)}
+      onSubmit={handleCreateVehicle}
+      vehicle={null}
+    />
+    <EmployeeFormModal
+      isOpen={employeeModalOpen}
+      onClose={() => setEmployeeModalOpen(false)}
+      onSubmit={handleCreateEmployee}
+      employee={null}
+    />
+    <ProductFormModal
+      isOpen={productRowIdx !== null}
+      onClose={() => setProductRowIdx(null)}
+      onSubmit={handleCreateProduct}
+      product={null}
+    />
+    </>
   );
 }
