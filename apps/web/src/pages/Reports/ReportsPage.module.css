@@ -250,6 +250,26 @@
   margin-top: var(--space-1);
 }
 
+/* Etiket/değer çiftli özet kutusu (gunSonu, karlilik, yaslandirma, kasa) */
+.summaryItem {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-3);
+  background: var(--color-bg);
+  border-radius: var(--radius-md);
+  text-align: center;
+}
+.summaryItem span {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+.summaryItem strong {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+}
+
 /* Badge */
 .badge {
   display: inline-block;

@@ -448,6 +448,8 @@ export class ReportsService {
 
   async getEmployeePerformance(startDate: string, endDate: string, tenantId?: string | null, userId?: string, userRole?: string) {
     const isAdmin = userRole === 'super_admin' || userRole === 'tenant_admin';
+    // endDate'in tüm gününü dahil et (diğer raporlarla tutarlı olsun).
+    const endTs = this.toEndOfDay(endDate);
 
     let usersQuery = this.db.knex('users')
       .leftJoin('sales', 'users.id', 'sales.created_by')
@@ -468,12 +470,12 @@ export class ReportsService {
         'users.email',
         'users.role',
       )
-      .count({ sale_count: this.db.knex.raw("CASE WHEN sales.status = 'completed' AND sales.sale_date BETWEEN ? AND ? THEN 1 END", [startDate, endDate]) })
-      .sum({ total_revenue: this.db.knex.raw("CASE WHEN sales.status = 'completed' AND sales.sale_date BETWEEN ? AND ? THEN sales.grand_total ELSE 0 END", [startDate, endDate]) })
-      .count({ invoice_count: this.db.knex.raw("CASE WHEN sales.invoice_issued = true AND sales.sale_date BETWEEN ? AND ? THEN 1 END", [startDate, endDate]) })
-      .count({ cancelled_count: this.db.knex.raw("CASE WHEN sales.status = 'cancelled' AND sales.sale_date BETWEEN ? AND ? THEN 1 END", [startDate, endDate]) })
+      .count({ sale_count: this.db.knex.raw("CASE WHEN sales.status = 'completed' AND sales.sale_date BETWEEN ? AND ? THEN 1 END", [startDate, endTs]) })
+      .sum({ total_revenue: this.db.knex.raw("CASE WHEN sales.status = 'completed' AND sales.sale_date BETWEEN ? AND ? THEN sales.grand_total ELSE 0 END", [startDate, endTs]) })
+      .count({ invoice_count: this.db.knex.raw("CASE WHEN sales.invoice_issued = true AND sales.sale_date BETWEEN ? AND ? THEN 1 END", [startDate, endTs]) })
+      .count({ cancelled_count: this.db.knex.raw("CASE WHEN sales.status = 'cancelled' AND sales.sale_date BETWEEN ? AND ? THEN 1 END", [startDate, endTs]) })
       .groupBy('users.id', 'users.name', 'users.email', 'users.role')
-      .orderByRaw("COALESCE(SUM(CASE WHEN sales.status = 'completed' AND sales.sale_date BETWEEN ? AND ? THEN sales.grand_total ELSE 0 END), 0) DESC", [startDate, endDate]);
+      .orderByRaw("COALESCE(SUM(CASE WHEN sales.status = 'completed' AND sales.sale_date BETWEEN ? AND ? THEN sales.grand_total ELSE 0 END), 0) DESC", [startDate, endTs]);
 
     const formatted = employees.map((e: any) => ({
       id: e.id,

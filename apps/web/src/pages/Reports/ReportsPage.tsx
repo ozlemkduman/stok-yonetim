@@ -431,6 +431,10 @@ export function ReportsPage() {
                   <span>{t('reports:profitability.margin')}</span>
                   <strong>%{productProfitability.summary.margin_percent}</strong>
                 </div>
+                <div className={styles.summaryItem}>
+                  <span>{t('reports:profitability.totalQuantity')}</span>
+                  <strong>{productProfitability.summary.total_quantity}</strong>
+                </div>
               </div>
 
               <p className={styles.noteText} style={{ marginTop: 12, fontSize: 'var(--font-size-xs)', color: 'var(--color-text-muted)' }}>
@@ -509,6 +513,10 @@ export function ReportsPage() {
                   <span>{t('reports:aging.total')}</span>
                   <strong>{formatCurrency(agingReport.summary.total)}</strong>
                 </div>
+                <div className={styles.summaryItem}>
+                  <span>{t('reports:aging.customerCount')}</span>
+                  <strong>{agingReport.summary.customer_count}</strong>
+                </div>
               </div>
 
               <p className={styles.noteText} style={{ marginTop: 12, fontSize: 'var(--font-size-xs)', color: 'var(--color-text-muted)' }}>
@@ -544,7 +552,7 @@ export function ReportsPage() {
                         <td className={`${styles.alignRight} ${c.buckets['60_90'] > 0 ? styles.warning : ''}`}>{c.buckets['60_90'] > 0 ? formatCurrency(c.buckets['60_90']) : '-'}</td>
                         <td className={`${styles.alignRight} ${c.buckets['90_plus'] > 0 ? styles.danger : ''}`}>{c.buckets['90_plus'] > 0 ? formatCurrency(c.buckets['90_plus']) : '-'}</td>
                         <td className={styles.alignRight}><strong>{formatCurrency(c.total)}</strong></td>
-                        <td className={styles.alignRight}>{c.oldest_days_overdue}g</td>
+                        <td className={styles.alignRight}>{c.oldest_days_overdue} {t('reports:general.days')}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -576,19 +584,19 @@ export function ReportsPage() {
               </div>
               <div className={styles.reportItem}>
                 <span>{t('reports:general.subtotal')}</span>
-                <strong>{formatCurrency(parseFloat(salesSummary.summary.subtotal))}</strong>
+                <strong>{formatCurrency(salesSummary.summary.subtotal)}</strong>
               </div>
               <div className={styles.reportItem}>
                 <span>{t('reports:general.totalDiscount')}</span>
-                <strong>{formatCurrency(parseFloat(salesSummary.summary.discount_total))}</strong>
+                <strong>{formatCurrency(salesSummary.summary.discount_total)}</strong>
               </div>
               <div className={styles.reportItem}>
                 <span>{t('reports:general.totalVat')}</span>
-                <strong>{formatCurrency(parseFloat(salesSummary.summary.vat_total))}</strong>
+                <strong>{formatCurrency(salesSummary.summary.vat_total)}</strong>
               </div>
               <div className={styles.reportItem}>
                 <span>{t('reports:general.grandTotal')}</span>
-                <strong className={styles.success}>{formatCurrency(parseFloat(salesSummary.summary.grand_total))}</strong>
+                <strong className={styles.success}>{formatCurrency(salesSummary.summary.grand_total)}</strong>
               </div>
             </div>
           )}
@@ -684,28 +692,30 @@ export function ReportsPage() {
                   <div className={styles.summaryLabel}>{t('reports:general.totalAmount')}</div>
                 </div>
               </div>
-              <table className={styles.reportTable}>
-                <thead>
-                  <tr>
-                    <th>{t('reports:general.invoice')}</th>
-                    <th>{t('reports:general.customer')}</th>
-                    <th>{t('reports:general.dueDate')}</th>
-                    <th>{t('reports:general.delay')}</th>
-                    <th className={styles.alignRight}>{t('reports:general.amount')}</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {overduePayments.overdueList.slice(0, 5).map((p) => (
-                    <tr key={p.id}>
-                      <td>{p.invoice_number}</td>
-                      <td>{p.customer_name || '-'}</td>
-                      <td>{formatDate(p.due_date)}</td>
-                      <td><span className={`${styles.badge} ${styles.badgeDanger}`}>{p.days_overdue} {t('reports:general.days')}</span></td>
-                      <td className={styles.alignRight}><strong>{formatCurrency(p.grand_total)}</strong></td>
+              <div className={styles.tableWrap}>
+                <table className={styles.reportTable}>
+                  <thead>
+                    <tr>
+                      <th>{t('reports:general.invoice')}</th>
+                      <th>{t('reports:general.customer')}</th>
+                      <th>{t('reports:general.dueDate')}</th>
+                      <th>{t('reports:general.delay')}</th>
+                      <th className={styles.alignRight}>{t('reports:general.amount')}</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {overduePayments.overdueList.slice(0, 5).map((p) => (
+                      <tr key={p.id}>
+                        <td>{p.invoice_number}</td>
+                        <td>{p.customer_name || '-'}</td>
+                        <td>{formatDate(p.due_date)}</td>
+                        <td><span className={`${styles.badge} ${styles.badgeDanger}`}>{p.days_overdue} {t('reports:general.days')}</span></td>
+                        <td className={styles.alignRight}><strong>{formatCurrency(p.grand_total)}</strong></td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </>
           ) : (
             <div className={styles.emptyState}>{t('reports:general.noOverduePayments')}</div>
@@ -721,28 +731,98 @@ export function ReportsPage() {
         </div>
         <div className={styles.reportCardBody}>
           {upcomingPayments.length > 0 ? (
-            <table className={styles.reportTable}>
-              <thead>
-                <tr>
-                  <th>{t('reports:general.invoice')}</th>
-                  <th>{t('reports:general.customer')}</th>
-                  <th>{t('reports:general.dueDate')}</th>
-                  <th className={styles.alignRight}>{t('reports:general.amount')}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {upcomingPayments.slice(0, 10).map((p) => (
-                  <tr key={p.id}>
-                    <td>{p.invoice_number}</td>
-                    <td>{p.customer_name || '-'}</td>
-                    <td>{formatDate(p.due_date)}</td>
-                    <td className={styles.alignRight}><strong>{formatCurrency(p.grand_total)}</strong></td>
+            <div className={styles.tableWrap}>
+              <table className={styles.reportTable}>
+                <thead>
+                  <tr>
+                    <th>{t('reports:general.invoice')}</th>
+                    <th>{t('reports:general.customer')}</th>
+                    <th>{t('reports:general.dueDate')}</th>
+                    <th className={styles.alignRight}>{t('reports:general.amount')}</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {upcomingPayments.slice(0, 10).map((p) => (
+                    <tr key={p.id}>
+                      <td>{p.invoice_number}</td>
+                      <td>{p.customer_name || '-'}</td>
+                      <td>{formatDate(p.due_date)}</td>
+                      <td className={styles.alignRight}><strong>{formatCurrency(p.grand_total)}</strong></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           ) : (
             <div className={styles.emptyState}>{t('reports:general.noUpcomingPayments')}</div>
+          )}
+        </div>
+      </div>
+
+      {/* Ödeme Tipine Göre Satış */}
+      <div className={`${styles.reportCard} ${styles.fullWidthCard}`}>
+        <div className={styles.reportCardHeader}>
+          {icons.sales}
+          <h3 className={styles.reportCardTitle}>{t('reports:general.byPaymentMethod')}</h3>
+        </div>
+        <div className={styles.reportCardBody}>
+          {salesSummary?.byPaymentMethod?.length > 0 ? (
+            <div className={styles.tableWrap}>
+              <table className={styles.reportTable}>
+                <thead>
+                  <tr>
+                    <th>{t('reports:general.method')}</th>
+                    <th className={styles.alignRight}>{t('reports:general.count')}</th>
+                    <th className={styles.alignRight}>{t('reports:general.amount')}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {salesSummary.byPaymentMethod.map((m: any) => (
+                    <tr key={m.payment_method}>
+                      <td>{t(`sales:paymentMethods.${m.payment_method}`, { defaultValue: m.payment_method })}</td>
+                      <td className={styles.alignRight}>{m.count}</td>
+                      <td className={styles.alignRight}><strong>{formatCurrency(m.total)}</strong></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <div className={styles.emptyState}>{t('reports:noData')}</div>
+          )}
+        </div>
+      </div>
+
+      {/* Günlük Satış Trendi */}
+      <div className={`${styles.reportCard} ${styles.fullWidthCard}`}>
+        <div className={styles.reportCardHeader}>
+          {icons.calendar}
+          <h3 className={styles.reportCardTitle}>{t('reports:general.dailyTrend')}</h3>
+        </div>
+        <div className={styles.reportCardBody}>
+          {salesSummary?.dailySales?.length > 0 ? (
+            <div className={styles.tableWrap}>
+              <table className={styles.reportTable}>
+                <thead>
+                  <tr>
+                    <th>{t('reports:general.date')}</th>
+                    <th className={styles.alignRight}>{t('reports:general.count')}</th>
+                    <th className={styles.alignRight}>{t('reports:general.amount')}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {salesSummary.dailySales.map((d: any) => (
+                    <tr key={d.date}>
+                      <td>{formatDate(d.date)}</td>
+                      <td className={styles.alignRight}>{d.count}</td>
+                      <td className={styles.alignRight}><strong>{formatCurrency(d.total)}</strong></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <div className={styles.emptyState}>{t('reports:noData')}</div>
           )}
         </div>
       </div>
@@ -759,26 +839,28 @@ export function ReportsPage() {
         </div>
         <div className={styles.reportCardBody}>
           {topProducts.length > 0 ? (
-            <table className={styles.reportTable}>
-              <thead>
-                <tr>
-                  <th>#</th>
-                  <th>{t('reports:sales.product')}</th>
-                  <th className={styles.alignRight}>{t('reports:sales.quantity')}</th>
-                  <th className={styles.alignRight}>{t('reports:sales.revenue')}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {topProducts.map((p, i) => (
-                  <tr key={p.id}>
-                    <td>{i + 1}</td>
-                    <td>{p.name}</td>
-                    <td className={styles.alignRight}>{p.total_quantity}</td>
-                    <td className={styles.alignRight}><strong>{formatCurrency(parseFloat(String(p.total_revenue)))}</strong></td>
+            <div className={styles.tableWrap}>
+              <table className={styles.reportTable}>
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>{t('reports:sales.product')}</th>
+                    <th className={styles.alignRight}>{t('reports:sales.quantity')}</th>
+                    <th className={styles.alignRight}>{t('reports:sales.revenue')}</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {topProducts.map((p, i) => (
+                    <tr key={p.id}>
+                      <td>{i + 1}</td>
+                      <td>{p.name}</td>
+                      <td className={styles.alignRight}>{p.total_quantity}</td>
+                      <td className={styles.alignRight}><strong>{formatCurrency(p.total_revenue)}</strong></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           ) : (
             <div className={styles.emptyState}>{t('reports:noData')}</div>
           )}
@@ -807,24 +889,51 @@ export function ReportsPage() {
               {returnsReport.topReturnedProducts?.length > 0 && (
                 <>
                   <h4 style={{ margin: 'var(--space-3) 0', fontSize: 'var(--font-size-sm)', color: 'var(--color-text-muted)' }}>{t('reports:sales.topReturnedProducts')}</h4>
-                  <table className={styles.reportTable}>
-                    <thead>
-                      <tr>
-                        <th>{t('reports:sales.product')}</th>
-                        <th className={styles.alignRight}>{t('reports:sales.returnQuantity')}</th>
-                        <th className={styles.alignRight}>{t('reports:sales.returnTotal')}</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {returnsReport.topReturnedProducts.slice(0, 5).map((p: any) => (
-                        <tr key={p.id}>
-                          <td>{p.name}</td>
-                          <td className={styles.alignRight}>{p.total_quantity}</td>
-                          <td className={styles.alignRight}>{formatCurrency(parseFloat(p.total_amount))}</td>
+                  <div className={styles.tableWrap}>
+                    <table className={styles.reportTable}>
+                      <thead>
+                        <tr>
+                          <th>{t('reports:sales.product')}</th>
+                          <th className={styles.alignRight}>{t('reports:sales.returnQuantity')}</th>
+                          <th className={styles.alignRight}>{t('reports:sales.returnTotal')}</th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                      </thead>
+                      <tbody>
+                        {returnsReport.topReturnedProducts.slice(0, 5).map((p: any) => (
+                          <tr key={p.id}>
+                            <td>{p.name}</td>
+                            <td className={styles.alignRight}>{p.total_quantity}</td>
+                            <td className={styles.alignRight}>{formatCurrency(p.total_amount)}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </>
+              )}
+              {returnsReport.byReason?.length > 0 && (
+                <>
+                  <h4 style={{ margin: 'var(--space-3) 0', fontSize: 'var(--font-size-sm)', color: 'var(--color-text-muted)' }}>{t('reports:sales.byReason')}</h4>
+                  <div className={styles.tableWrap}>
+                    <table className={styles.reportTable}>
+                      <thead>
+                        <tr>
+                          <th>{t('reports:sales.reason')}</th>
+                          <th className={styles.alignRight}>{t('reports:sales.returnQuantity')}</th>
+                          <th className={styles.alignRight}>{t('reports:sales.returnTotal')}</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {returnsReport.byReason.map((r: any, i: number) => (
+                          <tr key={r.reason || i}>
+                            <td>{r.reason || '-'}</td>
+                            <td className={styles.alignRight}>{Number(r.count)}</td>
+                            <td className={styles.alignRight}>{formatCurrency(Number(r.total))}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
                 </>
               )}
             </>
@@ -917,28 +1026,30 @@ export function ReportsPage() {
         </div>
         <div className={styles.reportCardBody}>
           {salesReturnsDetail && salesReturnsDetail.monthlyTrend.length > 0 ? (
-            <table className={styles.reportTable}>
-              <thead>
-                <tr>
-                  <th>{t('reports:salesDetail.month')}</th>
-                  <th className={styles.alignRight}>{t('reports:salesDetail.saleCount')}</th>
-                  <th className={styles.alignRight}>{t('reports:salesDetail.soldRevenue')}</th>
-                  <th className={styles.alignRight}>{t('reports:salesDetail.returnedAmount')}</th>
-                  <th className={styles.alignRight}>{t('reports:salesDetail.netRevenue')}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {salesReturnsDetail.monthlyTrend.map((m) => (
-                  <tr key={m.month}>
-                    <td>{m.month}</td>
-                    <td className={styles.alignRight}>{m.sale_count}</td>
-                    <td className={styles.alignRight}>{formatCurrency(m.sold_revenue)}</td>
-                    <td className={styles.alignRight}>{m.returned_amount ? formatCurrency(m.returned_amount) : '-'}</td>
-                    <td className={styles.alignRight}><strong>{formatCurrency(m.net_revenue)}</strong></td>
+            <div className={styles.tableWrap}>
+              <table className={styles.reportTable}>
+                <thead>
+                  <tr>
+                    <th>{t('reports:salesDetail.month')}</th>
+                    <th className={styles.alignRight}>{t('reports:salesDetail.saleCount')}</th>
+                    <th className={styles.alignRight}>{t('reports:salesDetail.soldRevenue')}</th>
+                    <th className={styles.alignRight}>{t('reports:salesDetail.returnedAmount')}</th>
+                    <th className={styles.alignRight}>{t('reports:salesDetail.netRevenue')}</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {salesReturnsDetail.monthlyTrend.map((m) => (
+                    <tr key={m.month}>
+                      <td>{m.month}</td>
+                      <td className={styles.alignRight}>{m.sale_count}</td>
+                      <td className={styles.alignRight}>{formatCurrency(m.sold_revenue)}</td>
+                      <td className={styles.alignRight}>{m.returned_amount ? formatCurrency(m.returned_amount) : '-'}</td>
+                      <td className={styles.alignRight}><strong>{formatCurrency(m.net_revenue)}</strong></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           ) : (
             <div className={styles.emptyState}>{t('reports:noData')}</div>
           )}
@@ -976,29 +1087,35 @@ export function ReportsPage() {
                   <div className={styles.summaryValue}>{formatCurrency(purchasesSummary.summary.vat_total)}</div>
                   <div className={styles.summaryLabel}>{t('reports:purchases.vatTotal')}</div>
                 </div>
+                <div className={styles.summaryCard}>
+                  <div className={styles.summaryValue}>{formatCurrency(purchasesSummary.summary.discount_total)}</div>
+                  <div className={styles.summaryLabel}>{t('reports:purchases.discountTotal')}</div>
+                </div>
               </div>
 
               {purchasesSummary.byPaymentMethod?.length > 0 && (
                 <>
                   <h4 style={{ marginTop: 24 }}>{t('reports:purchases.byPaymentMethod')}</h4>
-                  <table className={styles.reportTable}>
-                    <thead>
-                      <tr>
-                        <th>{t('reports:purchases.method')}</th>
-                        <th className={styles.alignRight}>{t('reports:purchases.count')}</th>
-                        <th className={styles.alignRight}>{t('reports:purchases.amount')}</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {purchasesSummary.byPaymentMethod.map((p: any) => (
-                        <tr key={p.payment_method}>
-                          <td>{t(`sales:paymentMethods.${p.payment_method}`, { defaultValue: p.payment_method || '-' })}</td>
-                          <td className={styles.alignRight}>{p.count}</td>
-                          <td className={styles.alignRight}><strong>{formatCurrency(p.total)}</strong></td>
+                  <div className={styles.tableWrap}>
+                    <table className={styles.reportTable}>
+                      <thead>
+                        <tr>
+                          <th>{t('reports:purchases.method')}</th>
+                          <th className={styles.alignRight}>{t('reports:purchases.count')}</th>
+                          <th className={styles.alignRight}>{t('reports:purchases.amount')}</th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                      </thead>
+                      <tbody>
+                        {purchasesSummary.byPaymentMethod.map((p: any) => (
+                          <tr key={p.payment_method}>
+                            <td>{t(`sales:paymentMethods.${p.payment_method}`, { defaultValue: p.payment_method || '-' })}</td>
+                            <td className={styles.alignRight}>{p.count}</td>
+                            <td className={styles.alignRight}><strong>{formatCurrency(p.total)}</strong></td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
                 </>
               )}
 
@@ -1025,26 +1142,62 @@ export function ReportsPage() {
         </div>
         <div className={styles.reportCardBody}>
           {purchasesSummary?.topSuppliers?.length > 0 ? (
-            <table className={styles.reportTable}>
-              <thead>
-                <tr>
-                  <th>#</th>
-                  <th>{t('reports:purchases.supplier')}</th>
-                  <th className={styles.alignRight}>{t('reports:purchases.count')}</th>
-                  <th className={styles.alignRight}>{t('reports:purchases.total')}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {purchasesSummary.topSuppliers.map((s: any, i: number) => (
-                  <tr key={s.supplier_id || i}>
-                    <td>{i + 1}</td>
-                    <td>{s.supplier_name}</td>
-                    <td className={styles.alignRight}>{s.purchase_count}</td>
-                    <td className={styles.alignRight}><strong>{formatCurrency(s.total)}</strong></td>
+            <div className={styles.tableWrap}>
+              <table className={styles.reportTable}>
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>{t('reports:purchases.supplier')}</th>
+                    <th className={styles.alignRight}>{t('reports:purchases.count')}</th>
+                    <th className={styles.alignRight}>{t('reports:purchases.total')}</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {purchasesSummary.topSuppliers.map((s: any, i: number) => (
+                    <tr key={s.supplier_id || i}>
+                      <td>{i + 1}</td>
+                      <td>{s.supplier_name}</td>
+                      <td className={styles.alignRight}>{s.purchase_count}</td>
+                      <td className={styles.alignRight}><strong>{formatCurrency(s.total)}</strong></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <div className={styles.emptyState}>{t('reports:noData')}</div>
+          )}
+        </div>
+      </div>
+
+      {/* Günlük Alış Trendi */}
+      <div className={`${styles.reportCard} ${styles.fullWidthCard}`}>
+        <div className={styles.reportCardHeader}>
+          {icons.calendar}
+          <h3 className={styles.reportCardTitle}>{t('reports:purchases.dailyTrend')}</h3>
+        </div>
+        <div className={styles.reportCardBody}>
+          {purchasesSummary?.dailyPurchases?.length > 0 ? (
+            <div className={styles.tableWrap}>
+              <table className={styles.reportTable}>
+                <thead>
+                  <tr>
+                    <th>{t('reports:purchases.date')}</th>
+                    <th className={styles.alignRight}>{t('reports:purchases.count')}</th>
+                    <th className={styles.alignRight}>{t('reports:purchases.amount')}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {purchasesSummary.dailyPurchases.map((d: any) => (
+                    <tr key={d.date}>
+                      <td>{formatDate(d.date)}</td>
+                      <td className={styles.alignRight}>{d.count}</td>
+                      <td className={styles.alignRight}><strong>{formatCurrency(d.total)}</strong></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           ) : (
             <div className={styles.emptyState}>{t('reports:noData')}</div>
           )}
@@ -1097,7 +1250,36 @@ export function ReportsPage() {
                 </div>
               </div>
 
+              {accountMovementsReport.byType?.length > 0 && (
+                <>
+                  <h4 style={{ marginTop: 24 }}>{t('reports:cash.byType')}</h4>
+                  <div className={styles.tableWrap}>
+                    <table className={styles.reportTable}>
+                      <thead>
+                        <tr>
+                          <th>{t('reports:cash.type')}</th>
+                          <th className={styles.alignRight}>{t('reports:cash.count')}</th>
+                          <th className={styles.alignRight}>{t('reports:cash.amount')}</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {accountMovementsReport.byType.map((r: any) => (
+                          <tr key={r.movement_type}>
+                            <td>{t(`reports:cash.movementTypes.${r.movement_type}`, { defaultValue: r.movement_type })}</td>
+                            <td className={styles.alignRight}>{r.count}</td>
+                            <td className={styles.alignRight}><strong>{formatCurrency(r.total)}</strong></td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </>
+              )}
+
               <h4 style={{ marginTop: 24 }}>{t('reports:cash.movements')}</h4>
+              {accountMovementsReport.movements?.length >= 200 && (
+                <p className={styles.subtitle} style={{ marginBottom: 8 }}>{t('reports:cash.truncated')}</p>
+              )}
               {accountMovementsReport.movements?.length > 0 ? (
                 <div className={styles.tableWrap}>
                   <table className={styles.reportTable}>
@@ -1243,27 +1425,36 @@ export function ReportsPage() {
                   <h4 className={styles.customerProductGroupHeader}>
                     {customer.name}
                     <span className={styles.customerProductGroupCount}>
-                      ({customer.products.reduce((s, p) => s + p.total_quantity, 0)} {t('reports:customers.totalPieces')})
+                      ({customer.products.reduce((s, p) => s + p.total_quantity, 0)} {t('reports:customers.totalPieces')} · {formatCurrency(customer.products.reduce((s, p) => s + Number(p.total_amount), 0))})
                     </span>
                   </h4>
-                  <table className={styles.reportTable}>
-                    <thead>
-                      <tr>
-                        <th>{t('reports:sales.product')}</th>
-                        <th className={styles.alignRight}>{t('reports:sales.quantity')}</th>
-                        <th className={styles.alignRight}>{t('reports:general.amount')}</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {customer.products.map((p) => (
-                        <tr key={p.product_name}>
-                          <td>{p.product_name}</td>
-                          <td className={styles.alignRight}><strong>{p.total_quantity}</strong></td>
-                          <td className={styles.alignRight}>{formatCurrency(p.total_amount)}</td>
+                  <div className={styles.tableWrap}>
+                    <table className={styles.reportTable}>
+                      <thead>
+                        <tr>
+                          <th>{t('reports:sales.product')}</th>
+                          <th className={styles.alignRight}>{t('reports:sales.quantity')}</th>
+                          <th className={styles.alignRight}>{t('reports:general.amount')}</th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                      </thead>
+                      <tbody>
+                        {customer.products.map((p) => (
+                          <tr key={p.product_name}>
+                            <td>{p.product_name}</td>
+                            <td className={styles.alignRight}><strong>{p.total_quantity}</strong></td>
+                            <td className={styles.alignRight}>{formatCurrency(p.total_amount)}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                      <tfoot>
+                        <tr>
+                          <td><strong>{t('reports:customers.amountTotal')}</strong></td>
+                          <td className={styles.alignRight}><strong>{customer.products.reduce((s, p) => s + p.total_quantity, 0)}</strong></td>
+                          <td className={styles.alignRight}><strong>{formatCurrency(customer.products.reduce((s, p) => s + Number(p.total_amount), 0))}</strong></td>
+                        </tr>
+                      </tfoot>
+                    </table>
+                  </div>
                 </div>
               ))
             ) : (
@@ -1310,6 +1501,12 @@ export function ReportsPage() {
                 <div className={`${styles.summaryValue} ${styles.success}`}>{formatCurrency(stockReport.summary.potentialProfit)}</div>
                 <div className={styles.summaryLabel}>{t('reports:stock.potentialProfit')}</div>
               </div>
+              {stockDetail?.summary && (
+                <div className={styles.summaryCard}>
+                  <div className={styles.summaryValue}>{stockDetail.summary.totalSoldQuantity}</div>
+                  <div className={styles.summaryLabel}>{t('reports:stock.totalSold')}</div>
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -1323,35 +1520,37 @@ export function ReportsPage() {
         </div>
         <div className={styles.reportCardBody}>
           {stockReport?.products && stockReport.products.filter(p => Number(p.stock_quantity) <= Number(p.min_stock_level)).length > 0 ? (
-            <table className={styles.reportTable}>
-              <thead>
-                <tr>
-                  <th>{t('reports:stock.product')}</th>
-                  <th>{t('reports:stock.barcode')}</th>
-                  <th className={styles.alignRight}>{t('reports:stock.current')}</th>
-                  <th className={styles.alignRight}>{t('reports:stock.minimum')}</th>
-                  <th className={styles.alignRight}>{t('reports:stock.status')}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {stockReport.products
-                  .filter(p => Number(p.stock_quantity) <= Number(p.min_stock_level))
-                  .slice(0, 15)
-                  .map((p) => (
-                    <tr key={p.id}>
-                      <td>{p.name}</td>
-                      <td>{p.barcode || '-'}</td>
-                      <td className={styles.alignRight}>{parseFloat(String(p.stock_quantity))}</td>
-                      <td className={styles.alignRight}>{parseFloat(String(p.min_stock_level))}</td>
-                      <td className={styles.alignRight}>
-                        <span className={`${styles.badge} ${p.stock_quantity === 0 ? styles.badgeDanger : styles.badgeWarning}`}>
-                          {p.stock_quantity === 0 ? t('reports:stock.depleted') : t('reports:stock.low')}
-                        </span>
-                      </td>
-                    </tr>
-                  ))}
-              </tbody>
-            </table>
+            <div className={styles.tableWrap}>
+              <table className={styles.reportTable}>
+                <thead>
+                  <tr>
+                    <th>{t('reports:stock.product')}</th>
+                    <th>{t('reports:stock.barcode')}</th>
+                    <th className={styles.alignRight}>{t('reports:stock.current')}</th>
+                    <th className={styles.alignRight}>{t('reports:stock.minimum')}</th>
+                    <th className={styles.alignRight}>{t('reports:stock.status')}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {stockReport.products
+                    .filter(p => Number(p.stock_quantity) <= Number(p.min_stock_level))
+                    .slice(0, 15)
+                    .map((p) => (
+                      <tr key={p.id}>
+                        <td>{p.name}</td>
+                        <td>{p.barcode || '-'}</td>
+                        <td className={styles.alignRight}>{Number(p.stock_quantity)}</td>
+                        <td className={styles.alignRight}>{Number(p.min_stock_level)}</td>
+                        <td className={styles.alignRight}>
+                          <span className={`${styles.badge} ${Number(p.stock_quantity) === 0 ? styles.badgeDanger : styles.badgeWarning}`}>
+                            {Number(p.stock_quantity) === 0 ? t('reports:stock.depleted') : t('reports:stock.low')}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                </tbody>
+              </table>
+            </div>
           ) : (
             <div className={styles.emptyState}>{t('reports:stock.noLowStock')}</div>
           )}
@@ -1366,26 +1565,28 @@ export function ReportsPage() {
         </div>
         <div className={styles.reportCardBody}>
           {stockDetail && stockDetail.byCategory.length > 0 ? (
-            <table className={styles.reportTable}>
-              <thead>
-                <tr>
-                  <th>{t('reports:stockDetail.category')}</th>
-                  <th className={styles.alignRight}>{t('reports:stockDetail.productCount')}</th>
-                  <th className={styles.alignRight}>{t('reports:stockDetail.stockQty')}</th>
-                  <th className={styles.alignRight}>{t('reports:stockDetail.stockValue')}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {stockDetail.byCategory.map((c) => (
-                  <tr key={c.category}>
-                    <td>{c.category}</td>
-                    <td className={styles.alignRight}>{c.product_count}</td>
-                    <td className={styles.alignRight}>{c.stock_quantity}</td>
-                    <td className={styles.alignRight}><strong>{formatCurrency(c.stock_value)}</strong></td>
+            <div className={styles.tableWrap}>
+              <table className={styles.reportTable}>
+                <thead>
+                  <tr>
+                    <th>{t('reports:stockDetail.category')}</th>
+                    <th className={styles.alignRight}>{t('reports:stockDetail.productCount')}</th>
+                    <th className={styles.alignRight}>{t('reports:stockDetail.stockQty')}</th>
+                    <th className={styles.alignRight}>{t('reports:stockDetail.stockValue')}</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {stockDetail.byCategory.map((c) => (
+                    <tr key={c.category}>
+                      <td>{c.category}</td>
+                      <td className={styles.alignRight}>{c.product_count}</td>
+                      <td className={styles.alignRight}>{c.stock_quantity}</td>
+                      <td className={styles.alignRight}><strong>{formatCurrency(c.stock_value)}</strong></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           ) : (
             <div className={styles.emptyState}>{t('reports:noData')}</div>
           )}
@@ -1526,32 +1727,34 @@ export function ReportsPage() {
                                   <strong>{sale.invoice_number}</strong>
                                   <span className={styles.accordionSaleMeta}>{formatDate(sale.sale_date)}</span>
                                   <span className={styles.accordionSaleMeta}>
-                                    ({PAYMENT_METHODS[sale.payment_method as keyof typeof PAYMENT_METHODS] || sale.payment_method})
+                                    ({t(`sales:paymentMethods.${sale.payment_method}`, { defaultValue: PAYMENT_METHODS[sale.payment_method as keyof typeof PAYMENT_METHODS] || sale.payment_method })})
                                   </span>
                                 </span>
                                 <strong>{formatCurrency(parseFloat(String(sale.grand_total)))}</strong>
                               </div>
                               {sale.items.length > 0 && (
-                                <table className={styles.reportTable}>
-                                  <thead>
-                                    <tr>
-                                      <th>{t('reports:customerSales.product')}</th>
-                                      <th className={styles.alignRight}>{t('reports:customerSales.quantity')}</th>
-                                      <th className={styles.alignRight}>{t('reports:customerSales.unitPrice')}</th>
-                                      <th className={styles.alignRight}>{t('reports:customerSales.total')}</th>
-                                    </tr>
-                                  </thead>
-                                  <tbody>
-                                    {sale.items.map((item, idx) => (
-                                      <tr key={idx}>
-                                        <td>{item.product_name}</td>
-                                        <td className={styles.alignRight}>{item.quantity}</td>
-                                        <td className={styles.alignRight}>{formatCurrency(parseFloat(String(item.unit_price)))}</td>
-                                        <td className={styles.alignRight}>{formatCurrency(parseFloat(String(item.line_total)))}</td>
+                                <div className={styles.tableWrap}>
+                                  <table className={styles.reportTable}>
+                                    <thead>
+                                      <tr>
+                                        <th>{t('reports:customerSales.product')}</th>
+                                        <th className={styles.alignRight}>{t('reports:customerSales.quantity')}</th>
+                                        <th className={styles.alignRight}>{t('reports:customerSales.unitPrice')}</th>
+                                        <th className={styles.alignRight}>{t('reports:customerSales.total')}</th>
                                       </tr>
-                                    ))}
-                                  </tbody>
-                                </table>
+                                    </thead>
+                                    <tbody>
+                                      {sale.items.map((item, idx) => (
+                                        <tr key={idx}>
+                                          <td>{item.product_name}</td>
+                                          <td className={styles.alignRight}>{item.quantity}</td>
+                                          <td className={styles.alignRight}>{formatCurrency(parseFloat(String(item.unit_price)))}</td>
+                                          <td className={styles.alignRight}>{formatCurrency(parseFloat(String(item.line_total)))}</td>
+                                        </tr>
+                                      ))}
+                                    </tbody>
+                                  </table>
+                                </div>
                               )}
                             </div>
                           ))}
@@ -1591,24 +1794,26 @@ export function ReportsPage() {
                   <div className={styles.summaryLabel}>{t('reports:expenses.totalExpenses')}</div>
                 </div>
               </div>
-              <table className={styles.reportTable}>
-                <thead>
-                  <tr>
-                    <th>{t('reports:expenses.category')}</th>
-                    <th className={styles.alignRight}>{t('reports:expenses.records')}</th>
-                    <th className={styles.alignRight}>{t('reports:expenses.amount')}</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {expensesReport.byCategory.map((c) => (
-                    <tr key={c.category}>
-                      <td>{EXPENSE_CATEGORIES[c.category as keyof typeof EXPENSE_CATEGORIES] || c.category}</td>
-                      <td className={styles.alignRight}>{c.count}</td>
-                      <td className={styles.alignRight}><strong>{formatCurrency(parseFloat(String(c.total)))}</strong></td>
+              <div className={styles.tableWrap}>
+                <table className={styles.reportTable}>
+                  <thead>
+                    <tr>
+                      <th>{t('reports:expenses.category')}</th>
+                      <th className={styles.alignRight}>{t('reports:expenses.records')}</th>
+                      <th className={styles.alignRight}>{t('reports:expenses.amount')}</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {expensesReport.byCategory.map((c) => (
+                      <tr key={c.category}>
+                        <td>{t(`reports:expenseCategories.${c.category}`, { defaultValue: EXPENSE_CATEGORIES[c.category as keyof typeof EXPENSE_CATEGORIES] || c.category })}</td>
+                        <td className={styles.alignRight}>{c.count}</td>
+                        <td className={styles.alignRight}><strong>{formatCurrency(parseFloat(String(c.total)))}</strong></td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </>
           ) : (
             <div className={styles.emptyState}>{t('reports:expenses.noExpenseData')}</div>
@@ -1624,22 +1829,30 @@ export function ReportsPage() {
         </div>
         <div className={styles.reportCardBody}>
           {expensesReport?.monthlyTrend && expensesReport.monthlyTrend.length > 0 ? (
-            <table className={styles.reportTable}>
-              <thead>
-                <tr>
-                  <th>{t('reports:expenses.month')}</th>
-                  <th className={styles.alignRight}>{t('reports:expenses.amount')}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {expensesReport.monthlyTrend.map((m: any) => (
-                  <tr key={m.month}>
-                    <td>{m.month}</td>
-                    <td className={styles.alignRight}><strong>{formatCurrency(parseFloat(m.total))}</strong></td>
+            <div className={styles.tableWrap}>
+              <table className={styles.reportTable}>
+                <thead>
+                  <tr>
+                    <th>{t('reports:expenses.month')}</th>
+                    <th className={styles.alignRight}>{t('reports:expenses.amount')}</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {expensesReport.monthlyTrend.map((m: any) => (
+                    <tr key={m.month}>
+                      <td>{m.month}</td>
+                      <td className={styles.alignRight}><strong>{formatCurrency(Number(m.total) || 0)}</strong></td>
+                    </tr>
+                  ))}
+                </tbody>
+                <tfoot>
+                  <tr>
+                    <td><strong>{t('reports:expenses.totalExpenses')}</strong></td>
+                    <td className={styles.alignRight}><strong>{formatCurrency(expensesReport.summary.total)}</strong></td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
           ) : (
             <div className={styles.emptyState}>{t('reports:noData')}</div>
           )}
@@ -1692,6 +1905,7 @@ export function ReportsPage() {
               <h3 className={styles.reportCardTitle}>{t('reports:staff.leaderboard')}</h3>
             </div>
             <div className={styles.reportCardBody}>
+              <div className={styles.tableWrap}>
               <table className={styles.reportTable}>
                 <thead>
                   <tr>
@@ -1731,6 +1945,7 @@ export function ReportsPage() {
                   ))}
                 </tbody>
               </table>
+              </div>
             </div>
           </div>
         )}
@@ -1846,46 +2061,59 @@ export function ReportsPage() {
         {filteredRenewals.length > 0 ? (
           <div className={`${styles.reportCard} ${styles.fullWidthCard}`}>
             <div className={styles.reportCardBody}>
-              <table className={styles.reportTable}>
-                <thead>
-                  <tr>
-                    <th>{t('reports:renewals.customer')}</th>
-                    <th>{t('reports:renewals.products')}</th>
-                    <th>{t('reports:renewals.saleDate')}</th>
-                    <th>{t('reports:renewals.renewalDate')}</th>
-                    <th className={styles.alignRight}>{t('reports:renewals.daysLeft')}</th>
-                    <th>{t('reports:renewals.status')}</th>
-                    <th>{t('reports:renewals.note')}</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredRenewals.map((item) => (
-                    <tr key={item.id}>
-                      <td>
-                        {item.customer_id ? (
-                          <button className={styles.customerLink} onClick={() => navigate(`/customers/${item.customer_id}`)}>
-                            {item.customer_name}
-                          </button>
-                        ) : (item.customer_name || '-')}
-                      </td>
-                      <td>{item.product_names?.join(', ') || '-'}</td>
-                      <td>{formatDate(item.sale_date)}</td>
-                      <td>{formatDate(item.renewal_date)}</td>
-                      <td className={styles.alignRight}>
-                        <strong className={
-                          item.computed_status === 'expired' || item.computed_status === 'red' ? styles.danger
-                          : item.computed_status === 'yellow' ? styles.warning
-                          : styles.success
-                        }>
-                          {item.days_remaining}
-                        </strong>
-                      </td>
-                      <td>{getStatusBadge(item.computed_status)}</td>
-                      <td>{item.reminder_note || '-'}</td>
+              <div className={styles.tableWrap}>
+                <table className={styles.reportTable}>
+                  <thead>
+                    <tr>
+                      <th>{t('reports:renewals.customer')}</th>
+                      <th>{t('reports:renewals.contact')}</th>
+                      <th>{t('reports:renewals.products')}</th>
+                      <th className={styles.alignRight}>{t('reports:renewals.amount')}</th>
+                      <th>{t('reports:renewals.saleDate')}</th>
+                      <th>{t('reports:renewals.renewalDate')}</th>
+                      <th className={styles.alignRight}>{t('reports:renewals.daysLeft')}</th>
+                      <th>{t('reports:renewals.status')}</th>
+                      <th>{t('reports:renewals.note')}</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {filteredRenewals.map((item) => (
+                      <tr key={item.id}>
+                        <td>
+                          {item.customer_id ? (
+                            <button className={styles.customerLink} onClick={() => navigate(`/customers/${item.customer_id}`)}>
+                              {item.customer_name}
+                            </button>
+                          ) : (item.customer_name || '-')}
+                        </td>
+                        <td>
+                          {item.customer_phone || item.customer_email ? (
+                            <>
+                              {item.customer_phone && <div>{item.customer_phone}</div>}
+                              {item.customer_email && <small style={{ color: 'var(--color-text-muted)' }}>{item.customer_email}</small>}
+                            </>
+                          ) : '-'}
+                        </td>
+                        <td>{item.product_names?.join(', ') || '-'}</td>
+                        <td className={styles.alignRight}>{formatCurrency(item.grand_total)}</td>
+                        <td>{formatDate(item.sale_date)}</td>
+                        <td>{formatDate(item.renewal_date)}</td>
+                        <td className={styles.alignRight}>
+                          <strong className={
+                            item.computed_status === 'expired' || item.computed_status === 'red' ? styles.danger
+                            : item.computed_status === 'yellow' ? styles.warning
+                            : styles.success
+                          }>
+                            {item.days_remaining}
+                          </strong>
+                        </td>
+                        <td>{getStatusBadge(item.computed_status)}</td>
+                        <td>{item.reminder_note || '-'}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
         ) : (

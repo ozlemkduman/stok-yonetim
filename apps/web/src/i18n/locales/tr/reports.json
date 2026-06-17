@@ -12,6 +12,13 @@
     "1yil": "Son 1 Yıl",
     "ozel": "Özel Aralık"
   },
+  "expenseCategories": {
+    "kira": "Kira",
+    "vergi": "Vergi",
+    "maas": "Maaş",
+    "fatura": "Fatura",
+    "diger": "Diğer"
+  },
   "tabs": {
     "general": "Genel Özet",
     "endOfDay": "Gün Sonu",
@@ -39,7 +46,10 @@
     "cancelled": "İptal Edilen",
     "topSuppliers": "En Çok Alış Yapılan Tedarikçiler",
     "supplier": "Tedarikçi",
-    "total": "Toplam"
+    "total": "Toplam",
+    "discountTotal": "Toplam İskonto",
+    "dailyTrend": "Günlük Alış Trendi",
+    "date": "Tarih"
   },
   "cash": {
     "title": "Kasa Hareketleri",
@@ -57,6 +67,9 @@
     "description": "Açıklama",
     "amount": "Tutar",
     "balanceAfter": "Bakiye",
+    "byType": "Hareket Tipine Göre",
+    "count": "Adet",
+    "truncated": "Yalnızca son 200 hareket gösteriliyor",
     "movementTypes": {
       "gelir": "Gelir",
       "gider": "Gider",
@@ -97,6 +110,7 @@
     "totalCogs": "Toplam Maliyet (COGS)",
     "grossProfit": "Brüt Kâr",
     "margin": "Kâr Marjı",
+    "totalQuantity": "Toplam Satılan Adet",
     "product": "Ürün",
     "quantity": "Satış Miktarı",
     "revenue": "Ciro",
@@ -113,6 +127,7 @@
     "bucket_60_90": "60-90 Gün",
     "bucket_90_plus": "90+ Gün",
     "total": "Toplam",
+    "customerCount": "Borçlu Müşteri",
     "customer": "Müşteri",
     "oldest": "En Eski",
     "invoices": "fatura",
@@ -149,7 +164,12 @@
     "amount": "Tutar",
     "noOverduePayments": "Geciken ödeme bulunmuyor",
     "upcomingPayments": "Yaklaşan Ödemeler (30 Gün)",
-    "noUpcomingPayments": "Yaklaşan ödeme bulunmuyor"
+    "noUpcomingPayments": "Yaklaşan ödeme bulunmuyor",
+    "byPaymentMethod": "Ödeme Tipine Göre Satış",
+    "method": "Ödeme Tipi",
+    "count": "Adet",
+    "dailyTrend": "Günlük Satış Trendi",
+    "date": "Tarih"
   },
   "sales": {
     "topProducts": "En Çok Satan Ürünler",
@@ -161,7 +181,9 @@
     "returnAmount": "İade Tutarı",
     "topReturnedProducts": "En Çok İade Edilen Ürünler",
     "returnQuantity": "Adet",
-    "returnTotal": "Tutar"
+    "returnTotal": "Tutar",
+    "byReason": "İade Nedenleri",
+    "reason": "Neden"
   },
   "salesDetail": {
     "title": "Ürün Bazında Satış & İade Detayı",
@@ -206,6 +228,7 @@
     "noDebtCustomers": "Borçlu müşteri bulunmuyor",
     "productPurchases": "Müşteri Bazlı Ürün Alım Detayı",
     "totalPieces": "adet toplam",
+    "amountTotal": "Tutar Toplamı",
     "noProductData": "Müşteri ürün verisi bulunamadı"
   },
   "customerSales": {
@@ -237,6 +260,7 @@
     "status": "Durum",
     "depleted": "Tükendi",
     "low": "Düşük",
+    "totalSold": "Dönemde Satılan",
     "noLowStock": "Düşük stoklu ürün bulunmuyor"
   },
   "expenses": {
@@ -276,6 +300,8 @@
     "future": "Normal",
     "futureLabel": "Normal",
     "customer": "Müşteri",
+    "contact": "İletişim",
+    "amount": "Tutar",
     "products": "Ürünler",
     "saleDate": "Satış Tarihi",
     "renewalDate": "Yenileme Tarihi",
