@@ -296,8 +296,9 @@ export class WarehousesRepository extends BaseTenantRepository<Warehouse> {
     const [transfer] = await trx('stock_transfers').insert(insertData).returning('*');
 
     if (items.length > 0) {
+      // tenant_id'yi kalemlere de taşı (diğer line-item insert'leriyle tutarlı; orphan tenant_id önlenir).
       await trx('stock_transfer_items').insert(
-        items.map((item) => ({ ...item, transfer_id: transfer.id }))
+        items.map((item) => ({ ...item, transfer_id: transfer.id, tenant_id: transfer.tenant_id }))
       );
     }
 

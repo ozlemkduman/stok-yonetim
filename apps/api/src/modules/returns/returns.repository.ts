@@ -8,6 +8,7 @@ export interface Return {
   return_number: string;
   sale_id: string | null;
   customer_id: string | null;
+  warehouse_id: string | null;
   return_date: Date;
   total_amount: number;
   vat_total: number;

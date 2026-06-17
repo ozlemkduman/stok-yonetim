@@ -31,6 +31,10 @@ export class CreateReturnDto {
   @IsUUID()
   customer_id?: string;
 
+  @IsOptional()
+  @IsUUID()
+  warehouse_id?: string;
+
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => ReturnItemDto)
