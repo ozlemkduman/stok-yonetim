@@ -4,9 +4,10 @@ import { useTranslation } from 'react-i18next';
 import { Button, Input, Select } from '@stok/ui';
 import { purchasesApi, CreatePurchaseData } from '../../api/purchases.api';
 import { suppliersApi, Supplier } from '../../api/suppliers.api';
-import { productsApi, Product } from '../../api/products.api';
+import { productsApi, Product, CreateProductData } from '../../api/products.api';
 import { warehousesApi, Warehouse } from '../../api/warehouses.api';
 import { InlineEntityForm, InlineWarehouseForm, SelectWithAdd } from '../../components/inline';
+import { ProductFormModal } from '../Products/ProductFormModal';
 import { useToast } from '../../context/ToastContext';
 import { formatCurrency } from '../../utils/formatters';
 import styles from './PurchaseFormPage.module.css';
@@ -35,6 +36,7 @@ export function PurchaseFormPage() {
   const [warehouseId, setWarehouseId] = useState('');
   const [showSupplierModal, setShowSupplierModal] = useState(false);
   const [showWarehouseModal, setShowWarehouseModal] = useState(false);
+  const [productModalRowIdx, setProductModalRowIdx] = useState<number | null>(null);
   const [paymentMethod, setPaymentMethod] = useState('nakit');
   const [purchaseDate, setPurchaseDate] = useState(() => new Date().toISOString().split('T')[0]);
   const [dueDate, setDueDate] = useState('');
@@ -94,6 +96,22 @@ export function PurchaseFormPage() {
       });
     } else {
       updateItem(idx, { product_id: productId, product_name: '' });
+    }
+  };
+
+  // Alış formundan ayrılmadan yeni ürün oluştur; oluşan ürünü listeye ekleyip
+  // tetikleyen satır kalemine seç (state henüz flush olmadığından ürünü doğrudan uygula).
+  const handleCreateProduct = async (data: CreateProductData) => {
+    const res = await productsApi.create(data);
+    const p = res.data;
+    setProducts((prev) => [p, ...prev]);
+    if (productModalRowIdx !== null) {
+      updateItem(productModalRowIdx, {
+        product_id: p.id,
+        product_name: p.name,
+        unit_price: Number(p.purchase_price) || 0,
+        vat_rate: Number(p.vat_rate) || 20,
+      });
     }
   };
 
@@ -288,11 +306,12 @@ export function PurchaseFormPage() {
                   <div className={styles.itemBody}>
                     <div className={styles.itemFieldFull}>
                       <label>{t('purchases:form.product')}</label>
-                      <Select
+                      <SelectWithAdd
                         value={it.product_id}
                         onChange={(e) => handleProductChange(idx, e.target.value)}
                         options={[{ value: '', label: t('purchases:form.selectProduct') }, ...products.map((p) => ({ value: p.id, label: p.name }))]}
-                        fullWidth
+                        onAdd={() => setProductModalRowIdx(idx)}
+                        addTitle={t('purchases:form.addProduct')}
                       />
                     </div>
                     <div className={styles.itemFieldGrid}>
@@ -343,6 +362,13 @@ export function PurchaseFormPage() {
           {saving ? t('common:labels.saving') : t('purchases:form.save')}
         </Button>
       </div>
+
+      <ProductFormModal
+        isOpen={productModalRowIdx !== null}
+        onClose={() => setProductModalRowIdx(null)}
+        onSubmit={handleCreateProduct}
+        product={null}
+      />
     </div>
   );
 }
