@@ -96,7 +96,7 @@ export function StockTransferPage() {
       return;
     }
 
-    if (items.length === 0 || items.some(item => !item.product_id || item.quantity < 1)) {
+    if (items.length === 0 || items.some(item => !item.product_id || item.quantity <= 0)) {
       showToast('error', t('warehouses:toast.invalidItemsError'));
       return;
     }
@@ -294,7 +294,8 @@ export function StockTransferPage() {
                         <td>
                           <Input
                             type="number"
-                            min="1"
+                            min="0.001"
+                            step="any"
                             value={item.quantity}
                             onChange={(e) => updateItem(index, 'quantity', Number(e.target.value))}
                           />

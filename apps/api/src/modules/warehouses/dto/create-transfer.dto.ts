@@ -6,7 +6,7 @@ export class TransferItemDto {
   product_id: string;
 
   @IsNumber()
-  @Min(1)
+  @Min(0.001)
   quantity: number;
 }
 
