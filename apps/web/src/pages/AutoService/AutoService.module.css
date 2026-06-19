@@ -27,6 +27,6 @@
 .formActions { display: flex; justify-content: flex-end; gap: var(--space-2); margin-top: var(--space-6); }
 .totalRow { display: flex; justify-content: space-between; align-items: center; padding: var(--space-3); background: var(--color-bg-muted, #f9fafb); border-radius: var(--radius-md); font-weight: 600; }
 
-.partRow { display: grid; grid-template-columns: 2fr 80px 110px 100px auto; gap: var(--space-2); align-items: center; margin-bottom: var(--space-2); }
+.partRow { display: grid; grid-template-columns: 2fr 80px 110px 90px 100px auto; gap: var(--space-2); align-items: center; margin-bottom: var(--space-2); }
 .partLineTotal { text-align: right; font-variant-numeric: tabular-nums; font-size: var(--font-size-sm); }
 .invoiceBadges { display: flex; gap: var(--space-1); flex-wrap: wrap; }

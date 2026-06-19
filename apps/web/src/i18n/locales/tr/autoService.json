@@ -155,6 +155,7 @@
       "addProduct": "Yeni ürün ekle",
       "qty": "Adet",
       "unitPrice": "Birim Fiyat",
+      "vatRate": "KDV %",
       "lineTotal": "Tutar",
       "total": "Parça Toplamı",
       "remove": "Sil",

@@ -9,6 +9,7 @@ import { employeesApi, CreateEmployeeData } from '../../api/employees.api';
 import { productsApi, Product, CreateProductData } from '../../api/products.api';
 import { useToast } from '../../context/ToastContext';
 import { formatCurrency } from '../../utils/formatters';
+import { VAT_RATES } from '../../utils/constants';
 import { SelectWithAdd } from '../../components/inline';
 import { VehicleFormModal } from './VehicleFormModal';
 import { EmployeeFormModal } from '../Employees/EmployeeFormModal';
@@ -111,6 +112,7 @@ export function ServiceOrderFormModal({ isOpen, onClose, onSubmit, order, preset
     { value: '', label: t('orders.parts.selectProduct') },
     ...products.map((p) => ({ value: p.id, label: p.name })),
   ];
+  const vatOptions: SelectOption[] = VAT_RATES.map((r) => ({ value: String(r), label: `%${r}` }));
 
   const addPart = () => setParts([...parts, { product_id: '', quantity: 1, unit_price: 0, vat_rate: 0 }]);
   const removePart = (idx: number) => setParts(parts.filter((_, i) => i !== idx));
@@ -282,6 +284,13 @@ export function ServiceOrderFormModal({ isOpen, onClose, onSubmit, order, preset
                   aria-label={t('orders.parts.unitPrice')}
                   value={row.unit_price}
                   onChange={(e) => updatePart(idx, { unit_price: parseFloat(e.target.value) || 0 })}
+                  disabled={partsLocked}
+                />
+                <Select
+                  options={vatOptions}
+                  aria-label={t('orders.parts.vatRate')}
+                  value={String(row.vat_rate)}
+                  onChange={(e) => updatePart(idx, { vat_rate: parseFloat(e.target.value) || 0 })}
                   disabled={partsLocked}
                 />
                 <span className={styles.partLineTotal}>{formatCurrency(lineTotal(row))}</span>
